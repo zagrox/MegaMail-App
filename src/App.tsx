@@ -229,7 +229,6 @@ const App = () => {
         { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
         { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.PENCIL },
         { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
-        { name: t('domains'), view: 'Domains', icon: ICONS.DOMAINS },
         { name: t('smtp'), view: 'SMTP', icon: ICONS.SMTP },
     ];
     
