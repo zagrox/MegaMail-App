@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '../contexts/ToastContext';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
+import { useConfiguration } from '../contexts/ConfigurationContext';
 
 const ResetPasswordView = () => {
     const { resetPassword } = useAuth();
     const { t } = useTranslation();
     const { addToast } = useToast();
+    const { config } = useConfiguration();
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -65,11 +67,13 @@ const ResetPasswordView = () => {
     const goToLogin = () => {
         window.location.href = '/';
     }
+    
+    const appName = config?.app_name || 'Mailzila';
 
     return (
         <div className="auth-container">
             <div className="auth-box">
-                <h1><span className="logo-font">Mailzila</span></h1>
+                <h1><span className="logo-font">{appName}</span></h1>
                 <p>{t('resetPasswordSubtitle')}</p>
 
                 <form className="auth-form" onSubmit={handleSubmit}>

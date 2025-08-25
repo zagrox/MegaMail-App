@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
@@ -8,11 +9,14 @@ import AccountDataCard from '../../components/AccountDataCard';
 import Icon, { ICONS } from '../../components/Icon';
 import Badge from '../../components/Badge';
 import { useStatusStyles } from '../../hooks/useStatusStyles';
+import { useConfiguration } from '../../contexts/ConfigurationContext';
 
 const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, installPrompt, handleInstallClick }: { accountData: any, contactsCountData: any, contactsCountLoading: boolean, installPrompt: any, handleInstallClick: () => void }) => {
     const { t, i18n } = useTranslation();
     const { logout } = useAuth();
     const { getStatusStyle } = useStatusStyles();
+    const { config } = useConfiguration();
+    const appName = config?.app_name || 'Mailzila';
 
     const getReputationInfo = (reputation: number) => {
         const score = Number(reputation || 0);
@@ -50,7 +54,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
                     <h3>{t('displayMode')}</h3>
                 </div>
                 <div className="account-tab-card-body">
-                    <p>{t('displayModeSubtitle')}</p>
+                    <p>{t('displayModeSubtitle', { appName })}</p>
                     <ThemeSwitcher />
                 </div>
             </div>
@@ -73,7 +77,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
                     <div className="account-tab-card-body">
                         <p>{t('installAppSubtitle')}</p>
                         <button className="btn btn-secondary" onClick={handleInstallClick} style={{maxWidth: '250px'}}>
-                            <Icon path={ICONS.DOWNLOAD} /> {t('installMailzila')}
+                            <Icon path={ICONS.DOWNLOAD} /> {t('installMailzila', { appName })}
                         </button>
                     </div>
                 </div>

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '../contexts/ToastContext';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
+import { useConfiguration } from '../contexts/ConfigurationContext';
 
 type AuthMode = 'login' | 'register' | 'forgot';
 
@@ -19,6 +20,7 @@ const AuthView = () => {
     const [loginPassword, setLoginPassword] = useState('');
     const { t, i18n } = useTranslation();
     const { addToast } = useToast();
+    const { config, loading: configLoading } = useConfiguration();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -67,10 +69,20 @@ const AuthView = () => {
          return t('createAccountSubtitle');
     }
 
+    if (configLoading) {
+        return (
+            <div className="auth-container">
+                <Loader />
+            </div>
+        );
+    }
+    
+    const appName = config?.app_name || '...';
+
     return (
         <div className="auth-container">
             <div className="auth-box">
-                <h1><span className="logo-font">Mailzila</span></h1>
+                <h1><span className="logo-font">{appName}</span></h1>
                 <p>{getSubtitle()}</p>
 
                 <form className="auth-form" onSubmit={handleSubmit}>

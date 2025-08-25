@@ -11,10 +11,12 @@ import Icon, { ICONS } from '../components/Icon';
 import useModules from '../hooks/useModules';
 import { Module } from '../api/types';
 import UnlockModuleModal from '../components/UnlockModuleModal';
+import { useConfiguration } from '../contexts/ConfigurationContext';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
     const { t, i18n } = useTranslation();
     const { hasModuleAccess, loading: authLoading } = useAuth();
+    const { config, loading: configLoading } = useConfiguration();
     const apiParams = useMemo(() => ({ from: formatDateForApiV4(getPastDateByDays(365)) }), []);
     const { data: statsData, loading: statsLoading, error: statsError } = useApiV4(`/statistics`, apiKey, apiParams);
     const { data: accountData, loading: accountLoading } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
@@ -53,6 +55,8 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     if (statsError) console.warn("Could not load dashboard stats:", statsError);
 
     const welcomeName = user?.first_name || t('user');
+    const appName = config?.app_name || 'Mailzila';
+    const copyrightText = configLoading ? '...' : (config?.app_copyright || `${appName} © ${new Date().getFullYear()}, All Rights Reserved`);
 
     return (
         <div className="dashboard-container">
@@ -159,7 +163,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                         </div>
                     </div>
                     <div className="dashboard-branding-footer">
-                        <p>Mailzila App by <strong>ZAGROX.com</strong></p>
+                        <p dangerouslySetInnerHTML={{ __html: copyrightText }} />
                     </div>
                 </>
             )}

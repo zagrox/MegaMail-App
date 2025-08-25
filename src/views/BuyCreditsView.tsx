@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from './useApi';
@@ -11,6 +8,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import CenteredMessage from '../components/CenteredMessage';
 import { DIRECTUS_CRM_URL } from '../api/config';
 import sdk from '../api/directus';
+import { useConfiguration } from '../contexts/ConfigurationContext';
 
 const CreditSelector = ({ packages, onPurchase, isSubmitting }: { packages: any[], onPurchase: (pkg: any) => void, isSubmitting: boolean }) => {
     const { t, i18n } = useTranslation();
@@ -110,6 +108,7 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
 
 const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, setView: (view: string, data?: any) => void }) => {
     const { t, i18n } = useTranslation();
+    const { config } = useConfiguration();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isPaying, setIsPaying] = useState(false);
     const [modalState, setModalState] = useState({ isOpen: false, title: '', message: '' });
@@ -237,7 +236,7 @@ const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, 
         try {
             // Step 1: Request trackId from Zibal
             const zibalPayload = {
-                merchant: "62f36ca618f934159dd26c19",
+                merchant: config?.app_zibal || "62f36ca618f934159dd26c19",
                 amount: createdOrder.order_total * 10, // Convert Toman to Rial for Zibal
                 callbackUrl: "https://my.mailzila.com/#/callback",
                 description: createdOrder.order_note,

@@ -61,3 +61,19 @@ export type Module = {
     modulediscount?: number;
     modulecore?: boolean;
 };
+export type Configuration = {
+    id: number;
+    app_phone: string;
+    app_support: string;
+    app_copyright: string;
+    app_secondary_color: string;
+    app_secondary_color_dark: string;
+    app_native: string;
+    app_name: string;
+    app_logo: string;
+    app_zibal: string;
+    app_site: string;
+    app_url: string;
+    app_icon: string;
+    app_banner: string;
+};

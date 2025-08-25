@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from './Icon';
+import { useConfiguration } from '../contexts/ConfigurationContext';
 
 const EmbedCodeCard = ({ apiKey }: { apiKey: string }) => {
     const { t, i18n } = useTranslation();
     const [view, setView] = useState('Dashboard');
     const [copied, setCopied] = useState(false);
+    const { config } = useConfiguration();
 
-    const baseUrl = 'https://my.mailzila.com';
+    const appName = config?.app_name || 'Mailzila';
+    const baseUrl = config?.app_url || 'https://my.mailzila.com';
     const embedUrl = `${baseUrl}/?embed=true&apiKey=${apiKey}&view=${view}&lang=${i18n.language}`;
-    const iframeCode = `<iframe src="${embedUrl}" width="100%" height="800px" style="border:1px solid #ccc; border-radius: 8px;" title="Mailzila Dashboard"></iframe>`;
+    const iframeCode = `<iframe src="${embedUrl}" width="100%" height="800px" style="border:1px solid #ccc; border-radius: 8px;" title="${appName} Dashboard"></iframe>`;
 
     const handleCopy = () => {
         navigator.clipboard.writeText(iframeCode);
@@ -23,7 +26,7 @@ const EmbedCodeCard = ({ apiKey }: { apiKey: string }) => {
                 <h3 style={{ margin: 0, fontSize: '1.25rem' }}>{t('embedDashboard')}</h3>
             </div>
             <div className="card-body" style={{ padding: '0 1.25rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <p style={{ color: 'var(--subtle-text-color)', marginTop: 0, fontSize: '0.9rem' }}>{t('embedDashboardSubtitle')}</p>
+                <p style={{ color: 'var(--subtle-text-color)', marginTop: 0, fontSize: '0.9rem' }}>{t('embedDashboardSubtitle', { appName })}</p>
                 <div className="info-message warning" style={{flexDirection: 'row', alignItems: 'center', textAlign: 'left'}}>
                     <p style={{margin: 0}}><strong>{t('warning')}:</strong> {t('embedWarning')}</p>
                 </div>

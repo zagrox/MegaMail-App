@@ -1,5 +1,6 @@
 
 
+
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -7,14 +8,18 @@ import { apiFetch } from '../api/elasticEmail';
 import { useToast } from '../contexts/ToastContext';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
+import { useConfiguration } from '../contexts/ConfigurationContext';
 
 const TOTAL_STEPS = 4;
 
 const Step1 = () => {
     const { t } = useTranslation();
+    const { config } = useConfiguration();
+    const appName = config?.app_name || 'Mailzila';
+
     return (
         <div className="onboarding-step">
-            <h2>{t('welcomeTitle')}</h2>
+            <h2>{t('welcomeTitle', { appName })}</h2>
             <p>{t('welcomeSubtitle')}</p>
         </div>
     );

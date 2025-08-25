@@ -1,5 +1,6 @@
 
 
+
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -71,7 +72,7 @@ const resources = {
       signInWithApiKey: 'Sign In with API Key',
       signInSubtitle: 'Welcome back! Please login to your account.',
       createAccountSubtitle: 'Create an account to get started.',
-      signInWithApiKeySubtitle: 'Enter your Mailzila API Key to sign in.',
+      signInWithApiKeySubtitle: 'Enter your {{appName}} API Key to sign in.',
       noAccount: "Don't have an account?",
       alreadyHaveAccount: 'Already have an account?',
       firstName: 'First Name',
@@ -102,7 +103,7 @@ const resources = {
       back: 'Back',
       finishSetup: 'Finish Setup',
       step_of: 'Step {{current}} of {{total}}',
-      welcomeTitle: 'Welcome to Mailzila!',
+      welcomeTitle: 'Welcome to {{appName}}!',
       welcomeSubtitle: "We're excited to have you. Let's get your account set up in a few simple steps.",
       featuresTitle: "Discover What's Possible",
       featuresSubtitle: 'Here are some of the powerful tools at your fingertips.',
@@ -174,7 +175,7 @@ const resources = {
       lastActivity: 'Last Activity',
       settings: 'Settings',
       displayMode: 'Display Mode',
-      displayModeSubtitle: 'Choose how Mailzila looks. Your preference will be saved for your next visit.',
+      displayModeSubtitle: 'Choose how {{appName}} looks. Your preference will be saved for your next visit.',
       language: 'Language',
       languageSubtitle: 'Choose the language for the application interface.',
       themeLight: 'Light',
@@ -182,8 +183,8 @@ const resources = {
       themeSystem: 'System',
       switchToTheme: 'Switch to {{theme}} theme',
       installApp: 'Install App',
-      installAppSubtitle: 'Get a native-like experience by installing Mailzila on your device.',
-      installMailzila: 'Install Mailzila',
+      installAppSubtitle: 'Get a native-like experience by installing our app on your device.',
+      installMailzila: 'Install {{appName}}',
       apiKey: 'API Key',
       yourApiKey: 'Your API Key',
       saveAndVerifyKey: 'Save & Verify Key',
@@ -240,7 +241,7 @@ const resources = {
       companyInformation: 'Company Information',
       // Embed
       embedDashboard: 'Embed Dashboard',
-      embedDashboardSubtitle: 'Copy and paste this HTML snippet into your website or application to embed a live view of your Mailzila dashboard.',
+      embedDashboardSubtitle: 'Copy and paste this HTML snippet into your website or application to embed a live view of your {{appName}} dashboard.',
       embedWarning: 'This embed code contains your API key. Only use it on secure websites you trust.',
       copyEmbedCode: 'Copy Embed Code',
       embedCode: 'Embed Code',
@@ -249,7 +250,7 @@ const resources = {
       warning: 'Warning',
       // Whitelabel
       whitelabelAndCustomSetup: 'Whitelabel & Custom Setup',
-      whitelabelInfo: 'Interested in a whitelabel version of Mailzila or need a custom setup on your own infrastructure? We offer solutions tailored to your brand and technical requirements.',
+      whitelabelInfo: 'Interested in a whitelabel version of our platform or need a custom setup on your own infrastructure? We offer solutions tailored to your brand and technical requirements.',
       contactUsForDetails: 'Contact Us for Details',
       // Buy Credits
       yourCurrentBalance: 'Your Current Balance',
@@ -780,7 +781,7 @@ const resources = {
       signInWithApiKey: 'ورود با کلید API',
       signInSubtitle: 'خوش آمدید! لطفاً وارد حساب کاربری خود شوید.',
       createAccountSubtitle: 'برای شروع یک حساب کاربری ایجاد کنید.',
-      signInWithApiKeySubtitle: 'برای ورود، کلید Mailzila خود را وارد کنید.',
+      signInWithApiKeySubtitle: 'برای ورود، کلید API برنامه را وارد کنید.',
       noAccount: 'حساب کاربری ندارید؟',
       alreadyHaveAccount: 'قبلاً ثبت‌نام کرده‌اید؟',
       firstName: 'نام',
@@ -811,7 +812,7 @@ const resources = {
       back: 'بازگشت',
       finishSetup: 'پایان راه‌اندازی',
       step_of: 'مرحله {{current}} از {{total}}',
-      welcomeTitle: 'به میلزیلا خوش آمدید!',
+      welcomeTitle: 'به {{appName}} خوش آمدید!',
       welcomeSubtitle: 'از حضور شما خوشحالیم. بیایید در چند مرحله ساده حساب شما را راه‌اندازی کنیم.',
       featuresTitle: 'کشف امکانات',
       featuresSubtitle: 'در اینجا برخی از ابزارهای قدرتمندی که در اختیار شماست را مشاهده می‌کنید.',
@@ -820,7 +821,7 @@ const resources = {
       finalizeSetupTitle: 'حساب خود را نهایی کنید',
       finalizeSetupSubtitle: 'برای اتصال حساب ایمیل و ایجاد کلید API خود، روی دکمه زیر کلیک کنید. این کار راه‌اندازی را تکمیل می‌کند.',
       verifyAndFinish: 'تأیید و پایان',
-      enterYourApiKey: 'کلید Mailzila API خود را وارد کنید',
+      enterYourApiKey: 'کلید API برنامه خود را وارد کنید',
       invalidApiKey: 'کلید API وارد شده نامعتبر است.',
       saveAndContinue: 'ذخیره و ادامه',
       setupFailed: 'راه‌اندازی خودکار ناموفق بود.',
@@ -883,7 +884,7 @@ const resources = {
       lastActivity: 'آخرین فعالیت',
       settings: 'تنظیمات',
       displayMode: 'حالت نمایش',
-      displayModeSubtitle: 'انتخاب کنید میلزیلا چگونه به نظر برسد. انتخاب شما برای بازدید بعدی ذخیره خواهد شد.',
+      displayModeSubtitle: 'انتخاب کنید {{appName}} چگونه به نظر برسد. انتخاب شما برای بازدید بعدی ذخیره خواهد شد.',
       language: 'زبان',
       languageSubtitle: 'زبان رابط کاربری برنامه را انتخاب کنید.',
       themeLight: 'روشن',
@@ -891,8 +892,8 @@ const resources = {
       themeSystem: 'سیستم',
       switchToTheme: 'تغییر به تم {{theme}}',
       installApp: 'نصب برنامه',
-      installAppSubtitle: 'با نصب میلزیلا روی دستگاه خود، تجربه‌ای شبیه به برنامه بومی داشته باشید.',
-      installMailzila: 'نصب میلزیلا',
+      installAppSubtitle: 'با نصب برنامه روی دستگاه خود، تجربه‌ای شبیه به برنامه بومی داشته باشید.',
+      installMailzila: 'نصب {{appName}}',
       apiKey: 'کلید API',
       yourApiKey: 'کلید API شما',
       saveAndVerifyKey: 'ذخیره و تأیید کلید',
@@ -950,7 +951,7 @@ const resources = {
       companyInformation: 'اطلاعات شرکت',
       // Embed
       embedDashboard: 'جاسازی داشبورد',
-      embedDashboardSubtitle: 'این قطعه کد HTML را در وب‌سایت یا برنامه خود کپی و جایگذاری کنید تا نمای زنده‌ای از داشبورد میلزیلا خود را جاسازی کنید.',
+      embedDashboardSubtitle: 'این قطعه کد HTML را در وب‌سایت یا برنامه خود کپی و جایگذاری کنید تا نمای زنده‌ای از داشبورد {{appName}} خود را جاسازی کنید.',
       embedWarning: 'این کد جاسازی حاوی کلید API شما است. فقط در وب‌سایت‌های امنی که به آن‌ها اعتماد دارید استفاده کنید.',
       copyEmbedCode: 'کپی کد جاسازی',
       embedCode: 'کد جاسازی',
@@ -959,7 +960,7 @@ const resources = {
       warning: 'هشدار',
       // Whitelabel
       whitelabelAndCustomSetup: 'وایت لیبل و نصب سفارشی',
-      whitelabelInfo: 'آیا به نسخه وایت لیبل میلزیلا علاقه‌مندید یا به نصب سفارشی بر روی زیرساخت خود نیاز دارید؟ ما راه‌حل‌هایی متناسب با برند و نیازهای فنی شما ارائه می‌دهیم.',
+      whitelabelInfo: 'آیا به نسخه وایت لیبل {{appName}} علاقه‌مندید یا به نصب سفارشی بر روی زیرساخت خود نیاز دارید؟ ما راه‌حل‌هایی متناسب با برند و نیازهای فنی شما ارائه می‌دهیم.',
       contactUsForDetails: 'برای جزئیات تماس بگیرید',
       // Buy Credits
       yourCurrentBalance: 'موجودی فعلی شما',
