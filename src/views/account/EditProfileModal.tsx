@@ -7,7 +7,7 @@ import Modal from '../../components/Modal';
 import Loader from '../../components/Loader';
 import { useToast } from '../../contexts/ToastContext';
 import Icon, { ICONS } from '../../components/Icon';
-import { DIRECTUS_URL } from '../../api/config';
+import { useConfiguration } from '../../contexts/ConfigurationContext';
 
 // A simple toggle component
 const Toggle = ({ label, checked, onChange, name }: { label: string; checked: boolean; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void, name: string }) => (
@@ -48,6 +48,7 @@ const EditProfileModal = ({ isOpen, onClose, user }: { isOpen: boolean, onClose:
     const { t } = useTranslation();
     const { updateUser } = useAuth();
     const { addToast } = useToast();
+    const { config } = useConfiguration();
     const [formData, setFormData] = useState<any>({});
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -67,11 +68,11 @@ const EditProfileModal = ({ isOpen, onClose, user }: { isOpen: boolean, onClose:
                 theme_light: user.theme_light || true,
                 email_notifications: user.email_notifications || false,
             });
-            const initialAvatarUrl = user.avatar ? `${DIRECTUS_URL}/assets/${user.avatar}` : null;
+            const initialAvatarUrl = user.avatar && config?.app_backend ? `${config.app_backend}/assets/${user.avatar}` : null;
             setAvatarPreview(initialAvatarUrl);
             setAvatarFile(null); // Reset file on open
         }
-    }, [user, isOpen]);
+    }, [user, isOpen, config]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;

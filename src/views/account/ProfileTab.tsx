@@ -1,11 +1,12 @@
 
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../../components/Icon';
-import { DIRECTUS_URL } from '../../api/config';
 import Badge from '../../components/Badge';
 import EditProfileModal from './EditProfileModal';
 import { useStatusStyles } from '../../hooks/useStatusStyles';
+import { useConfiguration } from '../../contexts/ConfigurationContext';
 
 const ProfileField = ({ label, value }: { label: string; value: string | number | null | undefined }) => (
     <div className="form-group">
@@ -19,6 +20,7 @@ const ProfileTab = ({ accountData, user }: { accountData: any, user: any }) => {
     const { t, i18n } = useTranslation();
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { getStatusStyle } = useStatusStyles();
+    const { config } = useConfiguration();
 
     if (!user) {
         return null; 
@@ -29,7 +31,7 @@ const ProfileTab = ({ accountData, user }: { accountData: any, user: any }) => {
     const email = user?.email;
     const fullName = [firstName, lastName].filter(Boolean).join(' ');
     
-    const avatarUrl = user?.avatar ? `${DIRECTUS_URL}/assets/${user.avatar}` : null;
+    const avatarUrl = user?.avatar && config?.app_backend ? `${config.app_backend}/assets/${user.avatar}` : null;
 
     const getRoleName = (role: any) => {
         if (typeof role === 'object' && role !== null && role.name) {

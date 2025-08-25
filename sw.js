@@ -7,9 +7,22 @@ const APP_SHELL_URLS = [
   '/manifest.json'
 ];
 
+let DYNAMIC_BACKEND_HOST = 'crm.mailzila.com'; // Default fallback host
+
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SET_BACKEND_URL') {
+        try {
+            const backendUrl = new URL(event.data.url);
+            DYNAMIC_BACKEND_HOST = backendUrl.hostname;
+            console.log('Service Worker: Backend host updated to', DYNAMIC_BACKEND_HOST);
+        } catch (e) {
+            console.error('Service Worker: Invalid backend URL received', event.data.url);
+        }
+    }
+});
+
 // URLs for runtime caching
 const RUNTIME_CACHE_HOSTS = [
-  'https://crm.mailzila.com',
   'https://api.elasticemail.com',
   'https://dns.google',
   'https://fonts.googleapis.com',
@@ -47,8 +60,11 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
+  // Combine static and dynamic hosts for caching logic
+  const dynamicRuntimeHosts = [DYNAMIC_BACKEND_HOST, ...RUNTIME_CACHE_HOSTS];
+
   // Network-First strategy for API and external resources to ensure fresh data
-  if (RUNTIME_CACHE_HOSTS.some(host => url.hostname.endsWith(host) || url.hostname.startsWith(host))) {
+  if (dynamicRuntimeHosts.some(host => url.hostname.endsWith(host) || url.hostname.startsWith(host))) {
     event.respondWith(
       fetch(event.request)
         .then((networkResponse) => {

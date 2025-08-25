@@ -21,7 +21,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     const { data: statsData, loading: statsLoading, error: statsError } = useApiV4(`/statistics`, apiKey, apiParams);
     const { data: accountData, loading: accountLoading } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
     const { data: contactsCountData, loading: contactsCountLoading } = useApi('/contact/count', apiKey, { allContacts: true }, apiKey ? 1 : 0);
-    const { modules, loading: modulesLoading } = useModules();
+    const { modules, loading: modulesLoading } = useModules(config?.app_backend);
     const [moduleToUnlock, setModuleToUnlock] = useState<Module | null>(null);
 
     const staticNavItems = useMemo(() => [

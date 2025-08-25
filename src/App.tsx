@@ -2,7 +2,6 @@ import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
 import { useConfiguration } from './contexts/ConfigurationContext';
-import { DIRECTUS_CRM_URL } from './api/config';
 import { ICONS } from './components/Icon';
 import CenteredMessage from './components/CenteredMessage';
 import Loader from './components/Loader';
@@ -44,7 +43,7 @@ const App = () => {
     const [contactDetailOrigin, setContactDetailOrigin] = useState<{ view: string, data: any } | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const appContainerRef = useRef<HTMLDivElement>(null);
-    const { modules, loading: modulesLoading } = useModules();
+    const { modules, loading: modulesLoading } = useModules(config?.app_backend);
     const [moduleToUnlock, setModuleToUnlock] = useState<Module | null>(null);
 
     useEffect(() => {
@@ -83,11 +82,18 @@ const App = () => {
         // Update Favicon and Apple Touch Icon
         const favicon = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
         const appleTouchIcon = document.querySelector("link[rel='apple-touch-icon']") as HTMLLinkElement;
-        if (config.app_logo && favicon) {
-            const iconUrl = `${DIRECTUS_CRM_URL}/assets/${config.app_logo}`;
+        if (config.app_logo && config.app_backend && favicon) {
+            const iconUrl = `${config.app_backend}/assets/${config.app_logo}`;
             favicon.href = iconUrl;
             if (appleTouchIcon) {
                 appleTouchIcon.href = iconUrl;
+            }
+        }
+
+        // Send backend URL to Service Worker
+        if (config.app_backend) {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({ type: 'SET_BACKEND_URL', url: config.app_backend });
             }
         }
     
@@ -105,7 +111,7 @@ const App = () => {
     
         // Update PWA Manifest
         const manifestLink = document.querySelector('link[rel="manifest"]');
-        if (manifestLink) {
+        if (manifestLink && config.app_backend) {
             const manifest = {
                 "name": `${config.app_name} - Email Marketing Platform`,
                 "short_name": config.app_name,
@@ -117,7 +123,7 @@ const App = () => {
                 "orientation": "portrait-primary",
                 "icons": [
                     {
-                        "src": `${DIRECTUS_CRM_URL}/assets/${config.app_logo}`,
+                        "src": `${config.app_backend}/assets/${config.app_logo}`,
                         "type": "image/png",
                         "purpose": "any maskable",
                         "sizes": "512x512"
@@ -233,8 +239,8 @@ const App = () => {
     ];
     
     const isRTL = i18n.dir() === 'rtl';
-    const appName = isRTL && config?.app_native ? config.app_native : (config?.app_name || 'Mailzila');
-    const logoUrl = config?.app_logo ? `${DIRECTUS_CRM_URL}/assets/${config.app_logo}` : 'https://mailzila.com/logo.png';
+    const appName = isRTL && config?.app_native ? config.app_native : (config?.app_name || '...');
+    const logoUrl = config?.app_logo && config?.app_backend ? `${config.app_backend}/assets/${config.app_logo}` : '';
     
     const SidebarContent = () => (
       <>

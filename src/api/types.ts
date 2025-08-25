@@ -76,4 +76,5 @@ export type Configuration = {
     app_url: string;
     app_icon: string;
     app_banner: string;
+    app_backend: string;
 };
