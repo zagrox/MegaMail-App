@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -24,6 +26,7 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const [listToRename, setListToRename] = useState<List | null>(null);
     const [listToDelete, setListToDelete] = useState<List | null>(null);
     const [listCounts, setListCounts] = useState<Record<string, { count: number | null; loading: boolean; error: boolean }>>({});
+    const [updatingList, setUpdatingList] = useState<string | null>(null);
 
 
     const LISTS_PER_PAGE = 25;
@@ -35,6 +38,24 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
+
+    const handleToggleUnsubscribe = async (list: List) => {
+        setUpdatingList(list.ListName);
+        const newAllowUnsubscribe = !list.AllowUnsubscribe;
+
+        try {
+            await apiFetchV4(`/lists/${encodeURIComponent(list.ListName)}`, apiKey, {
+                method: 'PUT',
+                body: { AllowUnsubscribe: newAllowUnsubscribe }
+            });
+            addToast(`'${list.ListName}' updated successfully.`, 'success');
+            refetch(); // Refetch data to get the latest state
+        } catch (err: any) {
+            addToast(`Failed to update list: ${err.message}`, 'error');
+        } finally {
+            setUpdatingList(null);
+        }
+    };
 
     const handleCreateList = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -112,7 +133,7 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                 }
             });
         }
-    }, [paginatedLists, apiKey]);
+    }, [paginatedLists, apiKey, listCounts]);
 
 
     return (
@@ -186,7 +207,8 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                             <thead>
                                 <tr>
                                     <th>{t('name')}</th>
-                                    <th>{t('contacts')}</th>
+                                    <th style={{ textAlign: 'center' }}>{t('contacts')}</th>
+                                    <th style={{ textAlign: 'center' }}>{t('allowUnsubscribe')}</th>
                                     <th>{t('dateAdded')}</th>
                                     <th style={{ textAlign: i18n.dir() === 'rtl' ? 'left' : 'right' }}>{t('action')}</th>
                                 </tr>
@@ -194,6 +216,7 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                             <tbody>
                                 {paginatedLists.map((list: List) => {
                                     const countInfo = listCounts[list.ListName];
+                                    const isUpdating = updatingList === list.ListName;
                                     return (
                                         <tr key={list.ListName}>
                                             <td>
@@ -206,9 +229,21 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                                                  countInfo.error ? 'N/A' :
                                                  countInfo.count !== null ? countInfo.count.toLocaleString(i18n.language) : '-'}
                                             </td>
+                                            <td style={{ textAlign: 'center' }}>
+                                                <label className="toggle-switch">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!list.AllowUnsubscribe}
+                                                        onChange={() => handleToggleUnsubscribe(list)}
+                                                        disabled={isUpdating}
+                                                    />
+                                                    <span className="toggle-slider"></span>
+                                                </label>
+                                            </td>
                                             <td>{formatDateRelative(list.DateAdded, i18n.language)}</td>
                                             <td>
                                                 <div className="action-buttons" style={{justifyContent: 'flex-end'}}>
+                                                    <button className="btn-icon btn-icon-primary" onClick={() => setView('ListDetail', { list })} aria-label={t('viewContactsInList')}><Icon path={ICONS.EYE}/></button>
                                                     <button className="btn-icon btn-icon-primary" onClick={() => setListToRename(list)} aria-label={t('renameList')}><Icon path={ICONS.PENCIL}/></button>
                                                     <button className="btn-icon btn-icon-danger" onClick={() => setListToDelete(list)} aria-label={t('deleteList')}><Icon path={ICONS.DELETE}/></button>
                                                 </div>

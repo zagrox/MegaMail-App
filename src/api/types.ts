@@ -1,3 +1,5 @@
+
+
 export type Contact = {
     Email: string;
     FirstName: string;
@@ -32,6 +34,7 @@ export type List = {
     ListName: string;
     DateAdded: string;
     ContactsCount: number;
+    AllowUnsubscribe: boolean;
 };
 export type Segment = {
     Name: string;
