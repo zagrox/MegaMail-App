@@ -10,6 +10,7 @@ import App from './src/App';
 import CenteredMessage from './src/components/CenteredMessage';
 import Loader from './src/components/Loader';
 import './src/index.css';
+import { LabelsProvider } from './src/contexts/LabelsContext';
 
 const root = createRoot(document.getElementById('root')!);
 root.render(
@@ -19,9 +20,11 @@ root.render(
                 <ThemeProvider>
                     <ConfigurationProvider>
                         <AuthProvider>
-                            <ToastProvider>
-                                <App />
-                            </ToastProvider>
+                            <LabelsProvider>
+                                <ToastProvider>
+                                    <App />
+                                </ToastProvider>
+                            </LabelsProvider>
                         </AuthProvider>
                     </ConfigurationProvider>
                 </ThemeProvider>

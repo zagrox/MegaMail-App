@@ -8,13 +8,28 @@ interface BadgeProps {
     iconPath?: string;
 }
 
+const getContrastYIQ = (hexcolor?: string): string => {
+    if (!hexcolor || !/^#([A-Fa-f0-9]{3}){1,2}$/.test(hexcolor)) {
+        return 'var(--text-color)';
+    }
+    let color = hexcolor.substring(1); // strip #
+    if (color.length === 3) {
+        color = color.split('').map(char => char + char).join('');
+    }
+    const r = parseInt(color.substring(0, 2), 16);
+    const g = parseInt(color.substring(2, 4), 16);
+    const b = parseInt(color.substring(4, 6), 16);
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? '#1F2937' : '#FFFFFF'; // Dark gray or white
+}
+
+
 const Badge = ({ text, type = 'default', color, iconPath }: BadgeProps) => {
     const style: React.CSSProperties = {};
     
     // If a specific hex color is provided, it takes precedence for the background.
     if (color) {
-        // Force text color to white for custom-colored badges for better contrast as requested.
-        style.color = '#FFFFFF';
+        style.color = getContrastYIQ(color);
         style.backgroundColor = color;
     }
 

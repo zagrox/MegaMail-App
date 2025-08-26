@@ -52,6 +52,7 @@ const ContactStatusFilter = ({ apiKey, selectedStatuses, onStatusChange, onExpor
     const [counts, setCounts] = useState<Record<string, number>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [fetchError, setFetchError] = useState<string | null>(null);
+    const { getStatusStyle } = useStatusStyles();
 
     React.useEffect(() => {
         if (!apiKey) {
@@ -90,6 +91,18 @@ const ContactStatusFilter = ({ apiKey, selectedStatuses, onStatusChange, onExpor
         fetchCounts();
     }, [apiKey]);
     
+    const hexToRgba = (hex: string, alpha = 0.15) => {
+        if (!/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+            return `rgba(128,128,128,${alpha})`; // fallback grey
+        }
+        let c: any = hex.substring(1).split('');
+        if (c.length === 3) {
+            c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+        }
+        c = '0x' + c.join('');
+        return `rgba(${(c >> 16) & 255},${(c >> 8) & 255},${c & 255},${alpha})`;
+    };
+
     return (
         <div className="card contact-status-filter">
             <div className="card-header">
@@ -100,6 +113,13 @@ const ContactStatusFilter = ({ apiKey, selectedStatuses, onStatusChange, onExpor
                 {fetchError && <p style={{fontSize: '0.8rem', color: 'var(--danger-color)', padding: '0 0.5rem'}}>{t('error')}: {fetchError}</p>}
                 {!isLoading && !fetchError && STATUS_ORDER.map(status => {
                     const count = counts[status];
+                    const statusStyle = getStatusStyle(status);
+                    
+                    const badgeStyle: React.CSSProperties = {};
+                    if (statusStyle.color) {
+                        badgeStyle.backgroundColor = hexToRgba(statusStyle.color, 0.15);
+                        badgeStyle.color = statusStyle.color;
+                    }
                     
                     return (
                         <div key={status} className="contact-status-filter-item" onClick={() => onStatusChange(status)}>
@@ -112,7 +132,7 @@ const ContactStatusFilter = ({ apiKey, selectedStatuses, onStatusChange, onExpor
                                 <span className="checkbox-checkmark"></span>
                                 <span className="checkbox-label">{status}</span>
                             </label>
-                            <span className="badge">
+                            <span className="badge" style={badgeStyle}>
                                 {count === -1 
                                  ? <Icon path={ICONS.COMPLAINT} title={t('error')} style={{width: '1em', height: '1em', color: 'var(--danger-color)'}}/> 
                                  : (count !== undefined ? Number(count).toLocaleString(i18n.language) : <Loader />)
@@ -263,7 +283,7 @@ const ContactCard = React.memo(({ contact, onView, onDelete, isSelected, onToggl
                     </div>
                 </div>
                 <div className="contact-card-status">
-                    <Badge text={statusStyle.text} type={statusStyle.type} iconPath={statusStyle.iconPath} />
+                    <Badge text={statusStyle.text} type={statusStyle.type} color={statusStyle.color} iconPath={statusStyle.iconPath} />
                 </div>
             </div>
             <div className="contact-card-footer">

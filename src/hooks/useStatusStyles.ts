@@ -1,19 +1,24 @@
 import { useTranslation } from 'react-i18next';
 import { ICONS } from '../components/Icon';
+import { useLabels } from '../contexts/LabelsContext';
 
 export type StatusStyle = {
     text: string;
     type: 'success' | 'warning' | 'danger' | 'info' | 'default';
     iconPath?: string;
+    color?: string;
 };
 
 // This hook provides consistent styling for status badges across the app.
 export const useStatusStyles = () => {
     const { t } = useTranslation();
+    const { labels } = useLabels();
 
     const getStatusStyle = (status: string | undefined): StatusStyle => {
         const originalStatus = status || t('unknown');
         const normalizedStatus = String(status || 'unknown').toLowerCase().replace(/\s/g, '');
+        
+        const color = labels?.[normalizedStatus] || undefined;
 
         // Map various status strings to a standardized style type
         switch (normalizedStatus) {
@@ -24,18 +29,20 @@ export const useStatusStyles = () => {
             case 'delivered':
             case 'engaged':
             case 'success':
-                return { text: originalStatus, type: 'success', iconPath: ICONS.CHECK };
+                return { text: originalStatus, type: 'success', iconPath: ICONS.CHECK, color };
 
             // Warning / In-progress states
             case 'pending':
             case 'paused':
             case 'transactional':
             case 'checking':
-                return { text: originalStatus, type: 'warning', iconPath: ICONS.LOADING_SPINNER };
+            case 'stale':
+            case 'notconfirmed':
+                return { text: originalStatus, type: 'warning', iconPath: ICONS.LOADING_SPINNER, color };
             
             case 'missing':
             case 'notverified':
-                return { text: originalStatus, type: 'warning' };
+                return { text: originalStatus, type: 'warning', color };
 
             // Info states
             case 'processing':
@@ -44,7 +51,7 @@ export const useStatusStyles = () => {
             case 'draft':
             case 'review':
             case 'info':
-                 return { text: originalStatus, type: 'info', iconPath: ICONS.LOADING_SPINNER };
+                 return { text: originalStatus, type: 'info', iconPath: ICONS.LOADING_SPINNER, color };
 
             // Danger / Error states
             case 'inactive':
@@ -58,11 +65,11 @@ export const useStatusStyles = () => {
             case 'manualcancel':
             case 'notdelivered':
             case 'invalid':
-                return { text: originalStatus, type: 'danger', iconPath: ICONS.X_CIRCLE };
+                return { text: originalStatus, type: 'danger', iconPath: ICONS.X_CIRCLE, color };
             
             // Default
             default:
-                return { text: originalStatus, type: 'default' };
+                return { text: originalStatus, type: 'default', color };
         }
     };
 
