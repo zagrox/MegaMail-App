@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from './useApi';
 import useApiV4 from '../hooks/useApiV4';
@@ -15,6 +15,8 @@ import Badge from '../components/Badge';
 import ConfirmModal from '../components/ConfirmModal';
 import { useStatusStyles } from '../hooks/useStatusStyles';
 import ExportContactsModal from '../components/ExportContactsModal';
+import BulkActionsBar from '../components/BulkActionsBar';
+import AddToListModal from '../components/AddToListModal';
 
 const STATUS_ORDER = [
     'Active', 'Engaged', 'Transactional', 'Bounced', 'Unsubscribed',
@@ -237,17 +239,28 @@ const ImportContactsModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { 
     );
 }
 
-const ContactCard = React.memo(({ contact, onView, onDelete }: { contact: Contact; onView: (email: string) => void; onDelete: (email: string) => void; }) => {
+const ContactCard = React.memo(({ contact, onView, onDelete, isSelected, onToggleSelect }: { contact: Contact; onView: (email: string) => void; onDelete: (email: string) => void; isSelected: boolean; onToggleSelect: (email: string) => void; }) => {
     const { t, i18n } = useTranslation();
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(contact.Status);
 
+    const handleActionClick = (e: React.MouseEvent, action: () => void) => {
+        e.stopPropagation();
+        action();
+    };
+
     return (
-        <div className="card contact-card">
-            <div className="contact-card-main" onClick={() => onView(contact.Email)}>
-                <div className="contact-card-info">
-                    <h4 className="contact-card-name">{contact.FirstName || contact.LastName ? `${contact.FirstName || ''} ${contact.LastName || ''}`.trim() : contact.Email}</h4>
-                    <p className="contact-card-email">{contact.Email}</p>
+        <div className={`card contact-card ${isSelected ? 'selected' : ''}`}>
+            <div className="contact-card-main" onClick={() => onToggleSelect(contact.Email)}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexGrow: 1, minWidth: 0 }}>
+                    <label className="custom-checkbox" onClick={(e) => e.stopPropagation()}>
+                        <input type="checkbox" checked={isSelected} onChange={() => onToggleSelect(contact.Email)} />
+                        <span className="checkbox-checkmark"></span>
+                    </label>
+                    <div className="contact-card-info" onClick={(e) => handleActionClick(e, () => onView(contact.Email))} style={{ cursor: 'pointer', flexGrow: 1, minWidth: 0 }}>
+                        <h4 className="contact-card-name" title={contact.Email}>{contact.FirstName || contact.LastName ? `${contact.FirstName || ''} ${contact.LastName || ''}`.trim() : contact.Email}</h4>
+                        <p className="contact-card-email">{contact.Email}</p>
+                    </div>
                 </div>
                 <div className="contact-card-status">
                     <Badge text={statusStyle.text} type={statusStyle.type} iconPath={statusStyle.iconPath} />
@@ -256,7 +269,7 @@ const ContactCard = React.memo(({ contact, onView, onDelete }: { contact: Contac
             <div className="contact-card-footer">
                 <small>{t('dateAdded')}: {formatDateForDisplay(contact.DateAdded, i18n.language)}</small>
                 <div className="action-buttons">
-                    <button className="btn-icon btn-icon-danger" onClick={() => onDelete(contact.Email)} aria-label={t('deleteContact')}>
+                    <button className="btn-icon btn-icon-danger" onClick={(e) => handleActionClick(e, () => onDelete(contact.Email))} aria-label={t('deleteContact')}>
                         <Icon path={ICONS.DELETE} />
                     </button>
                 </div>
@@ -264,6 +277,7 @@ const ContactCard = React.memo(({ contact, onView, onDelete }: { contact: Contac
         </div>
     );
 });
+
 
 const AddContactForm = ({ onSubmit }: { onSubmit: (data: {Email: string, FirstName: string, LastName: string}) => void }) => {
     const { t } = useTranslation();
@@ -308,6 +322,10 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
     const [contactToDelete, setContactToDelete] = useState<string | null>(null);
     const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+    const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
+    const [isAddToListModalOpen, setIsAddToListModalOpen] = useState(false);
+    const [isBulkDeleteConfirmOpen, setIsBulkDeleteConfirmOpen] = useState(false);
+
 
     const CONTACTS_PER_PAGE = 20;
     
@@ -363,6 +381,7 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
     const contacts = useV2Api ? v2ContactsMapped : v4Data;
     const loading = useV2Api ? v2Loading : v4Loading;
     const error = useV2Api ? v2Error : v4Error;
+    const paginatedContacts = Array.isArray(contacts) ? contacts : [];
 
     const refetch = () => setRefetchIndex(i => i + 1);
 
@@ -405,6 +424,64 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
         setView('ContactDetail', { contactEmail: email, origin: { view: 'Contacts', data: {} } });
     };
 
+    const toggleContactSelection = useCallback((email: string) => {
+        setSelectedContacts(prev =>
+            prev.includes(email)
+                ? prev.filter(e => e !== email)
+                : [...prev, email]
+        );
+    }, []);
+
+    const toggleSelectAll = () => {
+        const paginatedEmails = paginatedContacts.map(c => c.Email);
+        const allSelectedOnPage = paginatedEmails.every(email => selectedContacts.includes(email));
+        
+        if (allSelectedOnPage) {
+            setSelectedContacts(prev => prev.filter(email => !paginatedEmails.includes(email)));
+        } else {
+            setSelectedContacts(prev => [...new Set([...prev, ...paginatedEmails])]);
+        }
+    };
+    
+    const clearSelection = () => {
+        setSelectedContacts([]);
+    };
+
+    const handleBulkDelete = async () => {
+        setIsBulkDeleteConfirmOpen(false);
+        try {
+            await apiFetchV4('/contacts/delete', apiKey, {
+                method: 'POST',
+                body: { Emails: selectedContacts }
+            });
+            addToast(`${selectedContacts.length} contacts deleted successfully.`, 'success');
+            clearSelection();
+            refetch();
+        } catch (err: any) {
+            addToast(`Failed to delete contacts: ${err.message}`, 'error');
+        }
+    };
+
+    const handleBulkAddToList = async (listName: string) => {
+        try {
+            await apiFetchV4(`/lists/${encodeURIComponent(listName)}/contacts`, apiKey, {
+                method: 'POST',
+                body: selectedContacts
+            });
+            addToast(`${selectedContacts.length} contacts added to ${listName}.`, 'success');
+            clearSelection();
+            setIsAddToListModalOpen(false);
+        } catch (err: any) {
+            addToast(`Failed to add contacts to list: ${err.message}`, 'error');
+        }
+    };
+
+    const isAllVisibleSelected = useMemo(() => {
+        const paginatedEmails = paginatedContacts.map(c => c.Email);
+        return paginatedEmails.length > 0 && paginatedEmails.every(email => selectedContacts.includes(email));
+    }, [paginatedContacts, selectedContacts]);
+
+
     return (
         <div>
             <ImportContactsModal 
@@ -444,6 +521,21 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
             >
                 <p>{t('confirmDeleteContact', { email: contactToDelete })}</p>
             </ConfirmModal>
+            <ConfirmModal
+                isOpen={isBulkDeleteConfirmOpen}
+                onClose={() => setIsBulkDeleteConfirmOpen(false)}
+                onConfirm={handleBulkDelete}
+                title={t('delete', { count: selectedContacts.length })}
+            >
+                <p>{t('confirmDeleteContact', { email: `${selectedContacts.length} contacts` })}</p>
+            </ConfirmModal>
+            <AddToListModal
+                isOpen={isAddToListModalOpen}
+                onClose={() => setIsAddToListModalOpen(false)}
+                onConfirm={handleBulkAddToList}
+                apiKey={apiKey}
+            />
+
             
             <div className="contacts-view-layout">
                 <ContactStatusFilter
@@ -455,6 +547,17 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
 
                 <div className="contacts-view-main">
                     <div className="view-header contacts-header">
+                        <div className="contacts-selection-header">
+                             <label className="custom-checkbox" title={isAllVisibleSelected ? "Deselect all on page" : "Select all on page"}>
+                                <input
+                                    type="checkbox"
+                                    checked={isAllVisibleSelected}
+                                    onChange={toggleSelectAll}
+                                    disabled={loading || paginatedContacts.length === 0}
+                                />
+                                <span className="checkbox-checkmark"></span>
+                            </label>
+                        </div>
                         <div className="search-bar">
                              <Icon path={ICONS.SEARCH} />
                             <input
@@ -484,12 +587,14 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                         <>
                             {contacts?.length > 0 ? (
                                 <div className="contacts-grid">
-                                    {contacts.map((contact: Contact) => (
+                                    {paginatedContacts.map((contact: Contact) => (
                                         <ContactCard 
                                             key={contact.Email} 
                                             contact={contact} 
                                             onView={handleViewContact} 
-                                            onDelete={setContactToDelete} 
+                                            onDelete={setContactToDelete}
+                                            isSelected={selectedContacts.includes(contact.Email)}
+                                            onToggleSelect={toggleContactSelection}
                                         />
                                     ))}
                                 </div>
@@ -516,6 +621,14 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                     )}
                 </div>
             </div>
+            {selectedContacts.length > 0 && (
+                <BulkActionsBar
+                    count={selectedContacts.length}
+                    onDeselectAll={clearSelection}
+                    onDelete={() => setIsBulkDeleteConfirmOpen(true)}
+                    onAddToList={() => setIsAddToListModalOpen(true)}
+                />
+            )}
         </div>
     );
 };
