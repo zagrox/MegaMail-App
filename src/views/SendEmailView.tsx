@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react';
+
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
-import { apiFetchV4 } from '../api/elasticEmail';
+import { apiFetchV4, apiFetch } from '../api/elasticEmail';
 import { List, Segment, Template } from '../api/types';
 import { useToast } from '../contexts/ToastContext';
 import Loader from '../components/Loader';
@@ -10,13 +11,24 @@ import CenteredMessage from '../components/CenteredMessage';
 import Modal from '../components/Modal';
 import MultiSelectSearch from '../components/MultiSelectSearch';
 
-type CampaignType = 'Normal' | 'ABTest';
 type RecipientTarget = 'list' | 'segment' | 'all';
-type CreationStep = 'selection' | 'form';
 type ContentMethod = 'template' | 'plainText';
 type AccordionSection = 'recipients' | 'content' | 'settings' | '';
 
-const emptyContent = { From: '', ReplyTo: '', Subject: '', TemplateName: '', Preheader: '' };
+const emptyContent = { From: '', FromName: '', ReplyTo: '', Subject: '', TemplateName: '', Preheader: '', Body: null, Utm: null };
+const initialCampaignState = {
+    Name: '',
+    Content: [JSON.parse(JSON.stringify(emptyContent))],
+    Recipients: { ListNames: [], SegmentNames: [] },
+    Options: { 
+        TrackOpens: true, 
+        TrackClicks: true, 
+        ScheduleFor: null as string | null,
+        DeliveryOptimization: 'None',
+        EnableSendTimeOptimization: false
+    }
+};
+
 
 const AccordionItem = ({ 
     id, 
@@ -41,33 +53,26 @@ const AccordionItem = ({
 );
 
 
-const SendEmailView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void; }) => {
-    const { t } = useTranslation();
+const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, setView: (view: string, data?: any) => void; campaignToLoad?: any }) => {
+    const { t, i18n } = useTranslation();
     const { addToast } = useToast();
     
     const [isSending, setIsSending] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const [activeContent, setActiveContent] = useState(0);
     const [recipientTarget, setRecipientTarget] = useState<RecipientTarget>('all');
     const [contentMethod, setContentMethod] = useState<ContentMethod>('template');
     const [openAccordion, setOpenAccordion] = useState<AccordionSection>('recipients');
     const [isOptimizationOn, setIsOptimizationOn] = useState(false);
     const [isScheduling, setIsScheduling] = useState(false);
+    const [scheduleDate, setScheduleDate] = useState('');
+    const [scheduleTime, setScheduleTime] = useState('');
     const [isUtmEnabled, setIsUtmEnabled] = useState(false);
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [templateSearchTerm, setTemplateSearchTerm] = useState('');
-
-    const [campaign, setCampaign] = useState({
-        Name: '',
-        Content: [JSON.parse(JSON.stringify(emptyContent))],
-        Recipients: { ListNames: [], SegmentNames: [] },
-        Options: { 
-            TrackOpens: true, 
-            TrackClicks: true, 
-            ScheduleFor: null, 
-            DeliveryOptimization: 'None',
-            EnableSendTimeOptimization: false
-        }
-    });
+    const [recipientCount, setRecipientCount] = useState<number | null>(null);
+    const [isCountLoading, setIsCountLoading] = useState(false);
+    const [campaign, setCampaign] = useState(JSON.parse(JSON.stringify(initialCampaignState)));
     
     const { data: lists, loading: listsLoading } = useApiV4('/lists', apiKey, { limit: 1000 });
     const { data: segments, loading: segmentsLoading } = useApiV4('/segments', apiKey, {});
@@ -85,38 +90,17 @@ const SendEmailView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const listItems = useMemo(() => (Array.isArray(lists) ? lists : []).map((l: List) => ({ id: l.ListName, name: l.ListName })), [lists]);
     const segmentItems = useMemo(() => (Array.isArray(segments) ? segments : []).map((s: Segment) => ({ id: s.Name, name: s.Name })), [segments]);
 
-    const verifiedDomains = useMemo(() => (Array.isArray(domains) ? domains : [])
-        .filter(d => String(d.Spf).toLowerCase() === 'true' && String(d.Dkim).toLowerCase() === 'true')
-        .map(d => d.Domain), [domains]);
-        
-    const filteredTemplates = useMemo(() => {
-        if (!Array.isArray(templates)) return [];
-        return templates.filter((t: Template) => t.Name.toLowerCase().includes(templateSearchTerm.toLowerCase()));
-    }, [templates, templateSearchTerm]);
+    const verifiedDomainsWithDefault = useMemo(() => {
+        if (!Array.isArray(domains)) return [];
+        return domains
+            .filter(d => String(d.Spf).toLowerCase() === 'true' && String(d.Dkim).toLowerCase() === 'true')
+            .map(d => ({
+                domain: d.Domain,
+                defaultSender: d.DefaultSender || `mailer@${d.Domain}`
+            }));
+    }, [domains]);
 
-    useEffect(() => {
-        if (verifiedDomains.length > 0) {
-            const defaultFrom = `@${verifiedDomains[0]}`;
-            setCampaign(c => ({
-                ...c,
-                Content: c.Content.map(content => ({ ...content, From: content.From || defaultFrom }))
-            }));
-        }
-    }, [verifiedDomains]);
-    
-    useEffect(() => {
-        if (isOptimizationOn) {
-            setCampaign(c => ({
-                ...c,
-                Options: { ...c.Options, DeliveryOptimization: 'ToEngagedFirst', EnableSendTimeOptimization: false }
-            }));
-        } else {
-            setCampaign(c => ({
-                ...c,
-                Options: { ...c.Options, DeliveryOptimization: 'None', EnableSendTimeOptimization: false }
-            }));
-        }
-    }, [isOptimizationOn]);
+    const [selectedDomain, setSelectedDomain] = useState('');
 
     const handleValueChange = (section: 'Campaign' | 'Content' | 'Options', key: string, value: any, contentIndex: number = activeContent) => {
         setCampaign(prev => {
@@ -140,6 +124,220 @@ const SendEmailView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             return prev;
         });
     };
+
+    const handleDomainChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const domainName = e.target.value;
+        setSelectedDomain(domainName);
+        const domainInfo = verifiedDomainsWithDefault.find(d => d.domain === domainName);
+        if (domainInfo) {
+            handleValueChange('Content', 'From', domainInfo.defaultSender);
+        }
+    };
+        
+    const filteredTemplates = useMemo(() => {
+        if (!Array.isArray(templates)) return [];
+        return templates.filter((t: Template) => t.Name.toLowerCase().includes(templateSearchTerm.toLowerCase()));
+    }, [templates, templateSearchTerm]);
+    
+    const resetForm = useCallback(() => {
+        setCampaign(JSON.parse(JSON.stringify(initialCampaignState)));
+        setRecipientTarget('all');
+        setContentMethod('template');
+        setIsScheduling(false);
+        setScheduleDate('');
+        setScheduleTime('');
+        setIsOptimizationOn(false);
+        setIsUtmEnabled(false);
+        setOpenAccordion('recipients');
+        setRecipientCount(null);
+        setIsEditing(false);
+        setSelectedDomain('');
+    }, []);
+
+    useEffect(() => {
+        if (campaignToLoad) {
+            setIsEditing(true);
+            const loadedContent = campaignToLoad.Content?.[0] || {};
+            
+            const fromString = loadedContent.From || '';
+            let fromName = loadedContent.FromName;
+            let fromEmail = fromString;
+
+            const angleBracketMatch = fromString.match(/(.*)<(.*)>/);
+            if (angleBracketMatch && angleBracketMatch.length === 3) {
+                fromName = fromName || angleBracketMatch[1].trim().replace(/"/g, '');
+                fromEmail = angleBracketMatch[2].trim();
+            } else {
+                const lastSpaceIndex = fromString.lastIndexOf(' ');
+                if (lastSpaceIndex !== -1 && fromString.substring(lastSpaceIndex + 1).includes('@')) {
+                    fromName = fromName || fromString.substring(0, lastSpaceIndex).trim();
+                    fromEmail = fromString.substring(lastSpaceIndex + 1).trim();
+                }
+            }
+            
+            const domainPart = fromEmail.split('@')[1];
+            if (domainPart) {
+                setSelectedDomain(domainPart);
+            }
+
+            const loadedOptions = campaignToLoad.Options || {};
+            const loadedRecipients = campaignToLoad.Recipients || {};
+
+            setCampaign({
+                Name: campaignToLoad.Name || '',
+                Content: [{
+                    From: fromEmail || '',
+                    FromName: fromName || '',
+                    ReplyTo: loadedContent.ReplyTo || '',
+                    Subject: loadedContent.Subject || '',
+                    TemplateName: loadedContent.TemplateName || '',
+                    Preheader: loadedContent.Preheader || '',
+                    Body: loadedContent.Body || null,
+                    Utm: loadedContent.Utm || null
+                }],
+                Recipients: {
+                    ListNames: loadedRecipients.ListNames || [],
+                    SegmentNames: loadedRecipients.SegmentNames || [],
+                },
+                Options: {
+                    TrackOpens: loadedOptions.TrackOpens !== false,
+                    TrackClicks: loadedOptions.TrackClicks !== false,
+                    ScheduleFor: loadedOptions.ScheduleFor || null,
+                    DeliveryOptimization: loadedOptions.DeliveryOptimization || 'None',
+                    EnableSendTimeOptimization: loadedOptions.EnableSendTimeOptimization || false,
+                }
+            });
+
+            if (loadedRecipients.ListNames?.length > 0) setRecipientTarget('list');
+            else if (loadedRecipients.SegmentNames?.length > 0) setRecipientTarget('segment');
+            else setRecipientTarget('all');
+
+            setContentMethod(loadedContent.TemplateName ? 'template' : 'plainText');
+            setIsScheduling(!!loadedOptions.ScheduleFor);
+            setIsOptimizationOn(loadedOptions.DeliveryOptimization === 'ToEngagedFirst' || loadedOptions.EnableSendTimeOptimization);
+            setIsUtmEnabled(!!loadedContent.Utm);
+            setOpenAccordion('recipients');
+        } else {
+            setIsEditing(false);
+            resetForm();
+        }
+    }, [campaignToLoad, resetForm]);
+
+    // Effect to set initial domain
+    useEffect(() => {
+        if (!campaignToLoad && verifiedDomainsWithDefault.length > 0 && !selectedDomain) {
+            const initialDomain = verifiedDomainsWithDefault[0];
+            setSelectedDomain(initialDomain.domain);
+            handleValueChange('Content', 'From', initialDomain.defaultSender);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [verifiedDomainsWithDefault, campaignToLoad, selectedDomain]);
+
+    useEffect(() => {
+        const calculateCount = async () => {
+            if (!apiKey) return;
+    
+            const shouldShowLoader = recipientTarget === 'all' || (recipientTarget === 'list' && campaign.Recipients.ListNames.length > 0);
+            if (shouldShowLoader) {
+                setIsCountLoading(true);
+            }
+            setRecipientCount(null);
+    
+            try {
+                if (recipientTarget === 'all') {
+                    const count = await apiFetch('/contact/count', apiKey, { params: { allContacts: 'true' } });
+                    setRecipientCount(Number(count));
+                } else if (recipientTarget === 'list' && campaign.Recipients.ListNames.length > 0) {
+                    const counts = await Promise.all(
+                        campaign.Recipients.ListNames.map(listName =>
+                            apiFetch('/contact/count', apiKey, { params: { rule: `listname = '${listName.replace(/'/g, "''")}'` } })
+                        )
+                    );
+                    const total = counts.reduce((sum, count) => sum + Number(count), 0);
+                    setRecipientCount(total);
+                } else if (recipientTarget === 'segment' && campaign.Recipients.SegmentNames.length > 0) {
+                    if (segments && Array.isArray(segments)) {
+                        const total = campaign.Recipients.SegmentNames.reduce((sum, segmentName) => {
+                            const segment = segments.find((s: Segment) => s.Name === segmentName);
+                            return sum + (segment?.ContactsCount || 0);
+                        }, 0);
+                        setRecipientCount(total);
+                    } else {
+                        setRecipientCount(null);
+                    }
+                } else {
+                    setRecipientCount(0);
+                }
+            } catch (error) {
+                console.error("Failed to calculate recipient count:", error);
+                addToast(`Failed to get recipient count: ${(error as Error).message}`, 'error');
+                setRecipientCount(null);
+            } finally {
+                if (shouldShowLoader) {
+                    setIsCountLoading(false);
+                }
+            }
+        };
+    
+        const debounceTimer = setTimeout(() => {
+            calculateCount();
+        }, 300);
+    
+        return () => clearTimeout(debounceTimer);
+    }, [recipientTarget, campaign.Recipients.ListNames, campaign.Recipients.SegmentNames, apiKey, segments, addToast]);
+
+
+    useEffect(() => {
+        if (isScheduling) {
+            const scheduleFor = campaign.Options.ScheduleFor;
+            const initialDate = scheduleFor ? new Date(scheduleFor) : (() => {
+                const now = new Date();
+                now.setHours(now.getHours() + 1);
+                const minutes = now.getMinutes();
+                now.setMinutes(minutes - (minutes % 5) + 5);
+                now.setSeconds(0);
+                now.setMilliseconds(0);
+                return now;
+            })();
+
+            const year = initialDate.getFullYear();
+            const month = String(initialDate.getMonth() + 1).padStart(2, '0');
+            const day = String(initialDate.getDate()).padStart(2, '0');
+            const hours = String(initialDate.getHours()).padStart(2, '0');
+            const minutes = String(initialDate.getMinutes()).padStart(2, '0');
+
+            setScheduleDate(`${year}-${month}-${day}`);
+            setScheduleTime(`${hours}:${minutes}`);
+        }
+    }, [isScheduling, campaign.Options.ScheduleFor]);
+
+    useEffect(() => {
+        if (isScheduling) {
+            if (scheduleDate && scheduleTime) {
+                const combined = new Date(`${scheduleDate}T${scheduleTime}`);
+                if (!isNaN(combined.getTime())) {
+                    handleValueChange('Options', 'ScheduleFor', combined.toISOString());
+                }
+            } else {
+                handleValueChange('Options', 'ScheduleFor', null);
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [scheduleDate, scheduleTime, isScheduling]);
+
+    useEffect(() => {
+        if (isOptimizationOn) {
+            setCampaign(c => ({
+                ...c,
+                Options: { ...c.Options, DeliveryOptimization: 'ToEngagedFirst', EnableSendTimeOptimization: false }
+            }));
+        } else {
+            setCampaign(c => ({
+                ...c,
+                Options: { ...c.Options, DeliveryOptimization: 'None', EnableSendTimeOptimization: false }
+            }));
+        }
+    }, [isOptimizationOn]);
     
     const handleUtmFieldChange = (field: string, value: string, contentIndex: number) => {
         setCampaign(prev => {
@@ -168,56 +366,49 @@ const SendEmailView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const handleSubmit = async (action: 'send' | 'draft' | 'schedule') => {
         setIsSending(true);
     
-        let payload: any = { ...campaign };
+        const payload = JSON.parse(JSON.stringify(campaign));
     
-        if (action === 'send') {
+        payload.Content = payload.Content.map((c: any) => {
+            const fromEmail = c.From;
+            const fromName = c.FromName;
+            const combinedFrom = fromName ? `${fromName} ${fromEmail}` : fromEmail;
+            
+            const newContent = { ...c, From: combinedFrom };
+            delete newContent.FromName;
+            return newContent;
+        });
+    
+        if (action === 'send') payload.Status = 'Active';
+        else if (action === 'schedule' && payload.Options.ScheduleFor) {
             payload.Status = 'Active';
-        } else if (action === 'schedule' && campaign.Options.ScheduleFor) {
-            payload.Status = 'Active';
-        } else {
-            payload.Status = 'Draft';
-        }
+            payload.Options = { ...payload.Options, Trigger: { Count: 1 } };
+        } else payload.Status = 'Draft';
     
         if (contentMethod === 'plainText') {
-             payload.Content = payload.Content.map((c: any) => ({...c, Body: { Content: c.Body?.Content || '', ContentType: 'PlainText', Charset: 'utf-8' }, TemplateName: c.TemplateName || null }));
+             payload.Content = payload.Content.map((c: any) => ({...c, Body: { Content: c.Body?.Content || '', ContentType: 'PlainText', Charset: 'utf-8' }, TemplateName: null }));
         } else {
-             payload.Content = payload.Content.map((c: any) => ({...c, Body: null}));
+             payload.Content = payload.Content.map((c: any) => ({...c, Body: null, TemplateName: c.TemplateName || null}));
         }
         
         if (!isUtmEnabled) {
-             payload.Content = payload.Content.map((c: any) => {
-                const { Utm, ...rest } = c;
-                return rest;
-            });
+             payload.Content = payload.Content.map((c: any) => { const { Utm, ...rest } = c; return rest; });
         }
     
-        let finalRecipients: any;
-        if (recipientTarget === 'all') {
-            finalRecipients = {};
-        } else if (recipientTarget === 'list') {
-            finalRecipients = { ListNames: campaign.Recipients.ListNames || [] };
-        } else { // segment
-            finalRecipients = { SegmentNames: campaign.Recipients.SegmentNames || [] };
-        }
+        let finalRecipients = {};
+        if (recipientTarget === 'list') finalRecipients = { ListNames: campaign.Recipients.ListNames || [] };
+        else if (recipientTarget === 'segment') finalRecipients = { SegmentNames: campaign.Recipients.SegmentNames || [] };
     
-        const hasActualRecipients = 
-            recipientTarget === 'all' ||
-            (finalRecipients.ListNames && finalRecipients.ListNames.length > 0) ||
-            (finalRecipients.SegmentNames && finalRecipients.SegmentNames.length > 0);
-    
-        if (action === 'draft' && !hasActualRecipients) {
-            payload.Recipients = {};
-        } else {
-            payload.Recipients = finalRecipients;
-        }
+        payload.Recipients = finalRecipients;
     
         try {
-            await apiFetchV4('/campaigns', apiKey, { method: 'POST', body: payload });
-            if (payload.Status === 'Draft') {
-                addToast(t('draftSavedSuccess'), 'success');
+            if (isEditing && campaignToLoad) {
+                await apiFetchV4(`/campaigns/${encodeURIComponent(campaignToLoad.Name)}`, apiKey, { method: 'PUT', body: payload });
             } else {
-                addToast(t('emailSentSuccess'), 'success');
+                await apiFetchV4('/campaigns', apiKey, { method: 'POST', body: payload });
             }
+            
+            addToast(payload.Status === 'Draft' ? t('draftSavedSuccess') : t('emailSentSuccess'), 'success');
+            setView('Campaigns');
         } catch (err: any) {
             addToast(t('emailSentError', { error: err.message }), 'error');
         } finally {
@@ -236,9 +427,13 @@ const SendEmailView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     };
     
     const currentContent = campaign.Content[activeContent] || {};
-    const fromParts = (currentContent.From || '@').split('@');
-    const fromNamePart = fromParts[0];
-    const fromDomainPart = fromParts[1] || (verifiedDomains.length > 0 ? verifiedDomains[0] : '');
+    
+    const recipientAccordionTitle = useMemo(() => {
+        let title = `1. ${t('recipients')}`;
+        const count = isCountLoading ? '...' : (recipientCount !== null ? recipientCount.toLocaleString(i18n.language) : '...');
+        title += ` (${count})`;
+        return title;
+    }, [t, isCountLoading, recipientCount, i18n.language]);
     
     if (domainsLoading) return <CenteredMessage><Loader /></CenteredMessage>;
     
@@ -280,7 +475,7 @@ const SendEmailView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             <div className="accordion">
                 <AccordionItem 
                     id="recipients" 
-                    title={`1. ${t('recipients')}`}
+                    title={recipientAccordionTitle}
                     openAccordion={openAccordion}
                     setOpenAccordion={setOpenAccordion}
                 >
@@ -319,24 +514,19 @@ const SendEmailView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                     openAccordion={openAccordion}
                     setOpenAccordion={setOpenAccordion}
                 >
-                    {campaign.Content.length > 1 && (
-                        <div className="content-variant-tabs">
-                            <button type="button" className={`content-variant-tab ${activeContent === 0 ? 'active' : ''}`} onClick={() => setActiveContent(0)}>Content A</button>
-                            <button type="button" className={`content-variant-tab ${activeContent === 1 ? 'active' : ''}`} onClick={() => setActiveContent(1)}>Content B</button>
-                        </div>
-                    )}
                     <div className="form-grid">
                         <div className="form-group"><label>{t('fromName')}</label><input type="text" value={currentContent.FromName} onChange={e => handleValueChange('Content', 'FromName', e.target.value)} /></div>
                         <div className="form-group">
                             <label>{t('fromEmail')}</label>
-                            {verifiedDomains.length > 0 ? (
-                                <div className="from-email-composer">
-                                    <input type="text" value={fromNamePart} onChange={e => handleValueChange('Content', 'From', `${e.target.value}@${fromDomainPart}`)} />
-                                    <span className="from-email-at">@</span>
-                                    <select value={fromDomainPart} onChange={e => handleValueChange('Content', 'From', `${fromNamePart}@${e.target.value}`)}>
-                                        {verifiedDomains.map(d => <option key={d} value={d}>{d}</option>)}
-                                    </select>
-                                </div>
+                            {verifiedDomainsWithDefault.length > 0 ? (
+                                <>
+                                <select value={selectedDomain} onChange={handleDomainChange}>
+                                    {verifiedDomainsWithDefault.map(d => <option key={d.domain} value={d.domain}>{d.domain}</option>)}
+                                </select>
+                                <p style={{fontSize: '0.9rem', color: 'var(--subtle-text-color)', marginTop: '0.5rem'}}>
+                                    Sending from: <strong>{currentContent.From}</strong>
+                                </p>
+                                </>
                             ) : (
                                 <div className="info-message warning" style={{width: '100%', margin: 0}}>
                                     <p style={{margin: 0}}>
@@ -443,14 +633,15 @@ const SendEmailView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                 <button type="button" className="btn" onClick={() => handleSubmit('draft')} disabled={isSending}>{t('saveAsDraft')}</button>
                 {!isScheduling ? (
                     <div style={{display: 'flex', gap: '1rem'}}>
-                         <button type="button" className="btn btn-secondary" onClick={() => setIsScheduling(true)} disabled={isSending || verifiedDomains.length === 0}>{t('schedule')}</button>
-                         <button type="button" className="btn btn-primary" onClick={() => handleSubmit('send')} disabled={isSending || verifiedDomains.length === 0}>{isSending ? <Loader/> : t('sendNow')}</button>
+                         <button type="button" className="btn btn-secondary" onClick={() => setIsScheduling(true)} disabled={isSending || verifiedDomainsWithDefault.length === 0}>{t('schedule')}</button>
+                         <button type="button" className="btn btn-primary" onClick={() => handleSubmit('send')} disabled={isSending || verifiedDomainsWithDefault.length === 0}>{isSending ? <Loader/> : t('sendNow')}</button>
                     </div>
                 ) : (
                     <div className="schedule-controls">
-                        <input type="datetime-local" value={campaign.Options.ScheduleFor?.slice(0, 16) || ''} onChange={e => handleValueChange('Options', 'ScheduleFor', e.target.value ? new Date(e.target.value).toISOString() : null)} />
+                        <input type="date" value={scheduleDate} onChange={e => setScheduleDate(e.target.value)} required />
+                        <input type="time" value={scheduleTime} onChange={e => setScheduleTime(e.target.value)} required />
                         <button type="button" className="btn" onClick={() => setIsScheduling(false)} disabled={isSending}>{t('cancel')}</button>
-                        <button type="button" className="btn btn-primary" onClick={() => handleSubmit('schedule')} disabled={isSending || !campaign.Options.ScheduleFor || verifiedDomains.length === 0}>{isSending ? <Loader/> : t('confirm')}</button>
+                        <button type="button" className="btn btn-primary" onClick={() => handleSubmit('schedule')} disabled={isSending || !campaign.Options.ScheduleFor || verifiedDomainsWithDefault.length === 0}>{isSending ? <Loader/> : t('confirm')}</button>
                     </div>
                 )}
             </div>

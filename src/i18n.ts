@@ -442,6 +442,7 @@ const resources = {
       subject: 'Subject',
       fromEmail: 'From Email',
       fromName: 'From Name',
+      preheader: 'Preheader',
       sendTo: 'Send To',
       allContacts: 'All Contacts',
       aList: 'Lists',

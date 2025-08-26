@@ -34,7 +34,8 @@ export const apiFetch = async (endpoint: string, apiKey: string, options: { meth
 };
 
 // --- API Helper for v4 ---
-export const apiFetchV4 = async (endpoint: string, apiKey: string, options: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE', params?: Record<string, any>, body?: any } = {}) => {
+// FIX: Add 'PATCH' to the list of allowed methods for v4 API calls.
+export const apiFetchV4 = async (endpoint: string, apiKey: string, options: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', params?: Record<string, any>, body?: any } = {}) => {
     const { method = 'GET', params = {}, body = null } = options;
     const queryParams = new URLSearchParams(params).toString();
     const url = `${ELASTIC_EMAIL_API_V4_BASE}${endpoint}${queryParams ? `?${queryParams}` : ''}`;
@@ -46,7 +47,8 @@ export const apiFetchV4 = async (endpoint: string, apiKey: string, options: { me
         }
     };
     
-    if (body && (method === 'POST' || method === 'PUT')) {
+    // FIX: Include PATCH method when checking if a request body should be added.
+    if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
         fetchOptions.headers['Content-Type'] = 'application/json';
         fetchOptions.body = JSON.stringify(body);
     }

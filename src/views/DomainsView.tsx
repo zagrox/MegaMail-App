@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
 import { apiFetchV4 } from '../api/elasticEmail';
@@ -10,6 +10,7 @@ import Icon, { ICONS } from '../components/Icon';
 import Badge from '../components/Badge';
 import ConfirmModal from '../components/ConfirmModal';
 import { useStatusStyles } from '../hooks/useStatusStyles';
+import Modal from '../components/Modal';
 
 const DNS_RECORDS_CONFIG = {
     SPF: {
@@ -43,6 +44,67 @@ const DNS_RECORDS_CONFIG = {
 };
 
 type VerificationStatus = 'idle' | 'checking' | 'verified' | 'failed';
+
+const SetDefaultSenderModal = ({ isOpen, onClose, domain, apiKey, onSuccess }: { isOpen: boolean; onClose: () => void; domain: any; apiKey: string; onSuccess: () => void; }) => {
+    const { t } = useTranslation();
+    const [localPart, setLocalPart] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
+    const { addToast } = useToast();
+
+    useEffect(() => {
+        const defaultSender = domain?.DefaultSender || domain?.defaultsender;
+        if (defaultSender) {
+            setLocalPart(defaultSender.split('@')[0]);
+        } else {
+            setLocalPart('mailer'); // Default value
+        }
+    }, [domain]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSaving(true);
+        const fullEmail = `${localPart}@${domain.Domain}`;
+        try {
+            await apiFetchV4(`/domains/${encodeURIComponent(fullEmail)}/default`, apiKey, {
+                method: 'PATCH',
+            });
+            addToast('Default sender updated successfully!', 'success');
+            onSuccess();
+        } catch (err: any) {
+            addToast(`Failed to update: ${err.message}`, 'error');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title={`${t('Default sender')}`}>
+            <form onSubmit={handleSubmit} className="modal-form">
+                <p>Default sender is an email address used in your emails as a 'From' address. We strongly recommend setting a default sender to help increase your deliverability performance.</p>
+                <div className="form-group">
+                    <label htmlFor="email-local-part">{t('emailAddress')}</label>
+                    <div className="from-email-composer">
+                        <input
+                            id="email-local-part"
+                            type="text"
+                            value={localPart}
+                            onChange={e => setLocalPart(e.target.value.trim())}
+                            required
+                        />
+                        <span className="from-email-at">@{domain.Domain}</span>
+                    </div>
+                </div>
+                <div className="form-actions" style={{ marginTop: '1.5rem' }}>
+                    <button type="button" className="btn" onClick={onClose} disabled={isSaving}>{t('cancel')}</button>
+                    <button type="submit" className="btn btn-primary" disabled={isSaving || !localPart}>
+                        {isSaving ? <Loader /> : t('saveChanges')}
+                    </button>
+                </div>
+            </form>
+        </Modal>
+    );
+};
+
 
 const VerificationStatusIndicator = ({ status }: { status: VerificationStatus }) => {
     const { t } = useTranslation();
@@ -132,6 +194,8 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [expandedDomain, setExpandedDomain] = useState<string | null>(null);
     const [domainToDelete, setDomainToDelete] = useState<string | null>(null);
+    const [domainToEdit, setDomainToEdit] = useState<any | null>(null);
+
     const { getStatusStyle } = useStatusStyles();
 
     const { data, loading, error } = useApiV4('/domains', apiKey, {}, refetchIndex);
@@ -191,6 +255,18 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
             >
                 <p>{t('confirmDeleteDomain', { domainName: domainToDelete })}</p>
             </ConfirmModal>
+            {domainToEdit && (
+                <SetDefaultSenderModal
+                    isOpen={!!domainToEdit}
+                    onClose={() => setDomainToEdit(null)}
+                    domain={domainToEdit}
+                    apiKey={apiKey}
+                    onSuccess={() => {
+                        setDomainToEdit(null);
+                        refetch();
+                    }}
+                />
+            )}
              <div className="view-header">
                 <form className="add-domain-form" onSubmit={handleAddDomain}>
                     <input
@@ -215,6 +291,7 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                     <thead>
                         <tr>
                             <th>{t('domains')}</th>
+                            <th>{t('fromEmail')}</th>
                             <th>{t('status')}</th>
                             <th style={{ width: '1%', whiteSpace: 'nowrap', textAlign: i18n.dir() === 'rtl' ? 'left' : 'right' }}>{t('action')}</th>
                         </tr>
@@ -223,6 +300,8 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                         {domainsList.map((domain: any) => {
                              const domainName = domain.Domain || domain.domain;
                              if (!domainName) return null;
+
+                             const defaultSender = domain.DefaultSender || domain.defaultsender;
                              
                              const getVerificationStyle = (isVerified: boolean) => isVerified ? getStatusStyle('Verified') : getStatusStyle('Missing');
                              
@@ -237,6 +316,12 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                                 <React.Fragment key={domainName}>
                                 <tr>
                                     <td><strong>{domainName}</strong></td>
+                                    <td>
+                                        <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                                            <span>{defaultSender || t('notSet', {defaultValue: 'Not Set'})}</span>
+                                            <button className="btn-icon" onClick={() => setDomainToEdit(domain)}><Icon path={ICONS.PENCIL} /></button>
+                                        </div>
+                                    </td>
                                     <td>
                                         <div className="domain-status-pills">
                                             <Badge text="SPF" type={getVerificationStyle(isSpfVerified).type} />
@@ -267,7 +352,7 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                                 </tr>
                                 {isExpanded && (
                                     <tr>
-                                        <td colSpan={3} style={{ padding: 0 }}>
+                                        <td colSpan={4} style={{ padding: 0 }}>
                                             <DomainVerificationChecker domainName={domainName} />
                                         </td>
                                     </tr>
