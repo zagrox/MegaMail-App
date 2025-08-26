@@ -272,22 +272,22 @@ const ContactCard = React.memo(({ contact, onView, onDelete, isSelected, onToggl
     return (
         <div className={`card contact-card ${isSelected ? 'selected' : ''}`}>
             <div className="contact-card-main" onClick={() => onToggleSelect(contact.Email)}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexGrow: 1, minWidth: 0 }}>
-                    <label className="custom-checkbox" onClick={(e) => e.stopPropagation()}>
-                        <input type="checkbox" checked={isSelected} onChange={() => onToggleSelect(contact.Email)} />
-                        <span className="checkbox-checkmark"></span>
-                    </label>
-                    <div className="contact-card-info" onClick={(e) => handleActionClick(e, () => onView(contact.Email))} style={{ cursor: 'pointer', flexGrow: 1, minWidth: 0 }}>
-                        <h4 className="contact-card-name" title={contact.Email}>{contact.FirstName || contact.LastName ? `${contact.FirstName || ''} ${contact.LastName || ''}`.trim() : contact.Email}</h4>
-                        <p className="contact-card-email">{contact.Email}</p>
-                    </div>
+                <div className="contact-card-info" onClick={(e) => handleActionClick(e, () => onView(contact.Email))} style={{ cursor: 'pointer', flexGrow: 1, minWidth: 0 }}>
+                    <h4 className="contact-card-name" title={contact.Email}>{contact.FirstName || contact.LastName ? `${contact.FirstName || ''} ${contact.LastName || ''}`.trim() : contact.Email}</h4>
+                    <p className="contact-card-email">{contact.Email}</p>
                 </div>
                 <div className="contact-card-status">
                     <Badge text={statusStyle.text} type={statusStyle.type} color={statusStyle.color} iconPath={statusStyle.iconPath} />
                 </div>
             </div>
             <div className="contact-card-footer">
-                <small>{t('dateAdded')}: {formatDateForDisplay(contact.DateAdded, i18n.language)}</small>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <label className="custom-checkbox" onClick={(e) => e.stopPropagation()}>
+                        <input type="checkbox" checked={isSelected} onChange={() => onToggleSelect(contact.Email)} />
+                        <span className="checkbox-checkmark"></span>
+                    </label>
+                    <small>{t('dateAdded')}: {formatDateForDisplay(contact.DateAdded, i18n.language)}</small>
+                </div>
                 <div className="action-buttons">
                     <button className="btn-icon btn-icon-danger" onClick={(e) => handleActionClick(e, () => onDelete(contact.Email))} aria-label={t('deleteContact')}>
                         <Icon path={ICONS.DELETE} />
@@ -566,37 +566,51 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                 />
 
                 <div className="contacts-view-main">
-                    <div className="view-header contacts-header">
-                        <div className="contacts-selection-header">
-                             <label className="custom-checkbox" title={isAllVisibleSelected ? "Deselect all on page" : "Select all on page"}>
+                    <div className="contacts-view-header-sticky">
+                        <div className="view-header contacts-header">
+                            <div
+                                className="contacts-selection-header"
+                                onClick={toggleSelectAll}
+                                role="button"
+                                tabIndex={0}
+                                aria-label={isAllVisibleSelected ? t('deselectAllOnPage') : t('selectAllOnPage')}
+                                onKeyPress={(e) => (e.key === 'Enter' || e.key === ' ') && toggleSelectAll()}
+                            >
                                 <input
                                     type="checkbox"
                                     checked={isAllVisibleSelected}
-                                    onChange={toggleSelectAll}
+                                    onChange={() => {}} // The parent div handles the click
                                     disabled={loading || paginatedContacts.length === 0}
+                                    tabIndex={-1} // Makes the checkbox itself unfocusable
                                 />
                                 <span className="checkbox-checkmark"></span>
-                            </label>
-                        </div>
-                        <div className="search-bar">
-                             <Icon path={ICONS.SEARCH} />
-                            <input
-                                type="search"
-                                placeholder={t('searchContactsPlaceholder')}
-                                value={searchQuery}
-                                onChange={(e) => {
-                                    setSearchQuery(e.target.value);
-                                    setOffset(0);
-                                }}
-                            />
-                        </div>
-                        <div className="header-actions">
-                            <button className="btn" onClick={() => setIsImportModalOpen(true)}>
-                                <Icon path={ICONS.UPLOAD} /> {t('importContacts')}
-                            </button>
-                            <button className="btn btn-primary" onClick={() => setIsAddModalOpen(true)}>
-                                <Icon path={ICONS.USER_PLUS} /> {t('addContact')}
-                            </button>
+                                <span>
+                                    {selectedContacts.length > 0
+                                        ? t('countSelected', { count: selectedContacts.length })
+                                        : t('selectPage')
+                                    }
+                                </span>
+                            </div>
+                            <div className="search-bar">
+                                <Icon path={ICONS.SEARCH} />
+                                <input
+                                    type="search"
+                                    placeholder={t('searchContactsPlaceholder')}
+                                    value={searchQuery}
+                                    onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        setOffset(0);
+                                    }}
+                                />
+                            </div>
+                            <div className="header-actions">
+                                <button className="btn" onClick={() => setIsImportModalOpen(true)}>
+                                    <Icon path={ICONS.UPLOAD} /> {t('importContacts')}
+                                </button>
+                                <button className="btn btn-primary" onClick={() => setIsAddModalOpen(true)}>
+                                    <Icon path={ICONS.USER_PLUS} /> {t('addContact')}
+                                </button>
+                            </div>
                         </div>
                     </div>
 

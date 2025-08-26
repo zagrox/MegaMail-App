@@ -4,6 +4,7 @@
   --secondary-color-dark: #0069D9;
   --background-color: #F7F9FC;
   --surface-color: #FFFFFF;
+  --surface-color-rgb-for-sticky: 255, 255, 255;
   --subtle-background: #F8FAFC;
   --input-background-color: var(--background-color);
   --text-color: #334155;
@@ -28,6 +29,7 @@ html[data-theme='dark'] {
   --secondary-color-dark: #2563EB;
   --background-color: #111827;
   --surface-color: #1F2937;
+  --surface-color-rgb-for-sticky: 31, 41, 55;
   --subtle-background: #111827;
   --input-background-color: #374151;
   --text-color: #F9FAFB;
@@ -1483,7 +1485,7 @@ tbody tr:hover {
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
     flex-wrap: wrap;
 }
 .search-bar {
@@ -1537,15 +1539,52 @@ html[data-theme='dark'] .contact-status-filter-item .badge {
     background-color: var(--border-color);
 }
 
+.contacts-view-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 1rem;
+    margin: 0rem 0rem 1rem 0rem; /* Adjust for parent padding and add margin-bottom */
+    background-color: rgba(var(--surface-color-rgb-for-sticky), 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 2px solid var(--border-color);
+}
+
 .contacts-header {
     display: flex;
     gap: 1.5rem;
     align-items: center;
     width: 100%;
 }
-.contacts-header .contacts-selection-header {
-    flex-shrink: 0;
+.contacts-selection-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--surface-color);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: 500;
+    white-space: nowrap;
 }
+.contacts-selection-header:hover {
+    background-color: var(--subtle-background);
+}
+.contacts-selection-header input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.contacts-selection-header .checkbox-checkmark {
+    top: 0;
+    left: 0;
+    position: relative;
+}
+
 .contacts-header .search-bar {
     flex-grow: 2; /* Give more space to search */
 }
@@ -3068,7 +3107,7 @@ html[dir="rtl"] .multi-select-input {
     user-select: none;
 }
 .custom-checkbox input {
-    position: absolute;
+    position: relative;
     opacity: 0;
     cursor: pointer;
 }

@@ -1,6 +1,7 @@
 
 
 
+
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -286,6 +287,10 @@ const resources = {
       confirmAndPay: 'Confirm and Pay',
       paymentSuccess: 'Payment Successful',
       // Contacts View
+      selectPage: 'Select Page',
+      countSelected: '{{count}} selected',
+      selectAllOnPage: 'Select all on page',
+      deselectAllOnPage: 'Deselect all on page',
       searchContactsPlaceholder: 'Search by name or email...',
       importContacts: 'Import Contacts',
       addContact: 'Add Contact',
@@ -998,6 +1003,10 @@ const resources = {
       paymentSuccess: 'پرداخت موفق',
       totalAmount: 'مبلغ سفارش',
       // Contacts View
+      selectPage: 'انتخاب صفحه',
+      countSelected: '{{count}} انتخاب شده',
+      selectAllOnPage: 'انتخاب همه در این صفحه',
+      deselectAllOnPage: 'لغو انتخاب همه در این صفحه',
       searchContactsPlaceholder: 'جستجو بر اساس نام یا ایمیل...',
       importContacts: 'وارد کردن مخاطبین',
       addContact: 'افزودن مخاطب',
