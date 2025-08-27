@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -8,6 +9,9 @@ import ErrorMessage from '../components/ErrorMessage';
 import Icon, { ICONS } from '../components/Icon';
 import Badge from '../components/Badge';
 import { useStatusStyles } from '../hooks/useStatusStyles';
+import AddContactToListModal from '../components/AddContactToListModal';
+import { apiFetchV4 } from '../api/elasticEmail';
+import { useToast } from '../contexts/ToastContext';
 
 const ListDetailView = ({ apiKey, list, onBack, setView }: {
     apiKey: string;
@@ -17,6 +21,8 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
 }) => {
     const { t, i18n } = useTranslation();
     const { getStatusStyle } = useStatusStyles();
+    const { addToast } = useToast();
+    const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [offset, setOffset] = useState(0);
     const [refetchIndex, setRefetchIndex] = useState(0);
@@ -30,6 +36,22 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
         { limit: 10000 }, // Fetch a large number for client-side search/pagination
         refetchIndex
     );
+    
+    const refetch = () => setRefetchIndex(i => i + 1);
+
+    const handleAddContacts = async (emails: string[]) => {
+        try {
+            await apiFetchV4(`/lists/${encodeURIComponent(listName)}/contacts`, apiKey, {
+                method: 'POST',
+                body: { Emails: emails }
+            });
+            addToast(`${emails.length} contact(s) added to ${listName} successfully!`, 'success');
+            setIsAddContactModalOpen(false);
+            refetch();
+        } catch (err: any) {
+            addToast(`Failed to add contacts: ${err.message}`, 'error');
+        }
+    };
     
     const filteredContacts = React.useMemo(() => {
         if (!Array.isArray(allContacts)) return [];
@@ -59,6 +81,12 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
     
     return (
         <div>
+            <AddContactToListModal
+                isOpen={isAddContactModalOpen}
+                onClose={() => setIsAddContactModalOpen(false)}
+                onSubmit={handleAddContacts}
+                listName={listName}
+            />
             <div className="view-header" style={{flexWrap: 'nowrap'}}>
                 <button className="btn btn-secondary" onClick={onBack} style={{whiteSpace: 'nowrap'}}>
                     <Icon path={ICONS.CHEVRON_LEFT} />
@@ -67,7 +95,7 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                 <div style={{flexGrow: 1, display: 'flex', justifyContent: 'center'}}>
                     <h2 className="content-header" style={{margin: 0, borderBottom: 'none'}}>{t('contactsInList', { listName })}</h2>
                 </div>
-                <div className="header-actions" style={{display: 'flex', justifyContent: 'flex-end'}}>
+                <div className="header-actions" style={{display: 'flex', justifyContent: 'flex-end', gap: '1rem', alignItems: 'center'}}>
                      <div className="search-bar">
                         <Icon path={ICONS.SEARCH} />
                         <input
@@ -81,6 +109,9 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                             disabled={loading}
                         />
                     </div>
+                    <button className="btn btn-primary" onClick={() => setIsAddContactModalOpen(true)}>
+                        <Icon path={ICONS.USER_PLUS} /> {t('addContact')}
+                    </button>
                 </div>
             </div>
             

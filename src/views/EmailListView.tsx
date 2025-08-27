@@ -46,7 +46,10 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
         try {
             await apiFetchV4(`/lists/${encodeURIComponent(list.ListName)}`, apiKey, {
                 method: 'PUT',
-                body: { AllowUnsubscribe: newAllowUnsubscribe }
+                body: { 
+                    NewListName: list.ListName,
+                    AllowUnsubscribe: newAllowUnsubscribe 
+                }
             });
             addToast(`'${list.ListName}' updated successfully.`, 'success');
             refetch(); // Refetch data to get the latest state
@@ -92,7 +95,10 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
         try {
             await apiFetchV4(`/lists/${encodeURIComponent(listToRename.ListName)}`, apiKey, {
                 method: 'PUT',
-                body: { ListName: newName }
+                body: { 
+                    NewListName: newName,
+                    AllowUnsubscribe: listToRename.AllowUnsubscribe
+                }
             });
             addToast(t('listRenamedSuccess', { newName }), 'success');
             setListToRename(null);
