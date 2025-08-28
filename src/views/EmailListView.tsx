@@ -11,6 +11,7 @@ import { useToast } from '../contexts/ToastContext';
 import RenameModal from '../components/RenameModal';
 import Icon, { ICONS } from '../components/Icon';
 import ConfirmModal from '../components/ConfirmModal';
+import LineLoader from '../components/LineLoader';
 
 
 const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void }) => {
@@ -235,7 +236,7 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                                                 </button>
                                             </td>
                                             <td style={{ textAlign: 'center' }}>
-                                                {countInfo?.loading || !countInfo ? <div className="table-container td .loader"><Loader/></div> :
+                                                {countInfo?.loading || !countInfo ? <div style={{maxWidth: '50px', margin: '0 auto'}}><LineLoader/></div> :
                                                  countInfo.error ? 'N/A' :
                                                  countInfo.count !== null ? countInfo.count.toLocaleString(i18n.language) : '-'}
                                             </td>

@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -13,6 +14,7 @@ import { useStatusStyles } from '../hooks/useStatusStyles';
 import { Segment } from '../api/types';
 // FIX: Import useToast hook
 import { useToast } from '../contexts/ToastContext';
+import LineLoader from '../components/LineLoader';
 
 const CampaignDetailModal = ({ campaign, apiKey, isOpen, onClose }: { campaign: any, apiKey: string, isOpen: boolean, onClose: () => void }) => {
     const { t, i18n } = useTranslation();
@@ -165,7 +167,7 @@ const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { cam
             </div>
             <div className="campaign-card-footer">
                 <div className="campaign-card-footer-stats">
-                    {loadingStats && !stats ? <Loader /> : (
+                    {loadingStats && !stats ? <div style={{width: '80px'}}><LineLoader /></div> : (
                         stats ? (
                             <>
                                 <span>{t('delivered')}: <strong>{stats.Delivered.toLocaleString(i18n.language)}</strong></span>

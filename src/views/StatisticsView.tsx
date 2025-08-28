@@ -11,6 +11,7 @@ import AccountDataCard from '../components/AccountDataCard';
 import Icon, { ICONS } from '../components/Icon';
 import OverallActivityChart from '../components/OverallActivityChart';
 import ChannelStatsTable from '../components/ChannelStatsTable';
+import LineLoader from '../components/LineLoader';
 
 const StatisticsView = ({ apiKey, isEmbed = false }: { apiKey: string, isEmbed?: boolean }) => {
     const { t, i18n } = useTranslation();
@@ -122,22 +123,20 @@ const StatisticsView = ({ apiKey, isEmbed = false }: { apiKey: string, isEmbed?:
         <>
             {filterControl}
 
-            {aggregateLoading ? (
-                <CenteredMessage><Loader /></CenteredMessage>
-            ) : aggregateError ? (
+            {aggregateError ? (
                 <ErrorMessage error={aggregateError} />
-            ) : (!aggregateStats || Object.keys(aggregateStats).length === 0) ? (
+            ) : (!aggregateLoading && (!aggregateStats || Object.keys(aggregateStats).length === 0)) ? (
                 <CenteredMessage>{t('noStatsForPeriod', { period: durationOptions[duration].label.toLowerCase() })}</CenteredMessage>
             ) : (
                 <div className="card-grid account-grid" style={{ marginBottom: '1.5rem' }}>
-                    <AccountDataCard title={t('totalEmails')} iconPath={ICONS.MAIL}>{aggregateStats.EmailTotal?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
-                    <AccountDataCard title={t('recipients')} iconPath={ICONS.CONTACTS}>{aggregateStats.Recipients?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
-                    <AccountDataCard title={t('delivered')} iconPath={ICONS.VERIFY}>{aggregateStats.Delivered?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
-                    <AccountDataCard title={t('opened')} iconPath={ICONS.EYE}>{aggregateStats.Opened?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
-                    <AccountDataCard title={t('clicked')} iconPath={ICONS.CLICK}>{aggregateStats.Clicked?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
-                    <AccountDataCard title={t('unsubscribed')} iconPath={ICONS.LOGOUT}>{aggregateStats.Unsubscribed?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
-                    <AccountDataCard title={t('complaints')} iconPath={ICONS.COMPLAINT}>{aggregateStats.Complaints?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
-                    <AccountDataCard title={t('bounced')} iconPath={ICONS.BOUNCED}>{aggregateStats.Bounced?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
+                    <AccountDataCard title={t('totalEmails')} iconPath={ICONS.MAIL}>{aggregateLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : aggregateStats.EmailTotal?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
+                    <AccountDataCard title={t('recipients')} iconPath={ICONS.CONTACTS}>{aggregateLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : aggregateStats.Recipients?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
+                    <AccountDataCard title={t('delivered')} iconPath={ICONS.VERIFY}>{aggregateLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : aggregateStats.Delivered?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
+                    <AccountDataCard title={t('opened')} iconPath={ICONS.EYE}>{aggregateLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : aggregateStats.Opened?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
+                    <AccountDataCard title={t('clicked')} iconPath={ICONS.CLICK}>{aggregateLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : aggregateStats.Clicked?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
+                    <AccountDataCard title={t('unsubscribed')} iconPath={ICONS.LOGOUT}>{aggregateLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : aggregateStats.Unsubscribed?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
+                    <AccountDataCard title={t('complaints')} iconPath={ICONS.COMPLAINT}>{aggregateLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : aggregateStats.Complaints?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
+                    <AccountDataCard title={t('bounced')} iconPath={ICONS.BOUNCED}>{aggregateLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : aggregateStats.Bounced?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
                 </div>
             )}
             

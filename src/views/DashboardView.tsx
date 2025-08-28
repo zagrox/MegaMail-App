@@ -12,6 +12,7 @@ import useModules from '../hooks/useModules';
 import { Module } from '../api/types';
 import UnlockModuleModal from '../components/UnlockModuleModal';
 import { useConfiguration } from '../contexts/ConfigurationContext';
+import LineLoader from '../components/LineLoader';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
     const { t, i18n } = useTranslation();
@@ -99,13 +100,13 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
 
             <div className="dashboard-stats-grid">
                  <AccountDataCard title={t('sendingReputation')} iconPath={ICONS.TRENDING_UP}>
-                    {accountLoading ? '...' : (accountData?.reputation ? `${accountData.reputation}%` : 'N/A')}
+                    {accountLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : (accountData?.reputation ? `${accountData.reputation}%` : 'N/A')}
                 </AccountDataCard>
                 <AccountDataCard title={t('emailsSent365d')} iconPath={ICONS.MAIL}>
-                    {statsLoading ? '...' : (statsData?.EmailTotal?.toLocaleString(i18n.language) ?? '0')}
+                    {statsLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : (statsData?.EmailTotal?.toLocaleString(i18n.language) ?? '0')}
                 </AccountDataCard>
                  <AccountDataCard title={t('totalContacts')} iconPath={ICONS.CONTACTS}>
-                    {contactsCountLoading ? '...' : (contactsCountData?.toLocaleString(i18n.language) ?? '0')}
+                    {contactsCountLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : (contactsCountData?.toLocaleString(i18n.language) ?? '0')}
                 </AccountDataCard>
             </div>
 

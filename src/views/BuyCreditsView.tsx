@@ -2,12 +2,13 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from './useApi';
 import Icon, { ICONS } from '../components/Icon';
-import Loader from '../components/Loader';
+import LineLoader from '../components/LineLoader';
 import Modal from '../components/Modal';
 import ErrorMessage from '../components/ErrorMessage';
 import CenteredMessage from '../components/CenteredMessage';
 import sdk from '../api/directus';
 import { useConfiguration } from '../contexts/ConfigurationContext';
+import Loader from '../components/Loader';
 
 const CreditSelector = ({ packages, onPurchase, isSubmitting }: { packages: any[], onPurchase: (pkg: any) => void, isSubmitting: boolean }) => {
     const { t, i18n } = useTranslation();
@@ -93,7 +94,7 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
                 <div>
                     <span className="balance-title">{t('yourCurrentBalance')}</span>
                     <span className="balance-amount">
-                        {creditLoading ? <Loader /> : (creditError || accountData?.emailcredits === undefined) ? 'N/A' : Number(accountData.emailcredits).toLocaleString(i18n.language)}
+                        {creditLoading ? <div style={{width: '100px', display: 'inline-block'}}><LineLoader /></div> : (creditError || accountData?.emailcredits === undefined) ? 'N/A' : Number(accountData.emailcredits).toLocaleString(i18n.language)}
                     </span>
                 </div>
             </div>
