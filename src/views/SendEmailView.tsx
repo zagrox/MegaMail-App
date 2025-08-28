@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -38,14 +37,14 @@ const AccordionItem = ({
     setOpenAccordion 
 }: { 
     id: AccordionSection, 
-    title: string, 
+    title: React.ReactNode, 
     children: React.ReactNode,
     openAccordion: AccordionSection,
     setOpenAccordion: (id: AccordionSection) => void
 }) => (
     <div className="accordion-item">
         <div className={`accordion-header ${openAccordion === id ? 'open' : ''}`} onClick={() => setOpenAccordion(openAccordion === id ? '' : id)}>
-            <h3>{title}</h3>
+            <div className="accordion-title">{title}</div>
             <Icon path={ICONS.CHEVRON_DOWN} className={`accordion-icon ${openAccordion === id ? 'open' : ''}`} />
         </div>
         {openAccordion === id && <div className="accordion-content">{children}</div>}
@@ -73,6 +72,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     const [recipientCount, setRecipientCount] = useState<number | null>(null);
     const [isCountLoading, setIsCountLoading] = useState(false);
     const [campaign, setCampaign] = useState(JSON.parse(JSON.stringify(initialCampaignState)));
+    const [segmentCounts, setSegmentCounts] = useState<Record<string, number | null>>({});
     
     const { data: lists, loading: listsLoading } = useApiV4('/lists', apiKey, { limit: 1000 });
     const { data: segments, loading: segmentsLoading } = useApiV4('/segments', apiKey, {});
@@ -88,7 +88,34 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     );
     
     const listItems = useMemo(() => (Array.isArray(lists) ? lists : []).map((l: List) => ({ id: l.ListName, name: l.ListName })), [lists]);
-    const segmentItems = useMemo(() => (Array.isArray(segments) ? segments : []).map((s: Segment) => ({ id: s.Name, name: s.Name })), [segments]);
+    
+    useEffect(() => {
+        if (segments && Array.isArray(segments) && apiKey) {
+            segments.forEach((seg: Segment) => {
+                if (segmentCounts[seg.Name] === undefined) {
+                    apiFetch('/contact/count', apiKey, { params: { rule: seg.Rule } })
+                        .then(count => {
+                            setSegmentCounts(prev => ({ ...prev, [seg.Name]: Number(count) }));
+                        })
+                        .catch(() => {
+                            setSegmentCounts(prev => ({ ...prev, [seg.Name]: null }));
+                        });
+                }
+            });
+        }
+    }, [segments, apiKey, segmentCounts]);
+
+    const segmentItems = useMemo(() => {
+        if (!Array.isArray(segments)) return [];
+        return segments.map((s: Segment) => {
+            const count = segmentCounts[s.Name];
+            const nameWithCount = count !== null && count !== undefined
+                ? `${s.Name} (${count.toLocaleString()})`
+                : s.Name;
+            return { id: s.Name, name: nameWithCount };
+        });
+    }, [segments, segmentCounts]);
+
 
     const verifiedDomainsWithDefault = useMemo(() => {
         if (!Array.isArray(domains)) return [];
@@ -237,7 +264,9 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         const calculateCount = async () => {
             if (!apiKey) return;
     
-            const shouldShowLoader = recipientTarget === 'all' || (recipientTarget === 'list' && campaign.Recipients.ListNames.length > 0);
+            const shouldShowLoader = recipientTarget === 'all' 
+                || (recipientTarget === 'list' && campaign.Recipients.ListNames.length > 0);
+
             if (shouldShowLoader) {
                 setIsCountLoading(true);
             }
@@ -256,15 +285,11 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                     const total = counts.reduce((sum, count) => sum + Number(count), 0);
                     setRecipientCount(total);
                 } else if (recipientTarget === 'segment' && campaign.Recipients.SegmentNames.length > 0) {
-                    if (segments && Array.isArray(segments)) {
-                        const total = campaign.Recipients.SegmentNames.reduce((sum, segmentName) => {
-                            const segment = segments.find((s: Segment) => s.Name === segmentName);
-                            return sum + (segment?.ContactsCount || 0);
-                        }, 0);
-                        setRecipientCount(total);
-                    } else {
-                        setRecipientCount(null);
-                    }
+                    const total = campaign.Recipients.SegmentNames.reduce((sum, segmentName) => {
+                        const count = segmentCounts[segmentName];
+                        return sum + (typeof count === 'number' ? count : 0);
+                    }, 0);
+                    setRecipientCount(total);
                 } else {
                     setRecipientCount(0);
                 }
@@ -284,7 +309,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         }, 300);
     
         return () => clearTimeout(debounceTimer);
-    }, [recipientTarget, campaign.Recipients.ListNames, campaign.Recipients.SegmentNames, apiKey, segments, addToast]);
+    }, [recipientTarget, campaign.Recipients.ListNames, campaign.Recipients.SegmentNames, apiKey, segmentCounts, addToast]);
 
 
     useEffect(() => {
@@ -429,10 +454,14 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     const currentContent = campaign.Content[activeContent] || {};
     
     const recipientAccordionTitle = useMemo(() => {
-        let title = `1. ${t('recipients')}`;
-        const count = isCountLoading ? '...' : (recipientCount !== null ? recipientCount.toLocaleString(i18n.language) : '...');
-        title += ` (${count})`;
-        return title;
+        return (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span>1. {t('recipients')}</span>
+                <span className="badge-total-recipients">
+                    {isCountLoading ? <Loader /> : (recipientCount !== null ? recipientCount.toLocaleString(i18n.language) : '0')}
+                </span>
+            </div>
+        );
     }, [t, isCountLoading, recipientCount, i18n.language]);
     
     if (domainsLoading) return <CenteredMessage><Loader /></CenteredMessage>;

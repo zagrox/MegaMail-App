@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
-import { apiFetchV4 } from '../api/elasticEmail';
+import { apiFetch, apiFetchV4 } from '../api/elasticEmail';
 import { Segment } from '../api/types';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
@@ -12,6 +12,7 @@ import RenameModal from '../components/RenameModal';
 import RuleBuilder from '../components/RuleBuilder';
 import Icon, { ICONS } from '../components/Icon';
 import ConfirmModal from '../components/ConfirmModal';
+import LineLoader from '../components/LineLoader';
 
 const FIELD_TYPES: Record<string, 'date' | 'number' | 'boolean' | 'string'> = {
     DateAdded: 'date', DateUpdated: 'date', StatusChangeDate: 'date', ConsentDate: 'date',
@@ -187,9 +188,27 @@ const SegmentsView = ({ apiKey }: { apiKey: string }) => {
     const [segmentToRename, setSegmentToRename] = useState<Segment | null>(null);
     const [segmentToEditRules, setSegmentToEditRules] = useState<Segment | null>(null);
     const [segmentToDelete, setSegmentToDelete] = useState<string | null>(null);
+    const [segmentCounts, setSegmentCounts] = useState<Record<string, { count: number | null; loading: boolean; error: boolean }>>({});
 
     const { data: segments, loading, error } = useApiV4('/segments', apiKey, {}, refetchIndex);
     const refetch = () => setRefetchIndex(i => i + 1);
+
+    useEffect(() => {
+        if (segments && Array.isArray(segments) && apiKey) {
+            segments.forEach((seg: Segment) => {
+                if (!segmentCounts[seg.Name]) { // Only fetch if not already there
+                    setSegmentCounts(prev => ({ ...prev, [seg.Name]: { count: null, loading: true, error: false } }));
+                    apiFetch('/contact/count', apiKey, { params: { rule: seg.Rule } })
+                        .then(count => {
+                            setSegmentCounts(prev => ({ ...prev, [seg.Name]: { count: Number(count), loading: false, error: false } }));
+                        })
+                        .catch(() => {
+                            setSegmentCounts(prev => ({ ...prev, [seg.Name]: { count: null, loading: false, error: true } }));
+                        });
+                }
+            });
+        }
+    }, [segments, apiKey, segmentCounts]);
 
     const handleCreateSuccess = (name: string) => {
         setIsCreateModalOpen(false);
@@ -304,6 +323,18 @@ const SegmentsView = ({ apiKey }: { apiKey: string }) => {
                         <div className="segment-card-body">
                              <p>{t('rule')}:</p>
                              <div className="segment-rule">{seg.Rule}</div>
+                        </div>
+                        <div className="segment-card-footer">
+                            <span>{t('contacts')}:</span>
+                            <strong>
+                                {segmentCounts[seg.Name]?.loading ? (
+                                    <div style={{ width: '50px', display: 'inline-block' }}><LineLoader /></div>
+                                ) : segmentCounts[seg.Name]?.error ? (
+                                    'N/A'
+                                ) : (
+                                    segmentCounts[seg.Name]?.count?.toLocaleString(i18n.language) ?? '...'
+                                )}
+                            </strong>
                         </div>
                     </div>
                 ))}
