@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../Icon';
 import CenteredMessage from '../CenteredMessage';
+import SocialSettings from './settings/SocialSettings';
 
 const getPixelValue = (val: any) => parseInt(String(val).replace('px', ''), 10) || 0;
 
@@ -746,6 +747,8 @@ const SettingsPanel = ({ block, globalStyles, onGlobalStyleChange, onStyleChange
                 return <ProductSettings block={block} onStyleChange={onStyleChange} />;
             case 'Footer':
                 return <FooterSettings block={block} onStyleChange={onStyleChange} onContentChange={onContentChange} />;
+            case 'Social':
+                return <SocialSettings block={block} onStyleChange={onStyleChange} onContentChange={onContentChange} />;
             default:
                 return (
                     <CenteredMessage style={{ padding: '2rem', flexGrow: 1 }}>
@@ -769,6 +772,7 @@ const SettingsPanel = ({ block, globalStyles, onGlobalStyleChange, onStyleChange
             case 'Divider': return 'dividerBlock';
             case 'Product': return 'productBlock';
             case 'Footer': return 'footerBlock';
+            case 'Social': return 'social';
             default: return type;
         }
     }

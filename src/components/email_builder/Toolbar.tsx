@@ -92,6 +92,30 @@ export const TOOLBAR_COMPONENTS = [
         }
     },
     {
+        id: 'SOCIAL_BLOCK',
+        type: 'Social',
+        icon: ICONS.SHARE,
+        defaultContent: {
+            items: [
+                { id: 'social-1', network: 'Instagram', url: 'https://instagram.com' },
+                { id: 'social-2', network: 'Telegram', url: 'https://telegram.org' },
+                { id: 'social-3', network: 'LinkedIn', url: 'https://linkedin.com' },
+            ]
+        },
+        defaultStyle: {
+            iconStyle: 'circle',
+            iconColor: 'gray',
+            iconSize: 30,
+            iconSpacing: 15,
+            alignment: 'center',
+            backgroundColor: 'transparent',
+            paddingTop: 10,
+            paddingRight: 20,
+            paddingBottom: 10,
+            paddingLeft: 20,
+        }
+    },
+    {
         id: 'SPACER_BLOCK',
         type: 'Spacer',
         icon: ICONS.MENU,

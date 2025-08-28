@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../../hooks/useApiV4';
@@ -133,6 +132,7 @@ const MediaManagerModal = ({ isOpen, onClose, apiKey, onSelect }: { isOpen: bool
                 apiKey={apiKey}
                 onSuccess={handleUploadSuccess}
                 onError={handleUploadError}
+                zIndex={1001}
             />
             <Modal isOpen={isOpen} onClose={onClose} title={t('mediaLibrary')}>
                 <div className="media-manager-modal-content">

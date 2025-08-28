@@ -18,7 +18,7 @@ const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) 
 });
 
 
-const FileUploadModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { isOpen: boolean; onClose: () => void; apiKey: string; onSuccess: (fileInfo: FileInfo) => void; onError: (msg: string) => void; }) => {
+const FileUploadModal = ({ isOpen, onClose, apiKey, onSuccess, onError, zIndex }: { isOpen: boolean; onClose: () => void; apiKey: string; onSuccess: (fileInfo: FileInfo) => void; onError: (msg: string) => void; zIndex?: number; }) => {
     const { t } = useTranslation();
     const [file, setFile] = useState<File | null>(null);
     const [expiresAfterDays, setExpiresAfterDays] = useState('');
@@ -82,7 +82,7 @@ const FileUploadModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { isOp
     }, [isOpen]);
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('uploadModalTitle')}>
+        <Modal isOpen={isOpen} onClose={onClose} title={t('uploadModalTitle')} zIndex={zIndex}>
             <form onSubmit={handleSubmit} className="modal-form">
                 <div className="form-group">
                     <label>{t('file')}</label>

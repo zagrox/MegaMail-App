@@ -1,10 +1,9 @@
-
 import React, { useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableBlock } from './SortableBlock';
-import Icon, { ICONS } from '../Icon';
+import Icon, { ICONS, SOCIAL_ICONS } from '../Icon';
 
 interface EditableBlockProps {
     id: string;
@@ -346,6 +345,66 @@ const FooterBlock = ({ content, style }: { content?: any, style?: any }) => {
     );
 };
 
+const SocialBlock = ({ item }: { item: any }) => {
+    const s = item.style || {};
+    const c = item.content || {};
+    const items = c.items || [];
+
+    const wrapperStyle: React.CSSProperties = {
+        textAlign: s.alignment || 'center',
+        padding: `${getPixelValue(s.paddingTop)}px ${getPixelValue(s.paddingRight)}px ${getPixelValue(s.paddingBottom)}px ${getPixelValue(s.paddingLeft)}px`,
+        backgroundColor: s.backgroundColor || 'transparent',
+    };
+
+    const iconColors: Record<string, { bg: string, icon: string }> = {
+        dark: { bg: '#1F2937', icon: '#FFFFFF' },
+        white: { bg: '#FFFFFF', icon: '#1F2937' },
+        gray: { bg: '#6B7280', icon: '#FFFFFF' },
+    };
+
+    return (
+        <div style={wrapperStyle}>
+            <div style={{ display: 'inline-flex', gap: `${s.iconSpacing}px` }}>
+                {items.map((socialItem: any) => {
+                    const socialInfo = SOCIAL_ICONS[socialItem.network];
+                    if (!socialInfo) return null;
+
+                    const colors = s.iconColor === 'color' 
+                        ? { bg: socialInfo.brandColor, icon: '#FFFFFF' }
+                        : iconColors[s.iconColor] || iconColors.gray;
+
+                    const itemStyle: React.CSSProperties = {
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: `${s.iconSize}px`,
+                        height: `${s.iconSize}px`,
+                        backgroundColor: s.iconStyle !== 'default' ? colors.bg : 'transparent',
+                        borderRadius: s.iconStyle === 'circle' ? '50%' : s.iconStyle === 'rounded' ? '6px' : '0',
+                    };
+                    
+                    const iconSize = s.iconSize * 0.6;
+
+                    return (
+                        <a key={socialItem.id} href={socialItem.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.preventDefault()}>
+                            <div style={itemStyle}>
+                                <Icon 
+                                    path={socialInfo.path} 
+                                    style={{ 
+                                        color: s.iconStyle === 'default' ? colors.bg : colors.icon,
+                                        width: `${iconSize}px`,
+                                        height: `${iconSize}px`
+                                    }}
+                                />
+                            </div>
+                        </a>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
 
 // Block Renderer
 export const renderBlock = (block: any, props: any = {}) => {
@@ -375,6 +434,7 @@ export const renderBlock = (block: any, props: any = {}) => {
         'Divider': <DividerBlock {...baseProps} />,
         'Product': <ProductBlock {...baseProps} />,
         'Footer': <FooterBlock {...baseProps} />,
+        'Social': <SocialBlock item={block} />,
     };
 
     return (
