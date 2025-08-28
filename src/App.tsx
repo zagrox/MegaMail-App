@@ -234,7 +234,6 @@ const App = () => {
         { type: 'divider' },
         { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
         { name: t('emailLists'), view: 'Email Lists', icon: ICONS.EMAIL_LISTS },
-        { name: t('segments'), view: 'Segments', icon: ICONS.SEGMENTS },
         { type: 'divider' },
         { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
         { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.PENCIL },

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -12,6 +11,7 @@ import { useStatusStyles } from '../hooks/useStatusStyles';
 import AddContactToListModal from '../components/AddContactToListModal';
 import { apiFetchV4 } from '../api/elasticEmail';
 import { useToast } from '../contexts/ToastContext';
+import ExportContactsModal from '../components/ExportContactsModal';
 
 const ListDetailView = ({ apiKey, list, onBack, setView }: {
     apiKey: string;
@@ -23,6 +23,7 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
     const { getStatusStyle } = useStatusStyles();
     const { addToast } = useToast();
     const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [offset, setOffset] = useState(0);
     const [refetchIndex, setRefetchIndex] = useState(0);
@@ -87,28 +88,45 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                 onSubmit={handleAddContacts}
                 listName={listName}
             />
-            <div className="view-header" style={{flexWrap: 'nowrap'}}>
+             <ExportContactsModal
+                isOpen={isExportModalOpen}
+                onClose={() => setIsExportModalOpen(false)}
+                apiKey={apiKey}
+                listName={listName}
+                onSuccess={() => {
+                    setIsExportModalOpen(false);
+                    addToast(t('exportStartedSuccess'), 'success');
+                }}
+                onError={(message) => {
+                    addToast(t('exportFailedError', { error: message }), 'error');
+                }}
+            />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                 <button className="btn btn-secondary" onClick={onBack} style={{whiteSpace: 'nowrap'}}>
                     <Icon path={ICONS.CHEVRON_LEFT} />
                     <span>{t('emailLists')}</span>
                 </button>
-                <div style={{flexGrow: 1, display: 'flex', justifyContent: 'center'}}>
-                    <h2 className="content-header" style={{margin: 0, borderBottom: 'none'}}>{t('contactsInList', { listName })}</h2>
+                <h2 className="content-header" style={{margin: 0, borderBottom: 'none', fontSize: '2rem'}}>{t('contactsInList', { listName })}</h2>
+            </div>
+
+            <div className="view-header">
+                <div className="search-bar" style={{flexGrow: 1}}>
+                    <Icon path={ICONS.SEARCH} />
+                    <input
+                        type="search"
+                        placeholder={t('searchContactsPlaceholder')}
+                        value={searchQuery}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            setOffset(0);
+                        }}
+                        disabled={loading}
+                    />
                 </div>
-                <div className="header-actions" style={{display: 'flex', justifyContent: 'flex-end', gap: '1rem', alignItems: 'center'}}>
-                     <div className="search-bar">
-                        <Icon path={ICONS.SEARCH} />
-                        <input
-                            type="search"
-                            placeholder={t('searchContactsPlaceholder')}
-                            value={searchQuery}
-                            onChange={(e) => {
-                                setSearchQuery(e.target.value);
-                                setOffset(0);
-                            }}
-                            disabled={loading}
-                        />
-                    </div>
+                <div className="header-actions">
+                    <button className="btn" onClick={() => setIsExportModalOpen(true)}>
+                        <Icon path={ICONS.DOWNLOAD} /> {t('export')}
+                    </button>
                     <button className="btn btn-primary" onClick={() => setIsAddContactModalOpen(true)}>
                         <Icon path={ICONS.USER_PLUS} /> {t('addContact')}
                     </button>
@@ -151,7 +169,7 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                                                 </button>
                                             </td>
                                             <td>{`${contact.FirstName || ''} ${contact.LastName || ''}`.trim() || '-'}</td>
-                                            <td><Badge text={statusStyle.text} type={statusStyle.type} iconPath={statusStyle.iconPath} /></td>
+                                            <td><Badge text={statusStyle.text} type={statusStyle.type} color={statusStyle.color} iconPath={statusStyle.iconPath} /></td>
                                             <td>
                                                 <div className="action-buttons" style={{justifyContent: 'flex-end'}}>
                                                    <button className="btn-icon btn-icon-danger" aria-label={t('deleteContact')}><Icon path={ICONS.DELETE}/></button>

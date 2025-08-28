@@ -8,29 +8,25 @@ interface BadgeProps {
     iconPath?: string;
 }
 
-const getContrastYIQ = (hexcolor?: string): string => {
-    if (!hexcolor || !/^#([A-Fa-f0-9]{3}){1,2}$/.test(hexcolor)) {
-        return 'var(--text-color)';
+const hexToRgba = (hex?: string, alpha = 0.1): string => {
+    if (!hex || !/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+        return `rgba(128,128,128,${alpha})`; // fallback grey
     }
-    let color = hexcolor.substring(1); // strip #
-    if (color.length === 3) {
-        color = color.split('').map(char => char + char).join('');
+    let c: any = hex.substring(1).split('');
+    if (c.length === 3) {
+        c = [c[0], c[0], c[1], c[1], c[2], c[2]];
     }
-    const r = parseInt(color.substring(0, 2), 16);
-    const g = parseInt(color.substring(2, 4), 16);
-    const b = parseInt(color.substring(4, 6), 16);
-    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    return (yiq >= 128) ? '#1F2937' : '#FFFFFF'; // Dark gray or white
-}
+    c = '0x' + c.join('');
+    return `rgba(${(c >> 16) & 255},${(c >> 8) & 255},${c & 255},${alpha})`;
+};
 
 
 const Badge = ({ text, type = 'default', color, iconPath }: BadgeProps) => {
     const style: React.CSSProperties = {};
     
-    // If a specific hex color is provided, it takes precedence for the background.
     if (color) {
-        style.color = getContrastYIQ(color);
-        style.backgroundColor = color;
+        style.backgroundColor = hexToRgba(color, 0.1);
+        style.color = color;
     }
 
     return (

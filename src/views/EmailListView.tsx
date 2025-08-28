@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -168,7 +166,7 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             )}
 
             <div className="view-header">
-                <div className="search-bar" style={{flexGrow: 1, marginRight: '1rem'}}>
+                <div className="search-bar" style={{flexGrow: 1}}>
                     <Icon path={ICONS.SEARCH} />
                     <input
                         type="search"
@@ -178,24 +176,30 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                         disabled={loading}
                     />
                 </div>
-                <form className="create-list-form" onSubmit={handleCreateList}>
-                    <input
-                        type="text"
-                        placeholder={t('newListNamePlaceholder')}
-                        value={newListName}
-                        onChange={(e) => setNewListName(e.target.value)}
-                        disabled={isSubmitting}
-                        required
-                    />
-                    <button type="submit" className="btn btn-primary" disabled={!newListName || isSubmitting}>
-                        {isSubmitting ? <Loader /> : (
-                            <>
-                                <Icon path={ICONS.PLUS} />
-                                <span>{t('createList')}</span>
-                            </>
-                        )}
+                <div className="header-actions">
+                    <form className="create-list-form" onSubmit={handleCreateList}>
+                        <input
+                            type="text"
+                            placeholder={t('newListNamePlaceholder')}
+                            value={newListName}
+                            onChange={(e) => setNewListName(e.target.value)}
+                            disabled={isSubmitting}
+                            required
+                        />
+                        <button type="submit" className="btn btn-primary" disabled={!newListName || isSubmitting}>
+                            {isSubmitting ? <Loader /> : (
+                                <>
+                                    <Icon path={ICONS.PLUS} />
+                                    <span>{t('createList')}</span>
+                                </>
+                            )}
+                        </button>
+                    </form>
+                    <button className="btn btn-secondary" onClick={() => setView('Segments')}>
+                        <Icon path={ICONS.SEGMENTS} />
+                        <span>{t('segments')}</span>
                     </button>
-                </form>
+                </div>
             </div>
             
             {loading && <CenteredMessage><Loader /></CenteredMessage>}

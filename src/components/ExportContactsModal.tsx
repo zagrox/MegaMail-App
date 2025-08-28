@@ -4,14 +4,17 @@ import Modal from './Modal';
 import Loader from './Loader';
 import Icon, { ICONS } from './Icon';
 
-const ExportContactsModal = ({ isOpen, onClose, apiKey, selectedStatuses, onSuccess, onError }: {
+interface ExportContactsModalProps {
     isOpen: boolean;
     onClose: () => void;
     apiKey: string;
-    selectedStatuses: string[];
+    selectedStatuses?: string[];
+    listName?: string;
     onSuccess: () => void;
     onError: (msg: string) => void;
-}) => {
+}
+
+const ExportContactsModal = ({ isOpen, onClose, apiKey, selectedStatuses, listName, onSuccess, onError }: ExportContactsModalProps) => {
     const { t } = useTranslation();
     const [fileFormat, setFileFormat] = useState('Csv');
     const [compression, setCompression] = useState('None');
@@ -20,8 +23,9 @@ const ExportContactsModal = ({ isOpen, onClose, apiKey, selectedStatuses, onSucc
 
     useEffect(() => {
         if (isOpen) {
+            const baseName = listName ? listName.replace(/\s/g, '_') : 'contacts-export';
             const ext = compression === 'Zip' ? 'zip' : fileFormat.toLowerCase();
-            setFileName(`contacts-export.${ext}`);
+            setFileName(`${baseName}.${ext}`);
         } else {
             // Reset state on close
             setFileFormat('Csv');
@@ -29,18 +33,25 @@ const ExportContactsModal = ({ isOpen, onClose, apiKey, selectedStatuses, onSucc
             setFileName('');
             setIsExporting(false);
         }
-    }, [isOpen, fileFormat, compression]);
+    }, [isOpen, fileFormat, compression, listName]);
 
     const handleExport = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (selectedStatuses.length === 0) {
-            onError('No statuses selected for export.');
+
+        let rule = '';
+        if (selectedStatuses && selectedStatuses.length > 0) {
+            rule = selectedStatuses.map(s => `Status = '${s}'`).join(' OR ');
+        } else if (listName) {
+            const escapedListName = listName.replace(/'/g, "''");
+            rule = `listname = '${escapedListName}'`;
+        }
+
+        if (!rule) {
+            onError('No contacts specified for export.');
             return;
         }
 
         setIsExporting(true);
-
-        const rule = selectedStatuses.map(s => `Status = '${s}'`).join(' OR ');
 
         const body = {
             FileFormat: fileFormat,
@@ -99,8 +110,8 @@ const ExportContactsModal = ({ isOpen, onClose, apiKey, selectedStatuses, onSucc
         <Modal isOpen={isOpen} onClose={onClose} title={t('exportContacts')}>
             <form onSubmit={handleExport} className="modal-form">
                 <div className="info-message">
-                    <strong>{t('selectedForExport')}:</strong>
-                    <p>{selectedStatuses.join(', ')}</p>
+                    <strong>{listName ? t('list') : t('selectedForExport')}:</strong>
+                    <p>{listName ? listName : (selectedStatuses || []).join(', ')}</p>
                 </div>
 
                 <div className="form-group">
