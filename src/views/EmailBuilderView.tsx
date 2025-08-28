@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -273,6 +274,7 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
             setOriginalTemplateName(null);
             setTemplateName(t('newTemplateName'));
             setSubject('');
+            setFromName('');
             setItems([]);
             setGlobalStyles({
                 backdropColor: '#F7F9FC',
@@ -302,6 +304,7 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                         setGlobalStyles(state.globalStyles || globalStyles);
                         setItems(state.items || []);
                         setSubject(state.subject || templateToEdit.Subject || '');
+                        setFromName(state.fromName || '');
                         setTemplateName(state.templateName || templateToEdit.Name);
                         return; // Exit after successful parsing
                     } catch (e) {
@@ -314,6 +317,7 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
             addToast(t('This template is from an older version and could not be fully loaded into the editor. Its content has been placed in a text block.'), 'warning');
             setTemplateName(templateToEdit.Name);
             setSubject(templateToEdit.Subject || '');
+            setFromName('');
             const fallbackBlock = {
                 id: generateId('text'),
                 type: 'Text',
@@ -353,7 +357,7 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
         
         const contentHtml = items.map(renderBlockToHtml).join('');
         
-        const state = { globalStyles, items, subject, templateName };
+        const state = { globalStyles, items, subject, templateName, fromName };
         const jsonState = JSON.stringify(state);
         const base64State = encodeState(jsonState);
 
@@ -388,7 +392,7 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
             </body>
             </html>
         `;
-    }, [items, globalStyles, subject, templateName]);
+    }, [items, globalStyles, subject, templateName, fromName]);
     
     const handleSaveTemplate = async () => {
         if (!templateName) {
@@ -920,7 +924,9 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                                 selectedBlockId={selectedBlockId}
                                 onSelectBlock={handleSelectBlock}
                                 onEditBlock={handleEditBlock}
+// FIX: Changed onContentChange to handleContentChange
                                 onContentChange={handleContentChange}
+// FIX: Changed onStyleChange to handleStyleChange
                                 onStyleChange={handleStyleChange}
                                 onInsertBlock={handleInsertBlock}
                                 onSetColumns={handleSetColumns}
@@ -938,6 +944,10 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                             onContentChange={handleContentChange}
                             onOpenMediaManager={handleEditImageBlock}
                             onClose={handleCloseSettingsPanel}
+                            subject={subject}
+                            onSubjectChange={setSubject}
+                            fromName={fromName}
+                            onFromNameChange={setFromName}
                         />
                     </div>
                 </div>
@@ -950,7 +960,7 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                 onSelect={handleImageSelect}
             />
             
-            <Modal isOpen={isPreviewModalOpen} onClose={() => setIsPreviewModalOpen(false)} title={t('previewEmail')} size="fullscreen">
+            <Modal isOpen={isPreviewModalOpen} onClose={() => setIsPreviewModalOpen(false)} title={t('previewEmail')} size="fullscreen" bodyClassName="modal-body--no-padding">
                 <iframe srcDoc={generatedHtml} className="preview-iframe" title={t('previewEmail')} />
             </Modal>
             

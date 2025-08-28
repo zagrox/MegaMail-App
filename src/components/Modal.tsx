@@ -1,6 +1,6 @@
 import React, { useEffect, ReactNode } from 'react';
 
-const Modal = ({ isOpen, onClose, title, children, size }: { isOpen: boolean; onClose: () => void; title: string; children: ReactNode; size?: 'default' | 'large' | 'fullscreen' }) => {
+const Modal = ({ isOpen, onClose, title, children, size, bodyClassName }: { isOpen: boolean; onClose: () => void; title: string; children: ReactNode; size?: 'default' | 'large' | 'fullscreen', bodyClassName?: string }) => {
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
             if (event.key === 'Escape') onClose();
@@ -20,7 +20,7 @@ const Modal = ({ isOpen, onClose, title, children, size }: { isOpen: boolean; on
                         &times;
                     </button>
                 </div>
-                <div className="modal-body">
+                <div className={`modal-body ${bodyClassName || ''}`}>
                     {children}
                 </div>
             </div>

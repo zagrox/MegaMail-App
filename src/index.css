@@ -1077,6 +1077,11 @@ html[data-theme='dark'] .from-email-composer select {
 .modal-body {
     padding: 1.5rem;
     overflow-y: auto;
+    flex-grow: 1; /* Allow body to fill available space */
+}
+.modal-body--no-padding {
+    padding: 0;
+    overflow: hidden; /* Let iframe handle scrolling */
 }
 .modal-form .form-actions {
     margin-top: 1.5rem;

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../Icon';
@@ -149,7 +150,7 @@ const NumberInputWithUnit = ({ value, onChange, unit = 'px' }: { value: string |
     )
 }
 
-const GlobalSettings = ({ styles, onChange }: { styles: any, onChange: (newStyles: any) => void }) => {
+const GlobalSettings = ({ styles, onChange, subject, onSubjectChange, fromName, onFromNameChange }: { styles: any, onChange: (newStyles: any) => void, subject: string, onSubjectChange: (value: string) => void, fromName: string, onFromNameChange: (value: string) => void }) => {
     const { t } = useTranslation();
     const handleStyleChange = (key: string, value: any) => {
         onChange({ [key]: value });
@@ -158,6 +159,12 @@ const GlobalSettings = ({ styles, onChange }: { styles: any, onChange: (newStyle
     return (
         <>
             <Section title="">
+                <LabeledControl label={t('subject')}>
+                    <input type="text" value={subject} onChange={(e) => onSubjectChange(e.target.value)} style={{width: '100%'}} />
+                </LabeledControl>
+                <LabeledControl label={t('fromName')}>
+                    <input type="text" value={fromName} onChange={(e) => onFromNameChange(e.target.value)} style={{width: '100%'}} />
+                </LabeledControl>
                 <LabeledControl label={t('backdropColor')}>
                     <ColorInput value={styles.backdropColor} onChange={(val) => handleStyleChange('backdropColor', val)} onAdd={() => handleStyleChange('backdropColor', '#F0F0F0')} onRemove={() => handleStyleChange('backdropColor', 'transparent')} />
                 </LabeledControl>
@@ -716,7 +723,7 @@ const FooterSettings = ({ block, onStyleChange, onContentChange }: { block: any,
 };
 
 
-const SettingsPanel = ({ block, globalStyles, onGlobalStyleChange, onStyleChange, onContentChange, onOpenMediaManager, onClose }: { block: any, globalStyles: any, onGlobalStyleChange: any, onStyleChange: any, onContentChange: any, onOpenMediaManager: any, onClose: () => void }) => {
+const SettingsPanel = ({ block, globalStyles, onGlobalStyleChange, onStyleChange, onContentChange, onOpenMediaManager, onClose, subject, onSubjectChange, fromName, onFromNameChange }: { block: any, globalStyles: any, onGlobalStyleChange: any, onStyleChange: any, onContentChange: any, onOpenMediaManager: any, onClose: () => void, subject: string, onSubjectChange: (value: string) => void, fromName: string, onFromNameChange: (value: string) => void }) => {
     const { t } = useTranslation();
 
     const renderSettingsForBlock = () => {
@@ -782,7 +789,14 @@ const SettingsPanel = ({ block, globalStyles, onGlobalStyleChange, onStyleChange
             
             <div className="settings-panel-body">
             {!block ? (
-                <GlobalSettings styles={globalStyles} onChange={onGlobalStyleChange} />
+                <GlobalSettings 
+                    styles={globalStyles} 
+                    onChange={onGlobalStyleChange} 
+                    subject={subject}
+                    onSubjectChange={onSubjectChange}
+                    fromName={fromName}
+                    onFromNameChange={onFromNameChange}
+                />
             ) : (
                 renderSettingsForBlock()
             )}
