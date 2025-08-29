@@ -1,8 +1,5 @@
 
 
-
-
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -294,15 +291,15 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                 // Update state with all results at once.
                 setCampaignStats(prev => {
                     const newStats = { ...prev };
-                    results.forEach(res => {
-                        // FIX: Use an if/else block to help TypeScript correctly narrow the discriminated union type.
-                        if (res.success) {
-                            newStats[res.name] = { loading: false, data: res.data };
-                        } else {
+                    for (const res of results) {
+                        // FIX: Type narrowing for the success/error union type was failing. Checking for the success case explicitly and handling the error case in the else block resolves the issue.
+                        if (res.success === false) {
                             console.error(`Failed to fetch stats for campaign ${res.name}`, res.error);
                             newStats[res.name] = { loading: false, error: res.error };
+                        } else {
+                            newStats[res.name] = { loading: false, data: res.data };
                         }
-                    });
+                    }
                     return newStats;
                 });
             });

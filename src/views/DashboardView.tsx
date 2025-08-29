@@ -90,7 +90,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <p className="cta-banner-desc">{t('startEmailMarketingDesc')}</p>
                         </div>
                         <div className="cta-banner-action">
-                            <button className="btn btn-primary" onClick={() => setView('Send Email')}>
+                            <button className="btn btn-primary" onClick={() => setView('SendWizard')}>
                                 <Icon path={ICONS.SEND_EMAIL} /> {t('createCampaign')}
                             </button>
                         </div>

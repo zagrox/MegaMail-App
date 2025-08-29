@@ -17,6 +17,7 @@ import SegmentsView from './views/SegmentsView';
 import MediaManagerView from './views/MediaManagerView';
 import EmailBuilderView from './views/EmailBuilderView';
 import SendEmailView from './views/SendEmailView';
+import SendWizardView from './views/SendWizardView';
 import CampaignsView from './views/CampaignsView';
 import TemplatesView from './views/TemplatesView';
 import DomainsView from './views/DomainsView';
@@ -222,6 +223,7 @@ const App = () => {
         'Templates': { component: <TemplatesView apiKey={apiKey} setView={handleSetView} />, title: t('templates'), icon: ICONS.ARCHIVE },
         'Email Builder': { component: <EmailBuilderView apiKey={apiKey} user={user} templateToEdit={templateToEdit} />, title: t('emailBuilder'), icon: ICONS.PENCIL },
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
+        'SendWizard': { component: <SendWizardView apiKey={apiKey} setView={handleSetView} />, title: 'Send Wizard', icon: ICONS.SEND_EMAIL },
         'Domains': { component: <DomainsView apiKey={apiKey} />, title: t('domains'), icon: ICONS.DOMAINS },
         'SMTP': { component: <SmtpView apiKey={apiKey} user={user}/>, title: t('smtp'), icon: ICONS.SMTP }
     };
@@ -305,7 +307,7 @@ const App = () => {
     );
     
     const currentView = views[view];
-    const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail';
+    const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail' && view !== 'SendWizard';
 
     return (
         <div ref={appContainerRef} className={`app-container ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
@@ -330,7 +332,7 @@ const App = () => {
                         <Icon path={ICONS.ACCOUNT} />
                     </button>
                 </header>
-                <main className={`content ${view === 'Email Builder' ? 'content--no-padding' : ''}`}>
+                <main className={`content ${view === 'Email Builder' || view === 'SendWizard' ? 'content--no-padding' : ''}`}>
                     {showHeader && (
                         <header className="content-header">
                             <h2>{currentView?.title}</h2>
