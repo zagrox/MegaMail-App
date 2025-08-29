@@ -12,7 +12,6 @@ import Badge from '../components/Badge';
 import Modal from '../components/Modal';
 import { useStatusStyles } from '../hooks/useStatusStyles';
 import { Segment } from '../api/types';
-// FIX: Import useToast hook
 import { useToast } from '../contexts/ToastContext';
 import LineLoader from '../components/LineLoader';
 
@@ -276,7 +275,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                     apiFetchV4(`/statistics/campaigns/${encodeURIComponent(campaign.Name)}`, apiKey)
                         .then(result => ({
                             name: campaign.Name,
-                            // FIX: Add 'as const' to ensure TypeScript infers a literal type for discriminated union.
                             success: true as const,
                             data: {
                                 Delivered: result?.Delivered ?? 0,
@@ -285,7 +283,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                         }))
                         .catch(error => ({
                             name: campaign.Name,
-                            // FIX: Add 'as const' to ensure TypeScript infers a literal type for discriminated union.
                             success: false as const,
                             error
                         }))
@@ -295,6 +292,7 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                 setCampaignStats(prev => {
                     const newStats = { ...prev };
                     results.forEach(res => {
+                        // FIX: Use an if/else block to help TypeScript correctly narrow the discriminated union type.
                         if (res.success) {
                             // TypeScript can now correctly infer that `res` has a `data` property here.
                             newStats[res.name] = { loading: false, data: res.data };

@@ -11,7 +11,6 @@ import Modal from '../components/Modal';
 import MultiSelectSearch from '../components/MultiSelectSearch';
 
 type RecipientTarget = 'list' | 'segment' | 'all';
-type ContentMethod = 'template' | 'plainText';
 type AccordionSection = 'recipients' | 'content' | 'settings' | '';
 
 const emptyContent = { From: '', FromName: '', ReplyTo: '', Subject: '', TemplateName: '', Preheader: '', Body: null, Utm: null };
@@ -27,6 +26,19 @@ const initialCampaignState = {
         EnableSendTimeOptimization: false
     }
 };
+
+// Decode a Base64 string to UTF-8 using modern browser APIs
+const decodeState = (base64: string): string => {
+    // 1. Decode the Base64 string to a binary string.
+    const binary_string = window.atob(base64);
+    // 2. Create a Uint8Array from the binary string.
+    const bytes = new Uint8Array(binary_string.length);
+    for (let i = 0; i < binary_string.length; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    // 3. Decode the UTF-8 bytes back to a string.
+    return new TextDecoder().decode(bytes);
+}
 
 
 const AccordionItem = ({ 
@@ -60,7 +72,6 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     const [isEditing, setIsEditing] = useState(false);
     const [activeContent, setActiveContent] = useState(0);
     const [recipientTarget, setRecipientTarget] = useState<RecipientTarget>('all');
-    const [contentMethod, setContentMethod] = useState<ContentMethod>('template');
     const [openAccordion, setOpenAccordion] = useState<AccordionSection>('recipients');
     const [isOptimizationOn, setIsOptimizationOn] = useState(false);
     const [isScheduling, setIsScheduling] = useState(false);
@@ -169,7 +180,6 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     const resetForm = useCallback(() => {
         setCampaign(JSON.parse(JSON.stringify(initialCampaignState)));
         setRecipientTarget('all');
-        setContentMethod('template');
         setIsScheduling(false);
         setScheduleDate('');
         setScheduleTime('');
@@ -239,7 +249,6 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             else if (loadedRecipients.SegmentNames?.length > 0) setRecipientTarget('segment');
             else setRecipientTarget('all');
 
-            setContentMethod(loadedContent.TemplateName ? 'template' : 'plainText');
             setIsScheduling(!!loadedOptions.ScheduleFor);
             setIsOptimizationOn(loadedOptions.DeliveryOptimization === 'ToEngagedFirst' || loadedOptions.EnableSendTimeOptimization);
             setIsUtmEnabled(!!loadedContent.Utm);
@@ -409,11 +418,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             payload.Options = { ...payload.Options, Trigger: { Count: 1 } };
         } else payload.Status = 'Draft';
     
-        if (contentMethod === 'plainText') {
-             payload.Content = payload.Content.map((c: any) => ({...c, Body: { Content: c.Body?.Content || '', ContentType: 'PlainText', Charset: 'utf-8' }, TemplateName: null }));
-        } else {
-             payload.Content = payload.Content.map((c: any) => ({...c, Body: null, TemplateName: c.TemplateName || null}));
-        }
+        payload.Content = payload.Content.map((c: any) => ({...c, Body: null, TemplateName: c.TemplateName || null}));
         
         if (!isUtmEnabled) {
              payload.Content = payload.Content.map((c: any) => { const { Utm, ...rest } = c; return rest; });
@@ -441,9 +446,51 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         }
     };
     
-    const handleSelectTemplate = (templateName: string) => {
-        handleValueChange('Content', 'TemplateName', templateName, activeContent);
+    const handleSelectTemplate = async (templateName: string) => {
         setIsTemplateModalOpen(false);
+        setIsSending(true);
+        try {
+            const fullTemplate = await apiFetchV4(`/templates/${encodeURIComponent(templateName)}`, apiKey);
+            const htmlContent = fullTemplate.Body?.[0]?.Content;
+            let fromName = '';
+            let subject = fullTemplate.Subject || '';
+    
+            if (htmlContent) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                const stateContainer = doc.getElementById('mailzila-template-state');
+                const base64State = stateContainer?.getAttribute('data-state');
+    
+                if (base64State) {
+                    try {
+                        const jsonState = decodeState(base64State);
+                        const state = JSON.parse(jsonState);
+                        fromName = state.fromName || '';
+                        subject = state.subject || fullTemplate.Subject || '';
+                    } catch (e) {
+                        console.error("Failed to parse template state from HTML.", e);
+                    }
+                }
+            }
+            
+            setCampaign(prev => ({
+                ...prev,
+                Name: fullTemplate.Name,
+                Content: prev.Content.map((item, idx) => 
+                    idx === activeContent ? { 
+                        ...item, 
+                        TemplateName: fullTemplate.Name,
+                        Subject: subject,
+                        FromName: fromName
+                    } : item
+                )
+            }));
+    
+        } catch (err: any) {
+            addToast(`Failed to load template: ${err.message}`, 'error');
+        } finally {
+            setIsSending(false);
+        }
     };
 
     const handleGoToDomains = () => {
@@ -543,56 +590,57 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                     openAccordion={openAccordion}
                     setOpenAccordion={setOpenAccordion}
                 >
-                    <div className="form-grid">
-                        <div className="form-group"><label>{t('fromName')}</label><input type="text" value={currentContent.FromName} onChange={e => handleValueChange('Content', 'FromName', e.target.value)} /></div>
-                        <div className="form-group">
-                            <label>{t('fromEmail')}</label>
-                            {verifiedDomainsWithDefault.length > 0 ? (
-                                <>
-                                <select value={selectedDomain} onChange={handleDomainChange}>
-                                    {verifiedDomainsWithDefault.map(d => <option key={d.domain} value={d.domain}>{d.domain}</option>)}
-                                </select>
-                                <p style={{fontSize: '0.9rem', color: 'var(--subtle-text-color)', marginTop: '0.5rem'}}>
-                                    Sending from: <strong>{currentContent.From}</strong>
-                                </p>
-                                </>
-                            ) : (
-                                <div className="info-message warning" style={{width: '100%', margin: 0}}>
-                                    <p style={{margin: 0}}>
-                                        {t('noVerifiedDomainsToSendError')}{' '}
-                                        <button type="button" className="link-button" onClick={handleGoToDomains}>
-                                            {t('addDomainNow')}
-                                        </button>
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <div className="form-group"><label>{t('subject')}</label><input type="text" value={currentContent.Subject} onChange={e => handleValueChange('Content', 'Subject', e.target.value)} required /></div>
-                    <div className="form-group"><label>{t('preheader')}</label><input type="text" value={currentContent.Preheader} onChange={e => handleValueChange('Content', 'Preheader', e.target.value)} /></div>
-                    
-                    <h4>{t('content')}</h4>
-                    <div className="content-method-tabs">
-                        <button type="button" className={`content-method-tab ${contentMethod === 'template' ? 'active' : ''}`} onClick={() => setContentMethod('template')}><Icon path={ICONS.ARCHIVE} /> {t('templates')}</button>
-                        <button type="button" className={`content-method-tab ${contentMethod === 'plainText' ? 'active' : ''}`} onClick={() => setContentMethod('plainText')}><Icon path={ICONS.TYPE} /> {t('plainText')}</button>
-                    </div>
-
-                    {contentMethod === 'template' && (
-                        <div className="form-group">
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+                    <div className="form-group">
+                        <label>{t('template')}</label>
+                        {currentContent.TemplateName ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <input 
                                     type="text" 
                                     readOnly 
-                                    value={currentContent.TemplateName || ''} 
-                                    placeholder={t('noTemplatesFound')} 
-                                    onClick={() => setIsTemplateModalOpen(true)}
-                                    style={{cursor: 'pointer'}}
+                                    value={currentContent.TemplateName}
                                 />
-                                <button type="button" className="btn btn-secondary" onClick={() => setIsTemplateModalOpen(true)}>{t('useTemplate')}</button>
+                                <button type="button" className="btn btn-secondary" onClick={() => setIsTemplateModalOpen(true)}>{t('edit')}</button>
                             </div>
-                        </div>
+                        ) : (
+                            <button type="button" className="btn btn-secondary" onClick={() => setIsTemplateModalOpen(true)} style={{width: '100%', padding: '1.5rem'}}>
+                                <Icon path={ICONS.ARCHIVE} />
+                                <span>{t('useTemplate')}</span>
+                            </button>
+                        )}
+                    </div>
+
+                    {currentContent.TemplateName && (
+                        <>
+                             <hr className="form-separator" />
+                             <div className="form-grid">
+                                <div className="form-group"><label>{t('fromName')}</label><input type="text" value={currentContent.FromName} onChange={e => handleValueChange('Content', 'FromName', e.target.value)} /></div>
+                                <div className="form-group">
+                                    <label>{t('fromEmail')}</label>
+                                    {verifiedDomainsWithDefault.length > 0 ? (
+                                        <>
+                                        <select value={selectedDomain} onChange={handleDomainChange}>
+                                            {verifiedDomainsWithDefault.map(d => <option key={d.domain} value={d.domain}>{d.domain}</option>)}
+                                        </select>
+                                        <p style={{fontSize: '0.9rem', color: 'var(--subtle-text-color)', marginTop: '0.5rem'}}>
+                                            Sending from: <strong>{currentContent.From}</strong>
+                                        </p>
+                                        </>
+                                    ) : (
+                                        <div className="info-message warning" style={{width: '100%', margin: 0}}>
+                                            <p style={{margin: 0}}>
+                                                {t('noVerifiedDomainsToSendError')}{' '}
+                                                <button type="button" className="link-button" onClick={handleGoToDomains}>
+                                                    {t('addDomainNow')}
+                                                </button>
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="form-group"><label>{t('subject')}</label><input type="text" value={currentContent.Subject} onChange={e => handleValueChange('Content', 'Subject', e.target.value)} required /></div>
+                            <div className="form-group"><label>{t('preheader')}</label><input type="text" value={currentContent.Preheader} onChange={e => handleValueChange('Content', 'Preheader', e.target.value)} /></div>
+                        </>
                     )}
-                    {contentMethod === 'plainText' && <textarea value={currentContent.Body?.Content || ''} onChange={e => handleValueChange('Content', 'Body', { ...currentContent.Body, Content: e.target.value }, activeContent)} rows={10} />}
                 </AccordionItem>
 
                 <AccordionItem 
