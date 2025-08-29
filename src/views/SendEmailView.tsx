@@ -10,7 +10,7 @@ import CenteredMessage from '../components/CenteredMessage';
 import Modal from '../components/Modal';
 import MultiSelectSearch from '../components/MultiSelectSearch';
 
-type RecipientTarget = 'list' | 'segment' | 'all';
+type RecipientTarget = 'list' | 'segment' | 'all' | null;
 type AccordionSection = 'recipients' | 'content' | 'settings' | '';
 
 const emptyContent = { From: '', FromName: '', ReplyTo: '', Subject: '', TemplateName: '', Preheader: '', Body: null, Utm: null };
@@ -71,7 +71,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     const [isSending, setIsSending] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [activeContent, setActiveContent] = useState(0);
-    const [recipientTarget, setRecipientTarget] = useState<RecipientTarget>('all');
+    const [recipientTarget, setRecipientTarget] = useState<RecipientTarget>(null);
     const [openAccordion, setOpenAccordion] = useState<AccordionSection>('recipients');
     const [isOptimizationOn, setIsOptimizationOn] = useState(false);
     const [isScheduling, setIsScheduling] = useState(false);
@@ -179,7 +179,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     
     const resetForm = useCallback(() => {
         setCampaign(JSON.parse(JSON.stringify(initialCampaignState)));
-        setRecipientTarget('all');
+        setRecipientTarget(null);
         setIsScheduling(false);
         setScheduleDate('');
         setScheduleTime('');
@@ -245,9 +245,15 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                 }
             });
 
-            if (loadedRecipients.ListNames?.length > 0) setRecipientTarget('list');
-            else if (loadedRecipients.SegmentNames?.length > 0) setRecipientTarget('segment');
-            else setRecipientTarget('all');
+            if (loadedRecipients.ListNames?.length > 0) {
+                setRecipientTarget('list');
+            } else if (loadedRecipients.SegmentNames?.length > 0) {
+                setRecipientTarget('segment');
+            } else if (Object.keys(loadedRecipients).length === 0) {
+                setRecipientTarget('all');
+            } else {
+                setRecipientTarget(null);
+            }
 
             setIsScheduling(!!loadedOptions.ScheduleFor);
             setIsOptimizationOn(loadedOptions.DeliveryOptimization === 'ToEngagedFirst' || loadedOptions.EnableSendTimeOptimization);
@@ -272,51 +278,51 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     useEffect(() => {
         const calculateCount = async () => {
             if (!apiKey) return;
-    
-            const shouldShowLoader = recipientTarget === 'all' 
-                || (recipientTarget === 'list' && campaign.Recipients.ListNames.length > 0);
 
-            if (shouldShowLoader) {
-                setIsCountLoading(true);
+            // --- ASYNCHRONOUS PATH for 'all' and 'list' ---
+            if (recipientTarget === 'all' || (recipientTarget === 'list' && campaign.Recipients.ListNames.length > 0)) {
+                // The key fix is NOT setting a loading state that removes the existing count.
+                // By just fetching and then setting the new count, the number will update seamlessly
+                // without a disruptive "flash" or loading indicator replacing it.
+                try {
+                    let countResult: number | null = null;
+                    if (recipientTarget === 'all') {
+                        const count = await apiFetch('/contact/count', apiKey, { params: { allContacts: 'true' } });
+                        countResult = Number(count);
+                    } else { // 'list'
+                        const counts = await Promise.all(
+                            campaign.Recipients.ListNames.map(listName =>
+                                apiFetch('/contact/count', apiKey, { params: { rule: `listname = '${listName.replace(/'/g, "''")}'` } })
+                            )
+                        );
+                        countResult = counts.reduce((sum, count) => sum + Number(count), 0);
+                    }
+                    setRecipientCount(countResult);
+                } catch (error) {
+                    console.error("Failed to calculate recipient count:", error);
+                    addToast(`Failed to get recipient count: ${(error as Error).message}`, 'error');
+                    setRecipientCount(null);
+                }
+                return;
             }
-            setRecipientCount(null);
-    
-            try {
-                if (recipientTarget === 'all') {
-                    const count = await apiFetch('/contact/count', apiKey, { params: { allContacts: 'true' } });
-                    setRecipientCount(Number(count));
-                } else if (recipientTarget === 'list' && campaign.Recipients.ListNames.length > 0) {
-                    const counts = await Promise.all(
-                        campaign.Recipients.ListNames.map(listName =>
-                            apiFetch('/contact/count', apiKey, { params: { rule: `listname = '${listName.replace(/'/g, "''")}'` } })
-                        )
-                    );
-                    const total = counts.reduce((sum, count) => sum + Number(count), 0);
-                    setRecipientCount(total);
-                } else if (recipientTarget === 'segment' && campaign.Recipients.SegmentNames.length > 0) {
-                    const total = campaign.Recipients.SegmentNames.reduce((sum, segmentName) => {
-                        const count = segmentCounts[segmentName];
-                        return sum + (typeof count === 'number' ? count : 0);
-                    }, 0);
-                    setRecipientCount(total);
-                } else {
-                    setRecipientCount(0);
-                }
-            } catch (error) {
-                console.error("Failed to calculate recipient count:", error);
-                addToast(`Failed to get recipient count: ${(error as Error).message}`, 'error');
-                setRecipientCount(null);
-            } finally {
-                if (shouldShowLoader) {
-                    setIsCountLoading(false);
-                }
+
+            // --- SYNCHRONOUS PATH for 'segment', empty selection, or null target ---
+            setIsCountLoading(false); // Ensure loader is always off for sync operations.
+            if (recipientTarget === 'segment' && campaign.Recipients.SegmentNames.length > 0) {
+                const total = campaign.Recipients.SegmentNames.reduce((sum, segmentName) => {
+                    const count = segmentCounts[segmentName];
+                    return sum + (typeof count === 'number' ? count : 0);
+                }, 0);
+                setRecipientCount(total);
+            } else {
+                setRecipientCount(0); // Default to 0 if no recipients are selected
             }
         };
-    
+
         const debounceTimer = setTimeout(() => {
             calculateCount();
         }, 300);
-    
+
         return () => clearTimeout(debounceTimer);
     }, [recipientTarget, campaign.Recipients.ListNames, campaign.Recipients.SegmentNames, apiKey, segmentCounts, addToast]);
 
@@ -397,7 +403,18 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         });
     };
 
+    const isRecipientSelected = useMemo(() => (
+        recipientTarget === 'all' ||
+        (recipientTarget === 'list' && campaign.Recipients.ListNames.length > 0) ||
+        (recipientTarget === 'segment' && campaign.Recipients.SegmentNames.length > 0)
+    ), [recipientTarget, campaign.Recipients]);
+
     const handleSubmit = async (action: 'send' | 'draft' | 'schedule') => {
+        if (action !== 'draft' && !isRecipientSelected) {
+            addToast(t('selectRecipientsToSend'), 'error');
+            return;
+        }
+
         setIsSending(true);
     
         const payload = JSON.parse(JSON.stringify(campaign));
@@ -424,9 +441,22 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
              payload.Content = payload.Content.map((c: any) => { const { Utm, ...rest } = c; return rest; });
         }
     
-        let finalRecipients = {};
-        if (recipientTarget === 'list') finalRecipients = { ListNames: campaign.Recipients.ListNames || [] };
-        else if (recipientTarget === 'segment') finalRecipients = { SegmentNames: campaign.Recipients.SegmentNames || [] };
+        let finalRecipients: { ListNames?: string[]; SegmentNames?: string[] } = {};
+
+        switch (recipientTarget) {
+            case 'list':
+                finalRecipients = { ListNames: campaign.Recipients.ListNames || [] };
+                break;
+            case 'segment':
+                finalRecipients = { SegmentNames: campaign.Recipients.SegmentNames || [] };
+                break;
+            case 'all':
+                finalRecipients = {}; // API expects empty object for all contacts
+                break;
+            default: // recipientTarget is null
+                finalRecipients = { ListNames: [], SegmentNames: [] };
+                break;
+        }
     
         payload.Recipients = finalRecipients;
     
@@ -710,15 +740,15 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                 <button type="button" className="btn" onClick={() => handleSubmit('draft')} disabled={isSending}>{t('saveAsDraft')}</button>
                 {!isScheduling ? (
                     <div style={{display: 'flex', gap: '1rem'}}>
-                         <button type="button" className="btn btn-secondary" onClick={() => setIsScheduling(true)} disabled={isSending || verifiedDomainsWithDefault.length === 0}>{t('schedule')}</button>
-                         <button type="button" className="btn btn-primary" onClick={() => handleSubmit('send')} disabled={isSending || verifiedDomainsWithDefault.length === 0}>{isSending ? <Loader/> : t('sendNow')}</button>
+                         <button type="button" className="btn btn-secondary" onClick={() => setIsScheduling(true)} disabled={isSending || verifiedDomainsWithDefault.length === 0 || !isRecipientSelected}>{t('schedule')}</button>
+                         <button type="button" className="btn btn-primary" onClick={() => handleSubmit('send')} disabled={isSending || verifiedDomainsWithDefault.length === 0 || !isRecipientSelected}>{isSending ? <Loader/> : t('sendNow')}</button>
                     </div>
                 ) : (
                     <div className="schedule-controls">
                         <input type="date" value={scheduleDate} onChange={e => setScheduleDate(e.target.value)} required />
                         <input type="time" value={scheduleTime} onChange={e => setScheduleTime(e.target.value)} required />
                         <button type="button" className="btn" onClick={() => setIsScheduling(false)} disabled={isSending}>{t('cancel')}</button>
-                        <button type="button" className="btn btn-primary" onClick={() => handleSubmit('schedule')} disabled={isSending || !campaign.Options.ScheduleFor || verifiedDomainsWithDefault.length === 0}>{isSending ? <Loader/> : t('confirm')}</button>
+                        <button type="button" className="btn btn-primary" onClick={() => handleSubmit('schedule')} disabled={isSending || !campaign.Options.ScheduleFor || verifiedDomainsWithDefault.length === 0 || !isRecipientSelected}>{isSending ? <Loader/> : t('confirm')}</button>
                     </div>
                 )}
             </div>

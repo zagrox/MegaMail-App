@@ -1,4 +1,5 @@
 
+
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -443,6 +444,7 @@ const resources = {
       segmentRuleValidationError: 'Segment name and at least one valid rule are required.',
       'unknownError': 'An unknown error occurred.',
       // Send Email View
+      selectRecipientsToSend: 'Please select recipients before sending.',
       subject: 'Subject',
       fromEmail: 'From Email',
       fromName: 'From Name',
@@ -1111,6 +1113,7 @@ const resources = {
       segmentRuleValidationError: 'نام بخش و حداقل یک قانون معتبر الزامی است.',
       'unknownError': 'یک خطای ناشناخته رخ داد.',
       // Send Email View
+      selectRecipientsToSend: 'لطفاً قبل از ارسال گیرندگان را انتخاب کنید.',
       subject: 'موضوع',
       fromEmail: 'ایمیل فرستنده',
       fromName: 'نام فرستنده',

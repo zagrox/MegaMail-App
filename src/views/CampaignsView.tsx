@@ -1,5 +1,8 @@
 
 
+
+
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -294,10 +297,8 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                     results.forEach(res => {
                         // FIX: Use an if/else block to help TypeScript correctly narrow the discriminated union type.
                         if (res.success) {
-                            // TypeScript can now correctly infer that `res` has a `data` property here.
                             newStats[res.name] = { loading: false, data: res.data };
                         } else {
-                            // TypeScript can now correctly infer that `res` has an `error` property here.
                             console.error(`Failed to fetch stats for campaign ${res.name}`, res.error);
                             newStats[res.name] = { loading: false, error: res.error };
                         }
