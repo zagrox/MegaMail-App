@@ -16,6 +16,21 @@ import { Segment } from '../api/types';
 import { useToast } from '../contexts/ToastContext';
 import LineLoader from '../components/LineLoader';
 
+const ProgressBar = ({ value, max }: { value: number; max: number }) => {
+    const percentage = max > 0 ? (value / max) * 100 : 0;
+    let colorClass = '';
+    if (percentage >= 20) {
+        colorClass = 'success';
+    } else if (percentage >= 10) {
+        colorClass = 'warning';
+    }
+    return (
+        <div className={`progress-bar-container ${colorClass}`}>
+            <div className="progress-bar-fill" style={{ width: `${percentage}%` }} />
+        </div>
+    );
+};
+
 const CampaignDetailModal = ({ campaign, apiKey, isOpen, onClose }: { campaign: any, apiKey: string, isOpen: boolean, onClose: () => void }) => {
     const { t, i18n } = useTranslation();
     const isDraft = campaign.Status === 'Draft';
@@ -166,14 +181,33 @@ const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { cam
                 )}
             </div>
             <div className="campaign-card-footer">
-                <div className="campaign-card-footer-stats">
-                    {loadingStats && !stats ? <div style={{width: '80px'}}><LineLoader /></div> : (
-                        stats ? (
-                            <>
-                                <span>{t('delivered')}: <strong>{stats.Delivered.toLocaleString(i18n.language)}</strong></span>
-                                <span>{t('opened')}: <strong>{stats.Opened.toLocaleString(i18n.language)}</strong></span>
-                            </>
-                        ) : null
+                <div className="campaign-card-footer-stats" style={{ width: '100%', paddingRight: '1rem' }}>
+                    {loadingStats ? (
+                        <div style={{width: '80px'}}><LineLoader /></div>
+                    ) : stats ? (
+                        stats.Delivered > 0 ? (
+                            <div style={{ width: '100%' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>{t('openRate')}</span>
+                                    <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>
+                                        {((stats.Opened / stats.Delivered) * 100).toFixed(1)}%
+                                    </span>
+                                </div>
+                                <ProgressBar value={stats.Opened} max={stats.Delivered} />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '0.25rem', color: 'var(--subtle-text-color)' }}>
+                                    <span>{stats.Opened.toLocaleString(i18n.language)} {t('opened')}</span>
+                                    <span>{stats.Delivered.toLocaleString(i18n.language)} {t('delivered')}</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>0 {t('delivered')}</span>
+                        )
+                    ) : (
+                        isDraft ? (
+                            <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>&nbsp;</span>
+                        ) : (
+                            <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>{t('noStatsForCampaign')}</span>
+                        )
                     )}
                 </div>
                 <div className="action-buttons" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -217,50 +251,63 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     }, [searchQuery]);
 
     useEffect(() => {
-        let isMounted = true;
-    
-        const fetchAllStatsSequentially = async () => {
-            for (const campaign of paginatedCampaigns) {
-                if (!isMounted) break;
-    
-                if (!campaignStats[campaign.Name] && campaign.Status !== 'Draft') {
-                    if (isMounted) {
-                        setCampaignStats(prev => ({ ...prev, [campaign.Name]: { loading: true } }));
-                    }
-                    try {
-                        const result = await apiFetchV4(`/statistics/campaigns/${encodeURIComponent(campaign.Name)}`, apiKey);
-                        if (isMounted) {
-                            setCampaignStats(prev => ({
-                                ...prev,
-                                [campaign.Name]: { 
-                                    loading: false, 
-                                    data: {
-                                        Delivered: result?.Delivered ?? 0,
-                                        Opened: result?.Opened ?? 0,
-                                    }
-                                }
-                            }));
-                        }
-                    } catch (err) {
-                        if (isMounted) {
-                            console.error(`Failed to fetch stats for campaign ${campaign.Name}`, err);
-                            setCampaignStats(prev => ({
-                                ...prev,
-                                [campaign.Name]: { loading: false, error: err }
-                            }));
-                        }
-                    }
-                }
-            }
-        };
-    
-        if (apiKey && paginatedCampaigns.length > 0) {
-            fetchAllStatsSequentially();
+        if (!apiKey || !paginatedCampaigns || paginatedCampaigns.length === 0) {
+            return;
         }
     
-        return () => {
-            isMounted = false;
-        };
+        // Identify campaigns on the current page that need stats.
+        const campaignsToFetch = paginatedCampaigns.filter(
+            c => c.Status !== 'Draft' && !campaignStats[c.Name]
+        );
+    
+        if (campaignsToFetch.length > 0) {
+            // Set loading state for all new campaigns at once.
+            setCampaignStats(prev => {
+                const newStats = { ...prev };
+                campaignsToFetch.forEach(campaign => {
+                    newStats[campaign.Name] = { loading: true };
+                });
+                return newStats;
+            });
+    
+            // Fetch all stats in parallel.
+            Promise.all(
+                campaignsToFetch.map(campaign =>
+                    apiFetchV4(`/statistics/campaigns/${encodeURIComponent(campaign.Name)}`, apiKey)
+                        .then(result => ({
+                            name: campaign.Name,
+                            // FIX: Add 'as const' to ensure TypeScript infers a literal type for discriminated union.
+                            success: true as const,
+                            data: {
+                                Delivered: result?.Delivered ?? 0,
+                                Opened: result?.Opened ?? 0,
+                            }
+                        }))
+                        .catch(error => ({
+                            name: campaign.Name,
+                            // FIX: Add 'as const' to ensure TypeScript infers a literal type for discriminated union.
+                            success: false as const,
+                            error
+                        }))
+                )
+            ).then(results => {
+                // Update state with all results at once.
+                setCampaignStats(prev => {
+                    const newStats = { ...prev };
+                    results.forEach(res => {
+                        if (res.success) {
+                            // TypeScript can now correctly infer that `res` has a `data` property here.
+                            newStats[res.name] = { loading: false, data: res.data };
+                        } else {
+                            // TypeScript can now correctly infer that `res` has an `error` property here.
+                            console.error(`Failed to fetch stats for campaign ${res.name}`, res.error);
+                            newStats[res.name] = { loading: false, error: res.error };
+                        }
+                    });
+                    return newStats;
+                });
+            });
+        }
     }, [paginatedCampaigns, apiKey, campaignStats]);
 
     const handleSelectCampaign = (campaign: any) => {
