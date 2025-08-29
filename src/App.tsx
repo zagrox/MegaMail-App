@@ -19,6 +19,7 @@ import EmailBuilderView from './views/EmailBuilderView';
 import SendEmailView from './views/SendEmailView';
 import SendWizardView from './views/SendWizardView';
 import CampaignsView from './views/CampaignsView';
+import CampaignDetailView from './views/CampaignDetailView';
 import TemplatesView from './views/TemplatesView';
 import DomainsView from './views/DomainsView';
 import SmtpView from './views/SmtpView';
@@ -41,6 +42,7 @@ const App = () => {
     const [templateToEdit, setTemplateToEdit] = useState<Template | null>(null);
     const [campaignToLoad, setCampaignToLoad] = useState<any | null>(null);
     const [selectedList, setSelectedList] = useState<List | null>(null);
+    const [selectedCampaign, setSelectedCampaign] = useState<any | null>(null);
     const [selectedContactEmail, setSelectedContactEmail] = useState<string | null>(null);
     const [contactDetailOrigin, setContactDetailOrigin] = useState<{ view: string, data: any } | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -186,7 +188,7 @@ const App = () => {
         setView('Dashboard');
     };
 
-    const handleSetView = (newView: string, data?: { template?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any }) => {
+    const handleSetView = (newView: string, data?: { template?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any, campaign?: any }) => {
         if (newView === 'Email Builder' && data?.template) setTemplateToEdit(data.template);
         else setTemplateToEdit(null);
 
@@ -202,6 +204,12 @@ const App = () => {
         } else {
             setSelectedContactEmail(null);
             if (!data?.origin) setContactDetailOrigin(null);
+        }
+
+        if (newView === 'CampaignDetail' && data?.campaign) {
+            setSelectedCampaign(data.campaign);
+        } else {
+            setSelectedCampaign(null);
         }
 
         setView(newView);
@@ -220,6 +228,7 @@ const App = () => {
         'Segments': { component: <SegmentsView apiKey={apiKey} />, title: t('segments'), icon: ICONS.SEGMENTS },
         'Media Manager': { component: <MediaManagerView apiKey={apiKey} />, title: t('mediaManager'), icon: ICONS.FOLDER },
         'Campaigns': { component: <CampaignsView apiKey={apiKey} setView={handleSetView} />, title: t('campaigns'), icon: ICONS.CAMPAIGNS },
+        'CampaignDetail': { component: <CampaignDetailView apiKey={apiKey} campaign={selectedCampaign} onBack={() => handleSetView('Campaigns')} />, title: selectedCampaign?.Name || t('campaigns'), icon: ICONS.CAMPAIGNS },
         'Templates': { component: <TemplatesView apiKey={apiKey} setView={handleSetView} />, title: t('templates'), icon: ICONS.ARCHIVE },
         'Email Builder': { component: <EmailBuilderView apiKey={apiKey} user={user} templateToEdit={templateToEdit} />, title: t('emailBuilder'), icon: ICONS.PENCIL },
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
@@ -307,7 +316,7 @@ const App = () => {
     );
     
     const currentView = views[view];
-    const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail' && view !== 'SendWizard';
+    const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail' && view !== 'SendWizard' && view !== 'CampaignDetail';
 
     return (
         <div ref={appContainerRef} className={`app-container ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>

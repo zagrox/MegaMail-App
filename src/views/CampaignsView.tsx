@@ -3,15 +3,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
-import { apiFetch, apiFetchV4 } from '../api/elasticEmail';
+import { apiFetchV4 } from '../api/elasticEmail';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
 import ErrorMessage from '../components/ErrorMessage';
 import Icon, { ICONS } from '../components/Icon';
 import Badge from '../components/Badge';
-import Modal from '../components/Modal';
 import { useStatusStyles } from '../hooks/useStatusStyles';
-import { Segment } from '../api/types';
 import { useToast } from '../contexts/ToastContext';
 import LineLoader from '../components/LineLoader';
 
@@ -27,100 +25,6 @@ const ProgressBar = ({ value, max }: { value: number; max: number }) => {
         <div className={`progress-bar-container ${colorClass}`}>
             <div className="progress-bar-fill" style={{ width: `${percentage}%` }} />
         </div>
-    );
-};
-
-const CampaignDetailModal = ({ campaign, apiKey, isOpen, onClose }: { campaign: any, apiKey: string, isOpen: boolean, onClose: () => void }) => {
-    const { t, i18n } = useTranslation();
-    const isDraft = campaign.Status === 'Draft';
-
-    const { data: stats, loading, error, refetch } = useApiV4(
-        isOpen && !isDraft ? `/statistics/campaigns/${encodeURIComponent(campaign.Name)}` : '',
-        apiKey
-    );
-    
-    const [draftRecipientCount, setDraftRecipientCount] = useState<number | null>(null);
-    const [isCounting, setIsCounting] = useState(false);
-
-    useEffect(() => {
-        if (isOpen) {
-            if (isDraft) {
-                const calculateCount = async () => {
-                    setIsCounting(true);
-                    setDraftRecipientCount(null);
-                    let count = 0;
-                    try {
-                        const recipients = campaign.Recipients;
-                        if (recipients && recipients.ListNames && recipients.ListNames.length > 0) {
-                            const counts = await Promise.all(
-                                recipients.ListNames.map((listName: string) =>
-                                    apiFetch('/contact/count', apiKey, { params: { rule: `listname = '${listName.replace(/'/g, "''")}'` } })
-                                )
-                            );
-                            count = counts.reduce((sum, current) => sum + Number(current), 0);
-                        } else if (recipients && recipients.SegmentNames && recipients.SegmentNames.length > 0) {
-                            const allSegments: Segment[] = await apiFetchV4('/segments', apiKey, {});
-                            count = recipients.SegmentNames.reduce((sum: number, segmentName: string) => {
-                                const segment = allSegments.find(s => s.Name === segmentName);
-                                return sum + (segment?.ContactsCount || 0);
-                            }, 0);
-                        } else if (!recipients || Object.keys(recipients).length === 0 || (!recipients.ListNames && !recipients.SegmentNames)) {
-                            const allCount = await apiFetch('/contact/count', apiKey, { params: { allContacts: 'true' } });
-                            count = Number(allCount);
-                        }
-                        setDraftRecipientCount(count);
-                    } catch (e) {
-                        console.error("Failed to count draft recipients", e);
-                        setDraftRecipientCount(0);
-                    } finally {
-                        setIsCounting(false);
-                    }
-                };
-                calculateCount();
-            } else {
-                refetch();
-            }
-        }
-    }, [isOpen, campaign, apiKey, isDraft, refetch]);
-    
-    if (!isOpen) return null;
-    
-    const finalLoading = isDraft ? isCounting : loading;
-    const finalError = isDraft ? null : error;
-
-    const statItems = [
-        { label: t('recipients'), value: isDraft ? draftRecipientCount : stats?.Recipients },
-        { label: t('emailsSent'), value: stats?.EmailTotal },
-        { label: t('delivered'), value: stats?.Delivered },
-        { label: t('bounced'), value: stats?.Bounced },
-        { label: t('opened'), value: stats?.Opened },
-        { label: t('clicked'), value: stats?.Clicked },
-        { label: t('unsubscribed'), value: stats?.Unsubscribed },
-        { label: t('complaints'), value: stats?.Complaints },
-        { label: t('inProgress'), value: stats?.InProgress },
-        { label: t('failed'), value: stats?.Failed ?? stats?.TotalFailed },
-    ];
-
-    return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('statsForCampaign', { campaignName: campaign.Name })}>
-            {finalLoading && <CenteredMessage style={{height: 200}}><Loader/></CenteredMessage>}
-            {finalError && <ErrorMessage error={finalError} />}
-            {!finalLoading && !finalError && (
-                ((isDraft && draftRecipientCount !== null) || (!isDraft && stats)) ? (
-                    <div className="campaign-stats-grid">
-                        {statItems.map(item => (
-                            (item.value !== undefined && item.value !== null) &&
-                            <div key={item.label} className="campaign-stat-item">
-                                <span>{(item.value).toLocaleString(i18n.language)}</span>
-                                <label>{item.label}</label>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <CenteredMessage>{t('noStatsForCampaign')}</CenteredMessage>
-                )
-            )}
-        </Modal>
     );
 };
 
@@ -226,7 +130,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const { t } = useTranslation();
     const { addToast } = useToast();
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCampaign, setSelectedCampaign] = useState<any | null>(null);
     const [campaignStats, setCampaignStats] = useState<Record<string, { data?: any; loading: boolean; error?: any; }>>({});
     const [offset, setOffset] = useState(0);
     const [refetchIndex, setRefetchIndex] = useState(0);
@@ -307,7 +210,7 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     }, [paginatedCampaigns, apiKey, campaignStats]);
 
     const handleSelectCampaign = (campaign: any) => {
-        setSelectedCampaign(campaign);
+        setView('CampaignDetail', { campaign });
     };
 
     const handleEditCampaign = async (campaign: any) => {
@@ -324,14 +227,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
 
     return (
         <div>
-            {selectedCampaign && (
-                <CampaignDetailModal
-                    campaign={selectedCampaign}
-                    apiKey={apiKey}
-                    isOpen={!!selectedCampaign}
-                    onClose={() => setSelectedCampaign(null)}
-                />
-            )}
             <div className="view-header">
                 <div className="search-bar" style={{ flexGrow: 1 }}>
                     <Icon path={ICONS.SEARCH} />
