@@ -1,5 +1,6 @@
 
 
+
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -55,6 +56,7 @@ const resources = {
       opened: 'Opened',
       openRate: 'Open Rate',
       clicked: 'Clicked',
+      clickRate: 'Click Rate',
       unsubscribed: 'Unsubscribed',
       complaints: 'Complaints',
       bounced: 'Bounced',
@@ -496,6 +498,10 @@ const resources = {
       manualCancel: 'Manually Canceled',
       notDelivered: 'Not Delivered',
       noStatsForCampaign: 'No statistics available for this campaign.',
+      report: 'Report',
+      performance: 'Performance',
+      metric: 'Metric',
+      rate: 'Rate',
       // Templates
       searchTemplatesPlaceholder: 'Search templates...',
       createTemplate: 'Create Template',
@@ -724,6 +730,7 @@ const resources = {
       opened: 'باز شده',
       openRate: 'نرخ باز شدن',
       clicked: 'کلیک شده',
+      clickRate: 'نرخ کلیک',
       unsubscribed: 'لغو اشتراک شده',
       complaints: 'شکایات',
       bounced: 'برگشت خورده',
@@ -1165,6 +1172,10 @@ const resources = {
       manualCancel: 'به صورت دستی لغو شد',
       notDelivered: 'تحویل داده نشد',
       noStatsForCampaign: 'آماری برای این کمپین موجود نیست.',
+      report: 'گزارش',
+      performance: 'کارایی',
+      metric: 'متریک',
+      rate: 'نرخ',
       // Templates
       searchTemplatesPlaceholder: 'جستجوی قالب‌ها...',
       createTemplate: 'ایجاد قالب',

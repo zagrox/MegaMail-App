@@ -31,9 +31,9 @@ const DetailedStatsTable = ({ stats }: { stats: any }) => {
         { label: t('bounced'), value: stats.Bounced, totalForPercent: recipients },
         { label: t('unsubscribed'), value: stats.Unsubscribed, totalForPercent: delivered },
         { label: t('complaints'), value: stats.Complaints, totalForPercent: delivered },
-        { label: t('inProgress', {defaultValue: 'In Progress'}), value: stats.InProgress, totalForPercent: null },
-        { label: t('manualCancel', {defaultValue: 'Manual Cancel'}), value: stats.ManualCancel, totalForPercent: null },
-        { label: t('notDelivered', {defaultValue: 'Not Delivered'}), value: stats.NotDelivered, totalForPercent: null },
+        { label: t('inProgress'), value: stats.InProgress, totalForPercent: null },
+        { label: t('manualCancel'), value: stats.ManualCancel, totalForPercent: null },
+        { label: t('notDelivered'), value: stats.NotDelivered, totalForPercent: null },
     ];
 
     return (
@@ -42,9 +42,9 @@ const DetailedStatsTable = ({ stats }: { stats: any }) => {
                 <table className="simple-table">
                     <thead>
                         <tr>
-                            <th>{t('metric', {defaultValue: 'Metric'})}</th>
+                            <th>{t('metric')}</th>
                             <th style={{textAlign: 'right'}}>{t('total')}</th>
-                            <th style={{textAlign: 'right'}}>{t('rate', {defaultValue: 'Rate'})}</th>
+                            <th style={{textAlign: 'right'}}>{t('rate')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -180,6 +180,72 @@ const CampaignSummary = ({ campaignDetails, stats, campaign, accountData }: { ca
     );
 };
 
+const StatsPieChart = ({ stats }: { stats: any }) => {
+    const { t, i18n } = useTranslation();
+
+    const data = useMemo(() => [
+        { label: t('opened'), value: stats.Opened ?? 0, color: '#10B981' },
+        { label: t('clicked'), value: stats.Clicked ?? 0, color: '#F59E0B' },
+        { label: t('bounced'), value: stats.Bounced ?? 0, color: '#64748B' },
+        { label: t('unsubscribed'), value: stats.Unsubscribed ?? 0, color: '#8B5CF6' },
+        { label: t('complaints'), value: stats.Complaints ?? 0, color: '#EF4444' },
+    ], [stats, t]);
+
+    const filteredData = data.filter(d => d.value > 0);
+    const total = filteredData.reduce((sum, d) => sum + d.value, 0);
+
+    if (total === 0) {
+        return null;
+    }
+
+    let startAngle = -90; // Start from the top
+    const slices = filteredData.map(d => {
+        const angle = (d.value / total) * 360;
+        const endAngle = startAngle + angle;
+        const largeArcFlag = angle > 180 ? 1 : 0;
+        
+        const x1 = 50 + 40 * Math.cos(Math.PI * startAngle / 180);
+        const y1 = 50 + 40 * Math.sin(Math.PI * startAngle / 180);
+        const x2 = 50 + 40 * Math.cos(Math.PI * endAngle / 180);
+        const y2 = 50 + 40 * Math.sin(Math.PI * endAngle / 180);
+
+        const pathData = `M 50,50 L ${x1},${y1} A 40,40 0 ${largeArcFlag},1 ${x2},${y2} Z`;
+        startAngle = endAngle;
+
+        return { path: pathData, color: d.color, label: d.label, value: d.value, percentage: (d.value / total) * 100 };
+    });
+
+    return (
+        <div className="card">
+            <div className="card-header"><h3>Interaction Breakdown</h3></div>
+            <div style={{ display: 'flex', alignItems: 'center', padding: '1.5rem', gap: '2rem', flexWrap: 'wrap' }}>
+                <svg viewBox="0 0 100 100" width="200" height="200" style={{flexShrink: 0}}>
+                    {/* FIX: Replaced invalid 'title' prop on SVG <path> with a nested <title> element for tooltip. */}
+                    {slices.map(slice => (
+                        <path key={slice.label} d={slice.path} fill={slice.color}>
+                            <title>{`${slice.label}: ${slice.value.toLocaleString()}`}</title>
+                        </path>
+                    ))}
+                </svg>
+                <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {slices.map(slice => (
+                        <div key={slice.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{ width: '12px', height: '12px', backgroundColor: slice.color, borderRadius: '3px' }}></span>
+                                <span>{slice.label}</span>
+                            </div>
+                            <div style={{textAlign: 'right'}}>
+                                <span style={{ fontWeight: 600 }}>{slice.value.toLocaleString(i18n.language)}</span>
+                                <span style={{ color: 'var(--subtle-text-color)', marginLeft: '0.5rem' }}>({slice.percentage.toFixed(1)}%)</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
 const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string; campaign: any | null; onBack: () => void; }) => {
     const { t, i18n } = useTranslation();
@@ -228,20 +294,34 @@ const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string; camp
 
     const statusStyle = getStatusStyle(campaign.Status);
 
+    const ReportTabContent = () => (
+        <div className="campaign-report-container">
+            <OverallActivityChart stats={stats} loading={statsLoading} error={statsError} />
+            <div className="campaign-detail-kpi-grid" style={{marginTop: '2.5rem'}}>
+                <AccountDataCard title={t('openRate')} iconPath={ICONS.EYE}>{kpiData.openRate}%</AccountDataCard>
+                <AccountDataCard title={t('clickRate')} iconPath={ICONS.CLICK}>{kpiData.clickRate}%</AccountDataCard>
+                <AccountDataCard title={t('recipients')} iconPath={ICONS.CONTACTS}>{kpiData.recipients.toLocaleString(i18n.language)}</AccountDataCard>
+                <AccountDataCard title={t('unsubscribed')} iconPath={ICONS.LOGOUT}>{kpiData.unsubscribed.toLocaleString(i18n.language)}</AccountDataCard>
+            </div>
+             <StatsPieChart stats={stats} />
+        </div>
+    );
+
     const tabs = [
         {
             id: 'report',
-            label: t('report', {defaultValue: 'Report'}),
+            label: t('report'),
             icon: ICONS.STATISTICS,
             component: (
-                isDraft ? (
-                    <CenteredMessage>{t('noStatsForCampaign')}</CenteredMessage>
-                ) : (
-                    <div className="campaign-report-container">
-                        <OverallActivityChart stats={stats} loading={statsLoading} error={statsError} />
-                        {stats && !statsLoading && <DetailedStatsTable stats={stats} />}
-                    </div>
-                )
+                isDraft ? <CenteredMessage>{t('noStatsForCampaign')}</CenteredMessage> : <ReportTabContent />
+            )
+        },
+        {
+            id: 'performance',
+            label: t('performance'),
+            icon: ICONS.TRENDING_UP,
+            component: (
+                isDraft ? <CenteredMessage>{t('noStatsForCampaign')}</CenteredMessage> : (stats && !statsLoading && <DetailedStatsTable stats={stats} />)
             )
         },
         {
@@ -285,17 +365,7 @@ const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string; camp
             {anyError && <ErrorMessage error={anyError} />}
 
             {!allLoading && !anyError && (
-                <>
-                    {!isDraft && (
-                        <div className="campaign-detail-kpi-grid">
-                            <AccountDataCard title={t('openRate')} iconPath={ICONS.EYE}>{kpiData.openRate}%</AccountDataCard>
-                            <AccountDataCard title={t('clickRate', {defaultValue: 'Click Rate'})} iconPath={ICONS.CLICK}>{kpiData.clickRate}%</AccountDataCard>
-                            <AccountDataCard title={t('recipients')} iconPath={ICONS.CONTACTS}>{kpiData.recipients.toLocaleString(i18n.language)}</AccountDataCard>
-                            <AccountDataCard title={t('unsubscribed')} iconPath={ICONS.LOGOUT}>{kpiData.unsubscribed.toLocaleString(i18n.language)}</AccountDataCard>
-                        </div>
-                    )}
-                    <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-                </>
+                <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
             )}
         </div>
     );
