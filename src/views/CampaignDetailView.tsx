@@ -296,13 +296,13 @@ const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string; camp
 
     const ReportTabContent = () => (
         <div className="campaign-report-container">
-            <OverallActivityChart stats={stats} loading={statsLoading} error={statsError} />
-            <div className="campaign-detail-kpi-grid" style={{marginTop: '2.5rem'}}>
+            <div className="campaign-detail-kpi-grid" style={{marginTop: '2rem'}}>
                 <AccountDataCard title={t('openRate')} iconPath={ICONS.EYE}>{kpiData.openRate}%</AccountDataCard>
                 <AccountDataCard title={t('clickRate')} iconPath={ICONS.CLICK}>{kpiData.clickRate}%</AccountDataCard>
                 <AccountDataCard title={t('recipients')} iconPath={ICONS.CONTACTS}>{kpiData.recipients.toLocaleString(i18n.language)}</AccountDataCard>
                 <AccountDataCard title={t('unsubscribed')} iconPath={ICONS.LOGOUT}>{kpiData.unsubscribed.toLocaleString(i18n.language)}</AccountDataCard>
             </div>
+            <OverallActivityChart stats={stats} loading={statsLoading} error={statsError} />
              <StatsPieChart stats={stats} />
         </div>
     );

@@ -1,6 +1,3 @@
-
-
-
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -982,8 +979,8 @@ const resources = {
       contactDetails: 'جزئیات مخاطب',
       activity: 'فعالیت',
       totalSent: 'کل ارسالی',
-      totalOpened: 'کل باز شده',
-      totalClicked: 'کل کلیک شده',
+      totalOpened: 'کل باز کردن‌ها',
+      totalClicked: 'کل کلیک‌ها',
       totalFailed: 'کل ناموفق',
       lastSent: 'آخرین ارسال',
       lastOpened: 'آخرین باز کردن',
@@ -1366,7 +1363,7 @@ i18next
       escapeValue: false, // react already safes from xss
     },
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['querystring', 'localStorage', 'navigator'],
       caches: ['localStorage'],
     },
   });

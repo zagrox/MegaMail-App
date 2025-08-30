@@ -1,6 +1,6 @@
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../contexts/ToastContext';
@@ -21,6 +21,13 @@ const AuthView = () => {
     const { t, i18n } = useTranslation();
     const { addToast } = useToast();
     const { config, loading: configLoading } = useConfiguration();
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('register')) {
+            setMode('register');
+        }
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
