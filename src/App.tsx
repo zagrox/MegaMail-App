@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -51,13 +52,36 @@ const App = () => {
     const [moduleToUnlock, setModuleToUnlock] = useState<Module | null>(null);
 
     useEffect(() => {
-        if (user?.language) {
+        // For logged-out users, the backend config is the source of truth.
+        if (!user) {
+            if (config?.app_language) {
+                const langCode = config.app_language.split('-')[0];
+                if (langCode !== i18n.language) {
+                    i18n.changeLanguage(langCode);
+                }
+            }
+            return;
+        }
+
+        // For logged-in users, priority is:
+        // 1. User's profile setting
+        if (user.language) {
             const langCode = user.language.split('-')[0];
             if (langCode !== i18n.language) {
                 i18n.changeLanguage(langCode);
             }
+            return;
         }
-    }, [user, i18n]);
+
+        // 2. App default (only if user hasn't manually switched in this session)
+        const lngInStorage = localStorage.getItem('i18nextLng');
+        if (config?.app_language && !lngInStorage) {
+            const langCode = config.app_language.split('-')[0];
+            if (langCode !== i18n.language) {
+                i18n.changeLanguage(langCode);
+            }
+        }
+    }, [user, config, i18n]);
 
     const urlParams = new URLSearchParams(window.location.search);
     const isEmbedMode = urlParams.get('embed') === 'true';

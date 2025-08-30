@@ -80,4 +80,5 @@ export type Configuration = {
     app_icon: string;
     app_banner: string;
     app_backend: string;
+    app_language: string;
 };
