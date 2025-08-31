@@ -173,10 +173,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     const login = async (credentials: any) => {
         setLoading(true);
-        await sdk.login(credentials.email, credentials.password);
-        localStorage.removeItem('elastic_email_api_key');
-        await getMe();
-        setLoading(false);
+        try {
+            await sdk.login(credentials.email, credentials.password);
+            localStorage.removeItem('elastic_email_api_key');
+            await getMe();
+        } finally {
+            setLoading(false);
+        }
     };
     
     const loginWithApiKey = async (apiKey: string) => {
