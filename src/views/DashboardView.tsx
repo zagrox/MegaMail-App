@@ -56,7 +56,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     if (statsError) console.warn("Could not load dashboard stats:", statsError);
 
     const welcomeName = user?.first_name || t('user');
-    const appName = config?.app_name || 'Mailzila';
+    const appName = config?.app_name || 'MegaMail';
     const copyrightText = configLoading ? '...' : (config?.app_copyright || `${appName} © ${new Date().getFullYear()}, All Rights Reserved`);
 
     return (

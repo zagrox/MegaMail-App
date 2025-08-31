@@ -257,7 +257,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     
     const createElasticSubaccount = async (email: string, password: string) => {
-        const FLOW_ID = 'ba831cd4-2b5d-494a-aacb-17c934d969a1';
+        const FLOW_ID = '736aa130-adf4-4ab0-a117-7e7647b403ea';
         if (!user || !user.id) throw new Error("Current user not found.");
     
         await sdk.request(() => ({
@@ -295,7 +295,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     
     const purchaseModule = async (moduleId: string) => {
-        const PURCHASE_FLOW_TRIGGER_ID = '3bdc2659-67e7-4fa2-9717-89365b801bef';
+        const PURCHASE_FLOW_TRIGGER_ID = '974adeab-789f-428d-9433-b056e1c6da9b';
         
         try {
             await sdk.request(() => ({

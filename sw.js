@@ -7,7 +7,7 @@ const APP_SHELL_URLS = [
   '/manifest.json'
 ];
 
-let DYNAMIC_BACKEND_HOST = 'crm.mailzila.com'; // Default fallback host
+let DYNAMIC_BACKEND_HOST = 'crm.megamail.ir'; // Default fallback host
 
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SET_BACKEND_URL') {

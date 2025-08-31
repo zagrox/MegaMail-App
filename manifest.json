@@ -1,7 +1,7 @@
 {
   "name": "Email Marketing Platform",
-  "short_name": "Mailzila",
-  "description": "Your complete email marketing solution, powered by ZAGROX ",
+  "short_name": "MegaMail",
+  "description": "Your complete email marketing solution, powered by MegaMail",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F7F9FC",
@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://mailzila.com/logo/app-logo-red.png",
+      "src": "https://crm.megamail.ir/assets/8156ea40-b926-4b3e-9a64-2e20370cc295",
       "type": "image/png",
       "purpose": "any maskable",
       "sizes": "512x512"
