@@ -739,8 +739,8 @@ const resources = {
       theme: 'پوسته',
       close: 'بستن',
       modules: 'ماژول‌ها',
-      unlock: 'باز کردن',
-      unlocked: 'باز شده',
+      unlock: 'فعالسازی',
+      unlocked: 'فعال',
       // Auth
       signIn: 'ورود',
       signUp: 'ثبت نام',
@@ -801,8 +801,8 @@ const resources = {
       dashboardSubtitle: 'در اینجا یک نمای کلی از فعالیت حساب و ابزارهای شما آورده شده است.',
       startEmailMarketingTitle: 'بازاریابی ایمیلی را شروع کنید',
       startEmailMarketingDesc: 'اولین کمپین خود را راه اندازی کنید و با استفاده از سازنده کمپین قدرتمند و آسان ما، مخاطبان خود را درگیر کنید.',
-      credits: 'اعتبارها',
-      loadingCredits: 'در حال بارگذاری اعتبارها...',
+      credits: 'اعتبار',
+      loadingCredits: 'در حال بارگذاری اعتبار...',
       sendAnEmail: 'ارسال یک ایمیل',
       sendingReputation: 'اعتبار ارسال',
       emailsSent365d: 'ایمیل‌های ارسالی (365 روز)',
@@ -1346,12 +1346,12 @@ const resources = {
       noTransactionsFound: 'تراکنشی برای این سفارش یافت نشد.',
       payNow: 'اکنون پرداخت کنید',
       showActiveOnly: 'فقط فعال‌ها نمایش داده شوند',
-      unlockForCredits: 'باز کردن با {{amount}} اعتبار',
+      unlockForCredits: 'فعالسازی با {{amount}} اعتبار',
       yourBalanceLabel: 'موجودی فعلی شما',
-      unlockModalPriceLabel: 'هزینه باز کردن این ماژول',
-      notEnoughCredits: 'شما به {{amount}} اعتبار بیشتر برای باز کردن نیاز دارید.',
+      unlockModalPriceLabel: 'هزینه فعالسازی این ماژول',
+      notEnoughCredits: 'شما به {{amount}} اعتبار بیشتر برای فعالسازی نیاز دارید.',
       unlockModuleSuccess: 'ماژول "{{moduleName}}" باز شد!',
-      unlockModuleError: 'باز کردن ماژول ناموفق بود.',
+      unlockModuleError: 'فعالسازی ماژول ناموفق بود.',
     }
   }
 };
