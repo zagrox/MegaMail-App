@@ -95,7 +95,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
     return (
         <WizardLayout
             step={5}
-            title="Sending & Summary"
+            title="Review & Send"
             onNext={onSubmit}
             onBack={onBack}
             isLastStep

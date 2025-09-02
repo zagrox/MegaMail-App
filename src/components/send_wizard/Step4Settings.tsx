@@ -59,7 +59,7 @@ const Step4Settings = ({ onNext, onBack, data, updateData }: { onNext: () => voi
     return (
         <WizardLayout
             step={4}
-            title={t('settings')}
+            title="Campaign Settings"
             onNext={onNext}
             onBack={onBack}
             nextDisabled={!data.campaignName}

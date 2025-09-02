@@ -10,7 +10,7 @@ const Step1SelectType = ({ onNext, onBack, data, updateData }: { onNext: () => v
     return (
         <WizardLayout
             step={1}
-            title="Select Type"
+            title="Select Campaign Type"
             onNext={onNext}
             onBack={onBack}
             nextDisabled={!data.type}

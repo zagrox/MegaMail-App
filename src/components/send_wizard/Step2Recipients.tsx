@@ -111,7 +111,7 @@ const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext:
     return (
         <WizardLayout
             step={2}
-            title="Recipients"
+            title="Select Audience"
             onNext={onNext}
             onBack={onBack}
             nextDisabled={isNextDisabled}

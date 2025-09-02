@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -18,7 +19,7 @@ import SegmentsView from './views/SegmentsView';
 import MediaManagerView from './views/MediaManagerView';
 import EmailBuilderView from './views/EmailBuilderView';
 import SendEmailView from './views/SendEmailView';
-import SendWizardView from './views/SendWizardView';
+import MarketingView from './views/SendWizardView';
 import CampaignsView from './views/CampaignsView';
 import CampaignDetailView from './views/CampaignDetailView';
 import TemplatesView from './views/TemplatesView';
@@ -256,7 +257,7 @@ const App = () => {
         'Templates': { component: <TemplatesView apiKey={apiKey} setView={handleSetView} />, title: t('templates'), icon: ICONS.ARCHIVE },
         'Email Builder': { component: <EmailBuilderView apiKey={apiKey} user={user} templateToEdit={templateToEdit} />, title: t('emailBuilder'), icon: ICONS.PENCIL },
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
-        'SendWizard': { component: <SendWizardView apiKey={apiKey} setView={handleSetView} />, title: 'Send Wizard', icon: ICONS.SEND_EMAIL },
+        'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} />, title: t('marketingCampaign'), icon: ICONS.STAR },
         'Domains': { component: <DomainsView apiKey={apiKey} />, title: t('domains'), icon: ICONS.DOMAINS },
         'SMTP': { component: <SmtpView apiKey={apiKey} user={user}/>, title: t('smtp'), icon: ICONS.SMTP }
     };
@@ -265,6 +266,7 @@ const App = () => {
         { name: t('dashboard'), view: 'Dashboard', icon: ICONS.DASHBOARD },
         { name: t('statistics'), view: 'Statistics', icon: ICONS.STATISTICS },
         { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
+        { name: t('marketing'), view: 'Marketing', icon: ICONS.STAR },
         { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
         { type: 'divider' },
         { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
@@ -340,7 +342,7 @@ const App = () => {
     );
     
     const currentView = views[view];
-    const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail' && view !== 'SendWizard' && view !== 'CampaignDetail';
+    const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail' && view !== 'Marketing' && view !== 'CampaignDetail';
 
     return (
         <div ref={appContainerRef} className={`app-container ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
@@ -365,7 +367,7 @@ const App = () => {
                         <Icon path={ICONS.ACCOUNT} />
                     </button>
                 </header>
-                <main className={`content ${view === 'Email Builder' || view === 'SendWizard' ? 'content--no-padding' : ''}`}>
+                <main className={`content ${view === 'Email Builder' || view === 'Marketing' ? 'content--no-padding' : ''}`}>
                     {showHeader && (
                         <header className="content-header">
                             <h2>{currentView?.title}</h2>

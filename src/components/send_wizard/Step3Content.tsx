@@ -155,7 +155,7 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
             
             <WizardLayout
                 step={3}
-                title="Content"
+                title="Design Content"
                 onNext={onNext}
                 onBack={onBack}
                 nextDisabled={isNextDisabled}

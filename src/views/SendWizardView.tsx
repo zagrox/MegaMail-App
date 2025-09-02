@@ -9,7 +9,7 @@ import Step3Content from '../components/send_wizard/Step3Content';
 import Step4Settings from '../components/send_wizard/Step4Settings';
 import Step5Sending from '../components/send_wizard/Step5Sending';
 
-const SendWizardView = ({ apiKey, setView }: { apiKey: string, setView: (view: string) => void }) => {
+const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: string) => void }) => {
     const { t } = useTranslation();
     const { addToast } = useToast();
     const [step, setStep] = useState(1);
@@ -139,4 +139,4 @@ const SendWizardView = ({ apiKey, setView }: { apiKey: string, setView: (view: s
     );
 };
 
-export default SendWizardView;
+export default MarketingView;

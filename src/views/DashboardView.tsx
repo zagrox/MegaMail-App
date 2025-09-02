@@ -28,6 +28,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     const staticNavItems = useMemo(() => [
         { name: t('statistics'), icon: ICONS.STATISTICS, desc: t('statisticsDesc'), view: 'Statistics' },
         { name: t('contacts'), icon: ICONS.CONTACTS, desc: t('contactsDesc'), view: 'Contacts' },
+        { name: t('marketing'), icon: ICONS.STAR, desc: t('marketingDesc'), view: 'Marketing' },
         { name: t('sendEmail'), icon: ICONS.SEND_EMAIL, desc: t('sendEmailDesc'), view: 'Send Email' },
         { name: t('emailLists'), icon: ICONS.EMAIL_LISTS, desc: t('emailListsDesc'), view: 'Email Lists' },
         { name: t('segments'), icon: ICONS.SEGMENTS, desc: t('segmentsDesc'), view: 'Segments' },
@@ -90,7 +91,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <p className="cta-banner-desc">{t('startEmailMarketingDesc')}</p>
                         </div>
                         <div className="cta-banner-action">
-                            <button className="btn btn-primary" onClick={() => setView('SendWizard')}>
+                            <button className="btn btn-primary" onClick={() => setView('Marketing')}>
                                 <Icon path={ICONS.SEND_EMAIL} /> {t('createCampaign')}
                             </button>
                         </div>
