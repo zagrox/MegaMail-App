@@ -44,7 +44,11 @@ interface AuthContextType {
     resetPassword: (token: string, password: string) => Promise<void>;
     createElasticSubaccount: (email: string, password: string) => Promise<any>;
     hasModuleAccess: (moduleName: string, allModules: Module[] | null) => boolean;
+    canPerformAction: (actionName: string) => boolean;
     purchaseModule: (moduleId: string) => Promise<void>;
+    allModules: Module[] | null;
+    moduleToUnlock: Module | null;
+    setModuleToUnlock: (module: Module | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,6 +56,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [allModules, setAllModules] = useState<Module[] | null>(null);
+    const [moduleToUnlock, setModuleToUnlock] = useState<Module | null>(null);
 
     // This function ONLY handles fetching and setting a Directus user.
     const getMe = useCallback(async () => {
@@ -90,10 +96,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
 
             // 4. Get all available modules to map IDs to names
-            const allModules = await sdk.request(readItems('modules', { fields: ['id', 'modulename'], limit: -1 }));
+            const fetchedModules = await sdk.request(readItems('modules', { fields: ['id', 'modulename', 'moduleprice', 'moduledetails', 'status', 'modulepro', 'modulediscount', 'modulecore', 'locked_actions'], limit: -1 })) as Module[];
+            setAllModules(fetchedModules);
+
 
             // 5. Map purchased module IDs to module names
-            const purchasedModules = allModules
+            const purchasedModules = fetchedModules
                 .filter((module: any) => purchasedModuleIds.has(String(module.id)))
                 .map((module: any) => module.modulename);
 
@@ -101,8 +109,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const mergedUser: User = {
                 ...me,
                 ...profileData,
-                // Explicitly define required fields from `me` and resolve `id` conflict
-                // to satisfy TypeScript when the SDK returns `any` types.
                 id: me.id,
                 email: me.email,
                 status: me.status,
@@ -271,29 +277,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const hasModuleAccess = (moduleName: string, allModules: Module[] | null): boolean => {
-        // These are fundamental UI sections, not optional modules. Always grant access.
         const hardcodedCoreViews = ['Dashboard', 'Account', 'Buy Credits'];
         if (hardcodedCoreViews.includes(moduleName)) {
             return true;
         }
     
-        // API key users only have access to the above sections.
         if (user?.isApiKeyUser) return false;
     
-        // If modules are still loading, deny access to non-core modules to prevent flicker.
         if (!allModules) return false;
         
         const moduleData = allModules.find(m => m.modulename === moduleName);
         
-        // A module can be unlocked if it's marked as a core module from the CMS...
         if (moduleData?.modulecore) {
             return true;
         }
         
-        // ...or if it has been explicitly purchased by the user.
         return user?.purchasedModules.includes(moduleName) ?? false;
     };
     
+    const canPerformAction = (actionName: string): boolean => {
+        if (!allModules || user?.isApiKeyUser) return false;
+
+        // 1. Find which module this action belongs to.
+        const moduleForAction = allModules.find(m => 
+            Array.isArray(m.locked_actions) && m.locked_actions.includes(actionName)
+        );
+
+        // 2. If the action is not listed in ANY module's locked_actions, it's a free action.
+        if (!moduleForAction) {
+            return true;
+        }
+
+        // 3. If it IS in a module's locked_actions, check if the user has access to that module.
+        return hasModuleAccess(moduleForAction.modulename, allModules);
+    };
+
     const purchaseModule = async (moduleId: string) => {
         const PURCHASE_FLOW_TRIGGER_ID = '974adeab-789f-428d-9433-b056e1c6da9b';
         
@@ -327,7 +345,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         resetPassword,
         createElasticSubaccount,
         hasModuleAccess,
+        canPerformAction,
         purchaseModule,
+        allModules,
+        moduleToUnlock,
+        setModuleToUnlock
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

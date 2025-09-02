@@ -1,0 +1,49 @@
+import React from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import Icon, { ICONS } from './Icon';
+import { Module } from '../api/types';
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    action?: string;
+    children: React.ReactNode;
+    className?: string;
+}
+
+const Button: React.FC<ButtonProps> = ({ action, children, className = 'btn', onClick, ...props }) => {
+    const { canPerformAction, allModules, setModuleToUnlock } = useAuth();
+    const isLocked = action ? !canPerformAction(action) : false;
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (isLocked) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const moduleForAction = allModules?.find(m => 
+                Array.isArray(m.locked_actions) && m.locked_actions.includes(action!)
+            );
+
+            if (moduleForAction) {
+                setModuleToUnlock(moduleForAction);
+            } else {
+                console.warn(`Action "${action}" is locked but no corresponding module was found.`);
+            }
+        } else if (onClick) {
+            onClick(e);
+        }
+    };
+
+    return (
+        <button
+            className={`${className} ${isLocked ? 'btn-locked' : ''}`}
+            onClick={handleClick}
+            disabled={props.disabled}
+            aria-disabled={isLocked || props.disabled}
+            {...props}
+        >
+            {isLocked && <Icon path={ICONS.LOCK} style={{ marginRight: '0.5rem' }} />}
+            {children}
+        </button>
+    );
+};
+
+export default Button;

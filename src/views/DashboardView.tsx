@@ -8,22 +8,19 @@ import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
 import AccountDataCard from '../components/AccountDataCard';
 import Icon, { ICONS } from '../components/Icon';
-import useModules from '../hooks/useModules';
 import { Module } from '../api/types';
-import UnlockModuleModal from '../components/UnlockModuleModal';
 import { useConfiguration } from '../contexts/ConfigurationContext';
 import LineLoader from '../components/LineLoader';
+import Button from '../components/Button';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
     const { t, i18n } = useTranslation();
-    const { hasModuleAccess, loading: authLoading } = useAuth();
+    const { hasModuleAccess, loading: authLoading, allModules, setModuleToUnlock } = useAuth();
     const { config, loading: configLoading } = useConfiguration();
     const apiParams = useMemo(() => ({ from: formatDateForApiV4(getPastDateByDays(365)) }), []);
     const { data: statsData, loading: statsLoading, error: statsError } = useApiV4(`/statistics`, apiKey, apiParams);
     const { data: accountData, loading: accountLoading } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
     const { data: contactsCountData, loading: contactsCountLoading } = useApi('/contact/count', apiKey, { allContacts: true }, apiKey ? 1 : 0);
-    const { modules, loading: modulesLoading } = useModules(config?.app_backend);
-    const [moduleToUnlock, setModuleToUnlock] = useState<Module | null>(null);
 
     const staticNavItems = useMemo(() => [
         { name: t('statistics'), icon: ICONS.STATISTICS, desc: t('statisticsDesc'), view: 'Statistics' },
@@ -41,7 +38,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     ], [t]);
 
     const dashboardTools = useMemo(() => {
-        const moduleMap = modules ? new Map(modules.map(m => [m.modulename, m])) : new Map();
+        const moduleMap = allModules ? new Map(allModules.map(m => [m.modulename, m])) : new Map();
 
         return staticNavItems.map(item => {
             const moduleData = moduleMap.get(item.view);
@@ -51,7 +48,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                 moduleData: moduleData || null,
             };
         });
-    }, [staticNavItems, modules]);
+    }, [staticNavItems, allModules]);
 
     if (!user && !isEmbed) return <CenteredMessage><Loader /></CenteredMessage>;
     if (statsError) console.warn("Could not load dashboard stats:", statsError);
@@ -62,13 +59,6 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
 
     return (
         <div className="dashboard-container">
-            {moduleToUnlock && (
-                <UnlockModuleModal
-                    module={moduleToUnlock}
-                    onClose={() => setModuleToUnlock(null)}
-                    setView={setView}
-                />
-            )}
             {!isEmbed && (
                 <>
                     <div className="dashboard-header">
@@ -76,10 +66,10 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <h2>{t('welcomeMessage', { name: welcomeName })}</h2>
                         </div>
                         <div className="dashboard-actions">
-                            <button className="btn btn-credits" onClick={() => setView('Buy Credits')}>
+                            <Button className="btn-credits" onClick={() => setView('Buy Credits')}>
                                 <Icon path={ICONS.BUY_CREDITS} />
                                 {accountLoading ? t('loadingCredits') : `${t('credits')}: ${Number(accountData?.emailcredits ?? 0).toLocaleString(i18n.language)}`}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                     <div className="cta-banner">
@@ -91,9 +81,9 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <p className="cta-banner-desc">{t('startEmailMarketingDesc')}</p>
                         </div>
                         <div className="cta-banner-action">
-                            <button className="btn btn-primary" onClick={() => setView('Marketing')}>
+                            <Button className="btn-primary" onClick={() => setView('Marketing')} action="start_marketing_campaign">
                                 <Icon path={ICONS.SEND_EMAIL} /> {t('createCampaign')}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </>
@@ -119,7 +109,8 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <p>{t('exploreYourToolsSubtitle')}</p>
                         </div>
                         <div className="dashboard-nav-grid">
-                           {(modulesLoading || authLoading) ? (
+                           {/* FIX: Replaced undefined variable 'modulesLoading' with 'authLoading' from the useAuth hook, which correctly represents the loading state for modules. */}
+                           {(authLoading) ? (
                                 Array.from({ length: 8 }).map((_, i) => (
                                     <div key={i} className="card nav-card" style={{
                                         height: '115px',
@@ -129,7 +120,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                                 ))
                             ) : (
                                 dashboardTools.map(item => {
-                                    const hasAccess = hasModuleAccess(item.view, modules);
+                                    const hasAccess = hasModuleAccess(item.view, allModules);
                                     const isPurchasable = !!item.moduleData;
                                     const isLocked = isPurchasable && !hasAccess;
                                     const isPromotional = isLocked && item.moduleData?.modulepro === true;

@@ -17,6 +17,7 @@ import { useStatusStyles } from '../hooks/useStatusStyles';
 import ExportContactsModal from '../components/ExportContactsModal';
 import BulkActionsBar from '../components/BulkActionsBar';
 import AddToListModal from '../components/AddToListModal';
+import Button from '../components/Button';
 
 const STATUS_ORDER = [
     'Active', 'Engaged', 'Transactional', 'Bounced', 'Unsubscribed',
@@ -143,14 +144,15 @@ const ContactStatusFilter = ({ apiKey, selectedStatuses, onStatusChange, onExpor
                 })}
             </div>
             <div className="card-footer" style={{padding: '1rem', borderTop: '1px solid var(--border-color)', marginTop: '0.5rem'}}>
-                <button
-                    className="btn btn-secondary full-width"
+                <Button
+                    className="btn-secondary full-width"
                     onClick={onExportClick}
                     disabled={selectedStatuses.length === 0}
+                    action="export_contacts"
                 >
                     <Icon path={ICONS.DOWNLOAD} />
                     <span>{t('exportContacts')}</span>
-                </button>
+                </Button>
             </div>
         </div>
     );
@@ -250,9 +252,9 @@ const ImportContactsModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { 
                      </select>
                 </div>
                 <div className="form-actions" style={{marginTop: '1rem'}}>
-                     <button type="submit" className="btn btn-primary full-width" disabled={!file || isUploading}>
+                     <Button type="submit" className="btn-primary full-width" disabled={!file || isUploading}>
                         {isUploading ? <Loader /> : t('startImport')}
-                    </button>
+                    </Button>
                 </div>
             </form>
         </Modal>
@@ -289,9 +291,9 @@ const ContactCard = React.memo(({ contact, onView, onDelete, isSelected, onToggl
                     <small>{t('dateAdded')}: {formatDateForDisplay(contact.DateAdded, i18n.language)}</small>
                 </div>
                 <div className="action-buttons">
-                    <button className="btn-icon btn-icon-danger" onClick={(e) => handleActionClick(e, () => onDelete(contact.Email))} aria-label={t('deleteContact')}>
+                    <Button className="btn-icon btn-icon-danger" onClick={(e) => handleActionClick(e, () => onDelete(contact.Email))} aria-label={t('deleteContact')}>
                         <Icon path={ICONS.DELETE} />
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
@@ -326,7 +328,7 @@ const AddContactForm = ({ onSubmit }: { onSubmit: (data: {Email: string, FirstNa
                     <input id="lastName" type="text" value={lastName} onChange={e => setLastName(e.target.value)} />
                 </div>
             </div>
-            <button type="submit" className="btn btn-primary full-width">{t('addContact')}</button>
+            <Button type="submit" className="btn-primary full-width">{t('addContact')}</Button>
         </form>
     );
 };
@@ -604,12 +606,12 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                                 />
                             </div>
                             <div className="header-actions">
-                                <button className="btn" onClick={() => setIsImportModalOpen(true)}>
+                                <Button onClick={() => setIsImportModalOpen(true)} action="import_contacts">
                                     <Icon path={ICONS.UPLOAD} /> {t('importContacts')}
-                                </button>
-                                <button className="btn btn-primary" onClick={() => setIsAddModalOpen(true)}>
+                                </Button>
+                                <Button className="btn-primary" onClick={() => setIsAddModalOpen(true)} action="add_contact">
                                     <Icon path={ICONS.USER_PLUS} /> {t('addContact')}
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -640,15 +642,15 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
 
                             {contacts && (contacts.length > 0 || offset > 0) && (
                                 <div className="pagination-controls">
-                                    <button onClick={() => setOffset(o => Math.max(0, o - CONTACTS_PER_PAGE))} disabled={offset === 0 || loading}>
+                                    <Button onClick={() => setOffset(o => Math.max(0, o - CONTACTS_PER_PAGE))} disabled={offset === 0 || loading}>
                                         <Icon path={ICONS.CHEVRON_LEFT} />
                                         <span>{t('previous')}</span>
-                                    </button>
+                                    </Button>
                                     <span className="pagination-page-info">{t('page', { page: offset / CONTACTS_PER_PAGE + 1 })}</span>
-                                    <button onClick={() => setOffset(o => o + CONTACTS_PER_PAGE)} disabled={!contacts || contacts.length < CONTACTS_PER_PAGE || loading}>
+                                    <Button onClick={() => setOffset(o => o + CONTACTS_PER_PAGE)} disabled={!contacts || contacts.length < CONTACTS_PER_PAGE || loading}>
                                         <span>{t('next')}</span>
                                         <Icon path={ICONS.CHEVRON_RIGHT} />
-                                    </button>
+                                    </Button>
                                 </div>
                             )}
                         </>

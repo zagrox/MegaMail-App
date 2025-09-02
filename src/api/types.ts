@@ -63,6 +63,7 @@ export type Module = {
     modulepro?: boolean;
     modulediscount?: number;
     modulecore?: boolean;
+    locked_actions?: string[];
 };
 export type Configuration = {
     id: number;

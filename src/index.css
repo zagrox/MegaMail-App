@@ -318,14 +318,12 @@ a:hover {
 .nav-btn.locked {
     color: var(--subtle-text-color);
     cursor: pointer;
-    opacity: 0.7;
 }
 .nav-btn.locked .icon {
     opacity: 0.5;
 }
 .nav-btn.locked:hover {
     background-color: var(--subtle-background);
-    opacity: 1;
 }
 .nav-btn.locked .lock-icon {
     position: absolute;
@@ -523,6 +521,23 @@ a:hover {
 }
 .full-width {
     width: 100%;
+}
+.btn.btn-locked {
+    opacity: 0.7;
+    cursor: pointer;
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10px,
+        rgba(var(--border-color-rgb), 0.3) 10px,
+        rgba(var(--border-color-rgb), 0.3) 20px
+    );
+}
+.btn.btn-locked:hover {
+    opacity: 1;
+}
+.btn.btn-locked .icon {
+    color: var(--warning-color);
 }
 
 /* --- PROGRESS BAR --- */

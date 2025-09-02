@@ -32,12 +32,11 @@ import CallbackView from './views/CallbackView';
 import { List, Template, Module } from './api/types';
 import ListDetailView from './views/ListDetailView';
 import ContactDetailView from './views/ContactDetailView';
-import useModules from './hooks/useModules';
 import UnlockModuleModal from './components/UnlockModuleModal';
 
 
 const App = () => {
-    const { isAuthenticated, user, logout, hasModuleAccess, loading: authLoading } = useAuth();
+    const { isAuthenticated, user, logout, hasModuleAccess, loading: authLoading, allModules, moduleToUnlock, setModuleToUnlock } = useAuth();
     const { config } = useConfiguration();
     const { t, i18n } = useTranslation();
     const [view, setView] = useState('Dashboard');
@@ -49,8 +48,6 @@ const App = () => {
     const [contactDetailOrigin, setContactDetailOrigin] = useState<{ view: string, data: any } | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const appContainerRef = useRef<HTMLDivElement>(null);
-    const { modules, loading: modulesLoading } = useModules(config?.app_backend);
-    const [moduleToUnlock, setModuleToUnlock] = useState<Module | null>(null);
 
     useEffect(() => {
         // For logged-out users, the backend config is the source of truth.
@@ -294,27 +291,16 @@ const App = () => {
                     return <hr key={`divider-${index}`} className="nav-divider" />;
                 }
                 const navItem = item as { name: string; view: string; icon: string; };
-                const hasAccess = hasModuleAccess(navItem.view, modules);
+                const hasAccess = hasModuleAccess(navItem.view, allModules);
 
-                const moduleData = modules?.find(m => m.modulename === navItem.view);
+                const moduleData = allModules?.find(m => m.modulename === navItem.view);
                 const isPurchasableModule = !!moduleData;
 
-                // A module is locked if the user doesn't have access AND it's a known module from the CMS
-                // (or if modules are still loading, to prevent flicker).
-                // hasModuleAccess handles fundamental sections like Dashboard internally.
-                const isLocked = !hasAccess && (authLoading || modulesLoading || isPurchasableModule);
+                const isLocked = !hasAccess && (authLoading || !allModules || isPurchasableModule);
                 const isPromotional = isLocked && moduleData?.modulepro === true;
 
-                const handleClick = () => {
-                    if (isLocked) {
-                        if (moduleData) setModuleToUnlock(moduleData);
-                    } else {
-                        handleSetView(navItem.view);
-                    }
-                };
-
                 return (
-                    <button key={navItem.view} onClick={handleClick} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
+                    <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
                         <Icon path={navItem.icon} />
                         <span>{navItem.name}</span>
                         {isLocked && (
