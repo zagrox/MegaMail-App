@@ -18,6 +18,7 @@ import ExportContactsModal from '../components/ExportContactsModal';
 import BulkActionsBar from '../components/BulkActionsBar';
 import AddToListModal from '../components/AddToListModal';
 import Button from '../components/Button';
+import { AppActions } from '../config/actions';
 
 const STATUS_ORDER = [
     'Active', 'Engaged', 'Transactional', 'Bounced', 'Unsubscribed',
@@ -148,7 +149,7 @@ const ContactStatusFilter = ({ apiKey, selectedStatuses, onStatusChange, onExpor
                     className="btn-secondary full-width"
                     onClick={onExportClick}
                     disabled={selectedStatuses.length === 0}
-                    action="export_contacts"
+                    action={AppActions.EXPORT_CONTACTS}
                 >
                     <Icon path={ICONS.DOWNLOAD} />
                     <span>{t('exportContacts')}</span>
@@ -606,10 +607,10 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                                 />
                             </div>
                             <div className="header-actions">
-                                <Button onClick={() => setIsImportModalOpen(true)} action="import_contacts">
+                                <Button onClick={() => setIsImportModalOpen(true)} action={AppActions.IMPORT_CONTACTS}>
                                     <Icon path={ICONS.UPLOAD} /> {t('importContacts')}
                                 </Button>
-                                <Button className="btn-primary" onClick={() => setIsAddModalOpen(true)} action="add_contact">
+                                <Button className="btn-primary" onClick={() => setIsAddModalOpen(true)} action={AppActions.ADD_CONTACT}>
                                     <Icon path={ICONS.USER_PLUS} /> {t('addContact')}
                                 </Button>
                             </div>

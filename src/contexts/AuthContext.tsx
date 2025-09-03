@@ -309,22 +309,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     const canPerformAction = (actionName: string): boolean => {
         if (!allModules || user?.isApiKeyUser) return true; // Default to true if modules aren't loaded, to avoid blocking UI unnecessarily.
-
+    
         const normalize = (str: string) => str.toLowerCase().replace(/_/g, '');
         const normalizedActionName = normalize(actionName);
-
-        // 1. Find which module this action belongs to.
-        const moduleForAction = allModules.find(m => 
+    
+        // Find ALL modules that list this action in their 'locked_actions'.
+        const modulesProvidingAction = allModules.filter(m => 
             Array.isArray(m.locked_actions) && m.locked_actions.some(action => normalize(action) === normalizedActionName)
         );
-
-        // 2. If the action is not listed in ANY module's locked_actions, it's a free action.
-        if (!moduleForAction) {
+    
+        // If no module lists this action, it's considered a free action.
+        if (modulesProvidingAction.length === 0) {
             return true;
         }
-
-        // 3. If it IS in a module's locked_actions, check if the user has access to that module.
-        return hasModuleAccess(moduleForAction.modulename, allModules);
+        
+        // Check if the user has access to AT LEAST ONE of the modules that provide the action.
+        // The hasModuleAccess function already correctly handles core modules (returning true) and purchased modules.
+        const canPerform = modulesProvidingAction.some(m => hasModuleAccess(m.modulename, allModules));
+        
+        return canPerform;
     };
 
     const purchaseModule = async (moduleId: string) => {

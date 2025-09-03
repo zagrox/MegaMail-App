@@ -5,6 +5,7 @@ import Icon, { ICONS } from '../Icon';
 import useApiV4 from '../../hooks/useApiV4';
 import useApi from '../../views/useApi';
 import Loader from '../Loader';
+import { AppActions } from '../../config/actions';
 
 const SummaryItem = ({ label, value }: { label: string, value: React.ReactNode }) => {
     if (!value && value !== 0) return null;
@@ -27,6 +28,10 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
 
     const isSendingAction = data.sendAction === 'schedule' || data.sendAction === 'now';
     const isSubmitDisabled = (isSendingAction && !hasEnoughCredits) || domainsLoading;
+
+    const nextAction = data.sendAction === 'later'
+        ? AppActions.SAVE_MARKETING_DRAFT
+        : AppActions.SEND_MARKETING_CAMPAIGN;
 
     const defaultFromEmail = useMemo(() => {
         if (!Array.isArray(domains)) return '................@.................';
@@ -101,11 +106,12 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
             isLastStep
             isSubmitting={isSubmitting}
             nextDisabled={isSubmitDisabled}
+            nextAction={nextAction}
         >
             <div className="sending-options-list">
                 <label
                     htmlFor="sendAction-schedule"
-                    className={`selection-card sending-option-card ${data.sendAction === 'schedule' ? 'selected' : ''}`}
+                    className={`selection-card sending-option-card ${data.sendAction === 'schedule' ? 'selected' : ''} ${!hasEnoughCredits ? 'disabled' : ''}`}
                 >
                     <input
                         type="radio"
@@ -115,6 +121,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         checked={data.sendAction === 'schedule'}
                         onChange={() => handleSelect('schedule')}
                         style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
+                        disabled={!hasEnoughCredits}
                     />
                     <div className="selection-card-radio"></div>
                     <div className="sending-option-card-content">
@@ -135,7 +142,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                 </label>
                 <label
                     htmlFor="sendAction-now"
-                    className={`selection-card sending-option-card ${data.sendAction === 'now' ? 'selected' : ''}`}
+                    className={`selection-card sending-option-card ${data.sendAction === 'now' ? 'selected' : ''} ${!hasEnoughCredits ? 'disabled' : ''}`}
                 >
                     <input
                         type="radio"
@@ -145,6 +152,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         checked={data.sendAction === 'now'}
                         onChange={() => handleSelect('now')}
                         style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
+                        disabled={!hasEnoughCredits}
                     />
                     <div className="selection-card-radio"></div>
                     <div className="sending-option-card-content">

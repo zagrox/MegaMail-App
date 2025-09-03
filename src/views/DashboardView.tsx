@@ -14,6 +14,7 @@ import LineLoader from '../components/LineLoader';
 import Button from '../components/Button';
 import sdk from '../api/directus';
 import { readItems } from '@directus/sdk';
+import { AppActions } from '../config/actions';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
     const { t, i18n } = useTranslation();
@@ -128,7 +129,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <p className="cta-banner-desc">{t('startEmailMarketingDesc')}</p>
                         </div>
                         <div className="cta-banner-action">
-                            <Button className="btn-primary" onClick={() => setView('Marketing')} action="start_marketing_campaign">
+                            <Button className="btn-primary" onClick={() => setView('Marketing')} action={AppActions.START_MARKETING_CAMPAIGN}>
                                 <Icon path={ICONS.SEND_EMAIL} /> {t('createCampaign')}
                             </Button>
                         </div>

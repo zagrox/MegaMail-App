@@ -2,6 +2,8 @@ import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../Icon';
 import Loader from '../Loader';
+import Button from '../Button';
+import { AppActions } from '../../config/actions';
 
 interface WizardLayoutProps {
     step: number;
@@ -12,6 +14,7 @@ interface WizardLayoutProps {
     nextDisabled?: boolean;
     isLastStep?: boolean;
     isSubmitting?: boolean;
+    nextAction?: string;
 }
 
 const WizardLayout = ({
@@ -23,12 +26,9 @@ const WizardLayout = ({
     nextDisabled = false,
     isLastStep = false,
     isSubmitting = false,
+    nextAction = AppActions.WIZARD_NEXT_STEP,
 }: WizardLayoutProps) => {
     const { t } = useTranslation();
-
-    const steps = [
-        "Select Type", "Recipients", "Content", "Settings", "Sending"
-    ];
 
     return (
         <div className="wizard-main">
@@ -48,19 +48,21 @@ const WizardLayout = ({
                     <span>{t('back')}</span>
                 </button>
                 {!isLastStep ? (
-                    <button
-                        className="btn btn-primary"
+                    <Button
+                        className="btn-primary"
                         onClick={onNext}
                         disabled={nextDisabled || isSubmitting}
+                        action={nextAction}
                     >
                         <span>{t('next')}</span>
                         <Icon path={ICONS.CHEVRON_RIGHT} />
-                    </button>
+                    </Button>
                 ) : (
-                    <button
-                        className="btn btn-primary"
-                        onClick={onNext} // In last step, onNext is the submit handler
+                    <Button
+                        className="btn-primary"
+                        onClick={onNext}
                         disabled={nextDisabled || isSubmitting}
+                        action={nextAction}
                     >
                         {isSubmitting ? <Loader /> : (
                             <>
@@ -68,7 +70,7 @@ const WizardLayout = ({
                                 <span>{t('submit')}</span>
                             </>
                         )}
-                    </button>
+                    </Button>
                 )}
             </div>
         </div>
