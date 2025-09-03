@@ -1,6 +1,7 @@
 
 
 
+
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -69,6 +70,10 @@ const resources = {
       modules: 'Modules',
       unlock: 'Unlock',
       unlocked: 'Unlocked',
+      notifications: 'Notifications',
+      markAllAsRead: 'Mark all as read',
+      noNotifications: 'No notifications yet',
+      noNotificationsDesc: 'Your important updates and alerts will appear here.',
       // Auth
       signIn: 'Sign In',
       signUp: 'Sign Up',
@@ -746,6 +751,10 @@ const resources = {
       modules: 'ماژول‌ها',
       unlock: 'فعالسازی',
       unlocked: 'فعال',
+      notifications: 'اعلان‌ها',
+      markAllAsRead: 'علامت‌گذاری همه به عنوان خوانده شده',
+      noNotifications: 'هنوز اعلانی وجود ندارد',
+      noNotificationsDesc: 'به‌روزرسانی‌ها و هشدارهای مهم شما در اینجا ظاهر می‌شوند.',
       // Auth
       signIn: 'ورود',
       signUp: 'ثبت نام',

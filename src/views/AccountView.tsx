@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,6 +17,7 @@ import DomainsView from './DomainsView';
 import SmtpView from './SmtpView';
 import OrdersTab from './account/OrdersTab';
 import ModulesTab from './account/ModulesTab';
+import NotificationsTab from './account/NotificationsTab';
 
 const AccountView = ({ apiKey, user, setView }: { apiKey: string, user: any, setView: (view: string, data?: any) => void }) => {
     const { t } = useTranslation();
@@ -41,6 +43,7 @@ const AccountView = ({ apiKey, user, setView }: { apiKey: string, user: any, set
     const tabs = [
         { id: 'general', label: t('general'), icon: ICONS.DASHBOARD, component: <GeneralTab accountData={accountData} contactsCountData={contactsCountData} contactsCountLoading={contactsCountLoading} installPrompt={installPrompt} handleInstallClick={handleInstallClick} /> },
         { id: 'profile', label: t('profile'), icon: ICONS.ACCOUNT, component: <ProfileTab accountData={accountData} user={user} /> },
+        { id: 'notifications', label: t('notifications'), icon: ICONS.BELL, component: <NotificationsTab /> },
         { id: 'modules', label: t('modules'), icon: ICONS.STAR, component: <ModulesTab setView={setView} /> },
         { id: 'orders', label: t('orders'), icon: ICONS.BUY_CREDITS, component: <OrdersTab /> },
         { id: 'domains', label: t('domains'), icon: ICONS.DOMAINS, component: <DomainsView apiKey={apiKey} /> },
