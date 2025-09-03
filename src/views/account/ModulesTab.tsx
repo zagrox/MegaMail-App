@@ -1,8 +1,5 @@
-
-
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import useModules from '../../hooks/useModules';
 import { useAuth } from '../../contexts/AuthContext';
 import { Module } from '../../api/types';
 import UnlockModuleModal from '../../components/UnlockModuleModal';
@@ -77,8 +74,7 @@ const ModuleCard = ({ module, isUnlocked, onUnlock, onInstantUnlock, isUnlocking
 
 const ModulesTab: React.FC<ModulesTabProps> = ({ setView }) => {
     const { t } = useTranslation();
-    const { modules, loading: modulesLoading, error: modulesError } = useModules();
-    const { hasModuleAccess, purchaseModule } = useAuth();
+    const { allModules: modules, loading: modulesLoading, hasModuleAccess, purchaseModule } = useAuth();
     const { addToast } = useToast();
     const [moduleToUnlock, setModuleToUnlock] = useState<Module | null>(null);
     const [unlockingModuleId, setUnlockingModuleId] = useState<string | null>(null);
@@ -107,10 +103,6 @@ const ModulesTab: React.FC<ModulesTabProps> = ({ setView }) => {
 
     if (modulesLoading) {
         return <CenteredMessage><Loader /></CenteredMessage>;
-    }
-
-    if (modulesError) {
-        return <ErrorMessage error={{ endpoint: 'GET /items/modules', message: modulesError }} />;
     }
     
     const renderTable = () => (

@@ -109,13 +109,13 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <h2>{t('welcomeMessage', { name: welcomeName })}</h2>
                         </div>
                         <div className="dashboard-actions">
-                            <Button className="btn-secondary btn-notifications" onClick={handleNotificationsClick} title={t('notifications')}>
-                                <Icon path={ICONS.BELL} />
-                                {unreadCount > 0 && <span className="notification-dot"></span>}
-                            </Button>
                             <Button className="btn-credits" onClick={() => setView('Buy Credits')}>
                                 <Icon path={ICONS.BUY_CREDITS} />
                                 {accountLoading ? t('loadingCredits') : `${t('credits')}: ${Number(accountData?.emailcredits ?? 0).toLocaleString(i18n.language)}`}
+                            </Button>
+                            <Button className="btn-secondary btn-notifications" onClick={handleNotificationsClick} title={t('notifications')}>
+                                <Icon path={ICONS.BELL} />
+                                {unreadCount > 0 && <span className="notification-dot"></span>}
                             </Button>
                         </div>
                     </div>
