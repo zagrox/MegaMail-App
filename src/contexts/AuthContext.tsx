@@ -62,6 +62,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // This function ONLY handles fetching and setting a Directus user.
     const getMe = useCallback(async () => {
         try {
+            // If allModules is already populated, modulesPromise resolves instantly.
+            // Otherwise, it starts the network request in the background.
+            const modulesPromise = allModules
+                ? Promise.resolve(allModules)
+                : sdk.request(readItems('modules', { fields: ['id', 'modulename', 'moduleprice', 'moduledetails', 'status', 'modulepro', 'modulediscount', 'modulecore', 'locked_actions'], limit: -1 }));
+
             // 1. Get Directus user data
             const me = await sdk.request(readMe({
                 fields: [
@@ -84,28 +90,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 profileData = await sdk.request(createItem('profiles', { status: 'published', user_created: me.id }));
             }
 
-            // 3. Fetch purchased modules directly from the `profiles_modules` junction collection
-            let purchasedModuleIds = new Set<string>();
-            if (profileData.id) {
-                 const purchasedModulesResponse = await sdk.request(readItems('profiles_modules', {
+            // 3. Initiate fetching purchased modules based on the profile ID.
+            const purchasedModulesPromise = profileData.id
+                ? sdk.request(readItems('profiles_modules', {
                     filter: { profile_id: { _eq: profileData.id } },
                     fields: ['module_id'],
                     limit: -1
-                }));
-                purchasedModuleIds = new Set(purchasedModulesResponse.map((pm: any) => String(pm.module_id)));
+                }))
+                : Promise.resolve([]);
+
+            // 4. Await the modules (which may have been fetching in the background) and purchased modules.
+            const [fetchedModules, purchasedModulesResponse] = await Promise.all([
+                modulesPromise,
+                purchasedModulesPromise
+            ]);
+
+            // 5. Update the state for all modules if it was the first time fetching them.
+            if (!allModules) {
+                setAllModules(fetchedModules as Module[]);
             }
-
-            // 4. Get all available modules to map IDs to names
-            const fetchedModules = await sdk.request(readItems('modules', { fields: ['id', 'modulename', 'moduleprice', 'moduledetails', 'status', 'modulepro', 'modulediscount', 'modulecore', 'locked_actions'], limit: -1 })) as Module[];
-            setAllModules(fetchedModules);
-
-
-            // 5. Map purchased module IDs to module names
-            const purchasedModules = fetchedModules
+            
+            // 6. Process the purchased modules
+            const purchasedModuleIds = new Set(purchasedModulesResponse.map((pm: any) => String(pm.module_id)));
+            const purchasedModules = (fetchedModules as Module[])
                 .filter((module: any) => purchasedModuleIds.has(String(module.id)))
                 .map((module: any) => module.modulename);
 
-            // 6. Combine data and set the user state
+            // 7. Combine data and set the user state
             const mergedUser: User = {
                 ...me,
                 ...profileData,
@@ -129,7 +140,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             await sdk.logout();
             setUser(null);
         }
-    }, []);
+    }, [allModules]);
 
     // This function ONLY handles fetching and setting an API Key user.
     const getApiKeyUser = useCallback(async (apiKey: string) => {
@@ -210,6 +221,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } finally {
             localStorage.removeItem('elastic_email_api_key');
             setUser(null);
+            setAllModules(null); // Clear cached modules on logout
             setLoading(false);
         }
     };
