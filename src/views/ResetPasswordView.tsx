@@ -68,7 +68,7 @@ const ResetPasswordView = () => {
         window.location.href = '/';
     }
     
-    const appName = config?.app_name || 'Mailzila';
+    const appName = config?.app_name || 'MegaMail';
 
     return (
         <div className="auth-container">

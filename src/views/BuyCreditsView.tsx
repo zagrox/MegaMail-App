@@ -197,7 +197,7 @@ const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, 
                 status: "published",
                 user_created: user.id,
                 order_total: pkg.packprice,
-                project_name: "Mailzila",
+                project_name: "MegaMail",
                 order_note: String(pkg.packsize),
                 order_status: "pending",
             };

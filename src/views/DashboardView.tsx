@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import useApi from './useApi';
@@ -12,6 +12,8 @@ import { Module } from '../api/types';
 import { useConfiguration } from '../contexts/ConfigurationContext';
 import LineLoader from '../components/LineLoader';
 import Button from '../components/Button';
+import sdk from '../api/directus';
+import { readItems } from '@directus/sdk';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
     const { t, i18n } = useTranslation();
@@ -21,6 +23,47 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     const { data: statsData, loading: statsLoading, error: statsError } = useApiV4(`/statistics`, apiKey, apiParams);
     const { data: accountData, loading: accountLoading } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
     const { data: contactsCountData, loading: contactsCountLoading } = useApi('/contact/count', apiKey, { allContacts: true }, apiKey ? 1 : 0);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        if (!user || !user.id || user.isApiKeyUser) {
+            return;
+        }
+        
+        const fetchUnreadCount = async () => {
+            try {
+                const filter = {
+                    _and: [
+                        { status: { _eq: 'published' } },
+                        { read_status: { _eq: false } },
+                        {
+                            _or: [
+                                { recipient: { _eq: user.id } },
+                                { is_system_wide: { _eq: true } }
+                            ]
+                        }
+                    ]
+                };
+                const response = await sdk.request(readItems('notifications', {
+                    aggregate: { count: '*' },
+                    filter
+                }));
+                
+                if (response && response.length > 0 && response[0].count) {
+                     setUnreadCount(Number(response[0].count));
+                }
+            } catch (error) {
+                console.warn("Failed to fetch unread notification count:", error);
+            }
+        };
+
+        fetchUnreadCount();
+    }, [user]);
+
+    const handleNotificationsClick = () => {
+        sessionStorage.setItem('account-tab', 'notifications');
+        setView('Account');
+    };
 
     const staticNavItems = useMemo(() => [
         { name: t('statistics'), icon: ICONS.STATISTICS, desc: t('statisticsDesc'), view: 'Statistics' },
@@ -66,6 +109,10 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <h2>{t('welcomeMessage', { name: welcomeName })}</h2>
                         </div>
                         <div className="dashboard-actions">
+                            <Button className="btn-secondary btn-notifications" onClick={handleNotificationsClick} title={t('notifications')}>
+                                <Icon path={ICONS.BELL} />
+                                {unreadCount > 0 && <span className="notification-dot"></span>}
+                            </Button>
                             <Button className="btn-credits" onClick={() => setView('Buy Credits')}>
                                 <Icon path={ICONS.BUY_CREDITS} />
                                 {accountLoading ? t('loadingCredits') : `${t('credits')}: ${Number(accountData?.emailcredits ?? 0).toLocaleString(i18n.language)}`}

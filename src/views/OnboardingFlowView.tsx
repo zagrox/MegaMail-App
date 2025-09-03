@@ -15,7 +15,7 @@ const TOTAL_STEPS = 4;
 const Step1 = () => {
     const { t } = useTranslation();
     const { config } = useConfiguration();
-    const appName = config?.app_name || 'Mailzila';
+    const appName = config?.app_name || 'MegaMail';
 
     return (
         <div className="onboarding-step">
@@ -173,7 +173,7 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
             await createElasticSubaccount(user.email, randomPassword);
             // The createElasticSubaccount function in AuthContext handles refreshing the user data,
             // which will make the user?.elastickey available and exit the onboarding flow.
-            addToast('Your Mailzila account has been connected!', 'success');
+            addToast('Your MegaMail account has been connected!', 'success');
         } catch (err: any) {
             addToast(err.message, 'error');
             setNewUserFlowFailed(true);

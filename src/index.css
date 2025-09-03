@@ -1222,6 +1222,23 @@ html[data-theme='dark'] .from-email-composer select {
     flex-wrap: wrap;
 }
 
+.dashboard-actions .btn-notifications {
+    position: relative;
+    padding: 0.75rem; /* Make it more square-like */
+}
+
+.dashboard-actions .notification-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 10px;
+    height: 10px;
+    background-color: var(--danger-color);
+    border-radius: 50%;
+    border: 2px solid var(--surface-color);
+    pointer-events: none;
+}
+
 .cta-banner {
     background-color: var(--surface-color);
     border: 1px solid rgba(var(--border-color-rgb), 0.4);

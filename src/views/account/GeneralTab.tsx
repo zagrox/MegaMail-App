@@ -16,7 +16,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
     const { logout } = useAuth();
     const { getStatusStyle } = useStatusStyles();
     const { config } = useConfiguration();
-    const appName = config?.app_name || 'Mailzila';
+    const appName = config?.app_name || 'MegaMail';
 
     const getReputationInfo = (reputation: number) => {
         const score = Number(reputation || 0);

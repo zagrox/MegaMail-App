@@ -9,8 +9,8 @@ const EmbedCodeCard = ({ apiKey }: { apiKey: string }) => {
     const [copied, setCopied] = useState(false);
     const { config } = useConfiguration();
 
-    const appName = config?.app_name || 'Mailzila';
-    const baseUrl = config?.app_url || 'https://my.mailzila.com';
+    const appName = config?.app_name || 'MegaMail';
+    const baseUrl = config?.app_url || 'https://app.megamail.ir';
     const embedUrl = `${baseUrl}/?embed=true&apiKey=${apiKey}&view=${view}&lang=${i18n.language}`;
     const iframeCode = `<iframe src="${embedUrl}" width="100%" height="800px" style="border:1px solid #ccc; border-radius: 8px;" title="${appName} Dashboard"></iframe>`;
 
