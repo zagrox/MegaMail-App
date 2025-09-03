@@ -296,11 +296,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     
     const canPerformAction = (actionName: string): boolean => {
-        if (!allModules || user?.isApiKeyUser) return false;
+        if (!allModules || user?.isApiKeyUser) return true; // Default to true if modules aren't loaded, to avoid blocking UI unnecessarily.
+
+        const normalize = (str: string) => str.toLowerCase().replace(/_/g, '');
+        const normalizedActionName = normalize(actionName);
 
         // 1. Find which module this action belongs to.
         const moduleForAction = allModules.find(m => 
-            Array.isArray(m.locked_actions) && m.locked_actions.includes(actionName)
+            Array.isArray(m.locked_actions) && m.locked_actions.some(action => normalize(action) === normalizedActionName)
         );
 
         // 2. If the action is not listed in ANY module's locked_actions, it's a free action.

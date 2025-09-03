@@ -13,6 +13,7 @@ import Modal from '../components/Modal';
 import Icon, { ICONS } from '../components/Icon';
 import ConfirmModal from '../components/ConfirmModal';
 import FileUploadModal from '../components/media_manager/FileUploadModal';
+import Button from '../components/Button';
 
 const FilePreviewModal = ({ isOpen, onClose, fileInfo, apiKey }: { isOpen: boolean; onClose: () => void; fileInfo: FileInfo | null; apiKey: string; }) => {
     const { t } = useTranslation();
@@ -299,9 +300,9 @@ const MediaManagerView = ({ apiKey }: { apiKey: string }) => {
                             <option key={value} value={value}>{label}</option>
                         ))}
                     </select>
-                    <button className="btn btn-primary" onClick={() => setIsUploadModalOpen(true)}>
+                    <Button className="btn-primary" onClick={() => setIsUploadModalOpen(true)} action="upload_file">
                         <Icon path={ICONS.UPLOAD} /> {t('uploadFile')}
-                    </button>
+                    </Button>
                 </div>
             </div>
 

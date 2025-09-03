@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from './useApi';
@@ -11,6 +12,7 @@ import { apiFetch } from '../api/elasticEmail';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
 import { formatDateRelative } from '../utils/helpers';
+import Button from '../components/Button';
 
 const copyToClipboard = (text: string) => navigator.clipboard.writeText(text);
 
@@ -182,9 +184,9 @@ const SmtpView = ({ apiKey, user }: { apiKey: string, user: any }) => {
                     <h3>{t('additionalCredentials')}</h3>
                     {!user?.isApiKeyUser && (
                         <div className="header-actions">
-                            <button className="btn btn-primary" onClick={() => setIsAddModalOpen(true)}>
+                            <Button className="btn-primary" onClick={() => setIsAddModalOpen(true)} action="add_smtp_credential">
                                 <Icon path={ICONS.PLUS} /> {t('addCredential')}
-                            </button>
+                            </Button>
                         </div>
                     )}
                 </div>

@@ -337,6 +337,15 @@ a:hover {
     left: 0.75rem;
 }
 
+.nav-btn.locked.active,
+.nav-btn.locked.active:hover {
+    color: white;
+    background-color: var(--secondary-color);
+}
+.nav-btn.locked.active .icon {
+    opacity: 1;
+}
+
 .nav-card.locked {
     opacity: 0.6;
     background-image: repeating-linear-gradient(
@@ -523,18 +532,38 @@ a:hover {
     width: 100%;
 }
 .btn.btn-locked {
-    opacity: 0.7;
+    /* These styles must override .btn-primary, .btn-danger etc. */
+    background-color: var(--surface-color); /* Fallback */
+    border-color: var(--border-color);
+    color: var(--subtle-text-color);
+    box-shadow: none;
+    transform: none;
+    opacity: 0.8;
     cursor: pointer;
+    /* The gradient with solid colors will paint OVER any other background-color */
     background-image: repeating-linear-gradient(
         -45deg,
-        transparent,
-        transparent 10px,
+        var(--surface-color),
+        var(--surface-color) 10px,
         rgba(var(--border-color-rgb), 0.3) 10px,
         rgba(var(--border-color-rgb), 0.3) 20px
     );
 }
+
 .btn.btn-locked:hover {
+    background-color: var(--subtle-background); /* Fallback */
+    border-color: var(--subtle-text-color);
+    color: var(--text-color);
     opacity: 1;
+    transform: none;
+    box-shadow: none;
+    background-image: repeating-linear-gradient(
+        -45deg,
+        var(--subtle-background),
+        var(--subtle-background) 10px,
+        rgba(var(--border-color-rgb), 0.5) 10px,
+        rgba(var(--border-color-rgb), 0.5) 20px
+    );
 }
 .btn.btn-locked .icon {
     color: var(--warning-color);

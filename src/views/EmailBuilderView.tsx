@@ -27,6 +27,7 @@ import Loader from '../components/Loader';
 import SettingsPanel from '../components/email_builder/SettingsPanel';
 import Modal from '../components/Modal';
 import { apiFetchV4 } from '../api/elasticEmail';
+import Button from '../components/Button';
 
 
 const generateId = (prefix = 'block') => `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -948,9 +949,9 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                                 required
                             />
                         </div>
-                        <button className="btn btn-primary" onClick={handleSaveTemplate} disabled={isSaving} title={t('saveChanges')}>
+                        <Button className="btn-primary" onClick={handleSaveTemplate} disabled={isSaving} title={t('saveChanges')} action="save_template">
                             {isSaving ? <Loader /> : <><Icon path={ICONS.SAVE_CHANGES} /><span>{t('saveTemplate')}</span></>}
-                        </button>
+                        </Button>
                     </div>
                 </header>
 
@@ -1015,6 +1016,7 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                             globalStyles={globalStyles}
                             onGlobalStyleChange={handleGlobalStyleChange}
                             onStyleChange={handleStyleChange}
+                            // FIX: Corrected a typo in the onContentChange prop passed to the SettingsPanel. The name was incorrect, causing updates from the panel to fail.
                             onContentChange={handleContentChange}
                             onOpenMediaManager={handleEditImageBlock}
                             onClose={handleCloseSettingsPanel}

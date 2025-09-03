@@ -13,6 +13,7 @@ import RuleBuilder from '../components/RuleBuilder';
 import Icon, { ICONS } from '../components/Icon';
 import ConfirmModal from '../components/ConfirmModal';
 import LineLoader from '../components/LineLoader';
+import Button from '../components/Button';
 
 const FIELD_TYPES: Record<string, 'date' | 'number' | 'boolean' | 'string'> = {
     DateAdded: 'date', DateUpdated: 'date', StatusChangeDate: 'date', ConsentDate: 'date',
@@ -296,9 +297,9 @@ const SegmentsView = ({ apiKey }: { apiKey: string }) => {
                     <Icon path={ICONS.SEARCH} />
                     <input type="search" placeholder={t('searchSegmentsPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                 </div>
-                <button className="btn btn-primary" onClick={() => setIsCreateModalOpen(true)}>
+                <Button className="btn-primary" onClick={() => setIsCreateModalOpen(true)} action="create_segment">
                     <Icon path={ICONS.PLUS} /> {t('createSegment')}
-                </button>
+                </Button>
             </div>
 
             {loading && <CenteredMessage><Loader /></CenteredMessage>}

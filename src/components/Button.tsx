@@ -9,7 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     className?: string;
 }
 
-const Button: React.FC<ButtonProps> = ({ action, children, className = 'btn', onClick, ...props }) => {
+const Button: React.FC<ButtonProps> = ({ action, children, className, onClick, ...props }) => {
     const { canPerformAction, allModules, setModuleToUnlock } = useAuth();
     const isLocked = action ? !canPerformAction(action) : false;
 
@@ -34,9 +34,9 @@ const Button: React.FC<ButtonProps> = ({ action, children, className = 'btn', on
 
     return (
         <button
-            className={`${className} ${isLocked ? 'btn-locked' : ''}`}
+            className={`btn ${className || ''} ${isLocked ? 'btn-locked' : ''}`}
             onClick={handleClick}
-            disabled={props.disabled}
+            disabled={isLocked ? false : props.disabled}
             aria-disabled={isLocked || props.disabled}
             {...props}
         >

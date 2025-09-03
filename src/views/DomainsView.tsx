@@ -11,6 +11,7 @@ import Badge from '../components/Badge';
 import ConfirmModal from '../components/ConfirmModal';
 import { useStatusStyles } from '../hooks/useStatusStyles';
 import Modal from '../components/Modal';
+import Button from '../components/Button';
 
 const DNS_RECORDS_CONFIG = {
     SPF: {
@@ -276,9 +277,9 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                         onChange={handleNewDomainChange}
                         disabled={isSubmitting}
                     />
-                    <button type="submit" className="btn btn-primary" disabled={!newDomain || isSubmitting}>
+                    <Button type="submit" className="btn-primary" disabled={!newDomain || isSubmitting} action="add_domain">
                         {isSubmitting ? <Loader /> : <><Icon path={ICONS.PLUS}/> {t('addDomain')}</>}
-                    </button>
+                    </Button>
                 </form>
             </div>
             {loading && <CenteredMessage><Loader /></CenteredMessage>}

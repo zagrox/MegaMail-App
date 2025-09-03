@@ -9,6 +9,7 @@ import Icon, { ICONS } from '../components/Icon';
 import CenteredMessage from '../components/CenteredMessage';
 import Modal from '../components/Modal';
 import MultiSelectSearch from '../components/MultiSelectSearch';
+import Button from '../components/Button';
 
 type RecipientTarget = 'list' | 'segment' | 'all' | null;
 type AccordionSection = 'recipients' | 'content' | 'settings' | '';
@@ -737,18 +738,18 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             </div>
 
             <div className="campaign-form-footer">
-                <button type="button" className="btn" onClick={() => handleSubmit('draft')} disabled={isSending}>{t('saveAsDraft')}</button>
+                <Button type="button" onClick={() => handleSubmit('draft')} disabled={isSending} action="save_draft">{t('saveAsDraft')}</Button>
                 {!isScheduling ? (
                     <div style={{display: 'flex', gap: '1rem'}}>
                          <button type="button" className="btn btn-secondary" onClick={() => setIsScheduling(true)} disabled={isSending || verifiedDomainsWithDefault.length === 0 || !isRecipientSelected}>{t('schedule')}</button>
-                         <button type="button" className="btn btn-primary" onClick={() => handleSubmit('send')} disabled={isSending || verifiedDomainsWithDefault.length === 0 || !isRecipientSelected}>{isSending ? <Loader/> : t('sendNow')}</button>
+                         <Button type="button" className="btn-primary" onClick={() => handleSubmit('send')} disabled={isSending || verifiedDomainsWithDefault.length === 0 || !isRecipientSelected} action="send_campaign">{isSending ? <Loader/> : t('sendNow')}</Button>
                     </div>
                 ) : (
                     <div className="schedule-controls">
                         <input type="date" value={scheduleDate} onChange={e => setScheduleDate(e.target.value)} required />
                         <input type="time" value={scheduleTime} onChange={e => setScheduleTime(e.target.value)} required />
                         <button type="button" className="btn" onClick={() => setIsScheduling(false)} disabled={isSending}>{t('cancel')}</button>
-                        <button type="button" className="btn btn-primary" onClick={() => handleSubmit('schedule')} disabled={isSending || !campaign.Options.ScheduleFor || verifiedDomainsWithDefault.length === 0 || !isRecipientSelected}>{isSending ? <Loader/> : t('confirm')}</button>
+                        <Button type="button" className="btn-primary" onClick={() => handleSubmit('schedule')} disabled={isSending || !campaign.Options.ScheduleFor || verifiedDomainsWithDefault.length === 0 || !isRecipientSelected} action="send_campaign">{isSending ? <Loader/> : t('confirm')}</Button>
                     </div>
                 )}
             </div>

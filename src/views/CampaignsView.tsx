@@ -12,6 +12,7 @@ import Badge from '../components/Badge';
 import { useStatusStyles } from '../hooks/useStatusStyles';
 import { useToast } from '../contexts/ToastContext';
 import LineLoader from '../components/LineLoader';
+import Button from '../components/Button';
 
 const ProgressBar = ({ value, max }: { value: number; max: number }) => {
     const percentage = max > 0 ? (value / max) * 100 : 0;
@@ -240,9 +241,9 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                     />
                 </div>
                 <div className="header-actions">
-                    <button className="btn btn-primary" onClick={() => setView('Send Email')}>
+                    <Button className="btn-primary" onClick={() => setView('Send Email')} action="create_campaign">
                         <Icon path={ICONS.PLUS} /> {t('createCampaign')}
-                    </button>
+                    </Button>
                 </div>
             </div>
 

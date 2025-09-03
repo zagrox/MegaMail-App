@@ -12,6 +12,7 @@ import RenameModal from '../components/RenameModal';
 import Icon, { ICONS } from '../components/Icon';
 import ConfirmModal from '../components/ConfirmModal';
 import LineLoader from '../components/LineLoader';
+import Button from '../components/Button';
 
 
 const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void }) => {
@@ -187,14 +188,14 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                             disabled={isSubmitting}
                             required
                         />
-                        <button type="submit" className="btn btn-primary" disabled={!newListName || isSubmitting}>
+                        <Button type="submit" className="btn-primary" disabled={!newListName || isSubmitting} action="create_list">
                             {isSubmitting ? <Loader /> : (
                                 <>
                                     <Icon path={ICONS.PLUS} />
                                     <span>{t('createList')}</span>
                                 </>
                             )}
-                        </button>
+                        </Button>
                     </form>
                     <button className="btn btn-secondary" onClick={() => setView('Segments')}>
                         <Icon path={ICONS.SEGMENTS} />

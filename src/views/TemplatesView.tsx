@@ -11,6 +11,7 @@ import Modal from '../components/Modal';
 import Icon, { ICONS } from '../components/Icon';
 import ConfirmModal from '../components/ConfirmModal';
 import { Template } from '../api/types';
+import Button from '../components/Button';
 
 // Helper to decode a Base64 string to UTF-8
 const decodeState = (base64: string): string => {
@@ -221,9 +222,9 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
                     />
                 </div>
                 <div className="header-actions">
-                    <button className="btn btn-primary" onClick={() => setView('Email Builder')}>
+                    <Button className="btn-primary" onClick={() => setView('Email Builder')} action="create_template">
                         <Icon path={ICONS.PLUS} /> {t('createTemplate')}
-                    </button>
+                    </Button>
                 </div>
             </div>
 
