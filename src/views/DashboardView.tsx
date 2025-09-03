@@ -137,7 +137,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
             )}
 
             <div className="dashboard-stats-grid">
-                 <AccountDataCard title={t('sendingReputation')} iconPath={ICONS.TRENDING_UP}>
+                <AccountDataCard title={t('sendingReputation')} iconPath={ICONS.TRENDING_UP}>
                     {accountLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : (accountData?.reputation ? `${accountData.reputation}%` : 'N/A')}
                 </AccountDataCard>
                 <AccountDataCard title={t('emailsSent365d')} iconPath={ICONS.MAIL}>
