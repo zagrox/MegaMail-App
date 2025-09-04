@@ -165,7 +165,7 @@ const DomainVerificationChecker = ({ domainName }: { domainName: string }) => {
     return (
         <div className="domain-verification-checker">
             <button className="btn check-all-btn" onClick={checkAllDns} disabled={isChecking}>
-                {isChecking ? <Loader /> : <Icon path={ICONS.VERIFY} />}
+                {isChecking ? <Loader /> : <Icon>{ICONS.VERIFY}</Icon>}
                 {isChecking ? t('checkingDns') : t('checkDnsStatus')}
             </button>
             <div className="dns-records-list">
@@ -278,7 +278,7 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                         disabled={isSubmitting}
                     />
                     <Button type="submit" className="btn-primary" disabled={!newDomain || isSubmitting} action="add_domain">
-                        {isSubmitting ? <Loader /> : <><Icon path={ICONS.PLUS}/> {t('addDomain')}</>}
+                        {isSubmitting ? <Loader /> : <><Icon>{ICONS.PLUS}</Icon> {t('addDomain')}</>}
                     </Button>
                 </form>
             </div>
@@ -320,7 +320,7 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                                     <td>
                                         <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
                                             <span>{defaultSender || t('notSet', {defaultValue: 'Not Set'})}</span>
-                                            <button className="btn-icon" onClick={() => setDomainToEdit(domain)}><Icon path={ICONS.PENCIL} /></button>
+                                            <button className="btn-icon" onClick={() => setDomainToEdit(domain)}><Icon>{ICONS.PENCIL}</Icon></button>
                                         </div>
                                     </td>
                                     <td>
@@ -338,7 +338,7 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                                                 onClick={() => setExpandedDomain(isExpanded ? null : domainName)}
                                                 style={{ padding: '0.5rem 1rem' }}
                                             >
-                                                <Icon path={isExpanded ? ICONS.CHEVRON_DOWN : ICONS.VERIFY} style={{ transform: isExpanded ? 'rotate(180deg)' : 'none' }} />
+                                                <Icon style={{ transform: isExpanded ? 'rotate(180deg)' : 'none' }}>{isExpanded ? ICONS.CHEVRON_DOWN : ICONS.VERIFY}</Icon>
                                                 <span>{isExpanded ? t('cancel') : t('verify')}</span>
                                             </button>
                                             <button 
@@ -346,7 +346,7 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                                                 onClick={() => setDomainToDelete(domainName)} 
                                                 aria-label={t('deleteDomain', { domainName })}
                                             >
-                                                <Icon path={ICONS.DELETE} />
+                                                <Icon>{ICONS.DELETE}</Icon>
                                             </button>
                                         </div>
                                     </td>

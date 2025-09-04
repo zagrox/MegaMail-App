@@ -90,7 +90,7 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
     return (
         <div className="card balance-display-card">
             <div className="balance-info">
-                <Icon path={ICONS.BUY_CREDITS} className="balance-icon" />
+                <Icon className="balance-icon">{ICONS.BUY_CREDITS}</Icon>
                 <div>
                     <span className="balance-title">{t('yourCurrentBalance')}</span>
                     <span className="balance-amount">
@@ -99,7 +99,7 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
                 </div>
             </div>
             <button className="btn btn-secondary" onClick={onHistoryClick}>
-                <Icon path={ICONS.CALENDAR} />
+                <Icon>{ICONS.CALENDAR}</Icon>
                 <span>{t('viewHistory')}</span>
             </button>
         </div>
@@ -356,7 +356,7 @@ const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, 
             <div className="order-confirmation-view">
                 <div className="card" style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
                     <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                        <Icon path={ICONS.CHECK} style={{ width: 48, height: 48, color: 'var(--success-color)' }} />
+                        <Icon style={{ width: 48, height: 48, color: 'var(--success-color)' }}>{ICONS.CHECK}</Icon>
                         <h2 style={{ marginTop: '1rem' }}>{t('orderSuccessMessage')}</h2>
                         <p>{t('orderSuccessSubtitle')}</p>
                     </div>
@@ -382,11 +382,11 @@ const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, 
                     
                     <div className="form-actions" style={{justifyContent: 'space-between', padding: 0}}>
                         <button className="btn btn-secondary" onClick={() => setCreatedOrder(null)} disabled={isPaying}>
-                            <Icon path={ICONS.CHEVRON_LEFT} />
+                            <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                             <span>{t('buyDifferentPackage')}</span>
                         </button>
                         <button className="btn btn-primary" onClick={handleConfirmAndPay} disabled={isPaying}>
-                            {isPaying ? <Loader /> : <Icon path={ICONS.LOCK_OPEN} />}
+                            {isPaying ? <Loader /> : <Icon>{ICONS.LOCK_OPEN}</Icon>}
                             <span>{t('confirmAndPay')}</span>
                         </button>
                     </div>

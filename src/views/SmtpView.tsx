@@ -28,7 +28,7 @@ const CopyButton = ({ value }: { value: string }) => {
 
     return (
         <button onClick={handleCopy} className="btn-icon">
-            <Icon path={copied ? ICONS.CHECK : ICONS.MAIL} />
+            <Icon>{copied ? ICONS.CHECK : ICONS.MAIL}</Icon>
         </button>
     );
 };
@@ -41,7 +41,7 @@ const SecretValue = ({ value, type = "password" }: { value: string, type?: "text
         <div className="secret-value-wrapper">
             <input type={isVisible ? 'text' : type} value={value} readOnly />
             <button type="button" className="btn-icon" onClick={() => setIsVisible(!isVisible)}>
-                <Icon path={isVisible ? ICONS.EYE_OFF : ICONS.EYE} />
+                <Icon>{isVisible ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
             </button>
             <CopyButton value={value} />
         </div>
@@ -185,7 +185,7 @@ const SmtpView = ({ apiKey, user }: { apiKey: string, user: any }) => {
                     {!user?.isApiKeyUser && (
                         <div className="header-actions">
                             <Button className="btn-primary" onClick={() => setIsAddModalOpen(true)} action="add_smtp_credential">
-                                <Icon path={ICONS.PLUS} /> {t('addCredential')}
+                                <Icon>{ICONS.PLUS}</Icon> {t('addCredential')}
                             </Button>
                         </div>
                     )}
@@ -206,7 +206,7 @@ const SmtpView = ({ apiKey, user }: { apiKey: string, user: any }) => {
                                 <div className="card-header">
                                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                                         <h4>{cred.apikname}</h4>
-                                        <button className="btn-icon btn-icon-danger" onClick={() => setKeyToDelete(cred)}><Icon path={ICONS.DELETE} /></button>
+                                        <button className="btn-icon btn-icon-danger" onClick={() => setKeyToDelete(cred)}><Icon>{ICONS.DELETE}</Icon></button>
                                     </div>
                                 </div>
                                 <div className="card-body">

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../../components/Icon';
 import Badge from '../../components/Badge';
-import EditProfileModal from './EditProfileModal';
+import { EditProfileModal } from './EditProfileModal';
 import { useStatusStyles } from '../../hooks/useStatusStyles';
 import { useConfiguration } from '../../contexts/ConfigurationContext';
 
@@ -56,7 +56,7 @@ const ProfileTab = ({ accountData, user }: { accountData: any, user: any }) => {
                         {avatarUrl ? (
                             <img src={avatarUrl} alt={t('profile')} />
                         ) : (
-                            <Icon path={ICONS.ACCOUNT} />
+                            <Icon>{ICONS.ACCOUNT}</Icon>
                         )}
                     </div>
                     <div className="profile-info">
@@ -70,7 +70,7 @@ const ProfileTab = ({ accountData, user }: { accountData: any, user: any }) => {
                 </div>
                 <div className="profile-actions">
                     <button className="btn btn-secondary" onClick={() => setIsEditModalOpen(true)}>
-                        <Icon path={ICONS.PENCIL} />
+                        <Icon>{ICONS.PENCIL}</Icon>
                         <span>{t('editProfile')}</span>
                     </button>
                 </div>

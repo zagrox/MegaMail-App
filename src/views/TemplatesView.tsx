@@ -81,13 +81,13 @@ const TemplateCard = ({ template, onPreview, onUse, onDelete, isLoadingDetails }
             </div>
             <div className="campaign-card-footer" style={{ gap: '0.5rem', justifyContent: 'flex-end' }}>
                 <button className="btn btn-secondary" onClick={onPreview} disabled={isLoadingDetails}>
-                    {isLoadingDetails ? <Loader /> : <><Icon path={ICONS.EYE} /> {t('preview')}</>}
+                    {isLoadingDetails ? <Loader /> : <><Icon>{ICONS.EYE}</Icon> {t('preview')}</>}
                 </button>
                 <button className="btn" onClick={onUse} disabled={isLoadingDetails}>
-                    {isLoadingDetails ? <Loader /> : <><Icon path={ICONS.SEND_EMAIL} /> {t('useTemplate')}</>}
+                    {isLoadingDetails ? <Loader /> : <><Icon>{ICONS.SEND_EMAIL}</Icon> {t('useTemplate')}</>}
                 </button>
                 <button className="btn-icon btn-icon-danger" onClick={onDelete} disabled={isLoadingDetails}>
-                    <Icon path={ICONS.DELETE} />
+                    <Icon>{ICONS.DELETE}</Icon>
                 </button>
             </div>
         </div>
@@ -212,7 +212,7 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
 
             <div className="view-header">
                 <div className="search-bar" style={{ flexGrow: 1 }}>
-                    <Icon path={ICONS.SEARCH} />
+                    <Icon>{ICONS.SEARCH}</Icon>
                     <input
                         type="search"
                         placeholder={t('searchTemplatesPlaceholder')}
@@ -223,7 +223,7 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
                 </div>
                 <div className="header-actions">
                     <Button className="btn-primary" onClick={() => setView('Email Builder')} action="create_template">
-                        <Icon path={ICONS.PLUS} /> {t('createTemplate')}
+                        <Icon>{ICONS.PLUS}</Icon> {t('createTemplate')}
                     </Button>
                 </div>
             </div>
@@ -257,13 +257,13 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
                          {( (templatesFromApi && templatesFromApi.length > 0) || offset > 0) && (
                             <div className="pagination-controls">
                                 <button onClick={() => setOffset(o => Math.max(0, o - TEMPLATES_PER_PAGE))} disabled={offset === 0 || loading}>
-                                    <Icon path={ICONS.CHEVRON_LEFT} />
+                                    <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                                     <span>{t('previous')}</span>
                                 </button>
                                 <span className="pagination-page-info">{t('page', { page: offset / TEMPLATES_PER_PAGE + 1 })}</span>
                                 <button onClick={() => setOffset(o => o + TEMPLATES_PER_PAGE)} disabled={!templatesFromApi || templatesFromApi.length < TEMPLATES_PER_PAGE || loading}>
                                     <span>{t('next')}</span>
-                                    <Icon path={ICONS.CHEVRON_RIGHT} />
+                                    <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                                 </button>
                             </div>
                         )}

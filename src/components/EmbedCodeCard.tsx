@@ -43,7 +43,8 @@ const EmbedCodeCard = ({ apiKey }: { apiKey: string }) => {
                 </div>
                 <div className="form-actions" style={{justifyContent: 'flex-end', padding: 0, border: 'none', margin: 0}}>
                     <button className="btn btn-secondary" onClick={handleCopy}>
-                        <Icon path={copied ? ICONS.CHECK : ICONS.MAIL} /> {copied ? t('copied') : t('copyEmbedCode')}
+                        {/* FIX: Changed path prop to children for Icon component */}
+                        <Icon>{copied ? ICONS.CHECK : ICONS.MAIL}</Icon> {copied ? t('copied') : t('copyEmbedCode')}
                     </button>
                 </div>
             </div>

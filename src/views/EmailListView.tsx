@@ -169,7 +169,7 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
 
             <div className="view-header">
                 <div className="search-bar" style={{flexGrow: 1}}>
-                    <Icon path={ICONS.SEARCH} />
+                    <Icon>{ICONS.SEARCH}</Icon>
                     <input
                         type="search"
                         placeholder={t('searchListsPlaceholder')}
@@ -191,14 +191,14 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                         <Button type="submit" className="btn-primary" disabled={!newListName || isSubmitting} action="create_list">
                             {isSubmitting ? <Loader /> : (
                                 <>
-                                    <Icon path={ICONS.PLUS} />
+                                    <Icon>{ICONS.PLUS}</Icon>
                                     <span>{t('createList')}</span>
                                 </>
                             )}
                         </Button>
                     </form>
                     <button className="btn btn-secondary" onClick={() => setView('Segments')}>
-                        <Icon path={ICONS.SEGMENTS} />
+                        <Icon>{ICONS.SEGMENTS}</Icon>
                         <span>{t('segments')}</span>
                     </button>
                 </div>
@@ -255,9 +255,9 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                                             <td>{formatDateRelative(list.DateAdded, i18n.language)}</td>
                                             <td>
                                                 <div className="action-buttons" style={{justifyContent: 'flex-end'}}>
-                                                    <button className="btn-icon btn-icon-primary" onClick={() => setView('ListDetail', { list })} aria-label={t('viewContactsInList')}><Icon path={ICONS.EYE}/></button>
-                                                    <button className="btn-icon btn-icon-primary" onClick={() => setListToRename(list)} aria-label={t('renameList')}><Icon path={ICONS.PENCIL}/></button>
-                                                    <button className="btn-icon btn-icon-danger" onClick={() => setListToDelete(list)} aria-label={t('deleteList')}><Icon path={ICONS.DELETE}/></button>
+                                                    <button className="btn-icon btn-icon-primary" onClick={() => setView('ListDetail', { list })} aria-label={t('viewContactsInList')}><Icon>{ICONS.EYE}</Icon></button>
+                                                    <button className="btn-icon btn-icon-primary" onClick={() => setListToRename(list)} aria-label={t('renameList')}><Icon>{ICONS.PENCIL}</Icon></button>
+                                                    <button className="btn-icon btn-icon-danger" onClick={() => setListToDelete(list)} aria-label={t('deleteList')}><Icon>{ICONS.DELETE}</Icon></button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -269,13 +269,13 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                      {totalPages > 1 && (
                         <div className="pagination-controls">
                             <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1 || loading}>
-                                <Icon path={ICONS.CHEVRON_LEFT} />
+                                <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                                 <span>{t('previous')}</span>
                             </button>
                             <span className="pagination-page-info">Page {currentPage} of {totalPages}</span>
                             <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || loading}>
                                 <span>{t('next')}</span>
-                                <Icon path={ICONS.CHEVRON_RIGHT} />
+                                <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                             </button>
                         </div>
                     )}

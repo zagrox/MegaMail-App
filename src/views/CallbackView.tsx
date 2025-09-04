@@ -137,7 +137,7 @@ const CallbackView = () => {
             <div className="card" style={{ maxWidth: '500px', width: '100%', margin: '0 auto', padding: '2rem', textAlign: 'center' }}>
                 {error ? (
                     <>
-                        <Icon path={ICONS.X_CIRCLE} style={{ width: 48, height: 48, color: 'var(--danger-color)', margin: '0 auto 1rem' }} />
+                        <Icon style={{ width: 48, height: 48, color: 'var(--danger-color)', margin: '0 auto 1rem' }}>{ICONS.X_CIRCLE}</Icon>
                         <h2 style={{ color: 'var(--danger-color)' }}>{t('paymentFailed')}</h2>
                         <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{error}</p>
                         {processedOrder && (
@@ -156,7 +156,7 @@ const CallbackView = () => {
                     </>
                 ) : (
                     <>
-                        <Icon path={ICONS.CHECK} style={{ width: 48, height: 48, color: 'var(--success-color)', margin: '0 auto 1rem' }} />
+                        <Icon style={{ width: 48, height: 48, color: 'var(--success-color)', margin: '0 auto 1rem' }}>{ICONS.CHECK}</Icon>
                         <h2 style={{ color: 'var(--success-color)' }}>{t('paymentSuccess')}</h2>
                         <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{message}</p>
                         {processedOrder && (

@@ -88,7 +88,8 @@ const OrderDetailsModal = ({ isOpen, onClose, order }: { isOpen: boolean, onClos
                 <button className="btn" onClick={onClose}>{t('close')}</button>
                 {showPayButton && lastTransaction && (
                     <a href={paymentUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                        <Icon path={ICONS.LOCK_OPEN} />
+                        {/* FIX: Changed path prop to children for Icon component */}
+                        <Icon>{ICONS.LOCK_OPEN}</Icon>
                         <span>{t('payNow')}</span>
                     </a>
                 )}

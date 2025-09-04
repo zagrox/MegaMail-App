@@ -1,6 +1,5 @@
 
 
-
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +39,7 @@ const Step2 = () => {
             <div className="feature-grid">
                 {features.map(f => (
                     <div className="feature-card" key={f.title}>
-                        <Icon path={f.icon} />
+                        <Icon>{f.icon}</Icon>
                         <div>
                             <h4>{f.title}</h4>
                             <p>{f.desc}</p>
@@ -63,15 +62,15 @@ const Step3 = ({ data, setData }: { data: any, setData: Function }) => {
             <p>{t('profileSubtitle')}</p>
             <form className="auth-form" style={{maxWidth: '400px', margin: '0 auto'}}>
                 <div className="input-group">
-                    <span className="input-icon"><Icon path={ICONS.CONTACTS} /></span>
+                    <span className="input-icon"><Icon>{ICONS.CONTACTS}</Icon></span>
                     <input name="company" type="text" placeholder={t('company')} value={data.company} onChange={handleChange} />
                 </div>
                 <div className="input-group">
-                    <span className="input-icon"><Icon path={ICONS.DOMAINS} /></span>
+                    <span className="input-icon"><Icon>{ICONS.DOMAINS}</Icon></span>
                     <input name="website" type="url" placeholder={t('website')} value={data.website} onChange={handleChange} />
                 </div>
                  <div className="input-group">
-                    <span className="input-icon"><Icon path={ICONS.MOBILE} /></span>
+                    <span className="input-icon"><Icon>{ICONS.MOBILE}</Icon></span>
                     <input name="mobile" type="tel" placeholder={t('mobile')} value={data.mobile} onChange={handleChange} />
                 </div>
             </form>
@@ -204,10 +203,10 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
                                         <p>{t('setupFailedManualPrompt')}</p>
                                     </div>
                                     <div className="input-group has-btn" style={{ maxWidth: '400px', margin: '1rem auto 0' }}>
-                                        <span className="input-icon"><Icon path={ICONS.KEY} /></span>
+                                        <span className="input-icon"><Icon>{ICONS.KEY}</Icon></span>
                                         <input name="apikey" type={showPassword ? "text" : "password"} placeholder={t('enterYourApiKey')} required value={apiKey} onChange={e => setApiKey(e.target.value)} />
                                         <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-                                            <Icon path={showPassword ? ICONS.EYE_OFF : ICONS.EYE} />
+                                            <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
                                         </button>
                                     </div>
                                     <div className="form-actions" style={{ justifyContent: 'center', border: 'none', padding: '1rem 0 0', flexDirection: 'column', maxWidth: '400px', margin: '0 auto' }}>

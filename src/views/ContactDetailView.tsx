@@ -48,7 +48,7 @@ const ContactDetailView = ({ apiKey, contactEmail, onBack }: {
         <div>
             <div className="view-header" style={{ flexWrap: 'nowrap' }}>
                 <button className="btn btn-secondary" onClick={onBack}>
-                    <Icon path={ICONS.CHEVRON_LEFT} />
+                    <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                     <span>{t('back')}</span>
                 </button>
             </div>
@@ -59,7 +59,7 @@ const ContactDetailView = ({ apiKey, contactEmail, onBack }: {
                     <div className="profile-hero">
                         <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', flexGrow: 1 }}>
                             <div className="profile-avatar">
-                                <Icon path={ICONS.ACCOUNT} />
+                                <Icon>{ICONS.ACCOUNT}</Icon>
                             </div>
                             <div className="profile-info">
                                 <h3>{fullName || contact.Email}</h3>

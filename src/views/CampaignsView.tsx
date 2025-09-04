@@ -196,7 +196,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                 setCampaignStats(prev => {
                     const newStats = { ...prev };
                     for (const res of results) {
-                        // FIX: Type narrowing for the success/error union type was failing. Checking for the success case explicitly and handling the error case in the else block resolves the issue.
                         if (res.success === true) {
                             newStats[res.name] = { loading: false, data: res.data };
                         } else {
@@ -230,7 +229,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
         <div>
             <div className="view-header">
                 <div className="search-bar" style={{ flexGrow: 1 }}>
-                    {/* FIX: Changed path prop to children for Icon component */}
                     <Icon>{ICONS.SEARCH}</Icon>
                     <input
                         type="search"
@@ -243,7 +241,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                 </div>
                 <div className="header-actions">
                     <Button className="btn-primary" onClick={() => setView('Send Email')} action="create_campaign">
-                        {/* FIX: Changed path prop to children for Icon component */}
                         <Icon>{ICONS.PLUS}</Icon> {t('createCampaign')}
                     </Button>
                 </div>
@@ -281,14 +278,12 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                     {(paginatedCampaigns.length > 0 || offset > 0) && (
                         <div className="pagination-controls">
                             <button onClick={() => setOffset(o => Math.max(0, o - CAMPAIGNS_PER_PAGE))} disabled={offset === 0 || loading}>
-                                {/* FIX: Changed path prop to children for Icon component */}
                                 <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                                 <span>{t('previous')}</span>
                             </button>
                             <span className="pagination-page-info">{t('page', { page: offset / CAMPAIGNS_PER_PAGE + 1 })}</span>
                             <button onClick={() => setOffset(o => o + CAMPAIGNS_PER_PAGE)} disabled={!paginatedCampaigns || paginatedCampaigns.length < CAMPAIGNS_PER_PAGE || loading}>
                                 <span>{t('next')}</span>
-                                {/* FIX: Changed path prop to children for Icon component */}
                                 <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                             </button>
                         </div>

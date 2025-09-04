@@ -110,7 +110,7 @@ const StatisticsView = ({ apiKey, isEmbed = false }: { apiKey: string, isEmbed?:
 
     const filterControl = (
         <div className="view-controls">
-            <Icon path={ICONS.CALENDAR} />
+            <Icon>{ICONS.CALENDAR}</Icon>
             <select id="duration-select" value={duration} onChange={(e) => setDuration(e.target.value)} aria-label={t('dateRange')}>
                 {Object.entries(durationOptions).map(([key, { label }]) => (
                     <option key={key} value={key}>{label}</option>

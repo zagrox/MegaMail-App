@@ -107,14 +107,16 @@ const RuleBuilder = ({ rules, setRules, conjunction, setConjunction }: { rules: 
                             aria-label="Rule value"
                         />
                          <button type="button" className="btn-icon btn-icon-danger remove-rule-btn" onClick={() => removeRule(index)}>
-                            <Icon path={ICONS.DELETE} />
+                            {/* FIX: Changed path prop to children for Icon component */}
+                            <Icon>{ICONS.DELETE}</Icon>
                         </button>
                     </div>
                 ))}
             </div>
             <div className="add-rule-btn-container">
                 <button type="button" className="btn add-rule-btn" onClick={addRule}>
-                    <Icon path={ICONS.PLUS} /> {t('addAnotherRule')}
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <Icon>{ICONS.PLUS}</Icon> {t('addAnotherRule')}
                 </button>
             </div>
         </div>

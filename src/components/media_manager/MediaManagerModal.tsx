@@ -140,19 +140,23 @@ const MediaManagerModal = ({ isOpen, onClose, apiKey, onSelect }: { isOpen: bool
                    
                     <div className="view-header">
                         <div className="search-bar">
-                            <Icon path={ICONS.SEARCH}/>
+                            {/* FIX: Changed path prop to children for Icon component */}
+                            <Icon>{ICONS.SEARCH}</Icon>
                             <input type="search" placeholder={t('search')} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
                         </div>
                         <div className="header-actions">
                             <div className="view-switcher">
-                                <button onClick={() => setViewMode('list')} className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`}><Icon path={ICONS.EMAIL_LISTS} /></button>
-                                <button onClick={() => setViewMode('grid')} className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`}><Icon path={ICONS.DASHBOARD} /></button>
+                                {/* FIX: Changed path prop to children for Icon component */}
+                                <button onClick={() => setViewMode('list')} className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`}><Icon>{ICONS.EMAIL_LISTS}</Icon></button>
+                                {/* FIX: Changed path prop to children for Icon component */}
+                                <button onClick={() => setViewMode('grid')} className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`}><Icon>{ICONS.DASHBOARD}</Icon></button>
                             </div>
                             <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
                                 {Object.entries(sortOptions).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                             </select>
                             <button className="btn btn-primary" onClick={() => setIsUploadModalOpen(true)}>
-                                <Icon path={ICONS.UPLOAD} /> {t('uploadFile')}
+                                {/* FIX: Changed path prop to children for Icon component */}
+                                <Icon>{ICONS.UPLOAD}</Icon> {t('uploadFile')}
                             </button>
                         </div>
                     </div>
@@ -183,9 +187,11 @@ const MediaManagerModal = ({ isOpen, onClose, apiKey, onSelect }: { isOpen: bool
                             
                              {totalPages > 1 && (
                                 <div className="pagination-controls">
-                                    <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><Icon path={ICONS.CHEVRON_LEFT} /><span>{t('previous')}</span></button>
+                                    {/* FIX: Changed path prop to children for Icon component */}
+                                    <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><Icon>{ICONS.CHEVRON_LEFT}</Icon><span>{t('previous')}</span></button>
                                     <span className="pagination-page-info">{t('page', { page: `${currentPage} / ${totalPages}` })}</span>
-                                    <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}><span>{t('next')}</span><Icon path={ICONS.CHEVRON_RIGHT} /></button>
+                                    {/* FIX: Changed path prop to children for Icon component */}
+                                    <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}><span>{t('next')}</span><Icon>{ICONS.CHEVRON_RIGHT}</Icon></button>
                                 </div>
                             )}
                         </>

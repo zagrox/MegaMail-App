@@ -23,7 +23,7 @@ const ShareTab = ({ apiKey }: { apiKey: string }) => {
                         className="btn btn-primary"
                         style={{ maxWidth: '250px' }}
                     >
-                        <Icon path={ICONS.MAIL} />
+                        <Icon>{ICONS.MAIL}</Icon>
                         <span>{t('contactUsForDetails')}</span>
                     </a>
                 </div>

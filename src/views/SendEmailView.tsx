@@ -58,7 +58,8 @@ const AccordionItem = ({
     <div className="accordion-item">
         <div className={`accordion-header ${openAccordion === id ? 'open' : ''}`} onClick={() => setOpenAccordion(openAccordion === id ? '' : id)}>
             <div className="accordion-title">{title}</div>
-            <Icon path={ICONS.CHEVRON_DOWN} className={`accordion-icon ${openAccordion === id ? 'open' : ''}`} />
+            {/* FIX: Changed path prop to children for Icon component */}
+            <Icon className={`accordion-icon ${openAccordion === id ? 'open' : ''}`}>{ICONS.CHEVRON_DOWN}</Icon>
         </div>
         {openAccordion === id && <div className="accordion-content">{children}</div>}
     </div>
@@ -549,7 +550,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
              <Modal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} title={t('templates')}>
                 <div className="template-selector-modal">
                     <div className="search-bar" style={{marginBottom: '1rem'}}>
-                        <Icon path={ICONS.SEARCH} />
+                        <Icon>{ICONS.SEARCH}</Icon>
                         <input
                             type="search"
                             placeholder={t('searchTemplatesPlaceholder')}
@@ -634,7 +635,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                             </div>
                         ) : (
                             <button type="button" className="btn btn-secondary" onClick={() => setIsTemplateModalOpen(true)} style={{width: '100%', padding: '1.5rem'}}>
-                                <Icon path={ICONS.ARCHIVE} />
+                                <Icon>{ICONS.ARCHIVE}</Icon>
                                 <span>{t('useTemplate')}</span>
                             </button>
                         )}

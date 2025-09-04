@@ -132,7 +132,7 @@ const OrdersTab = () => {
                                             </td>
                                             <td style={{ textAlign: 'right' }}>
                                                 <button className="btn-icon btn-icon-primary" onClick={() => setSelectedOrder(order)} aria-label={t('orderDetails')}>
-                                                    <Icon path={ICONS.EYE} />
+                                                    <Icon>{ICONS.EYE}</Icon>
                                                 </button>
                                             </td>
                                         </tr>

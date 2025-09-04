@@ -136,7 +136,7 @@ const ContactStatusFilter = ({ apiKey, selectedStatuses, onStatusChange, onExpor
                             </label>
                             <span className="badge" style={badgeStyle}>
                                 {count === -1 
-                                 ? <Icon path={ICONS.COMPLAINT} title={t('error')} style={{width: '1em', height: '1em', color: 'var(--danger-color)'}}/> 
+                                 ? <Icon title={t('error')} style={{width: '1em', height: '1em', color: 'var(--danger-color)'}}>{ICONS.COMPLAINT}</Icon> 
                                  : (count !== undefined ? Number(count).toLocaleString(i18n.language) : <Loader />)
                                 }
                             </span>
@@ -151,7 +151,7 @@ const ContactStatusFilter = ({ apiKey, selectedStatuses, onStatusChange, onExpor
                     disabled={selectedStatuses.length === 0}
                     action={AppActions.EXPORT_CONTACTS}
                 >
-                    <Icon path={ICONS.DOWNLOAD} />
+                    <Icon>{ICONS.DOWNLOAD}</Icon>
                     <span>{t('exportContacts')}</span>
                 </Button>
             </div>
@@ -293,7 +293,7 @@ const ContactCard = React.memo(({ contact, onView, onDelete, isSelected, onToggl
                 </div>
                 <div className="action-buttons">
                     <Button className="btn-icon btn-icon-danger" onClick={(e) => handleActionClick(e, () => onDelete(contact.Email))} aria-label={t('deleteContact')}>
-                        <Icon path={ICONS.DELETE} />
+                        <Icon>{ICONS.DELETE}</Icon>
                     </Button>
                 </div>
             </div>
@@ -595,7 +595,7 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                                 </span>
                             </div>
                             <div className="search-bar">
-                                <Icon path={ICONS.SEARCH} />
+                                <Icon>{ICONS.SEARCH}</Icon>
                                 <input
                                     type="search"
                                     placeholder={t('searchContactsPlaceholder')}
@@ -608,10 +608,10 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                             </div>
                             <div className="header-actions">
                                 <Button onClick={() => setIsImportModalOpen(true)} action={AppActions.IMPORT_CONTACTS}>
-                                    <Icon path={ICONS.UPLOAD} /> {t('importContacts')}
+                                    <Icon>{ICONS.UPLOAD}</Icon> {t('importContacts')}
                                 </Button>
                                 <Button className="btn-primary" onClick={() => setIsAddModalOpen(true)} action={AppActions.ADD_CONTACT}>
-                                    <Icon path={ICONS.USER_PLUS} /> {t('addContact')}
+                                    <Icon>{ICONS.USER_PLUS}</Icon> {t('addContact')}
                                 </Button>
                             </div>
                         </div>
@@ -644,13 +644,13 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                             {contacts && (contacts.length > 0 || offset > 0) && (
                                 <div className="pagination-controls">
                                     <Button onClick={() => setOffset(o => Math.max(0, o - CONTACTS_PER_PAGE))} disabled={offset === 0 || loading}>
-                                        <Icon path={ICONS.CHEVRON_LEFT} />
+                                        <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                                         <span>{t('previous')}</span>
                                     </Button>
                                     <span className="pagination-page-info">{t('page', { page: offset / CONTACTS_PER_PAGE + 1 })}</span>
                                     <Button onClick={() => setOffset(o => o + CONTACTS_PER_PAGE)} disabled={!contacts || contacts.length < CONTACTS_PER_PAGE || loading}>
                                         <span>{t('next')}</span>
-                                        <Icon path={ICONS.CHEVRON_RIGHT} />
+                                        <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                                     </Button>
                                 </div>
                             )}

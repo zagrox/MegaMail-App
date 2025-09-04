@@ -220,7 +220,6 @@ const StatsPieChart = ({ stats }: { stats: any }) => {
             <div className="card-header"><h3>Interaction Breakdown</h3></div>
             <div style={{ display: 'flex', alignItems: 'center', padding: '1.5rem', gap: '2rem', flexWrap: 'wrap' }}>
                 <svg viewBox="0 0 100 100" width="200" height="200" style={{flexShrink: 0}}>
-                    {/* FIX: Replaced invalid 'title' prop on SVG <path> with a nested <title> element for tooltip. */}
                     {slices.map(slice => (
                         <path key={slice.label} d={slice.path} fill={slice.color}>
                             <title>{`${slice.label}: ${slice.value.toLocaleString()}`}</title>
@@ -354,7 +353,6 @@ const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string; camp
         <div>
             <div className="campaign-detail-header">
                 <button className="btn btn-secondary" onClick={onBack}>
-                    {/* FIX: Changed path prop to children for Icon component */}
                     <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                     <span>{t('campaigns')}</span>
                 </button>

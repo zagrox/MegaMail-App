@@ -103,7 +103,7 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
             />
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                 <button className="btn btn-secondary" onClick={onBack} style={{whiteSpace: 'nowrap'}}>
-                    <Icon path={ICONS.CHEVRON_LEFT} />
+                    <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                     <span>{t('emailLists')}</span>
                 </button>
                 <h2 className="content-header" style={{margin: 0, borderBottom: 'none', fontSize: '2rem'}}>{t('contactsInList', { listName })}</h2>
@@ -111,7 +111,7 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
 
             <div className="view-header">
                 <div className="search-bar" style={{flexGrow: 1}}>
-                    <Icon path={ICONS.SEARCH} />
+                    <Icon>{ICONS.SEARCH}</Icon>
                     <input
                         type="search"
                         placeholder={t('searchContactsPlaceholder')}
@@ -125,10 +125,10 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                 </div>
                 <div className="header-actions">
                     <button className="btn" onClick={() => setIsExportModalOpen(true)}>
-                        <Icon path={ICONS.DOWNLOAD} /> {t('export')}
+                        <Icon>{ICONS.DOWNLOAD}</Icon> {t('export')}
                     </button>
                     <button className="btn btn-primary" onClick={() => setIsAddContactModalOpen(true)}>
-                        <Icon path={ICONS.USER_PLUS} /> {t('addContact')}
+                        <Icon>{ICONS.USER_PLUS}</Icon> {t('addContact')}
                     </button>
                 </div>
             </div>
@@ -172,7 +172,7 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                                             <td><Badge text={statusStyle.text} type={statusStyle.type} color={statusStyle.color} iconPath={statusStyle.iconPath} /></td>
                                             <td>
                                                 <div className="action-buttons" style={{justifyContent: 'flex-end'}}>
-                                                   <button className="btn-icon btn-icon-danger" aria-label={t('deleteContact')}><Icon path={ICONS.DELETE}/></button>
+                                                   <button className="btn-icon btn-icon-danger" aria-label={t('deleteContact')}><Icon>{ICONS.DELETE}</Icon></button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -185,13 +185,13 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                     {(filteredContacts.length > CONTACTS_PER_PAGE || offset > 0) && (
                         <div className="pagination-controls">
                             <button onClick={() => setOffset(o => Math.max(0, o - CONTACTS_PER_PAGE))} disabled={offset === 0 || loading}>
-                                <Icon path={ICONS.CHEVRON_LEFT} />
+                                <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                                 <span>{t('previous')}</span>
                             </button>
                             <span className="pagination-page-info">{t('page', { page: offset / CONTACTS_PER_PAGE + 1 })}</span>
                             <button onClick={() => setOffset(o => o + CONTACTS_PER_PAGE)} disabled={offset + CONTACTS_PER_PAGE >= filteredContacts.length || loading}>
                                 <span>{t('next')}</span>
-                                <Icon path={ICONS.CHEVRON_RIGHT} />
+                                <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                             </button>
                         </div>
                     )}

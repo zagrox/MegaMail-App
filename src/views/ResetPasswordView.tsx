@@ -79,14 +79,14 @@ const ResetPasswordView = () => {
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <fieldset disabled={!token || loading} style={{border: 'none', padding: 0, margin: 0, display: 'contents'}}>
                         <div className="input-group has-btn">
-                            <span className="input-icon"><Icon path={ICONS.LOCK} /></span>
+                            <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
                             <input name="password" type={showPassword ? "text" : "password"} placeholder={t('newPassword')} required />
                              <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-                                <Icon path={showPassword ? ICONS.EYE_OFF : ICONS.EYE} />
+                                <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
                             </button>
                         </div>
                         <div className="input-group">
-                            <span className="input-icon"><Icon path={ICONS.LOCK} /></span>
+                            <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
                             <input name="confirm_password" type="password" placeholder={t('confirmPassword')} required />
                         </div>
 

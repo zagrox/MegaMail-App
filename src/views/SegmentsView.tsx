@@ -294,11 +294,11 @@ const SegmentsView = ({ apiKey }: { apiKey: string }) => {
             
             <div className="view-header">
                  <div className="search-bar">
-                    <Icon path={ICONS.SEARCH} />
+                    <Icon>{ICONS.SEARCH}</Icon>
                     <input type="search" placeholder={t('searchSegmentsPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                 </div>
                 <Button className="btn-primary" onClick={() => setIsCreateModalOpen(true)} action="create_segment">
-                    <Icon path={ICONS.PLUS} /> {t('createSegment')}
+                    <Icon>{ICONS.PLUS}</Icon> {t('createSegment')}
                 </Button>
             </div>
 
@@ -316,9 +316,9 @@ const SegmentsView = ({ apiKey }: { apiKey: string }) => {
                         <div className="segment-card-header">
                             <h3>{seg.Name}</h3>
                             <div className="action-buttons">
-                                <button className="btn-icon btn-icon-primary" onClick={() => setSegmentToEditRules(seg)} aria-label={t('editSegmentRules')}><Icon path={ICONS.SETTINGS}/></button>
-                                <button className="btn-icon btn-icon-primary" onClick={() => setSegmentToRename(seg)} aria-label={t('renameSegment')}><Icon path={ICONS.PENCIL}/></button>
-                                <button className="btn-icon btn-icon-danger" onClick={() => setSegmentToDelete(seg.Name)} aria-label={t('deleteSegment')}><Icon path={ICONS.DELETE}/></button>
+                                <button className="btn-icon btn-icon-primary" onClick={() => setSegmentToEditRules(seg)} aria-label={t('editSegmentRules')}><Icon>{ICONS.SETTINGS}</Icon></button>
+                                <button className="btn-icon btn-icon-primary" onClick={() => setSegmentToRename(seg)} aria-label={t('renameSegment')}><Icon>{ICONS.PENCIL}</Icon></button>
+                                <button className="btn-icon btn-icon-danger" onClick={() => setSegmentToDelete(seg.Name)} aria-label={t('deleteSegment')}><Icon>{ICONS.DELETE}</Icon></button>
                             </div>
                         </div>
                         <div className="segment-card-body">

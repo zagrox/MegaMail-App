@@ -103,7 +103,7 @@ const FileCard = React.memo(({ fileInfo, apiKey, onView, onDelete }: { fileInfo:
                     <img src={downloadUrl} alt={fileInfo.FileName} className="file-card-thumbnail" loading="lazy" />
                 ) : (
                     <div className="file-card-icon-placeholder">
-                        <Icon path={ICONS.FILE_TEXT} className="file-card-icon" />
+                        <Icon className="file-card-icon">{ICONS.FILE_TEXT}</Icon>
                     </div>
                 )}
             </div>
@@ -113,13 +113,13 @@ const FileCard = React.memo(({ fileInfo, apiKey, onView, onDelete }: { fileInfo:
             </div>
             <div className="file-card-actions">
                  <button className="btn-icon" onClick={() => onView(fileInfo)} aria-label={t('viewFileDetails')}>
-                    <Icon path={ICONS.EYE} />
+                    <Icon>{ICONS.EYE}</Icon>
                 </button>
                 <a href={downloadUrl} target="_blank" rel="noopener noreferrer" className="btn-icon" aria-label={t('downloadFile')}>
-                    <Icon path={ICONS.DOWNLOAD} />
+                    <Icon>{ICONS.DOWNLOAD}</Icon>
                 </a>
                 <button className="btn-icon btn-icon-danger" onClick={() => onDelete(fileInfo.FileName)} aria-label={t('deleteFile')}>
-                    <Icon path={ICONS.DELETE} />
+                    <Icon>{ICONS.DELETE}</Icon>
                 </button>
             </div>
         </div>
@@ -138,17 +138,17 @@ const FileGridCard = React.memo(({ fileInfo, apiKey, onView, onDelete }: { fileI
                     <img src={downloadUrl} alt={fileInfo.FileName} className="file-grid-card-thumbnail" loading="lazy" />
                 ) : (
                     <div className="file-grid-card-placeholder">
-                        <Icon path={ICONS.FILE_TEXT} />
+                        <Icon>{ICONS.FILE_TEXT}</Icon>
                     </div>
                 )}
             </div>
             <div className="file-grid-card-overlay">
                 <div className="file-grid-card-actions">
                     <a href={downloadUrl} target="_blank" rel="noopener noreferrer" className="btn-icon" aria-label={t('downloadFile')} onClick={(e) => e.stopPropagation()}>
-                        <Icon path={ICONS.DOWNLOAD} />
+                        <Icon>{ICONS.DOWNLOAD}</Icon>
                     </a>
                     <button className="btn-icon btn-icon-danger" onClick={(e) => { e.stopPropagation(); onDelete(fileInfo.FileName); }} aria-label={t('deleteFile')}>
-                        <Icon path={ICONS.DELETE} />
+                        <Icon>{ICONS.DELETE}</Icon>
                     </button>
                 </div>
             </div>
@@ -273,7 +273,7 @@ const MediaManagerView = ({ apiKey }: { apiKey: string }) => {
 
             <div className="view-header">
                 <div className="search-bar">
-                    <Icon path={ICONS.SEARCH}/>
+                    <Icon>{ICONS.SEARCH}</Icon>
                     <input 
                         type="search" 
                         placeholder={t('search')} 
@@ -285,10 +285,10 @@ const MediaManagerView = ({ apiKey }: { apiKey: string }) => {
                 <div className="header-actions">
                     <div className="view-switcher">
                         <button onClick={() => setViewMode('list')} className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`} aria-label="List view">
-                            <Icon path={ICONS.EMAIL_LISTS} />
+                            <Icon>{ICONS.EMAIL_LISTS}</Icon>
                         </button>
                         <button onClick={() => setViewMode('grid')} className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`} aria-label="Grid view">
-                            <Icon path={ICONS.DASHBOARD} />
+                            <Icon>{ICONS.DASHBOARD}</Icon>
                         </button>
                     </div>
                     <select 
@@ -301,7 +301,7 @@ const MediaManagerView = ({ apiKey }: { apiKey: string }) => {
                         ))}
                     </select>
                     <Button className="btn-primary" onClick={() => setIsUploadModalOpen(true)} action="upload_file">
-                        <Icon path={ICONS.UPLOAD} /> {t('uploadFile')}
+                        <Icon>{ICONS.UPLOAD}</Icon> {t('uploadFile')}
                     </Button>
                 </div>
             </div>
@@ -342,13 +342,13 @@ const MediaManagerView = ({ apiKey }: { apiKey: string }) => {
             {totalPages > 1 && (
                 <div className="pagination-controls">
                     <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1 || loading}>
-                        <Icon path={ICONS.CHEVRON_LEFT} />
+                        <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                         <span>{t('previous')}</span>
                     </button>
                     <span className="pagination-page-info">{t('page', { page: `${currentPage} / ${totalPages}` })}</span>
                     <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || loading}>
                         <span>{t('next')}</span>
-                        <Icon path={ICONS.CHEVRON_RIGHT} />
+                        <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                     </button>
                 </div>
             )}
