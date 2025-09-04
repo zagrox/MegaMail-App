@@ -4,7 +4,7 @@ import Icon from './Icon';
 interface Tab {
   id: string;
   label: string;
-  icon?: string;
+  icon?: React.ReactNode;
   component: ReactNode;
 }
 
@@ -28,7 +28,7 @@ const Tabs = ({ tabs, activeTab, setActiveTab }: TabsProps) => {
             role="tab"
             aria-selected={activeTab === tab.id}
           >
-            {tab.icon && <Icon path={tab.icon} className="icon" />}
+            {tab.icon && <Icon className="icon">{tab.icon}</Icon>}
             <span>{tab.label}</span>
           </button>
         ))}

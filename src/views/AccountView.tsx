@@ -44,7 +44,7 @@ const AccountView = ({ apiKey, user, setView }: { apiKey: string, user: any, set
         { id: 'general', label: t('general'), icon: ICONS.DASHBOARD, component: <GeneralTab accountData={accountData} contactsCountData={contactsCountData} contactsCountLoading={contactsCountLoading} installPrompt={installPrompt} handleInstallClick={handleInstallClick} /> },
         { id: 'profile', label: t('profile'), icon: ICONS.ACCOUNT, component: <ProfileTab accountData={accountData} user={user} /> },
         { id: 'orders', label: t('orders'), icon: ICONS.BUY_CREDITS, component: <OrdersTab /> },
-        { id: 'modules', label: t('modules'), icon: ICONS.STAR, component: <ModulesTab setView={setView} /> },
+        { id: 'modules', label: t('modules'), icon: ICONS.BOX, component: <ModulesTab setView={setView} /> },
         { id: 'domains', label: t('domains'), icon: ICONS.DOMAINS, component: <DomainsView apiKey={apiKey} /> },
         { id: 'notifications', label: t('notifications'), icon: ICONS.BELL, component: <NotificationsTab /> },
         { id: 'security', label: t('security'), icon: ICONS.LOCK, component: <SecurityTab user={user} /> },

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readField } from '@directus/sdk';
 import sdk from '../api/directus';
@@ -12,16 +12,19 @@ export interface OrderStatusChoice {
 }
 
 export interface MappedOrderStatus extends OrderStatusChoice {
-    iconPath?: string;
+    iconPath?: ReactNode;
 }
 
-const mapIconNameToPath = (iconName?: string): string | undefined => {
+const mapIconNameToPath = (iconName?: string): ReactNode | undefined => {
     if (!iconName) return undefined;
 
     // Handle special characters first
     switch(iconName) {
+        // FIX: Return JSX element instead of string key
         case '✓': return ICONS.CHECK;
+        // FIX: Return JSX element instead of string key
         case '⊗': return ICONS.X_CIRCLE;
+        // FIX: Return JSX element instead of string key
         case '❇': return ICONS.LOADING_SPINNER;
     }
 
@@ -31,20 +34,24 @@ const mapIconNameToPath = (iconName?: string): string | undefined => {
         case 'CHECK':
         case 'CHECKCIRCLE':
         case 'COMPLETED':
+            // FIX: Return JSX element instead of string key
             return ICONS.CHECK;
         case 'PENDING':
         case 'HOURGLASS':
         case 'HOURGLASSEMPTY':
         case 'SCHEDULE':
+            // FIX: Return JSX element instead of string key
             return ICONS.LOADING_SPINNER;
         case 'SYNC':
         case 'SETTINGS':
         case 'PROCESSING':
+             // FIX: Return JSX element instead of string key
              return ICONS.LOADING_SPINNER;
         case 'CANCEL':
         case 'CLOSE':
         case 'FAILED':
         case 'ERROR':
+            // FIX: Return JSX element instead of string key
             return ICONS.X_CIRCLE;
         default:
             const foundKey = Object.keys(ICONS).find(key => key.includes(normalizedName));

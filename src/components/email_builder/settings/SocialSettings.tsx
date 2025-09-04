@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -27,7 +28,8 @@ const LabeledControl = ({ label, children, fullWidth = false }: { label: string,
 
 const ColorInput = ({ value, onChange, onAdd, onRemove }: { value?: string; onChange: (hex: string) => void; onAdd: () => void; onRemove: () => void; }) => {
     if (!value || value === 'transparent') {
-        return <button onClick={onAdd} className="btn-icon color-input-add-btn"><Icon path={ICONS.PLUS}/></button>;
+        {/* FIX: Changed path prop to children for Icon component */}
+        return <button onClick={onAdd} className="btn-icon color-input-add-btn"><Icon>{ICONS.PLUS}</Icon></button>;
     }
     
     return (
@@ -42,7 +44,8 @@ const ColorInput = ({ value, onChange, onAdd, onRemove }: { value?: string; onCh
                 onChange={(e) => onChange(e.target.value)}
                 onFocus={(e) => e.target.select()}
             />
-             <button onClick={onRemove} className="btn-icon"><Icon path={ICONS.DELETE} /></button>
+             {/* FIX: Changed path prop to children for Icon component */}
+             <button onClick={onRemove} className="btn-icon"><Icon>{ICONS.DELETE}</Icon></button>
         </div>
     );
 };
@@ -67,7 +70,7 @@ const SliderControl = ({ label, value, onChange, min = 0, max = 100, step = 1 }:
     </div>
 );
 
-const SegmentedControl = ({ options, value, onChange, isIconOnly = false }: { options: { value: string, label?: string, icon?: string }[], value: string, onChange: (val: string) => void, isIconOnly?: boolean }) => (
+const SegmentedControl = ({ options, value, onChange, isIconOnly = false }: { options: { value: string, label?: string, icon?: React.ReactNode }[], value: string, onChange: (val: string) => void, isIconOnly?: boolean }) => (
     <div className={`segmented-control ${isIconOnly ? 'icon-only' : ''}`}>
         {options.map(opt => (
             <button
@@ -76,7 +79,8 @@ const SegmentedControl = ({ options, value, onChange, isIconOnly = false }: { op
                 onClick={() => onChange(opt.value)}
                 title={opt.label}
             >
-                {opt.icon && <Icon path={opt.icon} />}
+                {/* FIX: Changed path prop to children for Icon component */}
+                {opt.icon && <Icon>{opt.icon}</Icon>}
                 {!isIconOnly && opt.label && <span>{opt.label}</span>}
             </button>
         ))}
@@ -106,14 +110,17 @@ function SortableItem({ item, onUrlChange, onRemove }: { item: any, onUrlChange:
     return (
         <div ref={setNodeRef} style={style} className="social-item-row">
             <div className="drag-handle" {...attributes} {...listeners}>
-                <Icon path={ICONS.DRAG_HANDLE} />
+                {/* FIX: Changed path prop to children for Icon component */}
+                <Icon>{ICONS.DRAG_HANDLE}</Icon>
             </div>
-            {networkInfo && <Icon path={networkInfo.path} style={{ color: networkInfo.brandColor, flexShrink: 0 }} />}
+            {/* FIX: Changed path prop to children for Icon component */}
+            {networkInfo && <Icon style={{ color: networkInfo.brandColor, flexShrink: 0 }}>{networkInfo.path}</Icon>}
             <div className="form-group" style={{flexGrow: 1}}>
                  <label style={{fontSize: '0.8rem', marginBottom: '2px'}}>{t(item.network, {ns: 'translation', defaultValue: item.network})}</label>
                  <input type="url" value={item.url} onChange={(e) => onUrlChange(item.id, e.target.value)} placeholder={`https://...`} />
             </div>
-            <button className="btn-icon btn-icon-danger" onClick={() => onRemove(item.id)}><Icon path={ICONS.DELETE} /></button>
+            {/* FIX: Changed path prop to children for Icon component */}
+            <button className="btn-icon btn-icon-danger" onClick={() => onRemove(item.id)}><Icon>{ICONS.DELETE}</Icon></button>
         </div>
     );
 }

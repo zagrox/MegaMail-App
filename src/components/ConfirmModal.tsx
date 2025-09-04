@@ -11,7 +11,7 @@ interface ConfirmModalProps {
     title: string;
     children: React.ReactNode;
     confirmText?: string;
-    confirmIcon?: string;
+    confirmIcon?: React.ReactNode;
     isDestructive?: boolean;
 }
 
@@ -74,7 +74,8 @@ const ConfirmModal = ({
                             <Loader />
                         ) : (
                             <>
-                                <Icon path={confirmIcon} />
+                                {/* FIX: Changed path prop to children for Icon component */}
+                                <Icon>{confirmIcon}</Icon>
                                 <span>{confirmText || t('delete')}</span>
                             </>
                         )}

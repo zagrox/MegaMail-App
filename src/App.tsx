@@ -238,7 +238,7 @@ const App = () => {
         setIsMobileMenuOpen(false);
     }
     
-    const views: Record<string, { component: ReactNode, title: string, icon: string }> = {
+    const views: Record<string, { component: ReactNode, title: string, icon: React.ReactNode }> = {
         'Dashboard': { component: <DashboardView setView={handleSetView} apiKey={apiKey} user={user} />, title: t('dashboard'), icon: ICONS.DASHBOARD },
         'Statistics': { component: <StatisticsView apiKey={apiKey} />, title: t('statistics'), icon: ICONS.STATISTICS },
         'Account': { component: <AccountView apiKey={apiKey} user={user} setView={handleSetView} />, title: t('account'), icon: ICONS.ACCOUNT },
@@ -252,9 +252,9 @@ const App = () => {
         'Campaigns': { component: <CampaignsView apiKey={apiKey} setView={handleSetView} />, title: t('campaigns'), icon: ICONS.CAMPAIGNS },
         'CampaignDetail': { component: <CampaignDetailView apiKey={apiKey} campaign={selectedCampaign} onBack={() => handleSetView('Campaigns')} />, title: selectedCampaign?.Name || t('campaigns'), icon: ICONS.CAMPAIGNS },
         'Templates': { component: <TemplatesView apiKey={apiKey} setView={handleSetView} />, title: t('templates'), icon: ICONS.ARCHIVE },
-        'Email Builder': { component: <EmailBuilderView apiKey={apiKey} user={user} templateToEdit={templateToEdit} />, title: t('emailBuilder'), icon: ICONS.PENCIL },
+        'Email Builder': { component: <EmailBuilderView apiKey={apiKey} user={user} templateToEdit={templateToEdit} />, title: t('emailBuilder'), icon: ICONS.LAYERS },
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
-        'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} />, title: t('marketingCampaign'), icon: ICONS.STAR },
+        'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} />, title: t('marketingCampaign'), icon: ICONS.CALENDAR },
         'Domains': { component: <DomainsView apiKey={apiKey} />, title: t('domains'), icon: ICONS.DOMAINS },
         'SMTP': { component: <SmtpView apiKey={apiKey} user={user}/>, title: t('smtp'), icon: ICONS.SMTP }
     };
@@ -263,14 +263,14 @@ const App = () => {
         { name: t('dashboard'), view: 'Dashboard', icon: ICONS.DASHBOARD },
         { name: t('statistics'), view: 'Statistics', icon: ICONS.STATISTICS },
         { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
-        { name: t('marketing'), view: 'Marketing', icon: ICONS.STAR },
+        { name: t('marketing'), view: 'Marketing', icon: ICONS.CALENDAR },
         { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
         { type: 'divider' },
         { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
         { name: t('emailLists'), view: 'Email Lists', icon: ICONS.EMAIL_LISTS },
         { type: 'divider' },
         { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
-        { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.PENCIL },
+        { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
         { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
         { name: t('smtp'), view: 'SMTP', icon: ICONS.SMTP },
     ];
@@ -290,7 +290,7 @@ const App = () => {
                 if ('type' in item && item.type === 'divider') {
                     return <hr key={`divider-${index}`} className="nav-divider" />;
                 }
-                const navItem = item as { name: string; view: string; icon: string; };
+                const navItem = item as { name: string; view: string; icon: React.ReactNode; };
                 const hasAccess = hasModuleAccess(navItem.view, allModules);
 
                 const moduleData = allModules?.find(m => m.modulename === navItem.view);
@@ -301,14 +301,13 @@ const App = () => {
 
                 return (
                     <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
-                        <Icon path={navItem.icon} />
+                        <Icon>{navItem.icon}</Icon>
                         <span>{navItem.name}</span>
                         {isLocked && (
                             <Icon
-                                path={isPromotional ? ICONS.GIFT : ICONS.LOCK}
                                 className="lock-icon"
                                 style={isPromotional ? { color: 'var(--success-color)' } : {}}
-                            />
+                            >{isPromotional ? ICONS.GIFT : ICONS.LOCK}</Icon>
                         )}
                     </button>
                 )
@@ -316,11 +315,11 @@ const App = () => {
         </nav>
         <div className="sidebar-footer-nav">
              <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
-                <Icon path={ICONS.BUY_CREDITS} />
+                <Icon>{ICONS.BUY_CREDITS}</Icon>
                 <span>{t('buyCredits')}</span>
              </button>
              <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
-                 <Icon path={ICONS.ACCOUNT} />
+                 <Icon>{ICONS.ACCOUNT}</Icon>
                  <span>{t('account')}</span>
              </button>
         </div>
@@ -346,11 +345,11 @@ const App = () => {
             <div className="main-wrapper">
                 <header className="mobile-header">
                      <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)} aria-label={t('openMenu')}>
-                        <Icon path={ICONS.MENU} />
+                        <Icon>{ICONS.MENU}</Icon>
                     </button>
                     <h1 className="mobile-header-title">{currentView?.title || appName}</h1>
                     <button className="mobile-menu-toggle" onClick={() => handleSetView('Account')} aria-label={t('account')}>
-                        <Icon path={ICONS.ACCOUNT} />
+                        <Icon>{ICONS.ACCOUNT}</Icon>
                     </button>
                 </header>
                 <main className={`content ${view === 'Email Builder' || view === 'Marketing' ? 'content--no-padding' : ''}`}>

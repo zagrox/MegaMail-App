@@ -137,7 +137,8 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                                 />
                             )}
                         </div>
-                        <Icon path={ICONS.CALENDAR} className="sending-option-card-icon" />
+                        {/* FIX: Changed path prop to children for Icon component */}
+                        <Icon className="sending-option-card-icon">{ICONS.CALENDAR}</Icon>
                     </div>
                 </label>
                 <label
@@ -157,7 +158,8 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                     <div className="selection-card-radio"></div>
                     <div className="sending-option-card-content">
                         <h4 className="sending-option-card-title">Send Now</h4>
-                        <Icon path={ICONS.SEND_EMAIL} className="sending-option-card-icon" />
+                        {/* FIX: Changed path prop to children for Icon component */}
+                        <Icon className="sending-option-card-icon">{ICONS.SEND_EMAIL}</Icon>
                     </div>
                 </label>
                 <label
@@ -176,7 +178,8 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                     <div className="selection-card-radio"></div>
                     <div className="sending-option-card-content">
                         <h4 className="sending-option-card-title">Save for Later</h4>
-                        <Icon path={ICONS.SAVE_CHANGES} className="sending-option-card-icon" />
+                        {/* FIX: Changed path prop to children for Icon component */}
+                        <Icon className="sending-option-card-icon">{ICONS.SAVE_CHANGES}</Icon>
                     </div>
                 </label>
             </div>

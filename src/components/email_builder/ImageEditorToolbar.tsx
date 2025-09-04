@@ -41,7 +41,8 @@ const PaddingControl = ({ style, onStyleChange }: { style: any, onStyleChange: a
                     onClick={() => setIsLinked(!isLinked)}
                     title={t('paddingLinked')}
                 >
-                    <Icon path={ICONS.LINK} />
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <Icon>{ICONS.LINK}</Icon>
                 </button>
 
                 <NumberInput className="padding-input right" title="Right" value={getPixelValue(style.paddingRight)} onChange={e => onStyleChange('paddingRight', `${e.target.value}px`)} />
@@ -104,9 +105,12 @@ const ImageEditorToolbar = ({ block, canvasWrapperRef, onStyleChange, onContentC
     return (
         <div ref={toolbarRef} className="editor-toolbar image-editor-toolbar" style={toolbarState} onMouseDown={e => e.preventDefault()}>
             <div className="editor-toolbar-section">
-                <button onClick={() => handleStyleChange('textAlign', 'left')} className={currentStyle.textAlign === 'left' ? 'active' : ''} title={t('alignLeft')}><Icon path={ICONS.ALIGN_LEFT} /></button>
-                <button onClick={() => handleStyleChange('textAlign', 'center')} className={currentStyle.textAlign === 'center' ? 'active' : ''} title={t('alignCenter')}><Icon path={ICONS.ALIGN_CENTER} /></button>
-                <button onClick={() => handleStyleChange('textAlign', 'right')} className={currentStyle.textAlign === 'right' ? 'active' : ''} title={t('alignRight')}><Icon path={ICONS.ALIGN_RIGHT} /></button>
+                {/* FIX: Changed path prop to children for Icon component */}
+                <button onClick={() => handleStyleChange('textAlign', 'left')} className={currentStyle.textAlign === 'left' ? 'active' : ''} title={t('alignLeft')}><Icon>{ICONS.ALIGN_LEFT}</Icon></button>
+                {/* FIX: Changed path prop to children for Icon component */}
+                <button onClick={() => handleStyleChange('textAlign', 'center')} className={currentStyle.textAlign === 'center' ? 'active' : ''} title={t('alignCenter')}><Icon>{ICONS.ALIGN_CENTER}</Icon></button>
+                {/* FIX: Changed path prop to children for Icon component */}
+                <button onClick={() => handleStyleChange('textAlign', 'right')} className={currentStyle.textAlign === 'right' ? 'active' : ''} title={t('alignRight')}><Icon>{ICONS.ALIGN_RIGHT}</Icon></button>
             </div>
             
              <div className="editor-toolbar-section">
@@ -150,7 +154,8 @@ const ImageEditorToolbar = ({ block, canvasWrapperRef, onStyleChange, onContentC
             </div>
 
             <div className="editor-toolbar-section">
-                <Icon path={ICONS.LINK} />
+                {/* FIX: Changed path prop to children for Icon component */}
+                <Icon>{ICONS.LINK}</Icon>
                 <input
                     type="url"
                     className="editor-toolbar-link-input"

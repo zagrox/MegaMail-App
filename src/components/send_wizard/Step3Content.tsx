@@ -121,7 +121,8 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
             <Modal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} title={t('templates')}>
                 <div className="template-selector-modal">
                     <div className="search-bar" style={{marginBottom: '1rem'}}>
-                        <Icon path={ICONS.SEARCH} />
+                        {/* FIX: Changed path prop to children for Icon component */}
+                        <Icon>{ICONS.SEARCH}</Icon>
                         <input
                             type="search"
                             placeholder={t('searchTemplatesPlaceholder')}
@@ -165,8 +166,10 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
                     <div className="template-selector-display" onClick={() => setIsTemplateModalOpen(true)}>
                         {isLoadingTemplate ? <Loader /> : (data.template || t('useTemplate'))}
                     </div>
-                    <button className="btn-icon" onClick={() => setIsTemplateModalOpen(true)} aria-label={t('changeTemplate')}><Icon path={ICONS.SETTINGS} /></button>
-                    <button className="btn-icon" onClick={handlePreview} disabled={!data.template || isLoadingTemplate} aria-label={t('previewTemplate')}><Icon path={ICONS.EYE} /></button>
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <button className="btn-icon" onClick={() => setIsTemplateModalOpen(true)} aria-label={t('changeTemplate')}><Icon>{ICONS.SETTINGS}</Icon></button>
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <button className="btn-icon" onClick={handlePreview} disabled={!data.template || isLoadingTemplate} aria-label={t('previewTemplate')}><Icon>{ICONS.EYE}</Icon></button>
 
                     <label>From Name</label>
                     <input type="text" name="fromName" value={data.fromName} onChange={handleChange} className="full-width" style={{gridColumn: '2 / -1'}} />

@@ -139,7 +139,8 @@ const ExportContactsModal = ({ isOpen, onClose, apiKey, selectedStatuses, listNa
                 <div className="form-actions" style={{ marginTop: '1rem' }}>
                     <button type="button" className="btn" onClick={onClose} disabled={isExporting}>{t('cancel')}</button>
                     <button type="submit" className="btn btn-primary" disabled={isExporting}>
-                        {isExporting ? <Loader /> : <><Icon path={ICONS.DOWNLOAD} /> <span>{t('export')}</span></>}
+                        {/* FIX: Changed path prop to children for Icon component */}
+                        {isExporting ? <Loader /> : <><Icon>{ICONS.DOWNLOAD}</Icon> <span>{t('export')}</span></>}
                     </button>
                 </div>
             </form>

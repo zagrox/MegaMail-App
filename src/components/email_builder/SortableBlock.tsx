@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -73,18 +74,22 @@ export const SortableBlock = (props: SortableBlockProps) => {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="canvas-item-actions-bar-left">
-                           <Icon path={ICONS.DRAG_HANDLE} />
+                           {/* FIX: Changed path prop to children for Icon component */}
+                           <Icon>{ICONS.DRAG_HANDLE}</Icon>
                            <span>{getBlockTypeTranslationKey(item.type)}</span>
                         </div>
                         <div className="canvas-item-actions-bar-right">
+                            {/* FIX: Changed path prop to children for Icon component */}
                             <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onEdit(id); }} aria-label={t('editBlock')}>
-                                <Icon path={ICONS.PENCIL} />
+                                <Icon>{ICONS.PENCIL}</Icon>
                             </button>
+                            {/* FIX: Changed path prop to children for Icon component */}
                             <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onDuplicate(id); }} aria-label={t('duplicateBlock')}>
-                                <Icon path={ICONS.DUPLICATE} />
+                                <Icon>{ICONS.DUPLICATE}</Icon>
                             </button>
+                            {/* FIX: Changed path prop to children for Icon component */}
                             <button className="btn-icon btn-icon-danger" onClick={(e) => { e.stopPropagation(); onRemove(id); }} aria-label={t('deleteBlock')}>
-                                <Icon path={ICONS.DELETE} />
+                                <Icon>{ICONS.DELETE}</Icon>
                             </button>
                         </div>
                     </div>
@@ -95,7 +100,8 @@ export const SortableBlock = (props: SortableBlockProps) => {
                             onClick={(e) => { e.stopPropagation(); setIsAddPopoverOpen(p => !p); }}
                             aria-label={t('addBlock')}
                         >
-                            <Icon path={ICONS.PLUS} />
+                            {/* FIX: Changed path prop to children for Icon component */}
+                            <Icon>{ICONS.PLUS}</Icon>
                         </button>
                         {isAddPopoverOpen && (
                             <AddBlockPopover onSelectBlockType={handleInsert} onClose={() => setIsAddPopoverOpen(false)} />

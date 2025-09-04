@@ -38,7 +38,8 @@ const AddBlockPopover = ({ onSelectBlockType, onClose }: AddBlockPopoverProps) =
                     className="add-block-popover-item"
                     onClick={() => handleSelect(comp.type)}
                 >
-                    <Icon path={comp.icon} />
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <Icon>{comp.icon}</Icon>
                     <span>{t(comp.type.toLowerCase())}</span>
                 </button>
             ))}

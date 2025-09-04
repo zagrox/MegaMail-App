@@ -69,14 +69,14 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     const staticNavItems = useMemo(() => [
         { name: t('statistics'), icon: ICONS.STATISTICS, desc: t('statisticsDesc'), view: 'Statistics' },
         { name: t('contacts'), icon: ICONS.CONTACTS, desc: t('contactsDesc'), view: 'Contacts' },
-        { name: t('marketing'), icon: ICONS.STAR, desc: t('marketingDesc'), view: 'Marketing' },
+        { name: t('marketing'), icon: ICONS.CALENDAR, desc: t('marketingDesc'), view: 'Marketing' },
         { name: t('sendEmail'), icon: ICONS.SEND_EMAIL, desc: t('sendEmailDesc'), view: 'Send Email' },
         { name: t('emailLists'), icon: ICONS.EMAIL_LISTS, desc: t('emailListsDesc'), view: 'Email Lists' },
         { name: t('segments'), icon: ICONS.SEGMENTS, desc: t('segmentsDesc'), view: 'Segments' },
         { name: t('mediaManager'), icon: ICONS.FOLDER, desc: t('mediaManagerDesc'), view: 'Media Manager' },
         { name: t('campaigns'), icon: ICONS.CAMPAIGNS, desc: t('campaignsDesc'), view: 'Campaigns' },
         { name: t('templates'), icon: ICONS.ARCHIVE, desc: t('templatesDesc'), view: 'Templates' },
-        { name: t('emailBuilder'), icon: ICONS.PENCIL, desc: t('emailBuilderDesc'), view: 'Email Builder' },
+        { name: t('emailBuilder'), icon: ICONS.LAYERS, desc: t('emailBuilderDesc'), view: 'Email Builder' },
         { name: t('domains'), icon: ICONS.DOMAINS, desc: t('domainsDesc'), view: 'Domains' },
         { name: t('smtp'), icon: ICONS.SMTP, desc: t('smtpDesc'), view: 'SMTP' },
     ], [t]);
@@ -111,18 +111,18 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                         </div>
                         <div className="dashboard-actions">
                             <Button className="btn-credits" onClick={() => setView('Buy Credits')}>
-                                <Icon path={ICONS.BUY_CREDITS} />
+                                <Icon>{ICONS.BUY_CREDITS}</Icon>
                                 {accountLoading ? t('loadingCredits') : `${t('credits')}: ${Number(accountData?.emailcredits ?? 0).toLocaleString(i18n.language)}`}
                             </Button>
                             <Button className="btn-secondary btn-notifications" onClick={handleNotificationsClick} title={t('notifications')}>
-                                <Icon path={ICONS.BELL} />
+                                <Icon>{ICONS.BELL}</Icon>
                                 {unreadCount > 0 && <span className="notification-dot"></span>}
                             </Button>
                         </div>
                     </div>
                     <div className="cta-banner">
                         <div className="cta-banner-icon">
-                            <Icon path={ICONS.CAMPAIGNS} />
+                            <Icon>{ICONS.AT_SIGN}</Icon>
                         </div>
                         <div className="cta-banner-text">
                             <h3 className="cta-banner-title">{t('startEmailMarketingTitle')}</h3>
@@ -130,7 +130,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                         </div>
                         <div className="cta-banner-action">
                             <Button className="btn-primary" onClick={() => setView('Marketing')} action={AppActions.START_MARKETING_CAMPAIGN}>
-                                <Icon path={ICONS.SEND_EMAIL} /> {t('createCampaign')}
+                                <Icon>{ICONS.SEND_EMAIL}</Icon> {t('createCampaign')}
                             </Button>
                         </div>
                     </div>
@@ -138,7 +138,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
             )}
 
             <div className="dashboard-stats-grid">
-                <AccountDataCard title={t('sendingReputation')} iconPath={ICONS.TRENDING_UP}>
+                <AccountDataCard title={t('sendingReputation')} iconPath={ICONS.AWARD}>
                     {accountLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : (accountData?.reputation ? `${accountData.reputation}%` : 'N/A')}
                 </AccountDataCard>
                 <AccountDataCard title={t('emailsSent365d')} iconPath={ICONS.MAIL}>
@@ -189,10 +189,10 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                                         >
                                             {isLocked && (
                                                 <div className="lock-icon-overlay" style={isPromotional ? { color: 'var(--success-color)' } : {}}>
-                                                    <Icon path={isPromotional ? ICONS.GIFT : ICONS.LOCK} />
+                                                    <Icon>{isPromotional ? ICONS.GIFT : ICONS.LOCK}</Icon>
                                                 </div>
                                             )}
-                                            <Icon path={item.icon} className="nav-card-icon" />
+                                            <Icon className="nav-card-icon">{item.icon}</Icon>
                                             <div className="nav-card-text-content">
                                                 <div className="nav-card-title">{item.name}</div>
                                                 <div className="nav-card-description">{item.desc}</div>

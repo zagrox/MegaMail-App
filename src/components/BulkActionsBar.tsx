@@ -20,11 +20,13 @@ const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ count, onDeselectAll, o
             </div>
             <div className="bulk-actions-bar-actions">
                 <button className="btn btn-secondary" onClick={onAddToList}>
-                    <Icon path={ICONS.PLUS} />
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <Icon>{ICONS.PLUS}</Icon>
                     <span>{t('addToListOptional')}</span>
                 </button>
                 <button className="btn btn-danger" onClick={onDelete}>
-                    <Icon path={ICONS.DELETE} />
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <Icon>{ICONS.DELETE}</Icon>
                     <span>{t('delete')}</span>
                 </button>
             </div>

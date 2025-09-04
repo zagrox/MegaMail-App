@@ -388,14 +388,16 @@ const SocialBlock = ({ item }: { item: any }) => {
                     return (
                         <a key={socialItem.id} href={socialItem.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.preventDefault()}>
                             <div style={itemStyle}>
+                                {/* FIX: Changed path prop to children for Icon component */}
                                 <Icon 
-                                    path={socialInfo.path} 
                                     style={{ 
                                         color: s.iconStyle === 'default' ? colors.bg : colors.icon,
                                         width: `${iconSize}px`,
                                         height: `${iconSize}px`
                                     }}
-                                />
+                                >
+                                    {socialInfo.path}
+                                </Icon>
                             </div>
                         </a>
                     );

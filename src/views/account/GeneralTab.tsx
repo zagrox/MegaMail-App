@@ -37,7 +37,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
                 <AccountDataCard title={t('accountStatus')} iconPath={ICONS.VERIFY}>
                     <Badge text={statusStyle.text} type={statusStyle.type} iconPath={statusStyle.iconPath} />
                 </AccountDataCard>
-                <AccountDataCard title={t('reputation')} iconPath={ICONS.TRENDING_UP}>
+                <AccountDataCard title={t('reputation')} iconPath={ICONS.AWARD}>
                     <span className={`reputation-score ${reputation.className}`}>{accountData?.reputation ?? 0}%</span>
                     <span className="reputation-text">{reputation.text}</span>
                 </AccountDataCard>
@@ -77,7 +77,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
                     <div className="account-tab-card-body">
                         <p>{t('installAppSubtitle')}</p>
                         <button className="btn btn-secondary" onClick={handleInstallClick} style={{maxWidth: '250px'}}>
-                            <Icon path={ICONS.DOWNLOAD} /> {t('installMailzila', { appName })}
+                            <Icon>{ICONS.DOWNLOAD}</Icon> {t('installMailzila', { appName })}
                         </button>
                     </div>
                 </div>
@@ -90,7 +90,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
                 <div className="account-tab-card-body">
                     <p>{t('logoutDescription')}</p>
                     <button className="btn btn-secondary" onClick={logout} style={{maxWidth: '250px'}}>
-                        <Icon path={ICONS.LOGOUT} />
+                        <Icon>{ICONS.LOGOUT}</Icon>
                         <span>{t('logout')}</span>
                     </button>
                 </div>

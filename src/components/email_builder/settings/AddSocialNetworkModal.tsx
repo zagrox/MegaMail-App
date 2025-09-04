@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from '../../Modal';
@@ -28,7 +29,8 @@ const AddSocialNetworkModal: React.FC<AddSocialNetworkModalProps> = ({ isOpen, o
                         style={{ width: '100%', height: '100px', cursor: 'pointer' }}
                         onClick={() => onSelect(network)}
                     >
-                        <Icon path={SOCIAL_ICONS[network].path} style={{ color: SOCIAL_ICONS[network].brandColor, width: '32px', height: '32px' }} />
+                        {/* FIX: Changed path prop to children for Icon component */}
+                        <Icon style={{ color: SOCIAL_ICONS[network].brandColor, width: '32px', height: '32px' }}>{SOCIAL_ICONS[network].path}</Icon>
                         <span>{t(network, { ns: 'translation', defaultValue: network })}</span>
                     </button>
                 ))}

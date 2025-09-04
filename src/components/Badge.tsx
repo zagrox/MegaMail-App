@@ -5,7 +5,7 @@ interface BadgeProps {
     text: string;
     type?: 'success' | 'warning' | 'danger' | 'info' | 'default';
     color?: string; // Hex color for specific styling
-    iconPath?: string;
+    iconPath?: React.ReactNode;
 }
 
 const hexToRgba = (hex?: string, alpha = 0.1): string => {
@@ -31,7 +31,8 @@ const Badge = ({ text, type = 'default', color, iconPath }: BadgeProps) => {
 
     return (
         <span className={`badge badge-${type}`} style={style}>
-            {iconPath && <Icon path={iconPath} className="icon" style={{ width: '1em', height: '1em', marginRight: '0.4em', verticalAlign: 'text-bottom' }} />}
+            {/* FIX: Changed path prop to children for Icon component */}
+            {iconPath && <Icon className="icon" style={{ width: '1em', height: '1em', marginRight: '0.4em', verticalAlign: 'text-bottom' }}>{iconPath}</Icon>}
             {text}
         </span>
     );

@@ -44,7 +44,8 @@ const WizardLayout = ({
                     onClick={onBack}
                     disabled={isSubmitting}
                 >
-                    <Icon path={ICONS.CHEVRON_LEFT} />
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                     <span>{t('back')}</span>
                 </button>
                 {!isLastStep ? (
@@ -55,7 +56,8 @@ const WizardLayout = ({
                         action={nextAction}
                     >
                         <span>{t('next')}</span>
-                        <Icon path={ICONS.CHEVRON_RIGHT} />
+                        {/* FIX: Changed path prop to children for Icon component */}
+                        <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                     </Button>
                 ) : (
                     <Button
@@ -66,7 +68,8 @@ const WizardLayout = ({
                     >
                         {isSubmitting ? <Loader /> : (
                             <>
-                                <Icon path={ICONS.SEND_EMAIL} />
+                                {/* FIX: Changed path prop to children for Icon component */}
+                                <Icon>{ICONS.SEND_EMAIL}</Icon>
                                 <span>{t('submit')}</span>
                             </>
                         )}

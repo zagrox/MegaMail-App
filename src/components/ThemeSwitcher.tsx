@@ -11,7 +11,8 @@ const ThemeSwitcher = () => {
     const { theme, setTheme } = useTheme();
     const { updateUser, user } = useAuth();
 
-    const options: { value: Theme; label: string; icon: string; }[] = [
+    // FIX: Changed icon type to React.ReactNode to accept JSX elements
+    const options: { value: Theme; label: string; icon: React.ReactNode; }[] = [
         { value: 'light', label: t('themeLight'), icon: ICONS.SUN },
         { value: 'dark', label: t('themeDark'), icon: ICONS.MOON },
         { value: 'auto', label: t('themeSystem'), icon: ICONS.DESKTOP },
@@ -50,7 +51,8 @@ const ThemeSwitcher = () => {
                     onClick={() => handleThemeChange(option.value)}
                     aria-label={t('switchToTheme', { theme: option.label })}
                 >
-                    <Icon path={option.icon} />
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <Icon>{option.icon}</Icon>
                     <span>{option.label}</span>
                 </button>
             ))}

@@ -92,15 +92,21 @@ const EditorToolbar = ({ block, canvasWrapperRef, onStyleChange, onContentChange
             </div>
 
             <div className="editor-toolbar-section">
-                <button onClick={() => handleStyleCommand('bold')} title={t('bold')}><Icon path={ICONS.BOLD} /></button>
-                <button onClick={() => handleStyleCommand('italic')} title={t('italic')}><Icon path={ICONS.ITALIC} /></button>
-                <button onClick={handleLink} title={t('link')}><Icon path={ICONS.LINK} /></button>
+                {/* FIX: Changed path prop to children for Icon component */}
+                <button onClick={() => handleStyleCommand('bold')} title={t('bold')}><Icon>{ICONS.BOLD}</Icon></button>
+                {/* FIX: Changed path prop to children for Icon component */}
+                <button onClick={() => handleStyleCommand('italic')} title={t('italic')}><Icon>{ICONS.ITALIC}</Icon></button>
+                {/* FIX: Changed path prop to children for Icon component */}
+                <button onClick={handleLink} title={t('link')}><Icon>{ICONS.LINK}</Icon></button>
             </div>
             
             <div className="editor-toolbar-section">
-                <button onClick={() => handleStyleChange('textAlign', 'left')} className={currentStyle.textAlign === 'left' ? 'active' : ''} title={t('alignLeft')}><Icon path={ICONS.ALIGN_LEFT} /></button>
-                <button onClick={() => handleStyleChange('textAlign', 'center')} className={currentStyle.textAlign === 'center' ? 'active' : ''} title={t('alignCenter')}><Icon path={ICONS.ALIGN_CENTER} /></button>
-                <button onClick={() => handleStyleChange('textAlign', 'right')} className={currentStyle.textAlign === 'right' ? 'active' : ''} title={t('alignRight')}><Icon path={ICONS.ALIGN_RIGHT} /></button>
+                {/* FIX: Changed path prop to children for Icon component */}
+                <button onClick={() => handleStyleChange('textAlign', 'left')} className={currentStyle.textAlign === 'left' ? 'active' : ''} title={t('alignLeft')}><Icon>{ICONS.ALIGN_LEFT}</Icon></button>
+                {/* FIX: Changed path prop to children for Icon component */}
+                <button onClick={() => handleStyleChange('textAlign', 'center')} className={currentStyle.textAlign === 'center' ? 'active' : ''} title={t('alignCenter')}><Icon>{ICONS.ALIGN_CENTER}</Icon></button>
+                {/* FIX: Changed path prop to children for Icon component */}
+                <button onClick={() => handleStyleChange('textAlign', 'right')} className={currentStyle.textAlign === 'right' ? 'active' : ''} title={t('alignRight')}><Icon>{ICONS.ALIGN_RIGHT}</Icon></button>
             </div>
         </div>
     );

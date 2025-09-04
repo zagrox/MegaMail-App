@@ -62,7 +62,8 @@ const AddContactToListModal: React.FC<AddContactToListModalProps> = ({ isOpen, o
                         {t('cancel')}
                     </button>
                     <button type="submit" className="btn btn-primary" disabled={isSubmitting || !emails.trim()}>
-                        {isSubmitting ? <Loader /> : <><Icon path={ICONS.USER_PLUS} /><span>{t('addContact')}</span></>}
+                        {/* FIX: Changed path prop to children for Icon component */}
+                        {isSubmitting ? <Loader /> : <><Icon>{ICONS.USER_PLUS}</Icon><span>{t('addContact')}</span></>}
                     </button>
                 </div>
             </form>

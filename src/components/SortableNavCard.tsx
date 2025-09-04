@@ -28,7 +28,8 @@ export const SortableNavCard = ({ id, item, setView }: { id: string; item: { nam
             {...listeners}
             onClick={() => setView(item.view)}
         >
-            <Icon path={item.icon} className="nav-card-icon" />
+            {/* FIX: Changed path prop to children for Icon component */}
+            <Icon className="nav-card-icon">{item.icon as any}</Icon>
             <div className="nav-card-text-content">
                 <div className="nav-card-title">{item.name}</div>
                 <div className="nav-card-description">{item.desc}</div>

@@ -57,7 +57,8 @@ const MultiSelectSearch: React.FC<MultiSelectSearchProps> = ({
     return (
         <div className="multi-select-container" ref={containerRef}>
             <div className="multi-select-input-wrapper">
-                <Icon path={ICONS.HASH} className="multi-select-icon" />
+                {/* FIX: Changed path prop to children for Icon component */}
+                <Icon className="multi-select-icon">{ICONS.HASH}</Icon>
                 <input
                     type="search"
                     className="multi-select-input"

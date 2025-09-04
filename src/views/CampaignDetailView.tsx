@@ -354,7 +354,8 @@ const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string; camp
         <div>
             <div className="campaign-detail-header">
                 <button className="btn btn-secondary" onClick={onBack}>
-                    <Icon path={ICONS.CHEVRON_LEFT} />
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                     <span>{t('campaigns')}</span>
                 </button>
                 <h2>{campaign.Name}</h2>

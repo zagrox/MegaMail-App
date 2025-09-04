@@ -31,10 +31,12 @@ const ActionStatus: React.FC<ActionStatusProps> = ({ status, onDismiss }) => {
 
     return (
         <div className={`action-status info-message ${currentConfig.className}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            <Icon path={currentConfig.icon} />
+            {/* FIX: Changed path prop to children for Icon component */}
+            <Icon>{currentConfig.icon}</Icon>
             <p style={{ margin: '0 0.75rem', flexGrow: 1 }}>{status.message}</p>
             <button onClick={onDismiss} className="btn-icon" style={{alignSelf: 'center'}}>
-                <Icon path={ICONS.DELETE} />
+                {/* FIX: Changed path prop to children for Icon component */}
+                <Icon>{ICONS.DELETE}</Icon>
             </button>
         </div>
     );

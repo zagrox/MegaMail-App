@@ -193,7 +193,8 @@ const ToolbarItem = ({ component, onAddComponent }: { component: typeof TOOLBAR_
                 }
             }}
         >
-            <Icon path={component.icon} />
+            {/* FIX: Changed path prop to children for Icon component */}
+            <Icon>{component.icon}</Icon>
             <span>{t(component.type.toLowerCase())}</span>
         </div>
     );
