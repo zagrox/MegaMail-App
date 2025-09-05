@@ -13,7 +13,7 @@ interface AddSocialNetworkModalProps {
 }
 
 const AddSocialNetworkModal: React.FC<AddSocialNetworkModalProps> = ({ isOpen, onClose, onSelect, existingNetworks }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
 
     const availableNetworks = Object.keys(SOCIAL_ICONS).filter(
         network => !existingNetworks.includes(network)
@@ -31,7 +31,7 @@ const AddSocialNetworkModal: React.FC<AddSocialNetworkModalProps> = ({ isOpen, o
                     >
                         {/* FIX: Changed path prop to children for Icon component */}
                         <Icon style={{ color: SOCIAL_ICONS[network].brandColor, width: '32px', height: '32px' }}>{SOCIAL_ICONS[network].path}</Icon>
-                        <span>{t(network, { ns: 'translation', defaultValue: network })}</span>
+                        <span>{t(network, { ns: 'emailBuilder', defaultValue: network })}</span>
                     </button>
                 ))}
             </div>

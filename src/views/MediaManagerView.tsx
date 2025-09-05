@@ -16,7 +16,7 @@ import FileUploadModal from '../components/media_manager/FileUploadModal';
 import Button from '../components/Button';
 
 const FilePreviewModal = ({ isOpen, onClose, fileInfo, apiKey }: { isOpen: boolean; onClose: () => void; fileInfo: FileInfo | null; apiKey: string; }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['mediaManager', 'common']);
     const [contentUrl, setContentUrl] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -92,7 +92,7 @@ const FilePreviewModal = ({ isOpen, onClose, fileInfo, apiKey }: { isOpen: boole
 };
 
 const FileCard = React.memo(({ fileInfo, apiKey, onView, onDelete }: { fileInfo: FileInfo, apiKey: string, onView: (file: FileInfo) => void, onDelete: (fileName: string) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['mediaManager', 'common']);
     const downloadUrl = `${ELASTIC_EMAIL_API_V4_BASE}/files/${encodeURIComponent(fileInfo.FileName)}?apiKey=${apiKey}`;
     const isImage = /\.(jpe?g|png|gif|webp|svg)$/i.test(fileInfo.FileName);
 
@@ -127,7 +127,7 @@ const FileCard = React.memo(({ fileInfo, apiKey, onView, onDelete }: { fileInfo:
 });
 
 const FileGridCard = React.memo(({ fileInfo, apiKey, onView, onDelete }: { fileInfo: FileInfo, apiKey: string, onView: (file: FileInfo) => void, onDelete: (fileName: string) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['mediaManager', 'common']);
     const downloadUrl = `${ELASTIC_EMAIL_API_V4_BASE}/files/${encodeURIComponent(fileInfo.FileName)}?apiKey=${apiKey}`;
     const isImage = /\.(jpe?g|png|gif|webp|svg)$/i.test(fileInfo.FileName);
 
@@ -162,7 +162,7 @@ const FileGridCard = React.memo(({ fileInfo, apiKey, onView, onDelete }: { fileI
 
 
 const MediaManagerView = ({ apiKey }: { apiKey: string }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['mediaManager', 'common']);
     const { addToast } = useToast();
     const [refetchIndex, setRefetchIndex] = useState(0);
     const { data: files, loading, error } = useApiV4('/files', apiKey, {}, refetchIndex);

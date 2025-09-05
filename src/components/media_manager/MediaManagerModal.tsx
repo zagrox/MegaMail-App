@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../../hooks/useApiV4';
@@ -48,7 +49,7 @@ const FileListCardSelect = ({ fileInfo, apiKey, onSelect }: { fileInfo: FileInfo
 
 
 const MediaManagerModal = ({ isOpen, onClose, apiKey, onSelect }: { isOpen: boolean, onClose: () => void, apiKey: string, onSelect: (file: FileInfo) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['mediaManager', 'common']);
     const [refetchIndex, setRefetchIndex] = useState(0);
     const { data: allFiles, loading, error } = useApiV4(isOpen ? '/files' : '', apiKey, { limit: 1000 }, isOpen ? refetchIndex : 0);
 
@@ -114,12 +115,12 @@ const MediaManagerModal = ({ isOpen, onClose, apiKey, onSelect }: { isOpen: bool
     }, [sortedAndFilteredFiles, currentPage, FILES_PER_PAGE]);
 
     const sortOptions = {
-        "DateAdded-descending": "Recent first",
-        "DateAdded-ascending": "Oldest first",
-        "FileName-ascending": "Name (A-Z)",
-        "FileName-descending": "Name (Z-A)",
-        "Size-descending": "Size (Largest)",
-        "Size-ascending": "Size (Smallest)",
+        "DateAdded-descending": t('sortRecentFirst'),
+        "DateAdded-ascending": t('sortOldestFirst'),
+        "FileName-ascending": t('sortNameAZ'),
+        "FileName-descending": t('sortNameZA'),
+        "Size-descending": t('sortSizeLargest'),
+        "Size-ascending": t('sortSizeSmallest'),
     };
     
     // The wrapper div is necessary to scope the CSS for a larger modal
@@ -140,22 +141,18 @@ const MediaManagerModal = ({ isOpen, onClose, apiKey, onSelect }: { isOpen: bool
                    
                     <div className="view-header">
                         <div className="search-bar">
-                            {/* FIX: Changed path prop to children for Icon component */}
                             <Icon>{ICONS.SEARCH}</Icon>
                             <input type="search" placeholder={t('search')} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
                         </div>
                         <div className="header-actions">
                             <div className="view-switcher">
-                                {/* FIX: Changed path prop to children for Icon component */}
                                 <button onClick={() => setViewMode('list')} className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`}><Icon>{ICONS.EMAIL_LISTS}</Icon></button>
-                                {/* FIX: Changed path prop to children for Icon component */}
                                 <button onClick={() => setViewMode('grid')} className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`}><Icon>{ICONS.DASHBOARD}</Icon></button>
                             </div>
                             <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
                                 {Object.entries(sortOptions).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                             </select>
                             <button className="btn btn-primary" onClick={() => setIsUploadModalOpen(true)}>
-                                {/* FIX: Changed path prop to children for Icon component */}
                                 <Icon>{ICONS.UPLOAD}</Icon> {t('uploadFile')}
                             </button>
                         </div>
@@ -187,10 +184,8 @@ const MediaManagerModal = ({ isOpen, onClose, apiKey, onSelect }: { isOpen: bool
                             
                              {totalPages > 1 && (
                                 <div className="pagination-controls">
-                                    {/* FIX: Changed path prop to children for Icon component */}
                                     <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><Icon>{ICONS.CHEVRON_LEFT}</Icon><span>{t('previous')}</span></button>
                                     <span className="pagination-page-info">{t('page', { page: `${currentPage} / ${totalPages}` })}</span>
-                                    {/* FIX: Changed path prop to children for Icon component */}
                                     <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}><span>{t('next')}</span><Icon>{ICONS.CHEVRON_RIGHT}</Icon></button>
                                 </div>
                             )}

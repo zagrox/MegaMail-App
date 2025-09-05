@@ -173,7 +173,7 @@ export const TOOLBAR_COMPONENTS = [
 ];
 
 const ToolbarItem = ({ component, onAddComponent }: { component: typeof TOOLBAR_COMPONENTS[0], onAddComponent: (type: string) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const { attributes, listeners, setNodeRef } = useDraggable({
         id: component.id,
         data: {
@@ -201,7 +201,6 @@ const ToolbarItem = ({ component, onAddComponent }: { component: typeof TOOLBAR_
 };
 
 const Toolbar = ({ onAddComponent }: { onAddComponent: (type: string) => void }) => {
-    const { t } = useTranslation();
     return (
         <aside className="builder-toolbar">
             <div className="toolbar-grid">

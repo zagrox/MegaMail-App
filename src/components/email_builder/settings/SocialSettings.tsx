@@ -91,7 +91,7 @@ const SegmentedControl = ({ options, value, onChange, isIconOnly = false }: { op
 
 // Sortable Item Component for the social links list
 function SortableItem({ item, onUrlChange, onRemove }: { item: any, onUrlChange: (id: string, url: string) => void, onRemove: (id: string) => void }) {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const {
         attributes,
         listeners,
@@ -116,7 +116,7 @@ function SortableItem({ item, onUrlChange, onRemove }: { item: any, onUrlChange:
             {/* FIX: Changed path prop to children for Icon component */}
             {networkInfo && <Icon style={{ color: networkInfo.brandColor, flexShrink: 0 }}>{networkInfo.path}</Icon>}
             <div className="form-group" style={{flexGrow: 1}}>
-                 <label style={{fontSize: '0.8rem', marginBottom: '2px'}}>{t(item.network, {ns: 'translation', defaultValue: item.network})}</label>
+                 <label style={{fontSize: '0.8rem', marginBottom: '2px'}}>{t(item.network, {ns: 'emailBuilder', defaultValue: item.network})}</label>
                  <input type="url" value={item.url} onChange={(e) => onUrlChange(item.id, e.target.value)} placeholder={`https://...`} />
             </div>
             {/* FIX: Changed path prop to children for Icon component */}
@@ -127,7 +127,7 @@ function SortableItem({ item, onUrlChange, onRemove }: { item: any, onUrlChange:
 
 // Main Settings Component for the Social Block
 const SocialSettings = ({ block, onStyleChange, onContentChange }: { block: any, onStyleChange: any, onContentChange: any }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const s = block.style || {};
     const c = block.content || {};
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -198,10 +198,10 @@ const SocialSettings = ({ block, onStyleChange, onContentChange }: { block: any,
                         value={s.iconStyle || 'circle'}
                         onChange={(val) => handleStyleChange('iconStyle', val)}
                         options={[
-                            { value: 'default', label: 'Default' },
-                            { value: 'square', label: 'Square' },
-                            { value: 'rounded', label: 'Rounded' },
-                            { value: 'circle', label: 'Circle' },
+                            { value: 'default', label: t('iconStyleDefault') },
+                            { value: 'square', label: t('iconStyleSquare') },
+                            { value: 'rounded', label: t('iconStyleRounded') },
+                            { value: 'circle', label: t('iconStyleCircle') },
                         ]}
                     />
                 </LabeledControl>
@@ -210,10 +210,10 @@ const SocialSettings = ({ block, onStyleChange, onContentChange }: { block: any,
                         value={s.iconColor || 'gray'}
                         onChange={(val) => handleStyleChange('iconColor', val)}
                         options={[
-                            { value: 'dark', label: 'Dark' },
-                            { value: 'white', label: 'White' },
-                            { value: 'gray', label: 'Gray' },
-                            { value: 'color', label: 'Color' },
+                            { value: 'dark', label: t('iconColorDark') },
+                            { value: 'white', label: t('iconColorWhite') },
+                            { value: 'gray', label: t('iconColorGray') },
+                            { value: 'color', label: t('iconColorColor') },
                         ]}
                     />
                 </LabeledControl>

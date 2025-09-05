@@ -11,7 +11,7 @@ import { useConfiguration } from '../contexts/ConfigurationContext';
 import Loader from '../components/Loader';
 
 const CreditSelector = ({ packages, onPurchase, isSubmitting }: { packages: any[], onPurchase: (pkg: any) => void, isSubmitting: boolean }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['buyCredits', 'common']);
     const [selectedIndex, setSelectedIndex] = useState(Math.floor(packages.length / 4)); // Start somewhere in the lower-middle
 
     useEffect(() => {
@@ -39,7 +39,7 @@ const CreditSelector = ({ packages, onPurchase, isSubmitting }: { packages: any[
             <div className="credit-selector-display">
                 <div className="credit-amount-display">
                     <h2>{(selectedPackage.packsize || 0).toLocaleString(i18n.language)}</h2>
-                    <span>{t('credits')}</span>
+                    <span>{t('credits', { ns: 'dashboard' })}</span>
                 </div>
                 <div className="total-price-display">
                     <span>{(selectedPackage.packprice || 0).toLocaleString(i18n.language)} {t('priceIRT')}</span>
@@ -86,7 +86,7 @@ const CreditSelector = ({ packages, onPurchase, isSubmitting }: { packages: any[
 };
 
 const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistoryClick }: { creditLoading: boolean, creditError: any, accountData: any, onHistoryClick: () => void }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['buyCredits', 'common']);
     return (
         <div className="card balance-display-card">
             <div className="balance-info">
@@ -107,7 +107,7 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
 };
 
 const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, setView: (view: string, data?: any) => void }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['buyCredits', 'common', 'orders']);
     const { config } = useConfiguration();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isPaying, setIsPaying] = useState(false);

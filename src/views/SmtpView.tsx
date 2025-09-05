@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from './useApi';
@@ -17,7 +16,7 @@ import Button from '../components/Button';
 const copyToClipboard = (text: string) => navigator.clipboard.writeText(text);
 
 const CopyButton = ({ value }: { value: string }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['smtp', 'common']);
     const [copied, setCopied] = useState(false);
 
     const handleCopy = () => {
@@ -34,7 +33,7 @@ const CopyButton = ({ value }: { value: string }) => {
 };
 
 const SecretValue = ({ value, type = "password" }: { value: string, type?: "text" | "password" }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['smtp', 'common']);
     const [isVisible, setIsVisible] = useState(false);
 
     return (
@@ -49,7 +48,7 @@ const SecretValue = ({ value, type = "password" }: { value: string, type?: "text
 };
 
 const AddSmtpCredentialModal = ({ isOpen, onClose, apiKey, onSuccess }: { isOpen: boolean, onClose: () => void, apiKey: string, onSuccess: (newKeyData: any) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['smtp', 'common']);
     const { addToast } = useToast();
     const [name, setName] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,7 +92,7 @@ const AddSmtpCredentialModal = ({ isOpen, onClose, apiKey, onSuccess }: { isOpen
 };
 
 const NewApiKeyModal = ({ isOpen, onClose, newKeyData }: { isOpen: boolean, onClose: () => void, newKeyData: any }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['smtp', 'common']);
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={t('credentialCreatedSuccessTitle')}>
             <div className="new-api-key-display">
@@ -115,7 +114,7 @@ const NewApiKeyModal = ({ isOpen, onClose, newKeyData }: { isOpen: boolean, onCl
 };
 
 const SmtpView = ({ apiKey, user }: { apiKey: string, user: any }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['smtp', 'common']);
     const { addToast } = useToast();
     const [refetchIndex, setRefetchIndex] = useState(0);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);

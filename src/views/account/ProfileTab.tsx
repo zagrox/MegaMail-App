@@ -1,5 +1,6 @@
 
 
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../../components/Icon';
@@ -17,7 +18,7 @@ const ProfileField = ({ label, value }: { label: string; value: string | number 
 
 
 const ProfileTab = ({ accountData, user }: { accountData: any, user: any }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['account', 'common']);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { getStatusStyle } = useStatusStyles();
     const { config } = useConfiguration();
@@ -82,8 +83,8 @@ const ProfileTab = ({ accountData, user }: { accountData: any, user: any }) => {
                 </div>
                 <div className="account-tab-card-body">
                     <div className="form-grid">
-                        <ProfileField label={t('firstName')} value={user.first_name} />
-                        <ProfileField label={t('lastName')} value={user.last_name} />
+                        <ProfileField label={t('firstName', { ns: 'auth' })} value={user.first_name} />
+                        <ProfileField label={t('lastName', { ns: 'auth' })} value={user.last_name} />
                     </div>
                 </div>
             </div>

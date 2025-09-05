@@ -15,7 +15,7 @@ interface ModulesTabProps {
 }
 
 const ModuleCard = ({ module, isUnlocked, onUnlock, onInstantUnlock, isUnlocking }: { module: Module, isUnlocked: boolean, onUnlock: () => void, onInstantUnlock: () => void, isUnlocking: boolean }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['orders', 'common']);
 
     const handleUnlockClick = () => {
         if (module.moduleprice === 0) {
@@ -52,7 +52,7 @@ const ModuleCard = ({ module, isUnlocked, onUnlock, onInstantUnlock, isUnlocking
                             </span>
                         )}
                         <span style={{ fontWeight: 600, fontSize: '1.2rem' }}>
-                            {module.moduleprice > 0 ? `${module.moduleprice.toLocaleString(i18n.language)} ${t('credits')}` : 'Free'}
+                            {module.moduleprice > 0 ? `${module.moduleprice.toLocaleString(i18n.language)} ${t('credits', { ns: 'dashboard' })}` : 'Free'}
                         </span>
                     </div>
 
@@ -74,7 +74,7 @@ const ModuleCard = ({ module, isUnlocked, onUnlock, onInstantUnlock, isUnlocking
 };
 
 const ModulesTab: React.FC<ModulesTabProps> = ({ setView }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['orders', 'common']);
     const { allModules: modules, loading: modulesLoading, hasModuleAccess, purchaseModule } = useAuth();
     const { addToast } = useToast();
     const [moduleToUnlock, setModuleToUnlock] = useState<Module | null>(null);
@@ -124,7 +124,7 @@ const ModulesTab: React.FC<ModulesTabProps> = ({ setView }) => {
                             <td>{module.moduledetails}</td>
                             <td>
                                 {module.moduleprice > 0 
-                                    ? `${module.moduleprice.toLocaleString()} ${t('credits')}` 
+                                    ? `${module.moduleprice.toLocaleString()} ${t('credits', { ns: 'dashboard' })}` 
                                     : 'Free'
                                 }
                             </td>
@@ -185,11 +185,11 @@ const ModulesTab: React.FC<ModulesTabProps> = ({ setView }) => {
                 </div>
                 <div className="header-actions">
                      <div className="view-switcher">
-                        <button onClick={() => setViewMode('card')} className={`view-mode-btn ${viewMode === 'card' ? 'active' : ''}`} aria-label={t('cardView')}>
+                        <button onClick={() => setViewMode('card')} className={`view-mode-btn ${viewMode === 'card' ? 'active' : ''}`} aria-label={t('cardView', { ns: 'mediaManager' })}>
                             {/* FIX: Changed path prop to children for Icon component */}
                             <Icon>{ICONS.DASHBOARD}</Icon>
                         </button>
-                        <button onClick={() => setViewMode('table')} className={`view-mode-btn ${viewMode === 'table' ? 'active' : ''}`} aria-label={t('tableView')}>
+                        <button onClick={() => setViewMode('table')} className={`view-mode-btn ${viewMode === 'table' ? 'active' : ''}`} aria-label={t('tableView', { ns: 'mediaManager' })}>
                             {/* FIX: Changed path prop to children for Icon component */}
                             <Icon>{ICONS.EMAIL_LISTS}</Icon>
                         </button>

@@ -28,7 +28,7 @@ interface SortableBlockProps {
 
 export const SortableBlock = (props: SortableBlockProps) => {
     const { id, item, onRemove, onDuplicate, isSelected, onSelect, onEdit, onInsertBlock } = props;
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const [isAddPopoverOpen, setIsAddPopoverOpen] = useState(false);
     const {
         attributes,
@@ -52,7 +52,7 @@ export const SortableBlock = (props: SortableBlockProps) => {
     const getBlockTypeTranslationKey = (type: string) => {
         const key = type.toLowerCase();
         // Check if a specific translation exists, otherwise fallback to the type itself
-        return t(key, { ns: 'translation', defaultValue: type });
+        return t(key, { ns: 'emailBuilder', defaultValue: type });
     }
 
     return (

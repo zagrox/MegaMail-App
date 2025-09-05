@@ -18,7 +18,7 @@ const SummaryItem = ({ label, value }: { label: string, value: React.ReactNode }
 };
 
 const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting }: { onSubmit: () => void; onBack: () => void; data: any; updateData: (d: any) => void; apiKey: string; isSubmitting: boolean; }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['sendEmail', 'common', 'dashboard']);
     const { data: domains, loading: domainsLoading } = useApiV4('/domains', apiKey, {});
     const { data: accountData, loading: balanceLoading } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
 

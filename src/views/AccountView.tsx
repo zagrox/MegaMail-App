@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,7 +21,7 @@ import ModulesTab from './account/ModulesTab';
 import NotificationsTab from './account/NotificationsTab';
 
 const AccountView = ({ apiKey, user, setView }: { apiKey: string, user: any, setView: (view: string, data?: any) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['account', 'common', 'orders', 'modules']);
     const { data: accountData, loading: accountLoading, error: accountError } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
     const { data: contactsCountData, loading: contactsCountLoading } = useApi('/contact/count', apiKey, { allContacts: true }, apiKey ? 1 : 0);
     const [installPrompt, setInstallPrompt] = useState<any>(null);

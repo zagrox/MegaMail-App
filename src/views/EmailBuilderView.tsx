@@ -1,3 +1,5 @@
+
+
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -306,7 +308,7 @@ const findBlockById = (items: any[], id: string): any | null => {
 
 
 const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; user: any; templateToEdit: Template | null; }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['emailBuilder', 'common']);
     const { addToast } = useToast();
     const [items, setItems] = useState<any[]>([]);
     const [activeItem, setActiveItem] = useState<any | null>(null);
@@ -928,24 +930,17 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                 {isUpdatingImage && <div className="page-overlay"><Loader /></div>}
                 <header className="email-builder-header">
                     <div className="email-builder-header-left">
-                        {/* FIX: Changed path prop to children for Icon component */}
-                        <button className="btn-icon" onClick={() => setIsTestSendVisible(prev => !prev)} title={t('sendEmail')}>
+                        <button className="btn-icon" onClick={() => setIsTestSendVisible(prev => !prev)} title={t('sendTestEmail')}>
                             <Icon>{ICONS.SEND_EMAIL}</Icon>
                         </button>
-                        {/* FIX: Changed path prop to children for Icon component */}
                         <button className="btn-icon" onClick={handleOpenGlobalSettings} title={t('global')}><Icon>{ICONS.SETTINGS}</Icon></button>
-                        {/* FIX: Changed path prop to children for Icon component */}
                         <button className={`btn-icon ${isMobileView ? 'active' : ''}`} onClick={toggleMobileView} title={t('mobileView')}><Icon>{ICONS.MOBILE}</Icon></button>
-                        {/* FIX: Changed path prop to children for Icon component */}
                         <button className="btn-icon" onClick={() => prepareAndShowHtml('preview')} title={t('previewEmail')}><Icon>{ICONS.EYE}</Icon></button>
-                        {/* FIX: Changed path prop to children for Icon component */}
                         <button className="btn-icon" onClick={() => prepareAndShowHtml('code')} title={t('viewCode')}><Icon>{ICONS.CODE}</Icon></button>
-                        {/* FIX: Changed path prop to children for Icon component */}
                         <button className="btn-icon" onClick={handleExportHtml} title={t('exportHtml')}><Icon>{ICONS.DOWNLOAD}</Icon></button>
                     </div>
                     <div className="email-builder-header-right">
                         <div className="input-with-icon">
-                            {/* FIX: Changed path prop to children for Icon component */}
                             <Icon>{ICONS.ARCHIVE}</Icon>
                             <input
                                 type="text"
@@ -957,7 +952,7 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                             />
                         </div>
                         <Button className="btn-primary" onClick={handleSaveTemplate} disabled={isSaving} title={t('saveChanges')} action="save_template">
-                            {isSaving ? <Loader /> : <>{/* FIX: Changed path prop to children for Icon component */}<Icon>{ICONS.SAVE_CHANGES}</Icon><span>{t('saveTemplate')}</span></>}
+                            {isSaving ? <Loader /> : <><Icon>{ICONS.SAVE_CHANGES}</Icon><span>{t('saveTemplate')}</span></>}
                         </Button>
                     </div>
                 </header>
@@ -965,33 +960,30 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                 <div className={`email-builder-test-panel ${isTestSendVisible ? 'visible' : ''}`}>
                     <div className="form-group">
                         <div className="input-with-icon">
-                            {/* FIX: Changed path prop to children for Icon component */}
                             <Icon>{ICONS.MAIL}</Icon>
                             <input
                                 type="text"
-                                placeholder={t('subject')}
+                                placeholder={t('subject', { ns: 'sendEmail' })}
                                 value={subject}
                                 onChange={(e) => setSubject(e.target.value)}
-                                aria-label={t('subject')}
+                                aria-label={t('subject', { ns: 'sendEmail' })}
                             />
                         </div>
                     </div>
                     <div className="email-builder-test-panel-row">
                         <div className="form-group">
                             <div className="input-with-icon">
-                                {/* FIX: Changed path prop to children for Icon component */}
                                 <Icon>{ICONS.ACCOUNT}</Icon>
                                 <input
                                     type="text"
-                                    placeholder={t('fromName')}
+                                    placeholder={t('fromName', { ns: 'sendEmail' })}
                                     value={fromName}
                                     onChange={(e) => setFromName(e.target.value)}
-                                    aria-label={t('fromName')}
+                                    aria-label={t('fromName', { ns: 'sendEmail' })}
                                 />
                             </div>
                         </div>
                         <button className="btn btn-secondary">
-                            {/* FIX: Changed path prop to children for Icon component */}
                             <Icon>{ICONS.SEND_EMAIL}</Icon>
                             <span>{t('sendEmail')}</span>
                         </button>
@@ -1026,7 +1018,6 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                             globalStyles={globalStyles}
                             onGlobalStyleChange={handleGlobalStyleChange}
                             onStyleChange={handleStyleChange}
-                            // FIX: Corrected a typo in the onContentChange prop passed to the SettingsPanel. The name was incorrect, causing updates from the panel to fail.
                             onContentChange={handleContentChange}
                             onOpenMediaManager={handleEditImageBlock}
                             onClose={handleCloseSettingsPanel}
@@ -1061,7 +1052,6 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                     <div className="drag-overlay-item">
                         {activeItem.isToolbarItem ? (
                             <div className="toolbar-item" style={{cursor: 'grabbing'}}>
-                                {/* FIX: Changed path prop to children for Icon component */}
                                 <Icon>{activeItem.icon}</Icon>
                                 <span>{t(activeItem.type.toLowerCase())}</span>
                             </div>

@@ -1,5 +1,6 @@
 
 
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
@@ -12,7 +13,7 @@ import { useStatusStyles } from '../../hooks/useStatusStyles';
 import { useConfiguration } from '../../contexts/ConfigurationContext';
 
 const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, installPrompt, handleInstallClick }: { accountData: any, contactsCountData: any, contactsCountLoading: boolean, installPrompt: any, handleInstallClick: () => void }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['account', 'common']);
     const { logout } = useAuth();
     const { getStatusStyle } = useStatusStyles();
     const { config } = useConfiguration();
@@ -44,7 +45,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
                  <AccountDataCard title={t('remainingCredits')} iconPath={ICONS.BUY_CREDITS}>
                     {(accountData?.emailcredits === undefined) ? 'N/A' : Number(accountData.emailcredits).toLocaleString(i18n.language)}
                 </AccountDataCard>
-                <AccountDataCard title={t('totalContacts')} iconPath={ICONS.CONTACTS}>
+                <AccountDataCard title={t('totalContacts', { ns: 'dashboard' })} iconPath={ICONS.CONTACTS}>
                     {contactsCountLoading ? '...' : (contactsCountData?.toLocaleString(i18n.language) ?? '0')}
                 </AccountDataCard>
             </div>

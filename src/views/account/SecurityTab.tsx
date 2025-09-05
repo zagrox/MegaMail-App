@@ -5,7 +5,7 @@ import { useToast } from '../../contexts/ToastContext';
 import Loader from '../../components/Loader';
 
 const SecurityTab = ({ user }: { user: any }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['account', 'auth', 'common']);
     const { changePassword } = useAuth();
     const { addToast } = useToast();
     const [isSaving, setIsSaving] = useState(false);
@@ -72,7 +72,7 @@ const SecurityTab = ({ user }: { user: any }) => {
                                 <input id="new_password" name="new_password" type="password" required />
                             </div>
                              <div className="form-group">
-                                <label htmlFor="confirm_password">{t('confirmPassword')}</label>
+                                <label htmlFor="confirm_password">{t('confirmPassword', { ns: 'auth' })}</label>
                                 <input id="confirm_password" name="confirm_password" type="password" required />
                             </div>
                         </div>

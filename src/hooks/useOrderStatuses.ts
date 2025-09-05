@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readField } from '@directus/sdk';
@@ -60,7 +61,7 @@ const mapIconNameToPath = (iconName?: string): ReactNode | undefined => {
 };
 
 export const useOrderStatuses = () => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['orders', 'common']);
     const [statuses, setStatuses] = useState<OrderStatusChoice[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -109,14 +110,13 @@ export const useOrderStatuses = () => {
                 rawText = rawText.replace(iconRegex, '').trim();
             }
             
-            // Clean text by removing translation markers. Do not perform translation.
             const cleanedText = rawText
                 .replace(/^\$t:|^t:/, '')
                 .replace(/\$$/, '')
                 .trim();
             
-            // Capitalize for display.
-            const displayText = cleanedText.charAt(0).toUpperCase() + cleanedText.slice(1);
+            const defaultText = cleanedText.charAt(0).toUpperCase() + cleanedText.slice(1);
+            const displayText = t(cleanedText.toLowerCase(), { defaultValue: defaultText });
 
             acc[status.value] = {
                 ...status,
@@ -126,7 +126,7 @@ export const useOrderStatuses = () => {
             return acc;
         }, {} as Record<string, MappedOrderStatus>);
 
-    }, [statuses, loading, error]);
+    }, [statuses, loading, error, t]);
 
     return { statusesMap, loading, error };
 };

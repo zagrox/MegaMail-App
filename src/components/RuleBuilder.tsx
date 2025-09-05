@@ -53,7 +53,7 @@ const operatorRequiresValue = (operator: string) => {
 
 
 const RuleBuilder = ({ rules, setRules, conjunction, setConjunction }: { rules: any[]; setRules: Function; conjunction: string; setConjunction: Function }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('segments');
 
     const updateRule = (index: number, field: string, value: any) => {
         const newRules = [...rules];

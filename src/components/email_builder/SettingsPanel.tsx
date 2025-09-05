@@ -158,7 +158,7 @@ const NumberInputWithUnit = ({ value, onChange, unit = 'px' }: { value: string |
 }
 
 const GlobalSettings = ({ styles, onChange, subject, onSubjectChange, fromName, onFromNameChange }: { styles: any, onChange: (newStyles: any) => void, subject: string, onSubjectChange: (value: string) => void, fromName: string, onFromNameChange: (value: string) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const handleStyleChange = (key: string, value: any) => {
         onChange({ [key]: value });
     }
@@ -218,7 +218,7 @@ const getHeaderTag = (html: string): string => {
 };
 
 const HeaderSettings = ({ block, onStyleChange, onContentChange }: { block: any, onStyleChange: any, onContentChange: any }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const s = block.style || {};
     const c = block.content || {};
 
@@ -324,7 +324,7 @@ const HeaderSettings = ({ block, onStyleChange, onContentChange }: { block: any,
 
 
 const ImageSettings = ({ block, onStyleChange, onContentChange, onOpenMediaManager }: { block: any, onStyleChange: any, onContentChange: any, onOpenMediaManager: (id: string) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const s = block.style || {};
     const c = block.content || {};
 
@@ -415,7 +415,7 @@ const ImageSettings = ({ block, onStyleChange, onContentChange, onOpenMediaManag
 };
 
 const ButtonSettings = ({ block, onStyleChange, onContentChange }: { block: any, onStyleChange: any, onContentChange: any }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const s = block.style || {};
     const c = block.content || {};
 
@@ -498,7 +498,7 @@ const ButtonSettings = ({ block, onStyleChange, onContentChange }: { block: any,
 };
 
 const SpacerSettings = ({ block, onContentChange, onStyleChange }: { block: any, onContentChange: any, onStyleChange: any }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const s = block.style || {};
     const c = block.content || {};
 
@@ -530,7 +530,7 @@ const SpacerSettings = ({ block, onContentChange, onStyleChange }: { block: any,
 };
 
 const TextSettings = ({ block, onStyleChange, onContentChange }: { block: any, onStyleChange: any, onContentChange: any }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const s = block.style || {};
     const c = block.content || {};
     
@@ -607,7 +607,7 @@ const TextSettings = ({ block, onStyleChange, onContentChange }: { block: any, o
 };
 
 const ColumnsSettings = ({ block, onStyleChange }: { block: any, onStyleChange: any }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const s = block.style || {};
 
     const handleStyleChange = (key: string, value: any) => {
@@ -639,7 +639,7 @@ const ColumnsSettings = ({ block, onStyleChange }: { block: any, onStyleChange: 
 };
 
 const DividerSettings = ({ block, onStyleChange }: { block: any, onStyleChange: any }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const s = block.style || {};
 
     const handleStyleChange = (key: string, value: any) => {
@@ -676,7 +676,7 @@ const ProductSettings = ({ block, onStyleChange }: { block: any, onStyleChange: 
 };
 
 const FooterSettings = ({ block, onStyleChange, onContentChange }: { block: any, onStyleChange: any, onContentChange: any }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
     const s = block.style || {};
     const c = block.content || {};
 
@@ -732,7 +732,7 @@ const FooterSettings = ({ block, onStyleChange, onContentChange }: { block: any,
 
 
 const SettingsPanel = ({ block, globalStyles, onGlobalStyleChange, onStyleChange, onContentChange, onOpenMediaManager, onClose, subject, onSubjectChange, fromName, onFromNameChange }: { block: any, globalStyles: any, onGlobalStyleChange: any, onStyleChange: any, onContentChange: any, onOpenMediaManager: any, onClose: () => void, subject: string, onSubjectChange: (value: string) => void, fromName: string, onFromNameChange: (value: string) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('emailBuilder');
 
     const renderSettingsForBlock = () => {
         switch (block.type) {

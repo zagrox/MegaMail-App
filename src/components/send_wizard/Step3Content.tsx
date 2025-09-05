@@ -21,7 +21,7 @@ const decodeState = (base64: string): string => {
 };
 
 const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; apiKey: string; }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['templates', 'sendEmail', 'common']);
     const { addToast } = useToast();
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -140,7 +140,7 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
                                     onClick={() => handleSelectTemplate(template.Name)}
                                 >
                                     <span>{template.Name}</span>
-                                    <small>{template.Subject || t('noSubject')}</small>
+                                    <small>{template.Subject || t('noSubject', { ns: 'campaigns' })}</small>
                                 </button>
                             ))
                         ) : (
@@ -171,10 +171,10 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
                     {/* FIX: Changed path prop to children for Icon component */}
                     <button className="btn-icon" onClick={handlePreview} disabled={!data.template || isLoadingTemplate} aria-label={t('previewTemplate')}><Icon>{ICONS.EYE}</Icon></button>
 
-                    <label>From Name</label>
+                    <label>{t('fromName')}</label>
                     <input type="text" name="fromName" value={data.fromName} onChange={handleChange} className="full-width" style={{gridColumn: '2 / -1'}} />
 
-                    <label>Subject</label>
+                    <label>{t('subject')}</label>
                     <input type="text" name="subject" value={data.subject} onChange={handleChange} style={{gridColumn: '2 / 4'}} />
                     <span className="ai-sparkle">✨</span>
 

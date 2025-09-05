@@ -1,0 +1,23 @@
+{
+    "addDomain": "افزودن دامنه",
+    "domainAddedSuccess": "دامنه {{domain}} با موفقیت اضافه شد. برای تأیید آن دستورالعمل‌ها را دنبال کنید.",
+    "domainAddedError": "افزودن دامنه ناموفق بود: {{error}}",
+    "confirmDeleteDomain": "آیا از حذف دامنه {{domainName}} مطمئن هستید؟",
+    "domainDeletedSuccess": "دامنه {{domainName}} با موفقیت حذف شد.",
+    "domainDeletedError": "حذف دامنه ناموفق بود: {{error}}",
+    "noDomainsFound": "دامنه‌ای اضافه نشده است. برای شروع دامنه ارسال خود را اضافه کنید.",
+    "verified": "تأیید شده",
+    "missing": "موجود نیست",
+    "showDnsAndVerify": "نمایش رکوردهای DNS و تأیید",
+    "checkingDns": "در حال بررسی DNS...",
+    "checkDnsStatus": "بررسی وضعیت DNS",
+    "recordType": "رکورد {{type}}",
+    "host": "هاست",
+    "type": "نوع",
+    "value": "مقدار",
+    "checking": "در حال بررسی...",
+    "notVerified": "تأیید نشده",
+    "deleteDomain": "حذف دامنه {{domainName}}",
+    "verify": "تأیید",
+    "notSet": "تنظیم نشده"
+}

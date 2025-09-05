@@ -16,7 +16,7 @@ import Button from '../components/Button';
 
 
 const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['emailLists', 'common', 'segments']);
     const { addToast } = useToast();
     const [refetchIndex, setRefetchIndex] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');

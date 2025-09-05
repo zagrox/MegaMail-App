@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -38,7 +36,7 @@ import UnlockModuleModal from './components/UnlockModuleModal';
 const App = () => {
     const { isAuthenticated, user, logout, hasModuleAccess, loading: authLoading, allModules, moduleToUnlock, setModuleToUnlock } = useAuth();
     const { config } = useConfiguration();
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation('common');
     const [view, setView] = useState('Dashboard');
     const [templateToEdit, setTemplateToEdit] = useState<Template | null>(null);
     const [campaignToLoad, setCampaignToLoad] = useState<any | null>(null);
@@ -245,8 +243,8 @@ const App = () => {
         'Buy Credits': { component: <BuyCreditsView apiKey={apiKey} user={user} setView={handleSetView} />, title: t('buyCredits'), icon: ICONS.BUY_CREDITS },
         'Contacts': { component: <ContactsView apiKey={apiKey} setView={handleSetView} />, title: t('contacts'), icon: ICONS.CONTACTS },
         'Email Lists': { component: <EmailListView apiKey={apiKey} setView={handleSetView} />, title: t('emailLists'), icon: ICONS.EMAIL_LISTS },
-        'ListDetail': { component: <ListDetailView apiKey={apiKey} list={selectedList} setView={handleSetView} onBack={() => handleSetView('Email Lists')} />, title: selectedList ? t('contactsInList', { listName: selectedList.ListName }) : t('contacts'), icon: ICONS.CONTACTS },
-        'ContactDetail': { component: <ContactDetailView apiKey={apiKey} contactEmail={selectedContactEmail || ''} onBack={() => contactDetailOrigin ? handleSetView(contactDetailOrigin.view, contactDetailOrigin.data) : handleSetView('Contacts')} />, title: selectedContactEmail || t('contactDetails'), icon: ICONS.ACCOUNT },
+        'ListDetail': { component: <ListDetailView apiKey={apiKey} list={selectedList} setView={handleSetView} onBack={() => handleSetView('Email Lists')} />, title: selectedList ? t('contactsInList', { listName: selectedList.ListName, ns: 'emailLists' }) : t('contacts'), icon: ICONS.CONTACTS },
+        'ContactDetail': { component: <ContactDetailView apiKey={apiKey} contactEmail={selectedContactEmail || ''} onBack={() => contactDetailOrigin ? handleSetView(contactDetailOrigin.view, contactDetailOrigin.data) : handleSetView('Contacts')} />, title: selectedContactEmail || t('contactDetails', { ns: 'contacts' }), icon: ICONS.ACCOUNT },
         'Segments': { component: <SegmentsView apiKey={apiKey} />, title: t('segments'), icon: ICONS.SEGMENTS },
         'Media Manager': { component: <MediaManagerView apiKey={apiKey} />, title: t('mediaManager'), icon: ICONS.FOLDER },
         'Campaigns': { component: <CampaignsView apiKey={apiKey} setView={handleSetView} />, title: t('campaigns'), icon: ICONS.CAMPAIGNS },

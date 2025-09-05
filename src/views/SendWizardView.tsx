@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiFetchV4 } from '../api/elasticEmail';
@@ -10,7 +11,7 @@ import Step4Settings from '../components/send_wizard/Step4Settings';
 import Step5Sending from '../components/send_wizard/Step5Sending';
 
 const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: string) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['sendEmail', 'common']);
     const { addToast } = useToast();
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);

@@ -1,0 +1,26 @@
+
+{
+    "orders": "سفارش‌ها",
+    "totalAmount": "مبلغ کل",
+    "transactions": "تراکنش‌ها",
+    "noOrdersFound": "سفارشی یافت نشد.",
+    "noTransactionsFound": "تراکنشی برای این سفارش یافت نشد.",
+    "payNow": "اکنون پرداخت کنید",
+    "showActiveOnly": "فقط باز شده‌ها نمایش داده شوند",
+    "unlockForCredits": "باز کردن قفل با {{amount}} اعتبار",
+    "yourBalanceLabel": "موجودی فعلی شما",
+    "unlockModalPriceLabel": "هزینه باز کردن قفل این ماژول",
+    "notEnoughCredits": "شما به {{amount}} اعتبار بیشتر برای باز کردن قفل این مورد نیاز دارید.",
+    "unlockModuleSuccess": "ماژول «{{moduleName}}» باز شد!",
+    "unlockModuleError": "باز کردن قفل ماژول ناموفق بود.",
+    "modules": "ماژول‌ها",
+    "unlock": "باز کردن قفل",
+    "unlocked": "باز شده",
+    "description": "توضیحات",
+    "date": "تاریخ",
+    "status": "وضعیت",
+    "action": "عملیات",
+    "completed": "تکمیل شده",
+    "pending": "در انتظار",
+    "failed": "ناموفق"
+}

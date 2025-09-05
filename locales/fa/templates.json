@@ -1,0 +1,12 @@
+{
+    "searchTemplatesPlaceholder": "جستجوی قالب‌ها...",
+    "createTemplate": "ایجاد قالب",
+    "useTemplate": "استفاده از قالب",
+    "previewTemplate": "پیش‌نمایش قالب",
+    "deleteTemplate": "حذف قالب",
+    "confirmDeleteTemplate": "آیا از حذف قالب \"{{name}}\" مطمئن هستید؟ این عمل قابل بازگشت نیست.",
+    "templateDeletedSuccess": "قالب \"{{name}}\" با موفقیت ذخیره شد!",
+    "templateDeletedError": "حذف قالب ناموفق بود: {{error}}",
+    "noTemplatesFound": "قالبی یافت نشد. اولین قالب خود را ایجاد کنید!",
+    "noTemplatesForQuery": "قالبی برای \"{{query}}\" یافت نشد."
+}

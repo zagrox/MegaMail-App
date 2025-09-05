@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiFetchV4 } from '../../api/elasticEmail';
@@ -19,7 +20,7 @@ const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) 
 
 
 const FileUploadModal = ({ isOpen, onClose, apiKey, onSuccess, onError, zIndex }: { isOpen: boolean; onClose: () => void; apiKey: string; onSuccess: (fileInfo: FileInfo) => void; onError: (msg: string) => void; zIndex?: number; }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['mediaManager', 'common']);
     const [file, setFile] = useState<File | null>(null);
     const [expiresAfterDays, setExpiresAfterDays] = useState('');
     const [isUploading, setIsUploading] = useState(false);
@@ -100,9 +101,9 @@ const FileUploadModal = ({ isOpen, onClose, apiKey, onSuccess, onError, zIndex }
                             style={{ display: 'none' }}
                         />
                          {file ? (
-                            <p className="file-name">{t('selectedFile', { fileName: file.name })}</p>
+                            <p className="file-name">{t('selectedFile', { fileName: file.name, ns: 'contacts' })}</p>
                         ) : (
-                            <p><strong>{t('clickToBrowse')}</strong> {t('orDragAndDrop')}</p>
+                            <p><strong>{t('clickToBrowse', { ns: 'contacts' })}</strong> {t('orDragAndDrop', { ns: 'contacts' })}</p>
                         )}
                     </div>
                 </div>

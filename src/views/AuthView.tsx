@@ -18,7 +18,7 @@ const AuthView = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loginEmail, setLoginEmail] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['auth', 'common']);
     const { addToast } = useToast();
     const { config, loading: configLoading } = useConfiguration();
 

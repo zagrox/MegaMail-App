@@ -4,7 +4,7 @@ import Modal from './Modal';
 import Loader from './Loader';
 
 const RenameModal = ({ isOpen, onClose, entityName, entityType, onSubmit }: { isOpen: boolean, onClose: () => void, entityName: string, entityType: string, onSubmit: (newName: string) => Promise<void> }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('common');
     const [newName, setNewName] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -23,10 +23,10 @@ const RenameModal = ({ isOpen, onClose, entityName, entityType, onSubmit }: { is
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('renameEntityType', { type: entityType, name: entityName })}>
+        <Modal isOpen={isOpen} onClose={onClose} title={t('renameEntityType', { type: entityType, name: entityName, ns: 'emailLists' })}>
             <form onSubmit={handleSubmit} className="modal-form">
                 <div className="form-group">
-                    <label htmlFor="new-entity-name">{t('newEntityName', { type: entityType })}</label>
+                    <label htmlFor="new-entity-name">{t('newEntityName', { type: entityType, ns: 'emailLists' })}</label>
                     <input id="new-entity-name" type="text" value={newName} onChange={e => setNewName(e.target.value)} required disabled={isSubmitting} />
                 </div>
                 <div className="form-actions" style={{ marginTop: '1rem' }}>

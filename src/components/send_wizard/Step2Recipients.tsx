@@ -1,4 +1,6 @@
+
 import React, { useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import WizardLayout from './WizardLayout';
 import MultiSelectSearch from '../MultiSelectSearch';
 import useApiV4 from '../../hooks/useApiV4';
@@ -8,6 +10,7 @@ import { useToast } from '../../contexts/ToastContext';
 import Loader from '../Loader';
 
 const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; apiKey: string; }) => {
+    const { t } = useTranslation('sendEmail');
     const { addToast } = useToast();
     const [segmentDisplayCounts, setSegmentDisplayCounts] = useState<Record<string, number | null>>({});
 
@@ -77,8 +80,6 @@ const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext:
                         );
                         countResult = counts.reduce((sum, count) => sum + Number(count), 0);
                     }
-                } else {
-                    countResult = 0;
                 }
                 updateData({ recipientCount: countResult, isCountLoading: false });
             } catch (error) {
@@ -87,77 +88,81 @@ const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext:
                 updateData({ recipientCount: null, isCountLoading: false });
             }
         };
-    
-        const debounceTimer = setTimeout(() => {
-            calculateCount();
-        }, 300);
-    
-        return () => clearTimeout(debounceTimer);
-    }, [data.recipientTarget, data.recipients.listNames, data.recipients.segmentNames, apiKey, segments, updateData, addToast]);
 
+        const debounceTimer = setTimeout(calculateCount, 300);
+        return () => clearTimeout(debounceTimer);
+    }, [data.recipientTarget, data.recipients, apiKey, segments, addToast, updateData]);
 
     const handleTargetChange = (target: 'all' | 'list' | 'segment') => {
-        updateData({ recipientTarget: target, recipients: { listNames: [], segmentNames: [] } });
+        updateData({ recipientTarget: target });
     };
 
-    const handleSelectionChange = (selected: string[], type: 'listNames' | 'segmentNames') => {
-        updateData({ recipients: { ...data.recipients, [type]: selected } });
+    const handleSelectionChange = (selectedNames: string[], type: 'listNames' | 'segmentNames') => {
+        updateData({
+            recipients: {
+                ...data.recipients,
+                [type]: selectedNames,
+            }
+        });
     };
-    
-    const isNextDisabled = !data.recipientTarget || 
+
+    const isNextDisabled = !data.recipientTarget ||
         (data.recipientTarget === 'list' && data.recipients.listNames.length === 0) ||
         (data.recipientTarget === 'segment' && data.recipients.segmentNames.length === 0);
 
     return (
         <WizardLayout
             step={2}
-            title="Select Audience"
+            title={t('selectAudience')}
             onNext={onNext}
             onBack={onBack}
             nextDisabled={isNextDisabled}
         >
-            <div className="recipient-options">
-                <label className="custom-radio">
-                    <input type="radio" name="recipientTarget" checked={data.recipientTarget === 'all'} onChange={() => handleTargetChange('all')} />
-                    <span className="radio-checkmark"></span>
-                    <span className="radio-label">All Contacts</span>
-                </label>
-                <label className="custom-radio">
-                    <input type="radio" name="recipientTarget" checked={data.recipientTarget === 'list'} onChange={() => handleTargetChange('list')} />
-                    <span className="radio-checkmark"></span>
-                    <span className="radio-label">Lists</span>
-                </label>
-                <label className="custom-radio">
-                    <input type="radio" name="recipientTarget" checked={data.recipientTarget === 'segment'} onChange={() => handleTargetChange('segment')} />
-                    <span className="radio-checkmark"></span>
-                    <span className="radio-label">Segments</span>
-                </label>
-            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div className="recipient-options">
+                    <label className="custom-radio">
+                        <input type="radio" name="recipientTarget" value="all" checked={data.recipientTarget === 'all'} onChange={() => handleTargetChange('all')} />
+                        <span className="radio-checkmark"></span>
+                        <span className="radio-label">{t('allContacts')}</span>
+                    </label>
+                    <label className="custom-radio">
+                        <input type="radio" name="recipientTarget" value="list" checked={data.recipientTarget === 'list'} onChange={() => handleTargetChange('list')} />
+                        <span className="radio-checkmark"></span>
+                        <span className="radio-label">{t('aList')}</span>
+                    </label>
+                    <label className="custom-radio">
+                        <input type="radio" name="recipientTarget" value="segment" checked={data.recipientTarget === 'segment'} onChange={() => handleTargetChange('segment')} />
+                        <span className="radio-checkmark"></span>
+                        <span className="radio-label">{t('aSegment')}</span>
+                    </label>
+                </div>
 
-            {data.recipientTarget === 'list' && (
-                <MultiSelectSearch
-                    items={listItems}
-                    selectedItems={data.recipients.listNames}
-                    onSelectionChange={(selected) => handleSelectionChange(selected, 'listNames')}
-                    placeholder="# Select your contacts.."
-                    loading={listsLoading}
-                />
-            )}
-             {data.recipientTarget === 'segment' && (
-                <MultiSelectSearch
-                    items={segmentItems}
-                    selectedItems={data.recipients.segmentNames}
-                    onSelectionChange={(selected) => handleSelectionChange(selected, 'segmentNames')}
-                    placeholder="# Select your contacts.."
-                    loading={segmentsLoading}
-                />
-            )}
-            
-            <div className="recipient-count-display">
-                <strong>
-                    {data.isCountLoading ? <Loader /> : (data.recipientCount !== null ? data.recipientCount.toLocaleString() : '0')}
-                </strong>
-                <span>Selected Audiences</span>
+                {data.recipientTarget === 'list' && (
+                    <MultiSelectSearch
+                        items={listItems}
+                        selectedItems={data.recipients.listNames}
+                        onSelectionChange={(selected) => handleSelectionChange(selected, 'listNames')}
+                        placeholder={t('chooseList')}
+                        loading={listsLoading}
+                    />
+                )}
+
+                {data.recipientTarget === 'segment' && (
+                    <MultiSelectSearch
+                        items={segmentItems}
+                        selectedItems={data.recipients.segmentNames}
+                        onSelectionChange={(selected) => handleSelectionChange(selected, 'segmentNames')}
+                        placeholder={t('chooseSegment')}
+                        loading={segmentsLoading}
+                    />
+                )}
+
+                <div className="recipient-count-display">
+                    <strong>
+                        {data.isCountLoading ? <Loader /> : (data.recipientCount !== null ? data.recipientCount.toLocaleString() : '0')}
+                    </strong>
+                    <span>{t('recipients', { ns: 'common' })}</span>
+                </div>
             </div>
         </WizardLayout>
     );

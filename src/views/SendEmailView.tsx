@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -58,7 +59,6 @@ const AccordionItem = ({
     <div className="accordion-item">
         <div className={`accordion-header ${openAccordion === id ? 'open' : ''}`} onClick={() => setOpenAccordion(openAccordion === id ? '' : id)}>
             <div className="accordion-title">{title}</div>
-            {/* FIX: Changed path prop to children for Icon component */}
             <Icon className={`accordion-icon ${openAccordion === id ? 'open' : ''}`}>{ICONS.CHEVRON_DOWN}</Icon>
         </div>
         {openAccordion === id && <div className="accordion-content">{children}</div>}
@@ -67,7 +67,7 @@ const AccordionItem = ({
 
 
 const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, setView: (view: string, data?: any) => void; campaignToLoad?: any }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['sendEmail', 'templates', 'common']);
     const { addToast } = useToast();
     
     const [isSending, setIsSending] = useState(false);
@@ -535,7 +535,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     const recipientAccordionTitle = useMemo(() => {
         return (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span>1. {t('recipients')}</span>
+                <span>1. {t('recipients', { ns: 'common' })}</span>
                 <span className="badge-total-recipients">
                     {isCountLoading ? <Loader /> : (recipientCount !== null ? recipientCount.toLocaleString(i18n.language) : '0')}
                 </span>
@@ -568,7 +568,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                                     onClick={() => handleSelectTemplate(template.Name)}
                                 >
                                     <span>{template.Name}</span>
-                                    <small>{template.Subject || t('noSubject')}</small>
+                                    <small>{template.Subject || t('noSubject', { ns: 'campaigns' })}</small>
                                 </button>
                             ))
                         ) : (
@@ -578,7 +578,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                 </div>
             </Modal>
             <h2 className="content-header" style={{marginBottom: '2rem'}}>
-                {t('createCampaign')}
+                {t('createCampaign', { ns: 'campaigns' })}
             </h2>
             <div className="accordion">
                 <AccordionItem 
@@ -654,7 +654,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                                             {verifiedDomainsWithDefault.map(d => <option key={d.domain} value={d.domain}>{d.domain}</option>)}
                                         </select>
                                         <p style={{fontSize: '0.9rem', color: 'var(--subtle-text-color)', marginTop: '0.5rem'}}>
-                                            Sending from: <strong>{currentContent.From}</strong>
+                                            {t('sending')}: <strong>{currentContent.From}</strong>
                                         </p>
                                         </>
                                     ) : (

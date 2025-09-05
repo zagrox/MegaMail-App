@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readItems, updateItem } from '@directus/sdk';
@@ -44,7 +43,7 @@ const getIconPath = (iconName: string): React.ReactNode => {
 };
 
 const NotificationsTab = () => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['common', 'account']);
     const { user } = useAuth();
     const { addToast } = useToast();
     const [notifications, setNotifications] = useState<Notification[]>([]);

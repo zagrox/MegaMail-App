@@ -1,0 +1,26 @@
+
+{
+    "orders": "Orders",
+    "totalAmount": "Total Amount",
+    "transactions": "Transactions",
+    "noOrdersFound": "No orders found.",
+    "noTransactionsFound": "No transactions found for this order.",
+    "payNow": "Pay Now",
+    "showActiveOnly": "Show Unlocked Only",
+    "unlockForCredits": "Unlock for {{amount}} credits",
+    "yourBalanceLabel": "Your current balance",
+    "unlockModalPriceLabel": "Price to unlock this module",
+    "notEnoughCredits": "You need {{amount}} more credits to unlock this.",
+    "unlockModuleSuccess": "Module \"{{moduleName}}\" unlocked!",
+    "unlockModuleError": "Failed to unlock module.",
+    "modules": "Modules",
+    "unlock": "Unlock",
+    "unlocked": "Unlocked",
+    "description": "Description",
+    "date": "Date",
+    "status": "Status",
+    "action": "Action",
+    "completed": "Completed",
+    "pending": "Pending",
+    "failed": "Failed"
+}

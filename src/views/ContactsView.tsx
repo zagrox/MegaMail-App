@@ -50,7 +50,7 @@ const V2_ENUM_TO_STATUS: { [key: number]: string } = {
 };
 
 const ContactStatusFilter = ({ apiKey, selectedStatuses, onStatusChange, onExportClick }: { apiKey: string, selectedStatuses: string[], onStatusChange: (status: string) => void, onExportClick: () => void }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['contacts', 'common']);
     const [counts, setCounts] = useState<Record<string, number>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [fetchError, setFetchError] = useState<string | null>(null);
@@ -132,7 +132,7 @@ const ContactStatusFilter = ({ apiKey, selectedStatuses, onStatusChange, onExpor
                                     onChange={() => onStatusChange(status)}
                                 />
                                 <span className="checkbox-checkmark"></span>
-                                <span className="checkbox-label">{status}</span>
+                                <span className="checkbox-label">{t(status.toLowerCase())}</span>
                             </label>
                             <span className="badge" style={badgeStyle}>
                                 {count === -1 
@@ -160,7 +160,7 @@ const ContactStatusFilter = ({ apiKey, selectedStatuses, onStatusChange, onExpor
 };
 
 const ImportContactsModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { isOpen: boolean; onClose: () => void; apiKey: string; onSuccess: () => void; onError: (msg: string) => void; }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['contacts', 'common']);
     const [file, setFile] = useState<File | null>(null);
     const [listName, setListName] = useState('');
     const [isUploading, setIsUploading] = useState(false);
@@ -263,7 +263,7 @@ const ImportContactsModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { 
 }
 
 const ContactCard = React.memo(({ contact, onView, onDelete, isSelected, onToggleSelect }: { contact: Contact; onView: (email: string) => void; onDelete: (email: string) => void; isSelected: boolean; onToggleSelect: (email: string) => void; }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['contacts', 'common']);
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(contact.Status);
 
@@ -303,7 +303,7 @@ const ContactCard = React.memo(({ contact, onView, onDelete, isSelected, onToggl
 
 
 const AddContactForm = ({ onSubmit }: { onSubmit: (data: {Email: string, FirstName: string, LastName: string}) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['contacts', 'common', 'auth']);
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -316,16 +316,16 @@ const AddContactForm = ({ onSubmit }: { onSubmit: (data: {Email: string, FirstNa
     return (
         <form onSubmit={handleSubmit} className="modal-form">
             <div className="form-group">
-                <label htmlFor="email">{t('emailAddress')}</label>
+                <label htmlFor="email">{t('emailAddress', { ns: 'auth' })}</label>
                 <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
             </div>
             <div className="form-grid">
                  <div className="form-group">
-                    <label htmlFor="firstName">{t('firstName')}</label>
+                    <label htmlFor="firstName">{t('firstName', { ns: 'auth' })}</label>
                     <input id="firstName" type="text" value={firstName} onChange={e => setFirstName(e.target.value)} />
                 </div>
                  <div className="form-group">
-                    <label htmlFor="lastName">{t('lastName')}</label>
+                    <label htmlFor="lastName">{t('lastName', { ns: 'auth' })}</label>
                     <input id="lastName" type="text" value={lastName} onChange={e => setLastName(e.target.value)} />
                 </div>
             </div>
@@ -335,7 +335,7 @@ const AddContactForm = ({ onSubmit }: { onSubmit: (data: {Email: string, FirstNa
 };
 
 const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void; }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['contacts', 'common']);
     const { addToast } = useToast();
     const [refetchIndex, setRefetchIndex] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');

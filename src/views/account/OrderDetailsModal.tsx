@@ -8,7 +8,7 @@ import { useOrderStatuses } from '../../hooks/useOrderStatuses';
 import { useStatusStyles } from '../../hooks/useStatusStyles';
 
 const OrderDetailsModal = ({ isOpen, onClose, order }: { isOpen: boolean, onClose: () => void, order: any }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['orders', 'buyCredits', 'common']);
     const { statusesMap, loading: statusesLoading } = useOrderStatuses();
     const { getStatusStyle } = useStatusStyles();
 

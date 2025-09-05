@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
@@ -7,7 +8,7 @@ import { useToast } from '../../contexts/ToastContext';
 import Loader from '../../components/Loader';
 
 const ApiKeyTab = ({ apiKey: initialApiKey }: { apiKey: string }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['account', 'common']);
     const { updateUser } = useAuth();
     const { addToast } = useToast();
     const [newApiKey, setNewApiKey] = useState(initialApiKey || '');

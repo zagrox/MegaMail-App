@@ -1,0 +1,23 @@
+{
+    "addDomain": "Add Domain",
+    "domainAddedSuccess": "Domain {{domain}} added successfully. Follow the instructions to verify it.",
+    "domainAddedError": "Failed to add domain: {{error}}",
+    "confirmDeleteDomain": "Are you sure you want to delete the domain {{domainName}}?",
+    "domainDeletedSuccess": "Domain {{domainName}} deleted successfully.",
+    "domainDeletedError": "Failed to delete domain: {{error}}",
+    "noDomainsFound": "No domains added. Add your sending domain to get started.",
+    "verified": "Verified",
+    "missing": "Missing",
+    "showDnsAndVerify": "Show DNS Records & Verify",
+    "checkingDns": "Checking DNS...",
+    "checkDnsStatus": "Check DNS Status",
+    "recordType": "{{type}} Record",
+    "host": "Host",
+    "type": "Type",
+    "value": "Value",
+    "checking": "Checking...",
+    "notVerified": "Not Verified",
+    "deleteDomain": "Delete domain {{domainName}}",
+    "verify": "Verify",
+    "notSet": "Not Set"
+}

@@ -7,7 +7,7 @@ import Icon, { ICONS } from './Icon';
 type Theme = 'light' | 'dark' | 'auto';
 
 const ThemeSwitcher = () => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['account', 'common']);
     const { theme, setTheme } = useTheme();
     const { updateUser, user } = useAuth();
 

@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -43,7 +44,7 @@ const extractStateFromHtml = (htmlContent: string) => {
 
 
 const TemplatePreviewModal = ({ isOpen, onClose, template }: { isOpen: boolean; onClose: () => void; template: Template | null }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['templates', 'common']);
     const htmlContent = template?.Body?.[0]?.Content || '';
 
     return (
@@ -60,7 +61,7 @@ const TemplateCard = ({ template, onPreview, onUse, onDelete, isLoadingDetails }
     onDelete: () => void;
     isLoadingDetails?: boolean;
 }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['templates', 'common', 'sendEmail', 'contacts']);
     return (
         <div className="card campaign-card">
             <div className="campaign-card-header">
@@ -68,20 +69,20 @@ const TemplateCard = ({ template, onPreview, onUse, onDelete, isLoadingDetails }
             </div>
             <div className="campaign-card-body">
                 <p>
-                    <strong>{t('subject')}:</strong> {template.Subject || t('noSubject')}
+                    <strong>{t('subject', { ns: 'sendEmail' })}:</strong> {template.Subject || t('noSubject', { ns: 'campaigns' })}
                 </p>
                 {template.fromName && (
                     <p>
-                        <strong>{t('fromName')}:</strong> {template.fromName}
+                        <strong>{t('fromName', { ns: 'sendEmail' })}:</strong> {template.fromName}
                     </p>
                 )}
                 <p className="contact-card-email" style={{marginTop: 'auto'}}>
-                    {t('dateAdded')}: {formatDateForDisplay(template.DateAdded, i18n.language)}
+                    {t('dateAdded', { ns: 'common' })}: {formatDateForDisplay(template.DateAdded, i18n.language)}
                 </p>
             </div>
             <div className="campaign-card-footer" style={{ gap: '0.5rem', justifyContent: 'flex-end' }}>
                 <button className="btn btn-secondary" onClick={onPreview} disabled={isLoadingDetails}>
-                    {isLoadingDetails ? <Loader /> : <><Icon>{ICONS.EYE}</Icon> {t('preview')}</>}
+                    {isLoadingDetails ? <Loader /> : <><Icon>{ICONS.EYE}</Icon> {t('previewTemplate')}</>}
                 </button>
                 <button className="btn" onClick={onUse} disabled={isLoadingDetails}>
                     {isLoadingDetails ? <Loader /> : <><Icon>{ICONS.SEND_EMAIL}</Icon> {t('useTemplate')}</>}
@@ -95,7 +96,7 @@ const TemplateCard = ({ template, onPreview, onUse, onDelete, isLoadingDetails }
 };
 
 const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: string, data?: { template: Template }) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['templates', 'common']);
     const { addToast } = useToast();
     const [searchQuery, setSearchQuery] = useState('');
     const [refetchIndex, setRefetchIndex] = useState(0);
@@ -173,7 +174,7 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
                 throw new Error("Template not found or empty response.");
             }
         } catch (err: any) {
-            addToast(t('contactDetailsError'), 'error'); // Using a generic error
+            addToast(t('contactDetailsError', { ns: 'contacts'}), 'error'); // Using a generic error
         } finally {
             setLoadingTemplateName(null);
         }

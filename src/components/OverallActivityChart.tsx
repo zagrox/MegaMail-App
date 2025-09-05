@@ -15,7 +15,7 @@ const BAR_CHART_COLORS: { [key: string]: string } = {
 };
 
 const OverallActivityChart = ({ stats, loading, error }: { stats: any, loading: boolean, error: any }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation('statistics');
 
     if (loading) return <CenteredMessage style={{height: '350px'}}><Loader /></CenteredMessage>;
     if (error) return <ErrorMessage error={error} />;
@@ -24,12 +24,12 @@ const OverallActivityChart = ({ stats, loading, error }: { stats: any, loading: 
     }
 
     const chartData = [
-        { name: t('delivered'), value: stats.Delivered ?? 0, color: BAR_CHART_COLORS.Delivered },
-        { name: t('opened'), value: stats.Opened ?? 0, color: BAR_CHART_COLORS.Opened },
-        { name: t('clicked'), value: stats.Clicked ?? 0, color: BAR_CHART_COLORS.Clicked },
-        { name: t('bounced'), value: stats.Bounced ?? 0, color: BAR_CHART_COLORS.Bounced },
-        { name: t('unsubscribed'), value: stats.Unsubscribed ?? 0, color: BAR_CHART_COLORS.Unsubscribed },
-        { name: t('complaints'), value: stats.Complaints ?? 0, color: BAR_CHART_COLORS.Complaints },
+        { name: t('delivered', { ns: 'common' }), value: stats.Delivered ?? 0, color: BAR_CHART_COLORS.Delivered },
+        { name: t('opened', { ns: 'common' }), value: stats.Opened ?? 0, color: BAR_CHART_COLORS.Opened },
+        { name: t('clicked', { ns: 'common' }), value: stats.Clicked ?? 0, color: BAR_CHART_COLORS.Clicked },
+        { name: t('bounced', { ns: 'common' }), value: stats.Bounced ?? 0, color: BAR_CHART_COLORS.Bounced },
+        { name: t('unsubscribed', { ns: 'common' }), value: stats.Unsubscribed ?? 0, color: BAR_CHART_COLORS.Unsubscribed },
+        { name: t('complaints', { ns: 'common' }), value: stats.Complaints ?? 0, color: BAR_CHART_COLORS.Complaints },
     ].sort((a, b) => b.value - a.value);
 
     const maxValue = Math.max(...chartData.map(d => d.value), 1);

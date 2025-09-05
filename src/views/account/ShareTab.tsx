@@ -4,7 +4,7 @@ import EmbedCodeCard from '../../components/EmbedCodeCard';
 import Icon, { ICONS } from '../../components/Icon';
 
 const ShareTab = ({ apiKey }: { apiKey: string }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['account', 'common']);
 
     return (
         <div className="account-tab-content">

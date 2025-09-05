@@ -28,7 +28,7 @@ const WizardLayout = ({
     isSubmitting = false,
     nextAction = AppActions.WIZARD_NEXT_STEP,
 }: WizardLayoutProps) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('common');
 
     return (
         <div className="wizard-main">
@@ -46,7 +46,7 @@ const WizardLayout = ({
                 >
                     {/* FIX: Changed path prop to children for Icon component */}
                     <Icon>{ICONS.CHEVRON_LEFT}</Icon>
-                    <span>{t('back')}</span>
+                    <span>{t('back', { ns: 'onboarding' })}</span>
                 </button>
                 {!isLastStep ? (
                     <Button
@@ -70,7 +70,7 @@ const WizardLayout = ({
                             <>
                                 {/* FIX: Changed path prop to children for Icon component */}
                                 <Icon>{ICONS.SEND_EMAIL}</Icon>
-                                <span>{t('submit')}</span>
+                                <span>{t('submit', { ns: 'sendEmail' })}</span>
                             </>
                         )}
                     </Button>

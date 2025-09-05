@@ -1,0 +1,23 @@
+{
+    "onboarding": "Onboarding",
+    "getStarted": "Get Started",
+    "nextStep": "Next Step",
+    "back": "Back",
+    "finishSetup": "Finish Setup",
+    "step_of": "Step {{current}} of {{total}}",
+    "welcomeTitle": "Welcome to {{appName}}!",
+    "welcomeSubtitle": "We're excited to have you. Let's get your account set up in a few simple steps.",
+    "featuresTitle": "Discover What's Possible",
+    "featuresSubtitle": "Here are some of the powerful tools at your fingertips.",
+    "profileTitle": "Complete Your Profile",
+    "profileSubtitle": "This information helps us personalize your experience.",
+    "finalizeSetupTitle": "Finalize Your Account",
+    "finalizeSetupSubtitle": "Click below to connect your email account and generate your API key. This will complete the setup.",
+    "verifyAndFinish": "Verify & Finish",
+    "enterYourApiKey": "Enter your Mailzila API Key",
+    "invalidApiKey": "The provided API Key is invalid.",
+    "saveAndContinue": "Save and Continue",
+    "setupFailed": "Automatic setup failed.",
+    "setupFailedManualPrompt": "Please complete the setup manually. Your API key has been sent to your email.",
+    "visitDemo": "Stuck? Visit the demo version"
+}

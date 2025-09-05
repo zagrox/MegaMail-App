@@ -3,7 +3,7 @@ import WizardLayout from './WizardLayout';
 import { useTranslation } from 'react-i18next';
 
 const Step4Settings = ({ onNext, onBack, data, updateData }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['sendEmail', 'common']);
 
     const handleSimpleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;

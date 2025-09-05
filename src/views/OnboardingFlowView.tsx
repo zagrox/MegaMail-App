@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +10,7 @@ import { useConfiguration } from '../contexts/ConfigurationContext';
 const TOTAL_STEPS = 4;
 
 const Step1 = () => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['onboarding', 'common']);
     const { config } = useConfiguration();
     const appName = config?.app_name || 'MegaMail';
 
@@ -25,12 +23,12 @@ const Step1 = () => {
 };
 
 const Step2 = () => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['onboarding', 'common']);
     const features = [
-        { icon: ICONS.SEND_EMAIL, title: t('emailBuilder'), desc: t('emailBuilderDesc') },
-        { icon: ICONS.CONTACTS, title: t('contacts'), desc: t('contactsDesc') },
-        { icon: ICONS.STATISTICS, title: t('statistics'), desc: t('statisticsDesc') },
-        { icon: ICONS.CAMPAIGNS, title: t('campaigns'), desc: t('campaignsDesc') },
+        { icon: ICONS.SEND_EMAIL, title: t('emailBuilder', { ns: 'common' }), desc: t('emailBuilderDesc', { ns: 'dashboard' }) },
+        { icon: ICONS.CONTACTS, title: t('contacts', { ns: 'common' }), desc: t('contactsDesc', { ns: 'dashboard' }) },
+        { icon: ICONS.STATISTICS, title: t('statistics', { ns: 'common' }), desc: t('statisticsDesc', { ns: 'dashboard' }) },
+        { icon: ICONS.CAMPAIGNS, title: t('campaigns', { ns: 'common' }), desc: t('campaignsDesc', { ns: 'dashboard' }) },
     ];
     return (
         <div className="onboarding-step">
@@ -52,7 +50,7 @@ const Step2 = () => {
 };
 
 const Step3 = ({ data, setData }: { data: any, setData: Function }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['onboarding', 'common']);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setData({ ...data, [e.target.name]: e.target.value });
     };
@@ -63,15 +61,15 @@ const Step3 = ({ data, setData }: { data: any, setData: Function }) => {
             <form className="auth-form" style={{maxWidth: '400px', margin: '0 auto'}}>
                 <div className="input-group">
                     <span className="input-icon"><Icon>{ICONS.CONTACTS}</Icon></span>
-                    <input name="company" type="text" placeholder={t('company')} value={data.company} onChange={handleChange} />
+                    <input name="company" type="text" placeholder={t('company', { ns: 'account' })} value={data.company} onChange={handleChange} />
                 </div>
                 <div className="input-group">
                     <span className="input-icon"><Icon>{ICONS.DOMAINS}</Icon></span>
-                    <input name="website" type="url" placeholder={t('website')} value={data.website} onChange={handleChange} />
+                    <input name="website" type="url" placeholder={t('website', { ns: 'account' })} value={data.website} onChange={handleChange} />
                 </div>
                  <div className="input-group">
                     <span className="input-icon"><Icon>{ICONS.MOBILE}</Icon></span>
-                    <input name="mobile" type="tel" placeholder={t('mobile')} value={data.mobile} onChange={handleChange} />
+                    <input name="mobile" type="tel" placeholder={t('mobile', { ns: 'account' })} value={data.mobile} onChange={handleChange} />
                 </div>
             </form>
         </div>
@@ -79,7 +77,7 @@ const Step3 = ({ data, setData }: { data: any, setData: Function }) => {
 };
 
 const Step4 = () => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['onboarding', 'common']);
     return (
         <div className="onboarding-step">
             <h2>{t('finalizeSetupTitle')}</h2>
@@ -89,7 +87,7 @@ const Step4 = () => {
 };
 
 const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['onboarding', 'common']);
     const { user, updateUser, createElasticSubaccount } = useAuth();
     const { addToast } = useToast();
     
@@ -116,10 +114,10 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
         setLoading(true);
         try {
             await updateUser(profileData);
-            addToast(t('profileUpdateSuccess'), 'success');
+            addToast(t('profileUpdateSuccess', { ns: 'account' }), 'success');
             handleNext();
         } catch (err: any) {
-            addToast(t('profileUpdateError', { error: err.message }), 'error');
+            addToast(t('profileUpdateError', { error: err.message, ns: 'account' }), 'error');
         } finally {
             setLoading(false);
         }
@@ -132,7 +130,7 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
         try {
             await apiFetch('/account/load', apiKey); // Validate key
             await updateUser({ elastickey: apiKey });
-            addToast(t('apiKeyUpdateSuccess'), 'success');
+            addToast(t('apiKeyUpdateSuccess', { ns: 'account' }), 'success');
             onComplete();
         } catch (err: any) {
             addToast(err.message || t('invalidApiKey'), 'error');

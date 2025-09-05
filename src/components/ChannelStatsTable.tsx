@@ -6,7 +6,7 @@ import ErrorMessage from './ErrorMessage';
 import CenteredMessage from './CenteredMessage';
 
 const ChannelStatsTable = ({ apiKey }: { apiKey: string }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation('statistics');
     const { data: channels, loading, error } = useApiV4('/statistics/channels', apiKey);
     const [selectedChannel, setSelectedChannel] = useState('');
 
@@ -23,13 +23,13 @@ const ChannelStatsTable = ({ apiKey }: { apiKey: string }) => {
     }, [channels, selectedChannel]);
 
     const statRows = [
-        { key: 'Recipients', label: t('recipients') },
-        { key: 'EmailTotal', label: t('emailsSent') },
-        { key: 'Delivered', label: t('delivered') },
-        { key: 'Opened', label: t('opened') },
-        { key: 'Clicked', label: t('clicked') },
-        { key: 'Bounced', label: t('bounced') },
-        { key: 'Unsubscribed', label: t('unsubscribed') },
+        { key: 'Recipients', label: t('recipients', { ns: 'common' }) },
+        { key: 'EmailTotal', label: t('emailsSent', { ns: 'common' }) },
+        { key: 'Delivered', label: t('delivered', { ns: 'common' }) },
+        { key: 'Opened', label: t('opened', { ns: 'common' }) },
+        { key: 'Clicked', label: t('clicked', { ns: 'common' }) },
+        { key: 'Bounced', label: t('bounced', { ns: 'common' }) },
+        { key: 'Unsubscribed', label: t('unsubscribed', { ns: 'common' }) },
     ];
     
     return (

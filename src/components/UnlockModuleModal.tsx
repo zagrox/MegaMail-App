@@ -15,7 +15,7 @@ interface UnlockModuleModalProps {
 }
 
 const UnlockModuleModal: React.FC<UnlockModuleModalProps> = ({ module, onClose, setView }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['orders', 'common']);
     const { user, purchaseModule } = useAuth();
     const { addToast } = useToast();
     const { data: accountData, loading: balanceLoading } = useApi('/account/load', user?.elastickey || '', {}, user?.elastickey ? 1 : 0);
@@ -69,7 +69,7 @@ const UnlockModuleModal: React.FC<UnlockModuleModalProps> = ({ module, onClose, 
                                 </span>
                             )}
                             <span>
-                                {module.moduleprice.toLocaleString(i18n.language)} {t('credits')}
+                                {module.moduleprice.toLocaleString(i18n.language)} {t('credits', { ns: 'dashboard' })}
                             </span>
                         </div>
                     </div>
@@ -77,7 +77,7 @@ const UnlockModuleModal: React.FC<UnlockModuleModalProps> = ({ module, onClose, 
                     <div>
                         <div style={{ fontSize: '0.9rem', color: 'var(--subtle-text-color)' }}>{t('yourBalanceLabel')}</div>
                         <div style={{ fontSize: '1.5rem', fontWeight: 500 }}>
-                            {balanceLoading ? <Loader /> : `${userBalance.toLocaleString(i18n.language)} ${t('credits')}`}
+                            {balanceLoading ? <Loader /> : `${userBalance.toLocaleString(i18n.language)} ${t('credits', { ns: 'dashboard' })}`}
                         </div>
                     </div>
                 </div>

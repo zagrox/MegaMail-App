@@ -1,7 +1,10 @@
+
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import WizardLayout from './WizardLayout';
 
 const Step1SelectType = ({ onNext, onBack, data, updateData }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; }) => {
+    const { t } = useTranslation('sendEmail');
 
     const handleSelect = (type: string) => {
         updateData({ type });
@@ -10,7 +13,7 @@ const Step1SelectType = ({ onNext, onBack, data, updateData }: { onNext: () => v
     return (
         <WizardLayout
             step={1}
-            title="Select Campaign Type"
+            title={t('selectCampaignType')}
             onNext={onNext}
             onBack={onBack}
             nextDisabled={!data.type}

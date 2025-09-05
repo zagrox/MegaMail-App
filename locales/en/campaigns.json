@@ -1,0 +1,18 @@
+{
+    "searchCampaignsPlaceholder": "Search by campaign or subject...",
+    "createCampaign": "Create Campaign",
+    "viewCampaignStats": "View stats",
+    "noSubject": "(No Subject)",
+    "noCampaignsFound": "No campaigns found.",
+    "noCampaignsForQuery": "No campaigns found for \"{{query}}\".",
+    "noCampaignsSent": "No campaigns have been sent yet.",
+    "statsForCampaign": "Stats for \"{{campaignName}}\"",
+    "inProgress": "In Progress",
+    "manualCancel": "Manually Canceled",
+    "notDelivered": "Not Delivered",
+    "noStatsForCampaign": "No statistics available for this campaign.",
+    "report": "Report",
+    "performance": "Performance",
+    "metric": "Metric",
+    "rate": "Rate"
+}

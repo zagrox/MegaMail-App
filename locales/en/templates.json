@@ -1,0 +1,12 @@
+{
+    "searchTemplatesPlaceholder": "Search templates...",
+    "createTemplate": "Create Template",
+    "useTemplate": "Use Template",
+    "previewTemplate": "Preview Template",
+    "deleteTemplate": "Delete Template",
+    "confirmDeleteTemplate": "Are you sure you want to delete the template \"{{name}}\"? This action cannot be undone.",
+    "templateDeletedSuccess": "Template \"{{name}}\" saved successfully!",
+    "templateDeletedError": "Failed to delete template: {{error}}",
+    "noTemplatesFound": "No templates found. Create your first one!",
+    "noTemplatesForQuery": "No templates found for \"{{query}}\"."
+}

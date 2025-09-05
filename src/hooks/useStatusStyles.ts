@@ -12,11 +12,11 @@ export type StatusStyle = {
 
 // This hook provides consistent styling for status badges across the app.
 export const useStatusStyles = () => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['common', 'contacts']);
     const { labels } = useLabels();
 
     const getStatusStyle = (status: string | undefined): StatusStyle => {
-        const originalStatus = status || t('unknown');
+        const originalStatus = status ? t(status.toLowerCase(), { ns: 'contacts', defaultValue: status }) : t('unknown');
         const normalizedStatus = String(status || 'unknown').toLowerCase().replace(/\s/g, '');
         
         const color = labels?.[normalizedStatus] || undefined;

@@ -24,7 +24,7 @@ const FIELD_TYPES: Record<string, 'date' | 'number' | 'boolean' | 'string'> = {
 };
 
 const CreateSegmentModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { isOpen: boolean, onClose: () => void, apiKey: string, onSuccess: Function, onError: Function }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['segments', 'common']);
     const [name, setName] = useState('');
     const [conjunction, setConjunction] = useState('AND');
     const [rules, setRules] = useState([{ Field: 'Email', Operator: 'CONTAINS', Value: '' }]);
@@ -91,7 +91,7 @@ const CreateSegmentModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { i
 };
 
 const EditSegmentRulesModal = ({ isOpen, onClose, apiKey, segment, onSuccess, onError }: { isOpen: boolean, onClose: () => void, apiKey: string, segment: Segment | null, onSuccess: (name: string) => void, onError: (msg: string) => void }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['segments', 'common']);
     const [conjunction, setConjunction] = useState('AND');
     const [rules, setRules] = useState<any[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -181,7 +181,7 @@ const EditSegmentRulesModal = ({ isOpen, onClose, apiKey, segment, onSuccess, on
 
 
 const SegmentsView = ({ apiKey }: { apiKey: string }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['segments', 'common']);
     const { addToast } = useToast();
     const [refetchIndex, setRefetchIndex] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');

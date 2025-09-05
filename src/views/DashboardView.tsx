@@ -17,7 +17,7 @@ import { readItems } from '@directus/sdk';
 import { AppActions } from '../config/actions';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['dashboard', 'common']);
     const { hasModuleAccess, loading: authLoading, allModules, setModuleToUnlock } = useAuth();
     const { config, loading: configLoading } = useConfiguration();
     const apiParams = useMemo(() => ({ from: formatDateForApiV4(getPastDateByDays(365)) }), []);
@@ -130,7 +130,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                         </div>
                         <div className="cta-banner-action">
                             <Button className="btn-primary" onClick={() => setView('Marketing')} action={AppActions.START_MARKETING_CAMPAIGN}>
-                                <Icon>{ICONS.SEND_EMAIL}</Icon> {t('createCampaign')}
+                                <Icon>{ICONS.SEND_EMAIL}</Icon> {t('createCampaign', { ns: 'campaigns' })}
                             </Button>
                         </div>
                     </div>

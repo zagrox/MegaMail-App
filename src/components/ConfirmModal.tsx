@@ -25,7 +25,7 @@ const ConfirmModal = ({
     confirmIcon = ICONS.DELETE,
     isDestructive = true,
 }: ConfirmModalProps) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('common');
     const [isConfirming, setIsConfirming] = useState(false);
 
     const handleConfirm = async () => {

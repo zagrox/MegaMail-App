@@ -14,7 +14,7 @@ import ChannelStatsTable from '../components/ChannelStatsTable';
 import LineLoader from '../components/LineLoader';
 
 const StatisticsView = ({ apiKey, isEmbed = false }: { apiKey: string, isEmbed?: boolean }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['statistics', 'common']);
     const [duration, setDuration] = useState('3months');
     const [dailyData, setDailyData] = useState<any[]>([]);
     const [isChartLoading, setIsChartLoading] = useState(true);
@@ -35,10 +35,13 @@ const StatisticsView = ({ apiKey, isEmbed = false }: { apiKey: string, isEmbed?:
     const { data: aggregateStats, loading: aggregateLoading, error: aggregateError } = useApiV4(`/statistics`, apiKey, aggregateApiParams);
 
     // API call for the bottom "All Time" bar chart
+    const overallApiParams = useMemo(() => ({
+        from: formatDateForApiV4(getPastDateByYears(10)) + 'Z',
+    }), []);
     const { data: overallStats, loading: overallLoading, error: overallError } = useApiV4(
         `/statistics`, 
         apiKey, 
-        { from: formatDateForApiV4(getPastDateByYears(10)) + 'Z' }
+        overallApiParams
     );
     
     // Fetching data for the main line chart

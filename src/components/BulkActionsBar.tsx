@@ -10,7 +10,7 @@ interface BulkActionsBarProps {
 }
 
 const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ count, onDeselectAll, onDelete, onAddToList }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['contacts', 'common']);
     
     return (
         <div className="bulk-actions-bar">

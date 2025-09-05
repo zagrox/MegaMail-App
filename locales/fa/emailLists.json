@@ -1,0 +1,22 @@
+{
+    "searchListsPlaceholder": "جستجوی لیست‌ها...",
+    "newListNamePlaceholder": "نام لیست جدید...",
+    "createList": "ایجاد لیست",
+    "listCreatedSuccess": "لیست \"{{listName}}\" با موفقیت ایجاد شد.",
+    "listCreatedError": "ایجاد لیست ناموفق بود: {{error}}",
+    "confirmDeleteList": "آیا از حذف لیست \"{{listName}}\" مطمئن هستید؟ این کار مخاطبین داخل آن را حذف نخواهد کرد.",
+    "listDeletedSuccess": "لیست \"{{listName}}\" با موفقیت حذف شد.",
+    "listDeletedError": "حذف لیست ناموفق بود: {{error}}",
+    "listRenamedSuccess": "نام لیست با موفقیت به \"{{newName}}\" تغییر کرد.",
+    "listRenamedError": "تغییر نام لیست ناموفق بود: {{error}}",
+    "noListsForQuery": "لیستی برای \"{{query}}\" یافت نشد.",
+    "noListsFound": "هنوز لیستی ایجاد نشده است.",
+    "renameList": "تغییر نام لیست",
+    "viewContactsInList": "مشاهده مخاطبین در این لیست",
+    "deleteList": "حذف لیست",
+    "contactsInList": "مخاطبین در \"{{listName}}\"",
+    "listHasNoContacts": "این لیست هیچ مخاطبی ندارد.",
+    "renameEntityType": "تغییر نام {{type}} \"{{name}}\"",
+    "newEntityName": "نام جدید {{type}}",
+    "list": "لیست"
+}

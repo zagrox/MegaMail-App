@@ -4,7 +4,7 @@ import Icon, { ICONS } from './Icon';
 import { useConfiguration } from '../contexts/ConfigurationContext';
 
 const EmbedCodeCard = ({ apiKey }: { apiKey: string }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['account', 'dashboard', 'statistics', 'common']);
     const [view, setView] = useState('Dashboard');
     const [copied, setCopied] = useState(false);
     const { config } = useConfiguration();
@@ -28,13 +28,13 @@ const EmbedCodeCard = ({ apiKey }: { apiKey: string }) => {
             <div className="card-body" style={{ padding: '0 1.25rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <p style={{ color: 'var(--subtle-text-color)', marginTop: 0, fontSize: '0.9rem' }}>{t('embedDashboardSubtitle', { appName })}</p>
                 <div className="info-message warning" style={{flexDirection: 'row', alignItems: 'center', textAlign: 'left'}}>
-                    <p style={{margin: 0}}><strong>{t('warning')}:</strong> {t('embedWarning')}</p>
+                    <p style={{margin: 0}}><strong>{t('warning', { ns: 'common' })}:</strong> {t('embedWarning')}</p>
                 </div>
                 <div className="form-group">
                     <label htmlFor="embed-view-select">{t('selectView')}</label>
                     <select id="embed-view-select" value={view} onChange={e => setView(e.target.value)}>
-                        <option value="Dashboard">{t('dashboard')}</option>
-                        <option value="Statistics">{t('statistics')}</option>
+                        <option value="Dashboard">{t('dashboard', { ns: 'common' })}</option>
+                        <option value="Statistics">{t('statistics', { ns: 'common' })}</option>
                     </select>
                 </div>
                 <div className="form-group">
@@ -44,7 +44,7 @@ const EmbedCodeCard = ({ apiKey }: { apiKey: string }) => {
                 <div className="form-actions" style={{justifyContent: 'flex-end', padding: 0, border: 'none', margin: 0}}>
                     <button className="btn btn-secondary" onClick={handleCopy}>
                         {/* FIX: Changed path prop to children for Icon component */}
-                        <Icon>{copied ? ICONS.CHECK : ICONS.MAIL}</Icon> {copied ? t('copied') : t('copyEmbedCode')}
+                        <Icon>{copied ? ICONS.CHECK : ICONS.MAIL}</Icon> {copied ? t('copied', { ns: 'common' }) : t('copyEmbedCode')}
                     </button>
                 </div>
             </div>
