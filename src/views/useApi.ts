@@ -4,7 +4,7 @@ import { apiFetch } from '../api/elasticEmail';
 const useApi = (endpoint: string, apiKey: string, params: Record<string, any> = {}, refetchIndex = 0) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<{message: string, endpoint: string} | null>(null);
+  const [error, setError] = useState<{message: string, endpoint: string, status?: number} | null>(null);
   
   const paramsString = JSON.stringify(params);
 
@@ -21,7 +21,7 @@ const useApi = (endpoint: string, apiKey: string, params: Record<string, any> = 
         const result = await apiFetch(endpoint, apiKey, { params: JSON.parse(paramsString) });
         setData(result);
       } catch (err: any) {
-        setError({message: err.message, endpoint});
+        setError({message: err.message, endpoint, status: err.status});
       } finally {
         setLoading(false);
       }

@@ -27,7 +27,9 @@ export const apiFetch = async (endpoint: string, apiKey: string, options: { meth
   const data = await response.json();
   
   if (!data.success) {
-    throw new Error(data.error || `HTTP error! status: ${response.status}`);
+    const error: any = new Error(data.error || `An unknown API error occurred.`);
+    error.status = response.status;
+    throw error;
   }
   
   return data.data;
@@ -56,14 +58,16 @@ export const apiFetchV4 = async (endpoint: string, apiKey: string, options: { me
     const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
+        let errorMessage = `An unknown API error occurred.`;
         try {
             const errorData = await response.json();
             errorMessage = errorData.Error || 'An unknown API error occurred.';
         } catch (e) {
             // response was not json, use default message
         }
-        throw new Error(errorMessage);
+        const error: any = new Error(errorMessage);
+        error.status = response.status;
+        throw error;
     }
     
     if (response.status === 204) {
@@ -96,12 +100,14 @@ export const apiUploadV4 = async (endpoint: string, apiKey: string, formData: Fo
     });
 
     if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
+        let errorMessage = `An unknown API error occurred.`;
         try {
             const errorData = await response.json();
             errorMessage = errorData.Error || 'An unknown API error occurred.';
         } catch (e) { /* no-op */ }
-        throw new Error(errorMessage);
+        const error: any = new Error(errorMessage);
+        error.status = response.status;
+        throw error;
     }
 
     // Import returns 202, file upload returns 201
