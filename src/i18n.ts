@@ -13,6 +13,7 @@ i18next
     // Each component's useTranslation hook will now trigger the loading
     // of the namespaces it needs on-demand.
     defaultNS: 'common',
+    fallbackNS: 'common',
     interpolation: {
       escapeValue: false, // react already safes from xss
     },

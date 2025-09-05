@@ -28,7 +28,7 @@ const ProgressBar = ({ value, max }: { value: number; max: number }) => {
 };
 
 const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { campaign: any; onSelect: () => void; onEdit: () => void; stats: { Delivered: number, Opened: number } | null; loadingStats: boolean; }) => {
-    const { t, i18n } = useTranslation(['campaigns', 'common']);
+    const { t, i18n } = useTranslation(['campaigns', 'sendEmail']);
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(campaign.Status);
     const isDraft = campaign.Status === 'Draft';
@@ -90,19 +90,19 @@ const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { cam
                         stats.Delivered > 0 ? (
                             <div style={{ width: '100%' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>{t('openRate', { ns: 'common' })}</span>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>{t('openRate')}</span>
                                     <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>
                                         {((stats.Opened / stats.Delivered) * 100).toFixed(1)}%
                                     </span>
                                 </div>
                                 <ProgressBar value={stats.Opened} max={stats.Delivered} />
                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '0.25rem', color: 'var(--subtle-text-color)' }}>
-                                    <span>{stats.Opened.toLocaleString(i18n.language)} {t('opened', { ns: 'common' })}</span>
-                                    <span>{stats.Delivered.toLocaleString(i18n.language)} {t('delivered', { ns: 'common' })}</span>
+                                    <span>{stats.Opened.toLocaleString(i18n.language)} {t('opened')}</span>
+                                    <span>{stats.Delivered.toLocaleString(i18n.language)} {t('delivered')}</span>
                                 </div>
                             </div>
                         ) : (
-                            <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>0 {t('delivered', { ns: 'common' })}</span>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>0 {t('delivered')}</span>
                         )
                     ) : (
                         isDraft ? (
@@ -115,7 +115,7 @@ const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { cam
                 <div className="action-buttons" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                      {isDraft && (
                         <button onClick={onEdit} className="btn" disabled={loadingStats}>
-                             {loadingStats ? <Loader/> : <span>{t('edit', { ns: 'common' })}</span>}
+                             {loadingStats ? <Loader/> : <span>{t('edit')}</span>}
                         </button>
                     )}
                     <button onClick={onSelect} className="link-button campaign-card-view-link">{t('viewCampaignStats')} &rarr;</button>
@@ -126,7 +126,7 @@ const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { cam
 };
 
 const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void }) => {
-    const { t } = useTranslation(['campaigns', 'common']);
+    const { t } = useTranslation('campaigns');
     const { addToast } = useToast();
     const [searchQuery, setSearchQuery] = useState('');
     const [campaignStats, setCampaignStats] = useState<Record<string, { data?: any; loading: boolean; error?: any; }>>({});
@@ -277,11 +277,11 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                         <div className="pagination-controls">
                             <button onClick={() => setOffset(o => Math.max(0, o - CAMPAIGNS_PER_PAGE))} disabled={offset === 0 || loading}>
                                 <Icon>{ICONS.CHEVRON_LEFT}</Icon>
-                                <span>{t('previous', { ns: 'common' })}</span>
+                                <span>{t('previous')}</span>
                             </button>
-                            <span className="pagination-page-info">{t('page', { page: offset / CAMPAIGNS_PER_PAGE + 1, ns: 'common' })}</span>
+                            <span className="pagination-page-info">{t('page', { page: offset / CAMPAIGNS_PER_PAGE + 1 })}</span>
                             <button onClick={() => setOffset(o => o + CAMPAIGNS_PER_PAGE)} disabled={!paginatedCampaigns || paginatedCampaigns.length < CAMPAIGNS_PER_PAGE || loading}>
-                                <span>{t('next', { ns: 'common' })}</span>
+                                <span>{t('next')}</span>
                                 <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                             </button>
                         </div>

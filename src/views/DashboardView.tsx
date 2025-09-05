@@ -17,7 +17,7 @@ import { readItems } from '@directus/sdk';
 import { AppActions } from '../config/actions';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
-    const { t, i18n } = useTranslation(['dashboard', 'common']);
+    const { t, i18n } = useTranslation('dashboard');
     const { hasModuleAccess, loading: authLoading, allModules, setModuleToUnlock } = useAuth();
     const { config, loading: configLoading } = useConfiguration();
     const apiParams = useMemo(() => ({ from: formatDateForApiV4(getPastDateByDays(365)) }), []);
@@ -67,18 +67,18 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     };
 
     const staticNavItems = useMemo(() => [
-        { name: t('statistics'), icon: ICONS.STATISTICS, desc: t('statisticsDesc'), view: 'Statistics' },
-        { name: t('contacts'), icon: ICONS.CONTACTS, desc: t('contactsDesc'), view: 'Contacts' },
-        { name: t('marketing'), icon: ICONS.CALENDAR, desc: t('marketingDesc'), view: 'Marketing' },
-        { name: t('sendEmail'), icon: ICONS.SEND_EMAIL, desc: t('sendEmailDesc'), view: 'Send Email' },
-        { name: t('emailLists'), icon: ICONS.EMAIL_LISTS, desc: t('emailListsDesc'), view: 'Email Lists' },
-        { name: t('segments'), icon: ICONS.SEGMENTS, desc: t('segmentsDesc'), view: 'Segments' },
-        { name: t('mediaManager'), icon: ICONS.FOLDER, desc: t('mediaManagerDesc'), view: 'Media Manager' },
-        { name: t('campaigns'), icon: ICONS.CAMPAIGNS, desc: t('campaignsDesc'), view: 'Campaigns' },
-        { name: t('templates'), icon: ICONS.ARCHIVE, desc: t('templatesDesc'), view: 'Templates' },
-        { name: t('emailBuilder'), icon: ICONS.LAYERS, desc: t('emailBuilderDesc'), view: 'Email Builder' },
-        { name: t('domains'), icon: ICONS.DOMAINS, desc: t('domainsDesc'), view: 'Domains' },
-        { name: t('smtp'), icon: ICONS.SMTP, desc: t('smtpDesc'), view: 'SMTP' },
+        { name: t('statistics', { ns: 'common' }), icon: ICONS.STATISTICS, desc: t('statisticsDesc'), view: 'Statistics' },
+        { name: t('contacts', { ns: 'common' }), icon: ICONS.CONTACTS, desc: t('contactsDesc'), view: 'Contacts' },
+        { name: t('marketing', { ns: 'common' }), icon: ICONS.CALENDAR, desc: t('marketingDesc'), view: 'Marketing' },
+        { name: t('sendEmail', { ns: 'common' }), icon: ICONS.SEND_EMAIL, desc: t('sendEmailDesc'), view: 'Send Email' },
+        { name: t('emailLists', { ns: 'common' }), icon: ICONS.EMAIL_LISTS, desc: t('emailListsDesc'), view: 'Email Lists' },
+        { name: t('segments', { ns: 'common' }), icon: ICONS.SEGMENTS, desc: t('segmentsDesc'), view: 'Segments' },
+        { name: t('mediaManager', { ns: 'common' }), icon: ICONS.FOLDER, desc: t('mediaManagerDesc'), view: 'Media Manager' },
+        { name: t('campaigns', { ns: 'common' }), icon: ICONS.CAMPAIGNS, desc: t('campaignsDesc'), view: 'Campaigns' },
+        { name: t('templates', { ns: 'common' }), icon: ICONS.ARCHIVE, desc: t('templatesDesc'), view: 'Templates' },
+        { name: t('emailBuilder', { ns: 'common' }), icon: ICONS.LAYERS, desc: t('emailBuilderDesc'), view: 'Email Builder' },
+        { name: t('domains', { ns: 'common' }), icon: ICONS.DOMAINS, desc: t('domainsDesc'), view: 'Domains' },
+        { name: t('smtp', { ns: 'common' }), icon: ICONS.SMTP, desc: t('smtpDesc'), view: 'SMTP' },
     ], [t]);
 
     const dashboardTools = useMemo(() => {
@@ -88,7 +88,10 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
             const moduleData = moduleMap.get(item.view);
             return {
                 ...item,
-                desc: moduleData ? moduleData.moduledetails : item.desc,
+                // Prioritize the module name from the backend as requested by the user
+                name: moduleData?.modulename || item.name,
+                // Always use the translated description from the local dashboard.json file
+                desc: item.desc,
                 moduleData: moduleData || null,
             };
         });
@@ -114,7 +117,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                                 <Icon>{ICONS.BUY_CREDITS}</Icon>
                                 {accountLoading ? t('loadingCredits') : `${t('credits')}: ${Number(accountData?.emailcredits ?? 0).toLocaleString(i18n.language)}`}
                             </Button>
-                            <Button className="btn-secondary btn-notifications" onClick={handleNotificationsClick} title={t('notifications')}>
+                            <Button className="btn-secondary btn-notifications" onClick={handleNotificationsClick} title={t('notifications', { ns: 'common' })}>
                                 <Icon>{ICONS.BELL}</Icon>
                                 {unreadCount > 0 && <span className="notification-dot"></span>}
                             </Button>
@@ -130,7 +133,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                         </div>
                         <div className="cta-banner-action">
                             <Button className="btn-primary" onClick={() => setView('Marketing')} action={AppActions.START_MARKETING_CAMPAIGN}>
-                                <Icon>{ICONS.SEND_EMAIL}</Icon> {t('createCampaign', { ns: 'campaigns' })}
+                                <Icon>{ICONS.SEND_EMAIL}</Icon> {t('createCampaign', { ns: 'common' })}
                             </Button>
                         </div>
                     </div>
