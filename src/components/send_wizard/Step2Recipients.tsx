@@ -8,9 +8,10 @@ import { List, Segment } from '../../api/types';
 import { apiFetch } from '../../api/elasticEmail';
 import { useToast } from '../../contexts/ToastContext';
 import Loader from '../Loader';
+import Icon, { ICONS } from '../Icon';
 
 const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; apiKey: string; }) => {
-    const { t } = useTranslation('sendEmail');
+    const { t } = useTranslation(['send-wizard', 'sendEmail', 'common']);
     const { addToast } = useToast();
     const [segmentDisplayCounts, setSegmentDisplayCounts] = useState<Record<string, number | null>>({});
 
@@ -33,7 +34,7 @@ const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext:
                 }
             });
         }
-    }, [segments, apiKey]); // Note: segmentDisplayCounts is intentionally omitted to prevent loops
+    }, [segments, apiKey, segmentDisplayCounts]);
 
     const listItems = (lists || []).map((l: List) => ({ id: l.ListName, name: l.ListName }));
     
@@ -119,21 +120,26 @@ const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext:
             nextDisabled={isNextDisabled}
         >
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div className="wizard-step-intro">
+                    <Icon>{ICONS.CONTACTS}</Icon>
+                    <p>{t('selectAudience_desc')}</p>
+                </div>
+
                 <div className="recipient-options">
                     <label className="custom-radio">
                         <input type="radio" name="recipientTarget" value="all" checked={data.recipientTarget === 'all'} onChange={() => handleTargetChange('all')} />
                         <span className="radio-checkmark"></span>
-                        <span className="radio-label">{t('allContacts')}</span>
+                        <span className="radio-label">{t('allContacts', { ns: 'sendEmail' })}</span>
                     </label>
                     <label className="custom-radio">
                         <input type="radio" name="recipientTarget" value="list" checked={data.recipientTarget === 'list'} onChange={() => handleTargetChange('list')} />
                         <span className="radio-checkmark"></span>
-                        <span className="radio-label">{t('aList')}</span>
+                        <span className="radio-label">{t('aList', { ns: 'sendEmail' })}</span>
                     </label>
                     <label className="custom-radio">
                         <input type="radio" name="recipientTarget" value="segment" checked={data.recipientTarget === 'segment'} onChange={() => handleTargetChange('segment')} />
                         <span className="radio-checkmark"></span>
-                        <span className="radio-label">{t('aSegment')}</span>
+                        <span className="radio-label">{t('aSegment', { ns: 'sendEmail' })}</span>
                     </label>
                 </div>
 
@@ -142,7 +148,7 @@ const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext:
                         items={listItems}
                         selectedItems={data.recipients.listNames}
                         onSelectionChange={(selected) => handleSelectionChange(selected, 'listNames')}
-                        placeholder={t('chooseList')}
+                        placeholder={t('chooseList', { ns: 'sendEmail' })}
                         loading={listsLoading}
                     />
                 )}
@@ -152,7 +158,7 @@ const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext:
                         items={segmentItems}
                         selectedItems={data.recipients.segmentNames}
                         onSelectionChange={(selected) => handleSelectionChange(selected, 'segmentNames')}
-                        placeholder={t('chooseSegment')}
+                        placeholder={t('chooseSegment', { ns: 'sendEmail' })}
                         loading={segmentsLoading}
                     />
                 )}
@@ -161,7 +167,7 @@ const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext:
                     <strong>
                         {data.isCountLoading ? <Loader /> : (data.recipientCount !== null ? data.recipientCount.toLocaleString() : '0')}
                     </strong>
-                    <span>{t('recipients', { ns: 'common' })}</span>
+                    <span>{t('recipients')}</span>
                 </div>
             </div>
         </WizardLayout>

@@ -11,7 +11,7 @@ import Step4Settings from '../components/send_wizard/Step4Settings';
 import Step5Sending from '../components/send_wizard/Step5Sending';
 
 const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: string) => void }) => {
-    const { t } = useTranslation(['sendEmail', 'common']);
+    const { t } = useTranslation(['send-wizard', 'sendEmail', 'common']);
     const { addToast } = useToast();
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,7 +62,7 @@ const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             );
     
             if (verifiedDomains.length === 0) {
-                throw new Error("No verified sending domain available. Please configure a domain in your account settings.");
+                throw new Error(t('noVerifiedDomainError'));
             }
     
             const defaultFromEmail = verifiedDomains[0].DefaultSender || `mailer@${verifiedDomains[0].Domain}`;

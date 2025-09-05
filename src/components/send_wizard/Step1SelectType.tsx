@@ -2,9 +2,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import WizardLayout from './WizardLayout';
+import Icon, { ICONS } from '../Icon';
 
 const Step1SelectType = ({ onNext, onBack, data, updateData }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; }) => {
-    const { t } = useTranslation('sendEmail');
+    const { t } = useTranslation('send-wizard');
 
     const handleSelect = (type: string) => {
         updateData({ type });
@@ -17,20 +18,25 @@ const Step1SelectType = ({ onNext, onBack, data, updateData }: { onNext: () => v
             onNext={onNext}
             onBack={onBack}
             nextDisabled={!data.type}
+            hideBackButton
         >
+            <div className="wizard-step-intro">
+                <Icon>{ICONS.HASH}</Icon>
+                <p>{t('selectCampaignType_desc')}</p>
+            </div>
             <div className="selection-grid">
                 <div
                     className={`selection-card ${data.type === 'regular' ? 'selected' : ''}`}
                     onClick={() => handleSelect('regular')}
                 >
-                    <h3>REGULAR<br />CAMPAIGN</h3>
+                    <h3 dangerouslySetInnerHTML={{ __html: t('regularCampaign') }} />
                     <div className="selection-card-radio"></div>
                 </div>
                 <div
                     className="selection-card disabled"
-                    title="Coming Soon!"
+                    title={t('comingSoon')}
                 >
-                    <h3>A/B TEST<br />CAMPAIGN</h3>
+                    <h3 dangerouslySetInnerHTML={{ __html: t('abTestCampaign') }} />
                     <div className="selection-card-radio"></div>
                 </div>
             </div>

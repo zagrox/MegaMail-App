@@ -1,3 +1,4 @@
+
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../Icon';
@@ -15,6 +16,7 @@ interface WizardLayoutProps {
     isLastStep?: boolean;
     isSubmitting?: boolean;
     nextAction?: string;
+    hideBackButton?: boolean;
 }
 
 const WizardLayout = ({
@@ -27,8 +29,10 @@ const WizardLayout = ({
     isLastStep = false,
     isSubmitting = false,
     nextAction = AppActions.WIZARD_NEXT_STEP,
+    hideBackButton = false,
 }: WizardLayoutProps) => {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation(['send-wizard', 'common', 'sendEmail']);
+    const isRTL = i18n.dir() === 'rtl';
 
     return (
         <div className="wizard-main">
@@ -39,25 +43,44 @@ const WizardLayout = ({
                 {children}
             </div>
             <div className="wizard-footer">
-                <button
-                    className="btn btn-secondary"
-                    onClick={onBack}
-                    disabled={isSubmitting}
-                >
-                    {/* FIX: Changed path prop to children for Icon component */}
-                    <Icon>{ICONS.CHEVRON_LEFT}</Icon>
-                    <span>{t('back', { ns: 'onboarding' })}</span>
-                </button>
+                {!hideBackButton && (
+                    <button
+                        className="btn btn-secondary"
+                        onClick={onBack}
+                        disabled={isSubmitting}
+                    >
+                        {isRTL ? (
+                            <>
+                                <span>{t('back')}</span>
+                                <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
+                            </>
+                        ) : (
+                            <>
+                                <Icon>{ICONS.CHEVRON_LEFT}</Icon>
+                                <span>{t('back')}</span>
+                            </>
+                        )}
+                    </button>
+                )}
                 {!isLastStep ? (
                     <Button
                         className="btn-primary"
                         onClick={onNext}
                         disabled={nextDisabled || isSubmitting}
                         action={nextAction}
+                        style={{ marginLeft: hideBackButton ? 'auto' : undefined }}
                     >
-                        <span>{t('next')}</span>
-                        {/* FIX: Changed path prop to children for Icon component */}
-                        <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
+                        {isRTL ? (
+                            <>
+                                <Icon>{ICONS.CHEVRON_LEFT}</Icon>
+                                <span>{t('next')}</span>
+                            </>
+                        ) : (
+                            <>
+                                <span>{t('next')}</span>
+                                <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
+                            </>
+                        )}
                     </Button>
                 ) : (
                     <Button
@@ -68,7 +91,6 @@ const WizardLayout = ({
                     >
                         {isSubmitting ? <Loader /> : (
                             <>
-                                {/* FIX: Changed path prop to children for Icon component */}
                                 <Icon>{ICONS.SEND_EMAIL}</Icon>
                                 <span>{t('submit', { ns: 'sendEmail' })}</span>
                             </>

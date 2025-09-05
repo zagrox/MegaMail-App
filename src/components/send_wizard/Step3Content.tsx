@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import WizardLayout from './WizardLayout';
 import Icon, { ICONS } from '../Icon';
@@ -21,7 +22,7 @@ const decodeState = (base64: string): string => {
 };
 
 const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; apiKey: string; }) => {
-    const { t } = useTranslation(['templates', 'sendEmail', 'common']);
+    const { t } = useTranslation(['send-wizard', 'templates', 'sendEmail', 'common']);
     const { addToast } = useToast();
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -121,7 +122,6 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
             <Modal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} title={t('templates')}>
                 <div className="template-selector-modal">
                     <div className="search-bar" style={{marginBottom: '1rem'}}>
-                        {/* FIX: Changed path prop to children for Icon component */}
                         <Icon>{ICONS.SEARCH}</Icon>
                         <input
                             type="search"
@@ -156,34 +156,36 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
             
             <WizardLayout
                 step={3}
-                title="Design Content"
+                title={t('designContent')}
                 onNext={onNext}
                 onBack={onBack}
                 nextDisabled={isNextDisabled}
             >
+                <div className="wizard-step-intro">
+                    <Icon>{ICONS.MAIL}</Icon>
+                    <p>{t('designContent_desc')}</p>
+                </div>
                 <div className="content-form-grid">
-                    <label>Template</label>
+                    <label>{t('template', { ns: 'sendEmail' })}</label>
                     <div className="template-selector-display" onClick={() => setIsTemplateModalOpen(true)}>
-                        {isLoadingTemplate ? <Loader /> : (data.template || t('useTemplate'))}
+                        {isLoadingTemplate ? <Loader /> : (data.template || t('useTemplate', { ns: 'sendEmail' }))}
                     </div>
-                    {/* FIX: Changed path prop to children for Icon component */}
                     <button className="btn-icon" onClick={() => setIsTemplateModalOpen(true)} aria-label={t('changeTemplate')}><Icon>{ICONS.SETTINGS}</Icon></button>
-                    {/* FIX: Changed path prop to children for Icon component */}
                     <button className="btn-icon" onClick={handlePreview} disabled={!data.template || isLoadingTemplate} aria-label={t('previewTemplate')}><Icon>{ICONS.EYE}</Icon></button>
 
-                    <label>{t('fromName')}</label>
+                    <label>{t('fromName', { ns: 'sendEmail' })}</label>
                     <input type="text" name="fromName" value={data.fromName} onChange={handleChange} className="full-width" style={{gridColumn: '2 / -1'}} />
 
-                    <label>{t('subject')}</label>
+                    <label>{t('subject', { ns: 'sendEmail' })}</label>
                     <input type="text" name="subject" value={data.subject} onChange={handleChange} style={{gridColumn: '2 / 4'}} />
                     <span className="ai-sparkle">✨</span>
 
-                    <label style={{alignSelf: 'start', paddingTop: '0.5rem'}}>Reply-To</label>
+                    <label style={{alignSelf: 'start', paddingTop: '0.5rem'}}>{t('replyTo')}</label>
                     <div style={{ gridColumn: '2 / -1', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         <label className="custom-checkbox">
                             <input type="checkbox" name="enableReplyTo" checked={!!data.enableReplyTo} onChange={handleCheckboxChange} />
                             <span className="checkbox-checkmark"></span>
-                            <span className="checkbox-label" style={{ fontWeight: 'normal' }}>Set a different Reply-To address</span>
+                            <span className="checkbox-label" style={{ fontWeight: 'normal' }}>{t('setDifferentReplyTo')}</span>
                         </label>
                         {data.enableReplyTo &&
                             <input 
@@ -192,7 +194,7 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
                                 value={data.replyTo} 
                                 onChange={handleChange} 
                                 className="full-width" 
-                                placeholder="reply-to@example.com"
+                                placeholder={t('replyToPlaceholder')}
                             />
                         }
                     </div>
