@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../Icon';
@@ -23,7 +24,8 @@ const LabeledControl = ({ label, children, fullWidth = false }: { label: string,
 
 const ColorInput = ({ value, onChange, onAdd, onRemove }: { value?: string; onChange: (hex: string) => void; onAdd: () => void; onRemove: () => void; }) => {
     if (!value || value === 'transparent') {
-        return <button onClick={onAdd} className="btn-icon color-input-add-btn"><Icon path={ICONS.PLUS}/></button>;
+        // FIX: Changed path prop to children for Icon component
+        return <button onClick={onAdd} className="btn-icon color-input-add-btn"><Icon>{ICONS.PLUS}</Icon></button>;
     }
     
     return (
@@ -38,7 +40,8 @@ const ColorInput = ({ value, onChange, onAdd, onRemove }: { value?: string; onCh
                 onChange={(e) => onChange(e.target.value)}
                 onFocus={(e) => e.target.select()}
             />
-             <button onClick={onRemove} className="btn-icon"><Icon path={ICONS.DELETE} /></button>
+             {/* FIX: Changed path prop to children for Icon component */}
+             <button onClick={onRemove} className="btn-icon"><Icon>{ICONS.DELETE}</Icon></button>
         </div>
     );
 };
@@ -120,13 +123,15 @@ const ModernPaddingControl = ({ style, onStyleChange }: { style: any, onStyleCha
                 onClick={() => setIsLinked(!isLinked)}
                 aria-label="Link padding values"
             >
-                <Icon path={ICONS.LINK} />
+                {/* FIX: Changed path prop to children for Icon component */}
+                <Icon>{ICONS.LINK}</Icon>
             </button>
         </div>
     );
 };
 
-const SegmentedControl = ({ options, value, onChange, isIconOnly = false }: { options: { value: string, label?: string, icon?: string }[], value: string, onChange: (val: string) => void, isIconOnly?: boolean }) => (
+// FIX: Changed icon prop type from string to React.ReactNode and updated Icon usage
+const SegmentedControl = ({ options, value, onChange, isIconOnly = false }: { options: { value: string, label?: string, icon?: React.ReactNode }[], value: string, onChange: (val: string) => void, isIconOnly?: boolean }) => (
     <div className={`segmented-control ${isIconOnly ? 'icon-only' : ''}`}>
         {options.map(opt => (
             <button
@@ -135,7 +140,8 @@ const SegmentedControl = ({ options, value, onChange, isIconOnly = false }: { op
                 onClick={() => onChange(opt.value)}
                 title={opt.label}
             >
-                {opt.icon && <Icon path={opt.icon} />}
+                {/* FIX: Changed path prop to children for Icon component */}
+                {opt.icon && <Icon>{opt.icon}</Icon>}
                 {!isIconOnly && opt.label && <span>{opt.label}</span>}
             </button>
         ))}
@@ -337,7 +343,8 @@ const ImageSettings = ({ block, onStyleChange, onContentChange, onOpenMediaManag
                     <label htmlFor={`src-${block.id}`}>{t('sourceUrl')}</label>
                     <div className="input-with-button">
                         <input id={`src-${block.id}`} type="url" value={c.src || ''} onChange={(e) => handleContentChange('src', e.target.value)} placeholder="https://..." />
-                        <button className="btn" onClick={() => onOpenMediaManager(block.id)}><Icon path={ICONS.IMAGE} /></button>
+                        {/* FIX: Changed path prop to children for Icon component */}
+                        <button className="btn" onClick={() => onOpenMediaManager(block.id)}><Icon>{ICONS.IMAGE}</Icon></button>
                     </div>
                 </div>
                 <div className="form-group">
@@ -439,7 +446,7 @@ const ButtonSettings = ({ block, onStyleChange, onContentChange }: { block: any,
                 </div>
                 <div className="form-group">
                     <label htmlFor={`href-${block.id}`}>{t('url')}</label>
-                    <input id={`href-${block.id}`} type="url" value={c.href || ''} onChange={(e) => handleContentChange('href', e.target.value)} placeholder="https://" />
+                    <input id={`href-${block.id}`} type="url" value={c.href || ''} onChange={(e) => handleContentChange('href', e.target.value)} placeholder="https://..." />
                 </div>
             </Section>
 

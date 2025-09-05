@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React, { useState, useEffect, useCallback, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readItems, updateItem } from '@directus/sdk';
 import sdk from '../../api/directus';
@@ -23,7 +24,8 @@ interface Notification {
 }
 
 // Map icon names from Directus to the ICONS object
-const getIconPath = (iconName: string): string => {
+// FIX: Changed return type from string to React.ReactNode to match returned JSX elements.
+const getIconPath = (iconName: string): React.ReactNode => {
     switch (iconName?.toLowerCase()) {
         case 'order':
         case 'cart':
@@ -202,7 +204,8 @@ const NotificationsTab = () => {
                     onClick={handleMarkAllAsRead}
                     disabled={unreadCount === 0}
                 >
-                    <Icon path={ICONS.CHECK} />
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <Icon>{ICONS.CHECK}</Icon>
                     <span>{t('markAllAsRead')}</span>
                 </button>
             </div>
@@ -226,7 +229,8 @@ const NotificationsTab = () => {
                                 onKeyPress={(e) => (e.key === 'Enter' || e.key === ' ') && handleClickNotification(n)}
                             >
                                 <div className="notification-icon-wrapper">
-                                    <Icon path={getIconPath(n.icon)} />
+                                    {/* FIX: Changed path prop to children for Icon component */}
+                                    <Icon>{getIconPath(n.icon)}</Icon>
                                 </div>
                                 <div className="notification-content">
                                     <p className="notification-message">{n.message}</p>

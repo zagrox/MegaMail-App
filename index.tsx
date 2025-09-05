@@ -9,8 +9,47 @@ import { ToastProvider } from './src/contexts/ToastContext';
 import App from './src/App';
 import CenteredMessage from './src/components/CenteredMessage';
 import Loader from './src/components/Loader';
-import './src/index.css';
 import { LabelsProvider } from './src/contexts/LabelsContext';
+
+// Import modular stylesheets directly for robust bundling
+import './src/styles/00_variables.css';
+import './src/styles/01_global.css';
+import './src/styles/02_utilities.css';
+import './src/styles/03_layout.css';
+
+/* Components */
+import './src/styles/components/accordion.css';
+import './src/styles/components/badge.css';
+import './src/styles/components/button.css';
+import './src/styles/components/card.css';
+import './src/styles/components/charts.css';
+import './src/styles/components/forms.css';
+import './src/styles/components/modal.css';
+import './src/styles/components/multiselect.css';
+import './src/styles/components/progress.css';
+import './src/styles/components/tabs.css';
+import './src/styles/components/toast.css';
+import './src/styles/components/view-switcher.css';
+
+/* Views */
+import './src/styles/views/shared.css';
+import './src/styles/views/account.css';
+import './src/styles/views/auth.css';
+import './src/styles/views/buy-credits.css';
+import './src/styles/views/campaign-detail.css';
+import './src/styles/views/campaigns.css';
+import './src/styles/views/contacts.css';
+import './src/styles/views/dashboard.css';
+import './src/styles/views/domains.css';
+import './src/styles/views/email-builder.css';
+import './src/styles/views/email-lists.css';
+import './src/styles/views/embed.css';
+import './src/styles/views/media-manager.css';
+import './src/styles/views/onboarding.css';
+import './src/styles/views/segments.css';
+import './src/styles/views/send-email.css';
+import './src/styles/views/send-wizard.css';
+import './src/styles/views/smtp.css';
 
 const root = createRoot(document.getElementById('root')!);
 root.render(

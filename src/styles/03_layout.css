@@ -1,0 +1,211 @@
+/* --- MAIN LAYOUT --- */
+.app-container {
+    display: flex;
+    height: 100%;
+    background-color: var(--background-color);
+}
+.sidebar {
+    width: 250px;
+    background-color: var(--surface-color);
+    border-inline-end: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    overflow-y: auto;
+}
+.main-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+.content {
+    padding: 1.5rem 2rem;
+    flex-grow: 1;
+}
+.content-header {
+    margin-bottom: 1.5rem;
+}
+.content-header h2 {
+    font-size: 2.4rem;
+    margin-top: 0.8rem;
+    font-weight: 700;
+}
+
+/* --- SIDEBAR --- */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.sidebar-logo {
+    width: 36px;
+    height: 36px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex-grow: 1;
+}
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    background: none;
+    border: none;
+    color: var(--subtle-text-color);
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s, color 0.2s;
+    position: relative;
+}
+.nav-btn:hover {
+    background-color: var(--subtle-background);
+    color: var(--text-color);
+}
+.nav-btn.active {
+    background-color: var(--secondary-color);
+    color: white;
+}
+.nav-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 0.5rem 0;
+}
+.sidebar-footer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+.logout-btn:hover {
+    background-color: rgba(var(--danger-color), 0.1);
+    color: var(--danger-color);
+}
+
+.nav-btn.locked {
+    color: var(--subtle-text-color);
+    cursor: pointer;
+}
+.nav-btn.locked .icon {
+    opacity: 0.5;
+}
+.nav-btn.locked:hover {
+    background-color: var(--subtle-background);
+}
+.nav-btn.locked .lock-icon {
+    position: absolute;
+    inset-inline-end: 0.75rem;
+    color: var(--warning-color);
+    width: 1rem;
+    height: 1rem;
+}
+
+.nav-btn.locked.active,
+.nav-btn.locked.active:hover {
+    color: white;
+    background-color: var(--secondary-color);
+}
+.nav-btn.locked.active .icon {
+    opacity: 1;
+}
+
+.nav-card.locked {
+    opacity: 0.6;
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10px,
+        rgba(var(--border-color-rgb), 0.3) 10px,
+        rgba(var(--border-color-rgb), 0.3) 20px
+    );
+}
+.nav-card.locked .nav-card-icon {
+    filter: grayscale(80%);
+}
+.nav-card .lock-icon-overlay {
+    position: absolute;
+    top: 1rem;
+    inset-inline-end: 1rem;
+    color: var(--warning-color);
+}
+
+/* --- MOBILE & RESPONSIVE --- */
+.mobile-header, .mobile-menu-overlay, .mobile-menu-toggle {
+    display: none;
+}
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        inset-inline-start: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+        transform: translateX(var(--sidebar-translateX));
+        height: 100%;
+    }
+    .app-container.mobile-menu-open .sidebar {
+        transform: translateX(0);
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+    .mobile-menu-overlay {
+        position: fixed;
+        inset: 0;
+        background: var(--overlay-background);
+        z-index: 999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .app-container.mobile-menu-open .mobile-menu-overlay {
+        display: block;
+        opacity: 1;
+    }
+    .mobile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        background-color: var(--surface-color);
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    .mobile-menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+    }
+    .mobile-header-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    .mobile-header-placeholder {
+        width: 24px;
+    }
+    .content {
+        padding: 1rem;
+    }
+    .content-header {
+        display: none;
+    }
+}
+.content--no-padding {
+    padding: 0;
+}

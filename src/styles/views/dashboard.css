@@ -1,0 +1,201 @@
+/* --- DASHBOARD --- */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.dashboard-actions .btn-notifications {
+    position: relative;
+    padding: 0.75rem; /* Make it more square-like */
+}
+
+.dashboard-actions .notification-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 10px;
+    height: 10px;
+    background-color: var(--danger-color);
+    border-radius: 50%;
+    border: 2px solid var(--surface-color);
+    pointer-events: none;
+}
+
+.cta-banner {
+    background-color: var(--surface-color);
+    border: 1px solid rgba(var(--border-color-rgb), 0.4);
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+html[data-theme='dark'] .cta-banner {
+    background: linear-gradient(135deg, rgba(var(--info-color), 0.05), rgba(var(--info-color), 0));
+}
+
+.cta-banner-icon {
+    flex-shrink: 0;
+}
+.cta-banner-icon .icon {
+    width: 4rem;
+    height: 4rem;
+    color: var(--subtle-text-color);
+}
+
+.cta-banner-text {
+    flex-grow: 1;
+}
+
+.cta-banner-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--secondary-color);
+}
+
+.cta-banner-desc {
+    color: var(--subtle-text-color);
+    max-width: 450px;
+    line-height: 1.5;
+}
+
+.cta-banner-action {
+    margin-inline-start: auto;
+    flex-shrink: 0;
+}
+
+@media (max-width: 992px) {
+    .cta-banner {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    .cta-banner-action {
+        margin: 1rem auto 0;
+        width: 100%;
+        max-width: 100%;
+    }
+    .cta-banner-action .btn {
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .cta-banner {
+        display: none;
+    }
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .dashboard-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+}
+.dashboard-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+.dashboard-section {
+    margin-top: 2.5rem;
+}
+.dashboard-section-header {
+    margin-bottom: 1.5rem;
+}
+.dashboard-section-header h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+.dashboard-section-header p {
+    color: var(--subtle-text-color);
+}
+.dashboard-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+.nav-card {
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    position: relative;
+}
+.nav-card-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--secondary-color);
+    flex-shrink: 0;
+}
+.nav-card-text-content {
+    flex-grow: 1;
+}
+.nav-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+.nav-card-description {
+    font-size: 0.9rem;
+    color: var(--subtle-text-color);
+    line-height: 1.4;
+}
+.dashboard-branding-footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--subtle-text-color);
+    font-size: 0.9rem;
+}
+.theme-switcher, .language-switcher {
+    display: flex;
+    gap: 0.5rem;
+    background-color: var(--subtle-background);
+    padding: 0.25rem;
+    border-radius: 8px;
+    max-width: 300px;
+}
+.theme-switcher button, .language-switcher button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    font-weight: bold;
+    color: var(--subtle-text-color);
+}
+.theme-switcher button.active, .language-switcher button.active {
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    font-weight: 500;
+}

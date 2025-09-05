@@ -1,0 +1,110 @@
+/* --- CAMPAIGNS VIEW --- */
+.campaign-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+@media (min-width: 768px) {
+    .campaign-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.campaign-card {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+.campaign-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.campaign-card-header {
+    padding: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+}
+.campaign-card-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    word-break: break-all;
+    margin: 0;
+}
+.campaign-card-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex-grow: 1;
+}
+.campaign-detail {
+    color: var(--subtle-text-color);
+    margin: 0;
+    font-size: 0.9rem;
+    word-break: break-all;
+}
+.campaign-detail strong {
+    color: var(--text-color);
+    font-weight: 500;
+    margin-inline-end: 0.5rem;
+}
+.campaign-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1.5rem;
+}
+.campaign-stat-item {
+    text-align: center;
+}
+.campaign-stat-item span {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+.campaign-stat-item label {
+    font-size: 0.75rem;
+    color: var(--subtle-text-color);
+    text-transform: uppercase;
+}
+@media (max-width: 400px) {
+    .campaign-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+.campaign-card-footer {
+    margin-top: auto;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    background: var(--subtle-background);
+}
+.campaign-card-footer-stats {
+    display: flex;
+    gap: 1rem;
+    color: var(--subtle-text-color);
+    align-items: center;
+}
+.campaign-card-footer-stats .loader {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+.campaign-card-footer-stats span strong {
+    color: var(--text-color);
+    font-weight: 600;
+}
+.campaign-card-view-link {
+    color: var(--secondary-color);
+    font-weight: 500;
+    text-decoration: none;
+}
+.campaign-card-view-link:hover {
+    text-decoration: underline;
+}
