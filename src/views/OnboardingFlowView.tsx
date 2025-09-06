@@ -11,12 +11,10 @@ const TOTAL_STEPS = 4;
 
 const Step1 = () => {
     const { t } = useTranslation(['onboarding', 'common']);
-    const { config } = useConfiguration();
-    const appName = config?.app_name || 'MegaMail';
 
     return (
         <div className="onboarding-step">
-            <h2>{t('welcomeTitle', { appName })}</h2>
+            <h2>{t('welcomeTitle', { appName: t('appName') })}</h2>
             <p>{t('welcomeSubtitle')}</p>
         </div>
     );

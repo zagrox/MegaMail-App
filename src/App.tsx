@@ -36,7 +36,7 @@ import UnlockModuleModal from './components/UnlockModuleModal';
 const App = () => {
     const { isAuthenticated, user, logout, hasModuleAccess, loading: authLoading, allModules, moduleToUnlock, setModuleToUnlock } = useAuth();
     const { config } = useConfiguration();
-    const { t, i18n } = useTranslation('common');
+    const { t, i18n } = useTranslation(['common', 'emailLists', 'contacts']);
     const [view, setView] = useState('Dashboard');
     const [templateToEdit, setTemplateToEdit] = useState<Template | null>(null);
     const [campaignToLoad, setCampaignToLoad] = useState<any | null>(null);
@@ -95,13 +95,13 @@ const App = () => {
         }
     }, [i18n.language, i18n.dir, isEmbedMode]);
 
+    const appName = t('appName');
+
     useEffect(() => {
         if (!config) return;
     
         // Update Page Title
-        if (config.app_name) {
-            document.title = config.app_name;
-        }
+        document.title = appName;
     
         // Update Favicon and Apple Touch Icon
         const favicon = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
@@ -137,9 +137,9 @@ const App = () => {
         const manifestLink = document.querySelector('link[rel="manifest"]');
         if (manifestLink && config.app_backend) {
             const manifest = {
-                "name": `${config.app_name} - Email Marketing Platform`,
-                "short_name": config.app_name,
-                "description": `Your complete email marketing solution, powered by ${config.app_name}.`,
+                "name": `${appName} - Email Marketing Platform`,
+                "short_name": appName,
+                "description": `Your complete email marketing solution, powered by ${appName}.`,
                 "start_url": "/",
                 "display": "standalone",
                 "background_color": "#F7F9FC",
@@ -158,7 +158,7 @@ const App = () => {
             const manifestUrl = URL.createObjectURL(manifestBlob);
             manifestLink.setAttribute('href', manifestUrl);
         }
-    }, [config]);
+    }, [config, appName]);
     
     useEffect(() => {
         const container = appContainerRef.current;
@@ -243,8 +243,8 @@ const App = () => {
         'Buy Credits': { component: <BuyCreditsView apiKey={apiKey} user={user} setView={handleSetView} />, title: t('buyCredits'), icon: ICONS.BUY_CREDITS },
         'Contacts': { component: <ContactsView apiKey={apiKey} setView={handleSetView} />, title: t('contacts'), icon: ICONS.CONTACTS },
         'Email Lists': { component: <EmailListView apiKey={apiKey} setView={handleSetView} />, title: t('emailLists'), icon: ICONS.EMAIL_LISTS },
-        'ListDetail': { component: <ListDetailView apiKey={apiKey} list={selectedList} setView={handleSetView} onBack={() => handleSetView('Email Lists')} />, title: selectedList ? t('contactsInList', { listName: selectedList.ListName, ns: 'emailLists' }) : t('contacts'), icon: ICONS.CONTACTS },
-        'ContactDetail': { component: <ContactDetailView apiKey={apiKey} contactEmail={selectedContactEmail || ''} onBack={() => contactDetailOrigin ? handleSetView(contactDetailOrigin.view, contactDetailOrigin.data) : handleSetView('Contacts')} />, title: selectedContactEmail || t('contactDetails', { ns: 'contacts' }), icon: ICONS.ACCOUNT },
+        'ListDetail': { component: <ListDetailView apiKey={apiKey} list={selectedList} setView={handleSetView} onBack={() => handleSetView('Email Lists')} />, title: selectedList ? t('contactsInList', { listName: selectedList.ListName }) : t('contacts'), icon: ICONS.CONTACTS },
+        'ContactDetail': { component: <ContactDetailView apiKey={apiKey} contactEmail={selectedContactEmail || ''} onBack={() => contactDetailOrigin ? handleSetView(contactDetailOrigin.view, contactDetailOrigin.data) : handleSetView('Contacts')} />, title: selectedContactEmail || t('contactDetails'), icon: ICONS.ACCOUNT },
         'Segments': { component: <SegmentsView apiKey={apiKey} />, title: t('segments'), icon: ICONS.SEGMENTS },
         'Media Manager': { component: <MediaManagerView apiKey={apiKey} />, title: t('mediaManager'), icon: ICONS.FOLDER },
         'Campaigns': { component: <CampaignsView apiKey={apiKey} setView={handleSetView} />, title: t('campaigns'), icon: ICONS.CAMPAIGNS },
@@ -273,8 +273,6 @@ const App = () => {
         { name: t('smtp'), view: 'SMTP', icon: ICONS.SMTP },
     ];
     
-    const isRTL = i18n.dir() === 'rtl';
-    const appName = isRTL && config?.app_native ? config.app_native : (config?.app_name || '...');
     const logoUrl = config?.app_logo && config?.app_backend ? `${config.app_backend}/assets/${config.app_logo}` : '';
     
     const SidebarContent = () => (

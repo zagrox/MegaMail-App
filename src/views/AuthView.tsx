@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -84,12 +82,10 @@ const AuthView = () => {
         );
     }
     
-    const appName = config?.app_name || '...';
-
     return (
         <div className="auth-container">
             <div className="auth-box">
-                <h1><span className="logo-font">{appName}</span></h1>
+                <h1><span className="logo-font">{t('appName')}</span></h1>
                 <p>{getSubtitle()}</p>
 
                 <form className="auth-form" onSubmit={handleSubmit}>

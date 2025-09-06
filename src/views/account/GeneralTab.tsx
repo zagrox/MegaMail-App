@@ -1,6 +1,3 @@
-
-
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
@@ -16,9 +13,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
     const { t, i18n } = useTranslation(['account', 'common']);
     const { logout } = useAuth();
     const { getStatusStyle } = useStatusStyles();
-    const { config } = useConfiguration();
-    const appName = config?.app_name || 'MegaMail';
-
+    
     const getReputationInfo = (reputation: number) => {
         const score = Number(reputation || 0);
         if (score >= 80) return { text: t('reputationExcellent'), className: 'good' };
@@ -55,7 +50,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
                     <h3>{t('displayMode')}</h3>
                 </div>
                 <div className="account-tab-card-body">
-                    <p>{t('displayModeSubtitle', { appName })}</p>
+                    <p>{t('displayModeSubtitle', { appName: t('appName') })}</p>
                     <ThemeSwitcher />
                 </div>
             </div>
@@ -78,7 +73,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
                     <div className="account-tab-card-body">
                         <p>{t('installAppSubtitle')}</p>
                         <button className="btn btn-secondary" onClick={handleInstallClick} style={{maxWidth: '250px'}}>
-                            <Icon>{ICONS.DOWNLOAD}</Icon> {t('installMailzila', { appName })}
+                            <Icon>{ICONS.DOWNLOAD}</Icon> {t('installMailzila', { appName: t('appName') })}
                         </button>
                     </div>
                 </div>

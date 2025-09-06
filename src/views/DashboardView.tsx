@@ -17,7 +17,7 @@ import { readItems } from '@directus/sdk';
 import { AppActions } from '../config/actions';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
-    const { t, i18n } = useTranslation('dashboard');
+    const { t, i18n } = useTranslation(['dashboard', 'common']);
     const { hasModuleAccess, loading: authLoading, allModules, setModuleToUnlock } = useAuth();
     const { config, loading: configLoading } = useConfiguration();
     const apiParams = useMemo(() => ({ from: formatDateForApiV4(getPastDateByDays(365)) }), []);
@@ -101,7 +101,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     if (statsError) console.warn("Could not load dashboard stats:", statsError);
 
     const welcomeName = user?.first_name || t('user');
-    const appName = config?.app_name || 'MegaMail';
+    const appName = t('appName');
     const copyrightText = configLoading ? '...' : (config?.app_copyright || `${appName} © ${new Date().getFullYear()}, All Rights Reserved`);
 
     return (
