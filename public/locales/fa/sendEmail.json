@@ -1,3 +1,4 @@
+
 {
     "selectCampaignType": "انتخاب نوع کمپین",
     "selectAudience": "انتخاب مخاطب",
@@ -20,6 +21,7 @@
     "emailSentSuccess": "ایمیل برای ارسال در صف قرار گرفت!",
     "draftSavedSuccess": "کمپین با موفقیت به عنوان پیش‌نویس ذخیره شد!",
     "emailSentError": "ارسال ایمیل ناموفق بود: {{error}}",
+    "draftSaveError": "ذخیره پیش‌نویس ناموفق بود: {{error}}",
     "noVerifiedDomains": "هیچ دامنه تأیید شده‌ای یافت نشد.",
     "noVerifiedDomainsToSendError": "قبل از ارسال ایمیل باید یک دامنه ارسال اضافه و تأیید کنید.",
     "addDomainNow": "اکنون یک دامنه اضافه کنید.",

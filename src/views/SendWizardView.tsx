@@ -75,20 +75,23 @@ const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
+            const isDraftAction = campaignData.sendAction === 'later';
+    
             const verifiedDomains = (domains || []).filter((d: any) =>
                 String(d.Spf).toLowerCase() === 'true' &&
                 String(d.Dkim).toLowerCase() === 'true'
             );
     
-            if (verifiedDomains.length === 0) {
+            if (!isDraftAction && verifiedDomains.length === 0) {
                 throw new Error(t('noVerifiedDomainError'));
             }
     
-            const defaultFromEmail = verifiedDomains[0].DefaultSender || `mailer@${verifiedDomains[0].Domain}`;
+            const defaultFromEmail = (verifiedDomains.length > 0)
+                ? (verifiedDomains[0].DefaultSender || `mailer@${verifiedDomains[0].Domain}`)
+                : 'draft-email@example.com'; 
     
             const payload: any = {
                 Name: campaignData.campaignName,
-                Status: campaignData.sendAction === 'later' ? 'Draft' : 'Active',
                 Content: [
                     {
                         From: campaignData.fromName ? `${campaignData.fromName} <${defaultFromEmail}>` : defaultFromEmail,
@@ -98,38 +101,56 @@ const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                         Utm: campaignData.utmEnabled ? campaignData.utm : undefined,
                     }
                 ],
-                Recipients: {},
                 Options: {
                     TrackOpens: campaignData.trackOpens,
                     TrackClicks: campaignData.trackClicks,
-                    ScheduleFor: campaignData.sendAction === 'schedule' && campaignData.scheduleDateTime 
-                        ? new Date(campaignData.scheduleDateTime).toISOString() 
+                    ScheduleFor: campaignData.sendAction === 'schedule' && campaignData.scheduleDateTime
+                        ? new Date(campaignData.scheduleDateTime).toISOString()
                         : null,
                     DeliveryOptimization: campaignData.deliveryOptimization,
                     EnableSendTimeOptimization: campaignData.enableSendTimeOptimization,
                 }
             };
-    
-            if (campaignData.recipientTarget === 'list') {
-                payload.Recipients = { ListNames: campaignData.recipients.listNames };
-            } else if (campaignData.recipientTarget === 'segment') {
-                payload.Recipients = { SegmentNames: campaignData.recipients.segmentNames };
-            } else if (campaignData.recipientTarget === 'all') {
+            
+            if (isDraftAction) {
+                payload.Status = 'Draft';
+            } else {
+                payload.Status = 'Active';
+                if (campaignData.sendAction === 'schedule' && payload.Options.ScheduleFor) {
+                    payload.Options.Trigger = { Count: 1 };
+                }
+            }
+            
+            const hasLists = campaignData.recipients.listNames && campaignData.recipients.listNames.length > 0;
+            const hasSegments = campaignData.recipients.segmentNames && campaignData.recipients.segmentNames.length > 0;
+
+            if (campaignData.recipientTarget === 'all' && !isDraftAction) {
+                // Send to All Contacts - API requires a special empty object.
                 payload.Recipients = {};
+            } else if (hasLists || hasSegments) {
+                // Send to specific lists/segments OR save a draft with them selected.
+                payload.Recipients = {
+                    ListNames: hasLists ? campaignData.recipients.listNames : [],
+                    SegmentNames: hasSegments ? campaignData.recipients.segmentNames : []
+                };
+            } else {
+                // This is a draft with no specific recipients, so we omit the Recipients key.
+                // Or, this is an invalid send attempt, which will be caught by the API.
             }
     
-            // Clean up undefined/null properties to not send them in the payload
             if (!payload.Content[0].ReplyTo) delete payload.Content[0].ReplyTo;
             if (!payload.Content[0].Utm || Object.values(payload.Content[0].Utm).every(v => !v)) delete payload.Content[0].Utm;
             if (!payload.Options.ScheduleFor) delete payload.Options.ScheduleFor;
     
             await apiFetchV4('/campaigns', apiKey, { method: 'POST', body: payload });
             
-            addToast(payload.Status === 'Draft' ? t('draftSavedSuccess') : t('emailSentSuccess'), 'success');
+            addToast(payload.Status === 'Draft' ? t('draftSavedSuccess', { ns: 'sendEmail' }) : t('emailSentSuccess', { ns: 'sendEmail' }), 'success');
             setView('Campaigns');
     
         } catch (err: any) {
-            addToast(t('emailSentError', { error: err.message }), 'error');
+            const isDraftAction = campaignData.sendAction === 'later';
+            const errorKey = isDraftAction ? 'draftSaveError' : 'emailSentError';
+            addToast(t(errorKey, { ns: 'sendEmail', error: err.message }), 'error');
         } finally {
             setIsSubmitting(false);
         }

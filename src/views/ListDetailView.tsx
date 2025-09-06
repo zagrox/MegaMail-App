@@ -44,7 +44,7 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
         try {
             await apiFetchV4(`/lists/${encodeURIComponent(listName)}/contacts`, apiKey, {
                 method: 'POST',
-                body: { Emails: emails }
+                body: emails
             });
             addToast(`${emails.length} contact(s) added to ${listName} successfully!`, 'success');
             setIsAddContactModalOpen(false);

@@ -489,7 +489,7 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
         try {
             await apiFetchV4(`/lists/${encodeURIComponent(listName)}/contacts`, apiKey, {
                 method: 'POST',
-                body: selectedContacts
+                body: { Emails: selectedContacts }
             });
             addToast(`${selectedContacts.length} contacts added to ${listName}.`, 'success');
             clearSelection();

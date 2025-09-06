@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useCallback, ReactNode, createContext, useContext } from 'react';
 import { readMe, registerUser, updateMe, updateUser as sdkUpdateUser, createItem, readItems, updateItem } from '@directus/sdk';
 import sdk from '../api/directus';
@@ -28,6 +26,7 @@ interface User {
     isApiKeyUser?: boolean;
     profileId?: string;
     purchasedModules: string[];
+    type?: string;
 }
 
 interface AuthContextType {
@@ -80,7 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             // 2. Get the associated user profile from the 'profiles' collection
             const profiles = await sdk.request(readItems('profiles', {
                 filter: { user_created: { _eq: me.id } },
-                fields: ['id', 'company', 'website', 'mobile', 'elastickey', 'elasticid'],
+                fields: ['id', 'company', 'website', 'mobile', 'elastickey', 'elasticid', 'type'],
                 limit: 1
             }));
             

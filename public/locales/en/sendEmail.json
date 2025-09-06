@@ -1,3 +1,4 @@
+
 {
     "selectCampaignType": "Select Campaign Type",
     "selectAudience": "Select Audience",
@@ -20,6 +21,7 @@
     "emailSentSuccess": "Email has been queued for sending!",
     "draftSavedSuccess": "Campaign saved as draft successfully!",
     "emailSentError": "Failed to send email: {{error}}",
+    "draftSaveError": "Failed to save draft: {{error}}",
     "noVerifiedDomains": "No verified domains found.",
     "noVerifiedDomainsToSendError": "You must add and verify a sending domain before you can send emails.",
     "addDomainNow": "Add a domain now.",
