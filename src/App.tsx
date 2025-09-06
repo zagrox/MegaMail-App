@@ -260,12 +260,12 @@ const App = () => {
     };
 
     const navItems = [
-        // Strategy & Insights
+        // Overview
         { name: t('dashboard'), view: 'Dashboard', icon: ICONS.DASHBOARD },
         { name: t('statistics'), view: 'Statistics', icon: ICONS.STATISTICS },
         { name: t('calendar'), view: 'Calendar', icon: ICONS.CALENDAR },
         { type: 'divider' },
-        // Campaign Execution
+        // Marketing
         { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
         { name: t('marketing'), view: 'Marketing', icon: ICONS.TARGET },
         { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
@@ -279,10 +279,6 @@ const App = () => {
         { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
         { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
         { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
-        { type: 'divider' },
-        // Technical Setup
-        { name: t('domains'), view: 'Domains', icon: ICONS.DOMAINS },
-        { name: t('smtp'), view: 'SMTP', icon: ICONS.SMTP },
     ];
     
     const logoUrl = config?.app_logo && config?.app_backend ? `${config.app_backend}/assets/${config.app_logo}` : '';
