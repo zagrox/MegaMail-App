@@ -60,7 +60,7 @@ const Step4Settings = ({ onNext, onBack, data, updateData }: { onNext: () => voi
 
     return (
         <WizardLayout
-            step={4}
+            // FIX: Removed unused 'step' prop that was causing a TypeScript error.
             title={t('campaignSettings')}
             onNext={onNext}
             onBack={onBack}

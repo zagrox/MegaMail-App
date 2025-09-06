@@ -1,4 +1,5 @@
 
+
 import React, { useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import WizardLayout from './WizardLayout';
@@ -100,7 +101,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
 
     return (
         <WizardLayout
-            step={5}
+            // FIX: Removed unused 'step' prop that was causing a TypeScript error.
             title={t('reviewAndSend')}
             onNext={onSubmit}
             onBack={onBack}
@@ -128,8 +129,8 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
                         disabled={!hasEnoughCredits}
                     />
-                    <div className="selection-card-radio"></div>
                     <div className="sending-option-card-content">
+                        <Icon className="sending-option-card-icon">{ICONS.CALENDAR}</Icon>
                         <div className="sending-option-card-details">
                             <h4 className="sending-option-card-title">{t('schedule', { ns: 'sendEmail' })}</h4>
                             {data.sendAction === 'schedule' && (
@@ -142,7 +143,6 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                                 />
                             )}
                         </div>
-                        <Icon className="sending-option-card-icon">{ICONS.CALENDAR}</Icon>
                     </div>
                 </label>
                 <label
@@ -159,10 +159,9 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
                         disabled={!hasEnoughCredits}
                     />
-                    <div className="selection-card-radio"></div>
                     <div className="sending-option-card-content">
-                        <h4 className="sending-option-card-title">{t('sendNow', { ns: 'sendEmail' })}</h4>
                         <Icon className="sending-option-card-icon">{ICONS.SEND_EMAIL}</Icon>
+                        <h4 className="sending-option-card-title">{t('sendNow', { ns: 'sendEmail' })}</h4> 
                     </div>
                 </label>
                 <label
@@ -178,10 +177,9 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         onChange={() => handleSelect('later')}
                         style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
                     />
-                    <div className="selection-card-radio"></div>
                     <div className="sending-option-card-content">
-                        <h4 className="sending-option-card-title">{t('saveForLater')}</h4>
                         <Icon className="sending-option-card-icon">{ICONS.SAVE_CHANGES}</Icon>
+                        <h4 className="sending-option-card-title">{t('saveForLater')}</h4>
                     </div>
                 </label>
             </div>

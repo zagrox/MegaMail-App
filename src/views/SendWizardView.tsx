@@ -9,11 +9,13 @@ import Step2Recipients from '../components/send_wizard/Step2Recipients';
 import Step3Content from '../components/send_wizard/Step3Content';
 import Step4Settings from '../components/send_wizard/Step4Settings';
 import Step5Sending from '../components/send_wizard/Step5Sending';
+import Icon, { ICONS } from '../components/Icon';
 
 const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: string) => void }) => {
     const { t } = useTranslation(['send-wizard', 'sendEmail', 'common']);
     const { addToast } = useToast();
     const [step, setStep] = useState(1);
+    const [maxStep, setMaxStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { data: domains } = useApiV4('/domains', apiKey, {});
 
@@ -49,9 +51,26 @@ const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
         setCampaignData(prev => ({ ...prev, ...newData }));
     }, []);
 
-    const nextStep = () => setStep(s => s + 1);
+    const nextStep = () => setStep(s => {
+        const next = s + 1;
+        setMaxStep(ms => Math.max(ms, next));
+        return next;
+    });
     const prevStep = () => setStep(s => s - 1);
+    const goToStep = (targetStep: number) => {
+        if (targetStep <= maxStep) {
+            setStep(targetStep);
+        }
+    };
     const goToDashboard = () => setView('Dashboard');
+
+    const stepsInfo = [
+        { number: 1, title: t('selectCampaignType') },
+        { number: 2, title: t('selectAudience') },
+        { number: 3, title: t('designContent') },
+        { number: 4, title: t('campaignSettings') },
+        { number: 5, title: t('reviewAndSend') },
+    ];
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
@@ -116,7 +135,7 @@ const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
         }
     };
 
-    const renderStep = () => {
+    const renderStepContent = () => {
         switch (step) {
             case 1:
                 return <Step1SelectType onNext={nextStep} onBack={goToDashboard} data={campaignData} updateData={updateData} />;
@@ -134,8 +153,41 @@ const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     };
 
     return (
-        <div className="wizard-container">
-            {renderStep()}
+        <div className="wizard-layout-container">
+            <aside className="wizard-sidebar">
+                <div className="wizard-sidebar-header">
+                    <h4>{t('campaignSteps')}</h4>
+                </div>
+                <div className="wizard-sidebar-steps">
+                    {stepsInfo.map(({ number, title }) => {
+                        const isCompleted = number < step;
+                        const isActive = number === step;
+                        const isNavigable = number <= maxStep;
+
+                        let statusClass = '';
+                        if (isActive) statusClass = 'active';
+                        else if (isCompleted) statusClass = 'completed';
+
+                        return (
+                            <button
+                                key={number}
+                                className={`wizard-sidebar-step ${statusClass}`}
+                                onClick={() => goToStep(number)}
+                                disabled={!isNavigable}
+                                aria-current={isActive ? 'step' : undefined}
+                            >
+                                <div className="wizard-step-number">
+                                    {isCompleted ? <Icon>{ICONS.CHECK}</Icon> : <span>{number}</span>}
+                                </div>
+                                <span className="wizard-step-title">{title}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </aside>
+            <main className="wizard-content">
+                {renderStepContent()}
+            </main>
         </div>
     );
 };

@@ -7,68 +7,63 @@ import Button from '../Button';
 import { AppActions } from '../../config/actions';
 
 interface WizardLayoutProps {
-    step: number;
     title: string;
     children: ReactNode;
     onNext?: () => void;
     onBack: () => void;
+    backButtonText?: string;
     nextDisabled?: boolean;
     isLastStep?: boolean;
     isSubmitting?: boolean;
     nextAction?: string;
-    hideBackButton?: boolean;
 }
 
 const WizardLayout = ({
-    step,
     title,
     children,
     onNext,
     onBack,
+    backButtonText,
     nextDisabled = false,
     isLastStep = false,
     isSubmitting = false,
     nextAction = AppActions.WIZARD_NEXT_STEP,
-    hideBackButton = false,
 }: WizardLayoutProps) => {
     const { t, i18n } = useTranslation(['send-wizard', 'common', 'sendEmail']);
     const isRTL = i18n.dir() === 'rtl';
 
     return (
-        <div className="wizard-main">
-            <div className="wizard-step-header active">
-                {`${step}. ${title}`}
+        <div className="wizard-content-card">
+            <div className="wizard-card-header">
+                <h2>{title}</h2>
             </div>
-            <div className="wizard-content-box">
+            <div className="wizard-card-body">
                 {children}
             </div>
-            <div className="wizard-footer">
-                {!hideBackButton && (
-                    <button
-                        className="btn btn-secondary"
-                        onClick={onBack}
-                        disabled={isSubmitting}
-                    >
-                        {isRTL ? (
-                            <>
-                                <span>{t('back')}</span>
-                                <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
-                            </>
-                        ) : (
-                            <>
-                                <Icon>{ICONS.CHEVRON_LEFT}</Icon>
-                                <span>{t('back')}</span>
-                            </>
-                        )}
-                    </button>
-                )}
+            <div className="wizard-card-footer">
+                <button
+                    className="btn btn-secondary"
+                    onClick={onBack}
+                    disabled={isSubmitting}
+                >
+                    {isRTL ? (
+                        <>
+                            <span>{backButtonText || t('back')}</span>
+                            <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
+                        </>
+                    ) : (
+                        <>
+                            <Icon>{ICONS.CHEVRON_LEFT}</Icon>
+                            <span>{backButtonText || t('back')}</span>
+                        </>
+                    )}
+                </button>
                 {!isLastStep ? (
                     <Button
                         className="btn-primary"
                         onClick={onNext}
                         disabled={nextDisabled || isSubmitting}
                         action={nextAction}
-                        style={{ marginLeft: hideBackButton ? 'auto' : undefined }}
                     >
                         {isRTL ? (
                             <>

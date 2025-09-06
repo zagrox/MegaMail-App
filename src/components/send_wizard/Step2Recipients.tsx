@@ -113,7 +113,7 @@ const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext:
 
     return (
         <WizardLayout
-            step={2}
+            // FIX: Removed unused 'step' prop that was causing a TypeScript error.
             title={t('selectAudience')}
             onNext={onNext}
             onBack={onBack}

@@ -125,7 +125,7 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
                         <Icon>{ICONS.SEARCH}</Icon>
                         <input
                             type="search"
-                            placeholder={t('searchTemplatesPlaceholder')}
+                            placeholder={t('searchTemplatesPlaceholder', { ns: 'templates' })}
                             value={templateSearchTerm}
                             onChange={e => setTemplateSearchTerm(e.target.value)}
                         />
@@ -144,18 +144,17 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
                                 </button>
                             ))
                         ) : (
-                            <CenteredMessage>{t('noTemplatesForQuery', {query: templateSearchTerm})}</CenteredMessage>
+                            <CenteredMessage>{t('noTemplatesForQuery', {query: templateSearchTerm, ns: 'templates'})}</CenteredMessage>
                         )}
                     </div>
                 </div>
             </Modal>
             
             <Modal isOpen={isPreviewModalOpen} onClose={() => setIsPreviewModalOpen(false)} title={templateToPreview?.Name || ''} size="fullscreen" bodyClassName="modal-body--no-padding">
-                <iframe srcDoc={templateToPreview?.Body?.[0]?.Content || ''} className="preview-iframe" title={t('previewTemplate')} />
+                <iframe srcDoc={templateToPreview?.Body?.[0]?.Content || ''} className="preview-iframe" title={t('previewTemplate', { ns: 'templates' })} />
             </Modal>
             
             <WizardLayout
-                step={3}
                 title={t('designContent')}
                 onNext={onNext}
                 onBack={onBack}
@@ -167,18 +166,18 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
                 </div>
                 <div className="content-form-grid">
                     <label>{t('template', { ns: 'sendEmail' })}</label>
-                    <div className="template-selector-display" onClick={() => setIsTemplateModalOpen(true)}>
+                    <div className="template-selector-display" onClick={() => setIsTemplateModalOpen(true)} style={{ gridColumn: '2 / 4' }}>
                         {isLoadingTemplate ? <Loader /> : (data.template || t('useTemplate', { ns: 'sendEmail' }))}
                     </div>
-                    <button className="btn-icon" onClick={() => setIsTemplateModalOpen(true)} aria-label={t('changeTemplate')}><Icon>{ICONS.SETTINGS}</Icon></button>
-                    <button className="btn-icon" onClick={handlePreview} disabled={!data.template || isLoadingTemplate} aria-label={t('previewTemplate')}><Icon>{ICONS.EYE}</Icon></button>
+                    <button className="btn btn-secondary" onClick={handlePreview} disabled={!data.template || isLoadingTemplate}>
+                        <Icon>{ICONS.EYE}</Icon> {t('previewTemplate', { ns: 'templates' })}
+                    </button>
 
                     <label>{t('fromName', { ns: 'sendEmail' })}</label>
                     <input type="text" name="fromName" value={data.fromName} onChange={handleChange} className="full-width" style={{gridColumn: '2 / -1'}} />
 
                     <label>{t('subject', { ns: 'sendEmail' })}</label>
-                    <input type="text" name="subject" value={data.subject} onChange={handleChange} style={{gridColumn: '2 / 4'}} />
-                    <span className="ai-sparkle">✨</span>
+                    <input type="text" name="subject" value={data.subject} onChange={handleChange} style={{gridColumn: '2 / -1'}} />
 
                     <label style={{alignSelf: 'start', paddingTop: '0.5rem'}}>{t('replyTo')}</label>
                     <div style={{ gridColumn: '2 / -1', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

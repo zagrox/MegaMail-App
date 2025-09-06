@@ -13,12 +13,11 @@ const Step1SelectType = ({ onNext, onBack, data, updateData }: { onNext: () => v
 
     return (
         <WizardLayout
-            step={1}
             title={t('selectCampaignType')}
             onNext={onNext}
             onBack={onBack}
             nextDisabled={!data.type}
-            hideBackButton
+            backButtonText={t('exitWizard')}
         >
             <div className="wizard-step-intro">
                 <Icon>{ICONS.HASH}</Icon>

@@ -33,5 +33,7 @@
     "disabled": "Disabled",
     "insufficientFunds": "Insufficient funds",
     "loading": "Loading...",
-    "noVerifiedDomainError": "No verified sending domain available. Please configure a domain in your account settings."
+    "noVerifiedDomainError": "No verified sending domain available. Please configure a domain in your account settings.",
+    "campaignSteps": "Campaign Steps",
+    "exitWizard": "Exit Wizard"
 }

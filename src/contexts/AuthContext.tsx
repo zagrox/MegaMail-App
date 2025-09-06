@@ -191,7 +191,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const login = async (credentials: any) => {
         setLoading(true);
         try {
-            await sdk.login(credentials.email, credentials.password);
+            await sdk.login(credentials.email.toLowerCase(), credentials.password);
             localStorage.removeItem('elastic_email_api_key');
             await getMe();
         } finally {
@@ -209,7 +209,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const register = async (details: any) => {
         const { email, password, ...otherDetails } = details;
-        return await sdk.request(registerUser(email, password, otherDetails));
+        return await sdk.request(registerUser(email.toLowerCase(), password, otherDetails));
     };
 
     const logout = async () => {
@@ -261,7 +261,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const reset_url = `${window.location.origin}/#/reset-password`;
         await sdk.request(() => ({
             method: 'POST', path: '/auth/password/request',
-            body: JSON.stringify({ email, reset_url }),
+            body: JSON.stringify({ email: email.toLowerCase(), reset_url }),
             headers: { 'Content-Type': 'application/json' },
         }));
     };
