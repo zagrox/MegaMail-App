@@ -1,3 +1,4 @@
+
 {
     "appName": "MegaMail",
     "dashboard": "Dashboard",
@@ -70,5 +71,6 @@
     "copy": "Copy",
     "copied": "Copied!",
     "done": "Done",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "pleaseFillRequiredFields": "Please fill all required fields."
 }

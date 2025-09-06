@@ -111,7 +111,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
             nextAction={nextAction}
         >
             <div className="wizard-step-intro">
-                <Icon>{ICONS.SEND_EMAIL}</Icon>
+                <Icon>{ICONS.VERIFY}</Icon>
                 <p>{t('reviewAndSend_desc')}</p>
             </div>
             <div className="sending-options-list">

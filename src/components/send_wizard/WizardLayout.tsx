@@ -1,4 +1,5 @@
 
+
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../Icon';
@@ -86,7 +87,7 @@ const WizardLayout = ({
                     >
                         {isSubmitting ? <Loader /> : (
                             <>
-                                <Icon>{ICONS.SEND_EMAIL}</Icon>
+                                <Icon>{ICONS.VERIFY}</Icon>
                                 <span>{t('submit', { ns: 'sendEmail' })}</span>
                             </>
                         )}

@@ -1,3 +1,4 @@
+
 {
     "onboarding": "Onboarding",
     "getStarted": "Get Started",
@@ -10,7 +11,7 @@
     "featuresTitle": "Discover What's Possible",
     "featuresSubtitle": "Here are some of the powerful tools at your fingertips.",
     "profileTitle": "Complete Your Profile",
-    "profileSubtitle": "This information helps us personalize your experience.",
+    "profileSubtitle": "This information helps us personalize your experience and ensure compliance.",
     "finalizeSetupTitle": "Finalize Your Account",
     "finalizeSetupSubtitle": "Click below to connect your email account and generate your API key. This will complete the setup.",
     "verifyAndFinish": "Verify & Finish",
@@ -19,5 +20,24 @@
     "saveAndContinue": "Save and Continue",
     "setupFailed": "Automatic setup failed.",
     "setupFailedManualPrompt": "Please complete the setup manually. Your API key has been sent to your email.",
-    "visitDemo": "Stuck? Visit the demo version"
+    "visitDemo": "Stuck? Visit the demo version",
+    "accountType": "Account Type*",
+    "personal": "Personal",
+    "business": "Business",
+    "appLanguage": "App Language*",
+    "english": "English",
+    "persian": "Persian (Farsi)",
+    "displayMode": "Default Display Mode",
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto (System)",
+    "aiAssistant": "AI Assistant",
+    "aiAssistantDesc": "Leverage AI to write better subject lines, generate email content, and optimize your campaigns.",
+    "validation": "Validation",
+    "validationDesc": "Improve your deliverability by validating your email lists to remove invalid or risky addresses.",
+    "soon": "Soon",
+    "comingSoon": "Coming Soon!",
+    "welcomeToDemo": "Welcome to the demo version!",
+    "userEmailNotFound": "User email not found. Cannot create account.",
+    "accountConnectedSuccess": "Your MegaMail account has been connected!"
 }

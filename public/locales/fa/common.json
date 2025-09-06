@@ -1,7 +1,8 @@
+
 {
     "appName": "مگامیل",
     "dashboard": "داشبورد",
-    "statistics": "آمار",
+    "statistics": "گزارشات",
     "account": "حساب کاربری",
     "contacts": "مشترکین",
     "campaigns": "کمپین‌ها",
@@ -70,5 +71,6 @@
     "copy": "کپی",
     "copied": "کپی شد!",
     "done": "انجام شد",
-    "openMenu": "باز کردن منو"
+    "openMenu": "باز کردن منو",
+    "pleaseFillRequiredFields": "لطفا تمام فیلدهای الزامی را پر کنید."
 }

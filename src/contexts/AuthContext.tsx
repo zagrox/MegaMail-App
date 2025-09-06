@@ -229,8 +229,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const updateUser = async (data: any) => {
         if (!user || !user.id || user.isApiKeyUser) throw new Error("User not authenticated or is an API key user.");
 
-        const userFields = ['first_name', 'last_name', 'avatar', 'language', 'theme_dark', 'theme_light', 'email_notifications', 'text_direction'];
-        const profileFields = ['company', 'website', 'mobile', 'elastickey', 'elasticid'];
+        const userFields = ['first_name', 'last_name', 'avatar', 'theme_dark', 'theme_light', 'email_notifications', 'text_direction'];
+        const profileFields = ['company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'language', 'display'];
 
         const userPayload: any = {};
         const profilePayload: any = {};
