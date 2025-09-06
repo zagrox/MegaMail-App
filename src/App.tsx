@@ -260,19 +260,28 @@ const App = () => {
     };
 
     const navItems = [
+        // Strategy & Insights
         { name: t('dashboard'), view: 'Dashboard', icon: ICONS.DASHBOARD },
         { name: t('statistics'), view: 'Statistics', icon: ICONS.STATISTICS },
+        { name: t('calendar'), view: 'Calendar', icon: ICONS.CALENDAR },
+        { type: 'divider' },
+        // Campaign Execution
         { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
         { name: t('marketing'), view: 'Marketing', icon: ICONS.TARGET },
-        { name: t('calendar'), view: 'Calendar', icon: ICONS.CALENDAR },
         { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
         { type: 'divider' },
+        // Audience Management
         { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
         { name: t('emailLists'), view: 'Email Lists', icon: ICONS.EMAIL_LISTS },
+        { name: t('segments'), view: 'Segments', icon: ICONS.SEGMENTS },
         { type: 'divider' },
+        // Content & Assets
         { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
         { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
         { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
+        { type: 'divider' },
+        // Technical Setup
+        { name: t('domains'), view: 'Domains', icon: ICONS.DOMAINS },
         { name: t('smtp'), view: 'SMTP', icon: ICONS.SMTP },
     ];
     
