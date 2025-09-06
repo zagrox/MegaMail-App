@@ -47,7 +47,7 @@ const DNS_RECORDS_CONFIG = {
 type VerificationStatus = 'idle' | 'checking' | 'verified' | 'failed';
 
 const SetDefaultSenderModal = ({ isOpen, onClose, domain, apiKey, onSuccess }: { isOpen: boolean; onClose: () => void; domain: any; apiKey: string; onSuccess: () => void; }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['domains', 'common', 'auth']);
     const [localPart, setLocalPart] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const { addToast } = useToast();
@@ -79,9 +79,9 @@ const SetDefaultSenderModal = ({ isOpen, onClose, domain, apiKey, onSuccess }: {
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={`${t('Default sender')}`}>
+        <Modal isOpen={isOpen} onClose={onClose} title={t('defaultSenderTitle')}>
             <form onSubmit={handleSubmit} className="modal-form">
-                <p>Default sender is an email address used in your emails as a 'From' address. We strongly recommend setting a default sender to help increase your deliverability performance.</p>
+                <p>{t('defaultSenderDescription')}</p>
                 <div className="form-group">
                     <label htmlFor="email-local-part">{t('emailAddress')}</label>
                     <div className="from-email-composer">
@@ -108,7 +108,7 @@ const SetDefaultSenderModal = ({ isOpen, onClose, domain, apiKey, onSuccess }: {
 
 
 const VerificationStatusIndicator = ({ status }: { status: VerificationStatus }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('domains');
     const { getStatusStyle } = useStatusStyles();
 
     switch (status) {
@@ -127,7 +127,7 @@ const VerificationStatusIndicator = ({ status }: { status: VerificationStatus })
 };
 
 const DomainVerificationChecker = ({ domainName }: { domainName: string }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation('domains');
     const [statuses, setStatuses] = useState<Record<string, { status: VerificationStatus }>>(
       Object.keys(DNS_RECORDS_CONFIG).reduce((acc, key) => ({ ...acc, [key]: { status: 'idle' } }), {})
     );
@@ -188,7 +188,7 @@ const DomainVerificationChecker = ({ domainName }: { domainName: string }) => {
 };
 
 const DomainsView = ({ apiKey }: { apiKey: string }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['domains', 'common']);
     const { addToast } = useToast();
     const [refetchIndex, setRefetchIndex] = useState(0);
     const [newDomain, setNewDomain] = useState('');
@@ -319,7 +319,7 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                                     <td><strong>{domainName}</strong></td>
                                     <td>
                                         <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                                            <span>{defaultSender || t('notSet', {defaultValue: 'Not Set'})}</span>
+                                            <span>{defaultSender || t('notSet')}</span>
                                             <button className="btn-icon" onClick={() => setDomainToEdit(domain)}><Icon>{ICONS.PENCIL}</Icon></button>
                                         </div>
                                     </td>
