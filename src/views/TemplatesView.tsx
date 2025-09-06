@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -54,40 +53,40 @@ const TemplatePreviewModal = ({ isOpen, onClose, template }: { isOpen: boolean; 
     );
 };
 
-const TemplateCard = ({ template, onPreview, onUse, onDelete, isLoadingDetails }: { 
-    template: Template & { fromName?: string }; 
+const TemplateCard = ({ template, onPreview, onEdit, onDelete }: { 
+    template: Template & { fromName?: string, Body?: { Content: string }[] }; 
     onPreview: () => void; 
-    onUse: () => void; 
+    onEdit: () => void; 
     onDelete: () => void;
-    isLoadingDetails?: boolean;
 }) => {
-    const { t, i18n } = useTranslation(['templates', 'common', 'sendEmail', 'contacts']);
+    const { t, i18n } = useTranslation(['templates', 'common']);
+    const detailsLoaded = !!template.Body && template.Body.length > 0;
+    const htmlContent = detailsLoaded ? template.Body[0].Content : '';
+
     return (
-        <div className="card campaign-card">
-            <div className="campaign-card-header">
-                <h3>{template.Name}</h3>
-            </div>
-            <div className="campaign-card-body">
-                <p>
-                    <strong>{t('subject', { ns: 'sendEmail' })}:</strong> {template.Subject || t('noSubject', { ns: 'campaigns' })}
-                </p>
-                {template.fromName && (
-                    <p>
-                        <strong>{t('fromName', { ns: 'sendEmail' })}:</strong> {template.fromName}
-                    </p>
+        <div className="card template-card">
+            <div className="template-card-preview-wrapper" onClick={detailsLoaded ? onPreview : undefined}>
+                {detailsLoaded ? (
+                    <iframe
+                        srcDoc={htmlContent}
+                        title={template.Name}
+                        sandbox=""
+                        scrolling="no"
+                    />
+                ) : (
+                    <CenteredMessage><Loader/></CenteredMessage>
                 )}
-                <p className="contact-card-email" style={{marginTop: 'auto'}}>
-                    {t('dateAdded', { ns: 'common' })}: {formatDateForDisplay(template.DateAdded, i18n.language)}
-                </p>
             </div>
-            <div className="campaign-card-footer" style={{ gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <button className="btn btn-secondary" onClick={onPreview} disabled={isLoadingDetails}>
-                    {isLoadingDetails ? <Loader /> : <><Icon>{ICONS.EYE}</Icon> {t('previewTemplate')}</>}
-                </button>
-                <button className="btn" onClick={onUse} disabled={isLoadingDetails}>
-                    {isLoadingDetails ? <Loader /> : <><Icon>{ICONS.SEND_EMAIL}</Icon> {t('useTemplate')}</>}
-                </button>
-                <button className="btn-icon btn-icon-danger" onClick={onDelete} disabled={isLoadingDetails}>
+            <div className="template-card-content">
+                <h3>{template.Name}</h3>
+                <p className="template-card-subject">{template.Subject || t('noSubject', { ns: 'campaigns' })}</p>
+                <p className="template-card-date">{formatDateForDisplay(template.DateAdded, i18n.language)}</p>
+            </div>
+            <div className="template-card-actions">
+                <Button className="btn" onClick={onEdit} disabled={!detailsLoaded}>
+                    <Icon>{ICONS.PENCIL}</Icon> {t('edit')}
+                </Button>
+                <button className="btn-icon" onClick={onDelete} disabled={!detailsLoaded} aria-label={t('deleteTemplate')}>
                     <Icon>{ICONS.DELETE}</Icon>
                 </button>
             </div>
@@ -95,8 +94,36 @@ const TemplateCard = ({ template, onPreview, onUse, onDelete, isLoadingDetails }
     );
 };
 
+const TemplateRow = ({ template, onPreview, onEdit, onDelete }: {
+    template: Template & { fromName?: string, Body?: { Content: string }[] };
+    onPreview: () => void;
+    onEdit: () => void;
+    onDelete: () => void;
+}) => {
+    const { t, i18n } = useTranslation(['templates', 'common']);
+    const detailsLoaded = !!template.Body && template.Body.length > 0;
+
+    return (
+        <tr>
+            <td>
+                <strong>{template.Name}</strong>
+                <div className="template-row-subject">{template.Subject || t('noSubject', { ns: 'campaigns' })}</div>
+            </td>
+            <td>{template.fromName || (detailsLoaded ? '—' : '...')}</td>
+            <td>{formatDateForDisplay(template.DateAdded, i18n.language)}</td>
+            <td>
+                <div className="action-buttons" style={{justifyContent: 'flex-end'}}>
+                    <button className="btn-icon" onClick={onPreview} disabled={!detailsLoaded}><Icon>{ICONS.EYE}</Icon></button>
+                    <button className="btn-icon" onClick={onEdit} disabled={!detailsLoaded}><Icon>{ICONS.PENCIL}</Icon></button>
+                    <button className="btn-icon btn-icon-danger" onClick={onDelete} disabled={!detailsLoaded}><Icon>{ICONS.DELETE}</Icon></button>
+                </div>
+            </td>
+        </tr>
+    );
+};
+
 const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: string, data?: { template: Template }) => void }) => {
-    const { t } = useTranslation(['templates', 'common']);
+    const { t } = useTranslation(['templates', 'common', 'mediaManager']);
     const { addToast } = useToast();
     const [searchQuery, setSearchQuery] = useState('');
     const [refetchIndex, setRefetchIndex] = useState(0);
@@ -104,8 +131,8 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
     const [templateToDelete, setTemplateToDelete] = useState<Template | null>(null);
     const [offset, setOffset] = useState(0);
     const TEMPLATES_PER_PAGE = 12;
-    const [loadingTemplateName, setLoadingTemplateName] = useState<string | null>(null);
     const [detailedTemplates, setDetailedTemplates] = useState<(Template & { fromName?: string })[]>([]);
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
     const { data: templatesFromApi, loading, error } = useApiV4(
         '/templates',
@@ -122,7 +149,6 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
     
     useEffect(() => {
         if (templatesFromApi && Array.isArray(templatesFromApi)) {
-            // Immediately set basic data to show something on screen while details load
             setDetailedTemplates(templatesFromApi);
 
             const fetchDetails = async () => {
@@ -132,10 +158,10 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
                             const fullTemplate = await apiFetchV4(`/templates/${encodeURIComponent(template.Name)}`, apiKey);
                             const htmlContent = fullTemplate.Body?.[0]?.Content;
                             const state = extractStateFromHtml(htmlContent);
-                            return { ...template, fromName: state?.fromName };
+                            return { ...template, Body: fullTemplate.Body, fromName: state?.fromName };
                         } catch (e) {
                             console.warn(`Could not fetch details for template ${template.Name}`, e);
-                            return template; // return original template on error
+                            return template;
                         }
                     })
                 );
@@ -163,33 +189,13 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
             setTemplateToDelete(null);
         }
     };
-
-    const fetchFullTemplateAndAct = async (templateName: string, action: (fullTemplate: Template) => void) => {
-        setLoadingTemplateName(templateName);
-        try {
-            const fullTemplate = await apiFetchV4(`/templates/${encodeURIComponent(templateName)}`, apiKey);
-            if (fullTemplate) {
-                action(fullTemplate);
-            } else {
-                throw new Error("Template not found or empty response.");
-            }
-        } catch (err: any) {
-            addToast(t('contactDetailsError', { ns: 'contacts'}), 'error'); // Using a generic error
-        } finally {
-            setLoadingTemplateName(null);
-        }
-    };
-
+    
     const handlePreview = (template: Template) => {
-        fetchFullTemplateAndAct(template.Name, (fullTemplate) => {
-            setTemplateToPreview(fullTemplate);
-        });
+        setTemplateToPreview(template);
     };
 
-    const handleUse = (template: Template) => {
-        fetchFullTemplateAndAct(template.Name, (fullTemplate) => {
-            setView('Email Builder', { template: fullTemplate });
-        });
+    const handleEdit = (template: Template) => {
+        setView('Email Builder', { template: template });
     };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,6 +229,14 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
                     />
                 </div>
                 <div className="header-actions">
+                    <div className="view-switcher">
+                        <button onClick={() => setViewMode('grid')} className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`} aria-label={t('cardView', { ns: 'mediaManager' })}>
+                            <Icon>{ICONS.DASHBOARD}</Icon>
+                        </button>
+                        <button onClick={() => setViewMode('list')} className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`} aria-label={t('tableView', { ns: 'mediaManager' })}>
+                            <Icon>{ICONS.EMAIL_LISTS}</Icon>
+                        </button>
+                    </div>
                     <Button className="btn-primary" onClick={() => setView('Email Builder')} action="create_template">
                         <Icon>{ICONS.PLUS}</Icon> {t('createTemplate')}
                     </Button>
@@ -237,23 +251,48 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
                     <CenteredMessage style={{ height: '50vh' }}>
                         <div className="info-message">
                             <strong>{searchQuery ? t('noTemplatesForQuery', { query: searchQuery }) : t('noTemplatesFound')}</strong>
-                            {!searchQuery && <p>{t('createTemplate')}</p>}
+                            {!searchQuery && <p>{t('createYourFirst')}</p>}
                         </div>
                     </CenteredMessage>
                 ) : (
                     <>
-                        <div className="campaign-grid">
-                            {detailedTemplates.map((template: Template & { fromName?: string }) => (
-                                <TemplateCard
-                                    key={template.Name}
-                                    template={template}
-                                    onPreview={() => handlePreview(template)}
-                                    onUse={() => handleUse(template)}
-                                    onDelete={() => setTemplateToDelete(template)}
-                                    isLoadingDetails={loadingTemplateName === template.Name}
-                                />
-                            ))}
-                        </div>
+                        {viewMode === 'grid' ? (
+                            <div className="templates-grid">
+                                {detailedTemplates.map((template) => (
+                                    <TemplateCard
+                                        key={template.Name}
+                                        template={template}
+                                        onPreview={() => handlePreview(template)}
+                                        onEdit={() => handleEdit(template)}
+                                        onDelete={() => setTemplateToDelete(template)}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>{t('name')}</th>
+                                            <th>{t('fromName', {ns: 'sendEmail'})}</th>
+                                            <th>{t('dateAdded')}</th>
+                                            <th style={{textAlign: 'right'}}>{t('action')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {detailedTemplates.map((template) => (
+                                            <TemplateRow
+                                                key={template.Name}
+                                                template={template}
+                                                onPreview={() => handlePreview(template)}
+                                                onEdit={() => handleEdit(template)}
+                                                onDelete={() => setTemplateToDelete(template)}
+                                            />
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
 
                          {( (templatesFromApi && templatesFromApi.length > 0) || offset > 0) && (
                             <div className="pagination-controls">

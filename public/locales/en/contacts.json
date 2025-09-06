@@ -1,3 +1,4 @@
+
 {
     "selectPage": "Select Page",
     "countSelected": "{{count}} selected",
@@ -35,7 +36,7 @@
     "compression": "Compression",
     "fileNameOptional": "File Name (Optional)",
     "exportingContacts": "Exporting Contacts...",
-    "selectedForExport": "selected",
+    "selectedForExport": "Selected Statuses",
     "exportStartedSuccess": "Your contact export has started. Your download will begin shortly.",
     "exportFailedError": "Export failed: {{error}}",
     "importContactsTitle": "Import Contacts",
@@ -62,5 +63,12 @@
     "abuse": "Abuse",
     "inactive": "Inactive",
     "stale": "Stale",
-    "notconfirmed": "Not Confirmed"
+    "notconfirmed": "Not Confirmed",
+    "selectList": "Select a list",
+    "noListsFound": "No lists found. Create one first.",
+    "none": "None",
+    "zip": "Zip",
+    "csv": "CSV",
+    "xml": "XML",
+    "json": "JSON"
 }

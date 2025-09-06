@@ -1,3 +1,4 @@
+
 {
     "selectPage": "انتخاب صفحه",
     "countSelected": "{{count}} انتخاب شده",
@@ -35,7 +36,7 @@
     "compression": "فشرده سازی",
     "fileNameOptional": "نام فایل (اختیاری)",
     "exportingContacts": "در حال خروجی گرفتن از مخاطبین...",
-    "selectedForExport": "انتخاب شده",
+    "selectedForExport": "وضعیت‌های انتخاب شده",
     "exportStartedSuccess": "خروجی گرفتن از مخاطبین شما شروع شد. دانلود شما به زودی آغاز خواهد شد.",
     "exportFailedError": "خروجی گرفتن ناموفق بود: {{error}}",
     "importContactsTitle": "وارد کردن مخاطبین",
@@ -62,5 +63,12 @@
     "abuse": "اسپم",
     "inactive": "غیرفعال",
     "stale": "راکد",
-    "notconfirmed": "تایید نشده"
+    "notconfirmed": "تایید نشده",
+    "selectList": "یک لیست را انتخاب کنید",
+    "noListsFound": "هیچ لیستی یافت نشد. ابتدا یکی ایجاد کنید.",
+    "none": "هیچکدام",
+    "zip": "فشرده (Zip)",
+    "csv": "CSV",
+    "xml": "XML",
+    "json": "JSON"
 }

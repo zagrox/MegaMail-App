@@ -15,7 +15,7 @@ interface ExportContactsModalProps {
 }
 
 const ExportContactsModal = ({ isOpen, onClose, apiKey, selectedStatuses, listName, onSuccess, onError }: ExportContactsModalProps) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['contacts', 'common', 'emailLists']);
     const [fileFormat, setFileFormat] = useState('Csv');
     const [compression, setCompression] = useState('None');
     const [fileName, setFileName] = useState('');
@@ -106,28 +106,32 @@ const ExportContactsModal = ({ isOpen, onClose, apiKey, selectedStatuses, listNa
         }
     };
 
+    const translatedStatuses = (selectedStatuses || [])
+        .map(s => t(s.toLowerCase().replace(/\s/g, ''), { ns: 'contacts', defaultValue: s }))
+        .join(', ');
+
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={t('exportContacts')}>
             <form onSubmit={handleExport} className="modal-form">
                 <div className="info-message">
-                    <strong>{listName ? t('list') : t('selectedForExport')}:</strong>
-                    <p>{listName ? listName : (selectedStatuses || []).join(', ')}</p>
+                    <strong>{listName ? t('list', { ns: 'emailLists'}) : t('selectedForExport')}:</strong>
+                    <p>{listName ? listName : translatedStatuses}</p>
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="fileFormat">{t('fileFormat')}</label>
                     <select id="fileFormat" value={fileFormat} onChange={e => setFileFormat(e.target.value)}>
-                        <option value="Csv">CSV</option>
-                        <option value="Xml">XML</option>
-                        <option value="Json">JSON</option>
+                        <option value="Csv">{t('csv')}</option>
+                        <option value="Xml">{t('xml')}</option>
+                        <option value="Json">{t('json')}</option>
                     </select>
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="compression">{t('compression')}</label>
                     <select id="compression" value={compression} onChange={e => setCompression(e.target.value)}>
-                        <option value="None">None</option>
-                        <option value="Zip">Zip</option>
+                        <option value="None">{t('none')}</option>
+                        <option value="Zip">{t('zip')}</option>
                     </select>
                 </div>
                 
@@ -139,7 +143,6 @@ const ExportContactsModal = ({ isOpen, onClose, apiKey, selectedStatuses, listNa
                 <div className="form-actions" style={{ marginTop: '1rem' }}>
                     <button type="button" className="btn" onClick={onClose} disabled={isExporting}>{t('cancel')}</button>
                     <button type="submit" className="btn btn-primary" disabled={isExporting}>
-                        {/* FIX: Changed path prop to children for Icon component */}
                         {isExporting ? <Loader /> : <><Icon>{ICONS.DOWNLOAD}</Icon> <span>{t('export')}</span></>}
                     </button>
                 </div>

@@ -7,6 +7,7 @@
     "confirmDeleteTemplate": "آیا از حذف قالب \"{{name}}\" مطمئن هستید؟ این عمل قابل بازگشت نیست.",
     "templateDeletedSuccess": "قالب \"{{name}}\" با موفقیت ذخیره شد!",
     "templateDeletedError": "حذف قالب ناموفق بود: {{error}}",
-    "noTemplatesFound": "قالبی یافت نشد. اولین قالب خود را ایجاد کنید!",
+    "noTemplatesFound": "قالبی یافت نشد.",
+    "createYourFirst": "برای شروع اولین قالب خود را ایجاد کنید!",
     "noTemplatesForQuery": "قالبی برای \"{{query}}\" یافت نشد."
 }
