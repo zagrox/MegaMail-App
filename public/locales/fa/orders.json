@@ -21,5 +21,7 @@
     "action": "عملیات",
     "completed": "تکمیل شده",
     "pending": "در انتظار",
-    "failed": "ناموفق"
+    "failed": "ناموفق",
+    "orderDetails": "جزئیات سفارش",
+    "orderId": "شناسه سفارش"
 }

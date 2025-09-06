@@ -21,5 +21,7 @@
     "action": "Action",
     "completed": "Completed",
     "pending": "Pending",
-    "failed": "Failed"
+    "failed": "Failed",
+    "orderDetails": "Order Details",
+    "orderId": "Order ID"
 }

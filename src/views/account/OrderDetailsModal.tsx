@@ -11,6 +11,8 @@ const OrderDetailsModal = ({ isOpen, onClose, order }: { isOpen: boolean, onClos
     const { t, i18n } = useTranslation(['orders', 'buyCredits', 'common']);
     const { statusesMap, loading: statusesLoading } = useOrderStatuses();
     const { getStatusStyle } = useStatusStyles();
+    
+    const valueCellStyle: React.CSSProperties = { textAlign: i18n.dir() === 'rtl' ? 'left' : 'right' };
 
     const getPaymentStatusBadge = (status: string) => {
         const numStatus = Number(status);
@@ -31,13 +33,13 @@ const OrderDetailsModal = ({ isOpen, onClose, order }: { isOpen: boolean, onClos
             <div className="table-container-simple" style={{ marginBottom: '1.5rem' }}>
                 <table className="simple-table">
                     <tbody>
-                        <tr><td>{t('orderId')}</td><td style={{ textAlign: 'right' }}><strong>#{order.id}</strong></td></tr>
-                        <tr><td>{t('date')}</td><td style={{ textAlign: 'right' }}>{formatDateForDisplay(order.date_created, i18n.language)}</td></tr>
-                        <tr><td>{t('description')}</td><td style={{ textAlign: 'right' }}>{order.order_note}</td></tr>
-                        <tr><td>{t('totalAmount')}</td><td style={{ textAlign: 'right' }}><strong>{order.order_total.toLocaleString(i18n.language)} {t('priceIRT')}</strong></td></tr>
+                        <tr><td>{t('orderId')}</td><td style={valueCellStyle}><strong>#{order.id}</strong></td></tr>
+                        <tr><td>{t('date')}</td><td style={valueCellStyle}>{formatDateForDisplay(order.date_created, i18n.language)}</td></tr>
+                        <tr><td>{t('description')}</td><td style={valueCellStyle}>{order.order_note}</td></tr>
+                        <tr><td>{t('totalAmount')}</td><td style={valueCellStyle}><strong>{order.order_total.toLocaleString(i18n.language)} {t('buyCredits:priceIRT')}</strong></td></tr>
                         <tr>
                             <td>{t('status')}</td>
-                            <td style={{ textAlign: 'right' }}>
+                            <td style={valueCellStyle}>
                                 {statusInfo ? (
                                     <Badge text={statusInfo.text} color={statusInfo.color} iconPath={statusInfo.iconPath} />
                                 ) : (
@@ -88,7 +90,6 @@ const OrderDetailsModal = ({ isOpen, onClose, order }: { isOpen: boolean, onClos
                 <button className="btn" onClick={onClose}>{t('close')}</button>
                 {showPayButton && lastTransaction && (
                     <a href={paymentUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                        {/* FIX: Changed path prop to children for Icon component */}
                         <Icon>{ICONS.LOCK_OPEN}</Icon>
                         <span>{t('payNow')}</span>
                     </a>

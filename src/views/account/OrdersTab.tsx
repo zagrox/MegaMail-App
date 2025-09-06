@@ -13,7 +13,7 @@ import Badge from '../../components/Badge';
 import { useOrderStatuses } from '../../hooks/useOrderStatuses';
 
 const OrdersTab = () => {
-    const { t, i18n } = useTranslation(['orders', 'common']);
+    const { t, i18n } = useTranslation(['orders', 'common', 'buyCredits']);
     const { user } = useAuth();
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -122,7 +122,7 @@ const OrdersTab = () => {
                                         <tr key={order.id}>
                                             <td>{order.order_note}</td>
                                             <td>{formatDateRelative(order.date_created, i18n.language)}</td>
-                                            <td>{order.order_total.toLocaleString(i18n.language)} {t('priceIRT', { ns: 'buyCredits' })}</td>
+                                            <td>{order.order_total.toLocaleString(i18n.language)} {t('buyCredits:priceIRT')}</td>
                                             <td>
                                                 {statusInfo ? (
                                                     <Badge text={statusInfo.text} color={statusInfo.color} iconPath={statusInfo.iconPath} />
