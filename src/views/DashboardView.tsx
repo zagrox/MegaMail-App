@@ -69,7 +69,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     const staticNavItems = useMemo(() => [
         { name: t('statistics', { ns: 'common' }), icon: ICONS.STATISTICS, desc: t('statisticsDesc'), view: 'Statistics' },
         { name: t('contacts', { ns: 'common' }), icon: ICONS.CONTACTS, desc: t('contactsDesc'), view: 'Contacts' },
-        { name: t('marketing', { ns: 'common' }), icon: ICONS.CALENDAR, desc: t('marketingDesc'), view: 'Marketing' },
+        { name: t('marketing', { ns: 'common' }), icon: ICONS.TARGET, desc: t('marketingDesc'), view: 'Marketing' },
         { name: t('sendEmail', { ns: 'common' }), icon: ICONS.SEND_EMAIL, desc: t('sendEmailDesc'), view: 'Send Email' },
         { name: t('emailLists', { ns: 'common' }), icon: ICONS.EMAIL_LISTS, desc: t('emailListsDesc'), view: 'Email Lists' },
         { name: t('segments', { ns: 'common' }), icon: ICONS.SEGMENTS, desc: t('segmentsDesc'), view: 'Segments' },

@@ -1,0 +1,305 @@
+
+{
+  "events": [
+    {
+      "gregorianDate": "01-01",
+      "title_en": "New Year's Day",
+      "title_fa": "روز سال نو میلادی"
+    },
+    {
+      "date": "2024-01-15",
+      "title_en": "Martin Luther King Jr. Day",
+      "title_fa": "روز مارتین لوتر کینگ جونیور"
+    },
+    {
+      "date": "2025-01-20",
+      "title_en": "Martin Luther King Jr. Day",
+      "title_fa": "روز مارتین لوتر کینگ جونیور"
+    },
+    {
+      "gregorianDate": "02-14",
+      "title_en": "Valentine's Day",
+      "title_fa": "روز ولنتاین"
+    },
+    {
+      "gregorianDate": "03-08",
+      "title_en": "International Women's Day",
+      "title_fa": "روز جهانی زن"
+    },
+    {
+      "gregorianDate": "03-17",
+      "title_en": "St. Patrick's Day",
+      "title_fa": "روز سنت پاتریک"
+    },
+    {
+      "date": "2024-03-31",
+      "title_en": "Easter Sunday",
+      "title_fa": "یکشنبه عید پاک"
+    },
+    {
+      "date": "2025-04-20",
+      "title_en": "Easter Sunday",
+      "title_fa": "یکشنبه عید پاک"
+    },
+    {
+      "gregorianDate": "04-01",
+      "title_en": "April Fools' Day",
+      "title_fa": "دروغ اول آوریل"
+    },
+    {
+      "gregorianDate": "04-22",
+      "title_en": "Earth Day",
+      "title_fa": "روز زمین"
+    },
+    {
+      "gregorianDate": "05-01",
+      "title_en": "International Labour Day",
+      "title_fa": "روز جهانی کارگر"
+    },
+    {
+      "gregorianDate": "05-04",
+      "title_en": "Star Wars Day",
+      "title_fa": "روز جنگ ستارگان"
+    },
+    {
+      "date": "2024-05-12",
+      "title_en": "Mother's Day",
+      "title_fa": "روز مادر"
+    },
+    {
+      "date": "2025-05-11",
+      "title_en": "Mother's Day",
+      "title_fa": "روز مادر"
+    },
+    {
+      "date": "2024-05-27",
+      "title_en": "Memorial Day (US)",
+      "title_fa": "روز یادبود (آمریکا)"
+    },
+    {
+      "date": "2025-05-26",
+      "title_en": "Memorial Day (US)",
+      "title_fa": "روز یادبود (آمریکا)"
+    },
+    {
+      "gregorianDate": "06-05",
+      "title_en": "World Environment Day",
+      "title_fa": "روز جهانی محیط زیست"
+    },
+    {
+      "date": "2024-06-16",
+      "title_en": "Father's Day",
+      "title_fa": "روز پدر"
+    },
+    {
+      "date": "2025-06-15",
+      "title_en": "Father's Day",
+      "title_fa": "روز پدر"
+    },
+    {
+        "gregorianDate": "06-30",
+        "title_en": "Social Media Day",
+        "title_fa": "روز شبکه های اجتماعی"
+    },
+    {
+      "gregorianDate": "07-04",
+      "title_en": "Independence Day (US)",
+      "title_fa": "روز استقلال (آمریکا)"
+    },
+    {
+        "gregorianDate": "07-07",
+        "title_en": "World Chocolate Day",
+        "title_fa": "روز جهانی شکلات"
+    },
+    {
+      "date": "2024-09-02",
+      "title_en": "Labor Day (US)",
+      "title_fa": "روز کارگر (آمریکا)"
+    },
+    {
+      "date": "2025-09-01",
+      "title_en": "Labor Day (US)",
+      "title_fa": "روز کارگر (آمریکا)"
+    },
+    {
+      "gregorianDate": "10-01",
+      "title_en": "International Coffee Day",
+      "title_fa": "روز جهانی قهوه"
+    },
+    {
+      "gregorianDate": "10-05",
+      "title_en": "World Teachers' Day",
+      "title_fa": "روز جهانی معلم"
+    },
+    {
+      "gregorianDate": "10-24",
+      "title_en": "United Nations Day",
+      "title_fa": "روز ملل متحد"
+    },
+    {
+      "gregorianDate": "10-31",
+      "title_en": "Halloween",
+      "title_fa": "هالووین"
+    },
+    {
+      "date": "2024-11-28",
+      "title_en": "Thanksgiving (US)",
+      "title_fa": "روز شکرگزاری (آمریکا)"
+    },
+    {
+      "date": "2025-11-27",
+      "title_en": "Thanksgiving (US)",
+      "title_fa": "روز شکرگزاری (آمریکا)"
+    },
+    {
+        "date": "2024-11-29",
+        "title_en": "Black Friday",
+        "title_fa": "جمعه سیاه"
+    },
+    {
+        "date": "2025-11-28",
+        "title_en": "Black Friday",
+        "title_fa": "جمعه سیاه"
+    },
+    {
+        "date": "2024-12-02",
+        "title_en": "Cyber Monday",
+        "title_fa": "دوشنبه سایبری"
+    },
+    {
+        "date": "2025-12-01",
+        "title_en": "Cyber Monday",
+        "title_fa": "دوشنبه سایبری"
+    },
+    {
+      "gregorianDate": "12-24",
+      "title_en": "Christmas Eve",
+      "title_fa": "شب کریسمس"
+    },
+    {
+      "gregorianDate": "12-25",
+      "title_en": "Christmas Day",
+      "title_fa": "روز کریسمس"
+    },
+    {
+      "gregorianDate": "12-31",
+      "title_en": "New Year's Eve",
+      "title_fa": "شب سال نو میلادی"
+    },
+    {
+      "jalaliDate": "01-01",
+      "title_en": "Nowruz",
+      "title_fa": "نوروز"
+    },
+    {
+      "jalaliDate": "01-02",
+      "title_en": "Nowruz Holiday",
+      "title_fa": "تعطیلات نوروز"
+    },
+    {
+      "jalaliDate": "01-03",
+      "title_en": "Nowruz Holiday",
+      "title_fa": "تعطیلات نوروز"
+    },
+    {
+      "jalaliDate": "01-04",
+      "title_en": "Nowruz Holiday",
+      "title_fa": "تعطیلات نوروز"
+    },
+    {
+      "jalaliDate": "01-12",
+      "title_en": "Islamic Republic Day",
+      "title_fa": "روز جمهوری اسلامی"
+    },
+    {
+      "jalaliDate": "01-13",
+      "title_en": "Sizdah Bedar",
+      "title_fa": "سیزده بدر"
+    },
+    {
+      "jalaliDate": "02-01",
+      "title_en": "Saadi Day",
+      "title_fa": "روز بزرگداشت سعدی"
+    },
+    {
+      "jalaliDate": "02-12",
+      "title_en": "Teacher's Day",
+      "title_fa": "روز معلم"
+    },
+    {
+        "jalaliDate": "02-25",
+        "title_en": "Ferdowsi Day",
+        "title_fa": "روز بزرگداشت فردوسی"
+    },
+    {
+      "jalaliDate": "02-28",
+      "title_en": "Khayyam Day",
+      "title_fa": "روز بزرگداشت خیام"
+    },
+    {
+      "jalaliDate": "03-14",
+      "title_en": "Demise of Imam Khomeini",
+      "title_fa": "رحلت امام خمینی"
+    },
+    {
+      "jalaliDate": "03-15",
+      "title_en": "Khordad 15 Uprising",
+      "title_fa": "قیام ۱۵ خرداد"
+    },
+    {
+      "jalaliDate": "04-13",
+      "title_en": "Tirgan",
+      "title_fa": "جشن تیرگان"
+    },
+    {
+      "jalaliDate": "07-10",
+      "title_en": "Mehregan",
+      "title_fa": "جشن مهرگان"
+    },
+    {
+      "jalaliDate": "07-20",
+      "title_en": "Hafez Day",
+      "title_fa": "روز بزرگداشت حافظ"
+    },
+    {
+      "jalaliDate": "08-07",
+      "title_en": "Cyrus the Great Day",
+      "title_fa": "روز کوروش بزرگ"
+    },
+    {
+      "jalaliDate": "09-16",
+      "title_en": "Student Day",
+      "title_fa": "روز دانشجو"
+    },
+    {
+      "jalaliDate": "09-30",
+      "title_en": "Yalda Night",
+      "title_fa": "شب یلدا"
+    },
+    {
+      "jalaliDate": "10-05",
+      "title_en": "Death of Zoroaster",
+      "title_fa": "درگذشت زرتشت"
+    },
+    {
+      "jalaliDate": "10-10",
+      "title_en": "National Persian Gulf Day",
+      "title_fa": "روز ملی خلیج فارس"
+    },
+    {
+        "jalaliDate": "11-29",
+        "title_en": "Sepandarmazgan",
+        "title_fa": "سپندارمذگان"
+    },
+    {
+      "jalaliDate": "11-22",
+      "title_en": "Revolution Day",
+      "title_fa": "پیروزی انقلاب اسلامی"
+    },
+    {
+      "jalaliDate": "12-29",
+      "title_en": "Oil Nationalization Day",
+      "title_fa": "روز ملی شدن صنعت نفت"
+    }
+  ]
+}

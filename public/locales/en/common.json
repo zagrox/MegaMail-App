@@ -1,4 +1,3 @@
-
 {
     "appName": "MegaMail",
     "dashboard": "Dashboard",
@@ -18,6 +17,7 @@
     "marketingCampaign": "Marketing Campaign",
     "emailBuilder": "Email Builder",
     "mediaManager": "Media Manager",
+    "calendar": "Calendar",
     "logout": "Log Out",
     "loading": "Loading...",
     "error": "Error",

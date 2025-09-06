@@ -227,28 +227,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     const updateUser = async (data: any) => {
         if (!user || !user.id || user.isApiKeyUser) throw new Error("User not authenticated or is an API key user.");
-
-        const userFields = ['first_name', 'last_name', 'avatar', 'theme_dark', 'theme_light', 'email_notifications', 'text_direction'];
-        const profileFields = ['company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'language', 'display'];
-
+    
+        // FIX: Moved 'language' to userFields as it's part of the main user record, not the profile.
+        // This ensures the language preference is saved to the correct location.
+        const userFields = ['first_name', 'last_name', 'avatar', 'theme_dark', 'theme_light', 'email_notifications', 'text_direction', 'language'];
+        const profileFields = ['company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display'];
+    
         const userPayload: any = {};
         const profilePayload: any = {};
-
+    
         Object.keys(data).forEach(key => {
             if (userFields.includes(key)) userPayload[key] = data[key];
             else if (profileFields.includes(key)) profilePayload[key] = data[key];
         });
-        
-        const promises = [];
-        if (Object.keys(userPayload).length > 0) {
-            promises.push(sdk.request(updateMe(userPayload)));
+    
+        // FIX: Perform an optimistic update of the local state immediately.
+        // This makes the UI feel instant and avoids the race condition where `getMe()`
+        // could fetch stale data and revert the language change.
+        setUser(prevUser => prevUser ? { ...prevUser, ...data } : null);
+    
+        try {
+            const promises = [];
+            if (Object.keys(userPayload).length > 0) {
+                promises.push(sdk.request(updateMe(userPayload)));
+            }
+            if (Object.keys(profilePayload).length > 0 && user.profileId) {
+                promises.push(sdk.request(updateItem('profiles', user.profileId, profilePayload)));
+            }
+            await Promise.all(promises);
+            // After successful API call, we can optionally refetch to sync any other server-side changes,
+            // but the primary UI-blocking issue is now resolved.
+            // For simplicity and robustness, we will rely on the optimistic update for this session.
+            // await getMe(); // This line is removed to prevent the race condition.
+        } catch (error) {
+            console.error("Failed to update user:", error);
+            // If the update fails, refetch the original data to revert the optimistic update
+            await getMe(); 
+            throw error; // Re-throw the error to be caught by the calling component
         }
-        if (Object.keys(profilePayload).length > 0 && user.profileId) {
-            promises.push(sdk.request(updateItem('profiles', user.profileId, profilePayload)));
-        }
-        
-        await Promise.all(promises);
-        await getMe(); // Refetch all user data to ensure consistency
     }
 
     const changePassword = async (passwords: { old: string; new: string }) => {

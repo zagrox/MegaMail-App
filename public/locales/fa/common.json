@@ -1,4 +1,3 @@
-
 {
     "appName": "مگامیل",
     "dashboard": "داشبورد",
@@ -18,6 +17,7 @@
     "marketingCampaign": "کمپین بازاریابی",
     "emailBuilder": "ایمیل ساز",
     "mediaManager": "فایل‌ها",
+    "calendar": "تقویم",
     "logout": "خروج",
     "loading": "در حال بارگذاری...",
     "error": "خطا",

@@ -36,6 +36,7 @@ import './src/styles/views/shared.css';
 import './src/styles/views/account.css';
 import './src/styles/views/auth.css';
 import './src/styles/views/buy-credits.css';
+import './src/styles/views/calendar.css';
 import './src/styles/views/campaign-detail.css';
 import './src/styles/views/campaigns.css';
 import './src/styles/views/contacts.css';
