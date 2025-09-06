@@ -1,7 +1,6 @@
-
 {
     "back": "بازگشت",
-    "selectCampaignType": "نوع کمپین را انتخاب کنید",
+    "selectCampaignType": "انتخاب نوع کمپین",
     "selectCampaignType_desc": "نوع کمپینی را که می‌خواهید ایجاد کنید انتخاب نمایید. کمپین عادی یک ایمیل واحد را به مخاطبان شما ارسال می‌کند.",
     "regularCampaign": "کمپین<br />عادی",
     "abTestCampaign": "کمپین<br />آزمایشی A/B",
