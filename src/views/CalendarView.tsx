@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../components/Icon';
@@ -19,7 +20,7 @@ const CalendarView = () => {
     const isJalali = i18n.language === 'fa';
 
     useEffect(() => {
-        fetch('/src/data/events.json')
+        fetch('/data/events.json')
             .then(res => {
                 if (!res.ok) {
                     throw new Error('Failed to fetch events');
