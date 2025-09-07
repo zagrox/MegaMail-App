@@ -50,7 +50,6 @@ const AccountView = ({ apiKey, user, setView }: { apiKey: string, user: any, set
         { id: 'notifications', label: t('notifications'), icon: ICONS.BELL, component: <NotificationsTab /> },
         { id: 'security', label: t('security'), icon: ICONS.LOCK, component: <SecurityTab user={user} /> },
         { id: 'smtp', label: t('smtp'), icon: ICONS.SMTP, component: <SmtpView apiKey={apiKey} user={user} /> },
-        { id: 'api_key', label: t('apiKey'), icon: ICONS.KEY, component: <ApiKeyTab apiKey={apiKey} /> },
         { id: 'share', label: t('share'), icon: ICONS.SHARE, component: <ShareTab apiKey={apiKey} /> },
     ];
     

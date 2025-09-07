@@ -5,7 +5,7 @@ import StatisticsView from './StatisticsView';
 import CenteredMessage from '../components/CenteredMessage';
 
 const EmbedView = () => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['account', 'common']);
     const urlParams = new URLSearchParams(window.location.search);
     const apiKey = urlParams.get('apiKey');
     const view = urlParams.get('view') || 'Dashboard';

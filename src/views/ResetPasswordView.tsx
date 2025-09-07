@@ -8,7 +8,7 @@ import { useConfiguration } from '../contexts/ConfigurationContext';
 
 const ResetPasswordView = () => {
     const { resetPassword } = useAuth();
-    const { t } = useTranslation();
+    const { t } = useTranslation(['auth', 'common']);
     const { addToast } = useToast();
     const { config } = useConfiguration();
     const [token, setToken] = useState<string | null>(null);

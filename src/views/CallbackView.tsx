@@ -18,7 +18,7 @@ type ProcessedOrder = {
 };
 
 const CallbackView = () => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['buyCredits', 'dashboard', 'orders', 'common']);
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -144,14 +144,14 @@ const CallbackView = () => {
                              <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
                                 <table className="simple-table">
                                      <tbody>
-                                        <tr><td>{t('orderId')}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
+                                        <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
                                         <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.note}</strong></td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         )}
                         <div className="form-actions" style={{ justifyContent: 'center' }}>
-                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToDashboard')}</button>
+                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToDashboard', { ns: 'dashboard' })}</button>
                         </div>
                     </>
                 ) : (
@@ -163,16 +163,16 @@ const CallbackView = () => {
                             <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
                                 <table className="simple-table">
                                     <tbody>
-                                        <tr><td>{t('orderId')}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
+                                        <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
                                         <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.note}</strong></td></tr>
-                                        {processedOrder.creditsAdded && <tr><td>{t('credits')}</td><td style={{textAlign: 'right'}}><strong>+{processedOrder.creditsAdded.toLocaleString(i18n.language)}</strong></td></tr>}
-                                        <tr><td>{t('total')}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.total.toLocaleString(i18n.language)} {t('priceIRT')}</strong></td></tr>
+                                        {processedOrder.creditsAdded && <tr><td>{t('credits', { ns: 'dashboard' })}</td><td style={{textAlign: 'right'}}><strong>+{processedOrder.creditsAdded.toLocaleString(i18n.language)}</strong></td></tr>}
+                                        <tr><td>{t('total', { ns: 'common' })}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.total.toLocaleString(i18n.language)} {t('priceIRT')}</strong></td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         )}
                         <div className="form-actions" style={{ justifyContent: 'center' }}>
-                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToDashboard')}</button>
+                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToDashboard', { ns: 'dashboard' })}</button>
                         </div>
                     </>
                 )}
