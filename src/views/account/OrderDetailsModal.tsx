@@ -7,7 +7,7 @@ import Icon, { ICONS } from '../../components/Icon';
 import { useOrderStatuses } from '../../hooks/useOrderStatuses';
 import { useStatusStyles } from '../../hooks/useStatusStyles';
 
-const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder }: { isOpen: boolean, onClose: () => void, order: any, onContinueOrder?: (order: any) => void }) => {
+const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder, onGoToOfflineForm }: { isOpen: boolean, onClose: () => void, order: any, onContinueOrder?: (order: any) => void, onGoToOfflineForm?: (order: any) => void }) => {
     const { t, i18n } = useTranslation(['orders', 'buyCredits', 'common']);
     const { statusesMap, loading: statusesLoading } = useOrderStatuses();
     const { getStatusStyle } = useStatusStyles();
@@ -50,17 +50,16 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder }: { isOpen
             <div className="form-actions" style={{ justifyContent: 'space-between', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)', marginTop: '1.5rem' }}>
                 <button className="btn" onClick={onClose}>{t('close')}</button>
                 
-                {showPayButton && lastTransaction && (
-                    <a href={paymentUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                {showPayButton && onContinueOrder && (
+                    <button className="btn btn-primary" onClick={() => onContinueOrder(order)}>
                         <Icon>{ICONS.LOCK_OPEN}</Icon>
-                        <span>{t('payNow')}</span>
-                    </a>
-                )}
-                
-                {order.order_status === 'pending' && !lastTransaction && onContinueOrder && (
-                     <button className="btn btn-primary" onClick={() => onContinueOrder(order)}>
-                        <Icon>{ICONS.BUY_CREDITS}</Icon>
                         <span>{t('continueOrder')}</span>
+                    </button>
+                )}
+                {order.order_status === 'processing' && onGoToOfflineForm && (
+                    <button className="btn btn-primary" onClick={() => onGoToOfflineForm(order)}>
+                        <Icon>{ICONS.PENCIL}</Icon>
+                        <span>{t('submitBankInfo', { ns: 'buyCredits' })}</span>
                     </button>
                 )}
             </div>

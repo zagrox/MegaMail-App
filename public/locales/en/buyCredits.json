@@ -31,5 +31,16 @@
     "buyDifferentPackage": "Choose a Different Package",
     "confirmAndPay": "Confirm and Pay",
     "paymentSuccess": "Payment Successful",
-    "orderPlacedForProcessing": "Your order has been placed and is now processing. Please check your order history for payment instructions."
+    "orderPlacedForProcessing": "Your order has been placed and is now processing. Please submit your bank transfer details.",
+    "offlinePaymentTitle": "Offline Payment Details",
+    "submitBankInfo": "Submit Bank Info",
+    "offlinePaymentFormTitle": "Submit Bank Transfer Details",
+    "offlinePaymentFormInstructions": "Please enter the details of your bank transfer below. Our team will review and confirm your payment within 24 hours.",
+    "transferDetails": "Transfer Details",
+    "transferDetailsPlaceholder": "Enter transaction ID, date, amount, and any other relevant information here...",
+    "submitDetails": "Submit Details",
+    "detailsSubmittedSuccess": "Your bank transfer details have been submitted successfully.",
+    "detailsSubmittedError": "Failed to submit details: {{error}}",
+    "backToOrders": "Back to Orders",
+    "detailsCannotBeEmpty": "Details cannot be empty."
 }

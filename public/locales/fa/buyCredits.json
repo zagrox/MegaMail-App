@@ -31,5 +31,16 @@
     "buyDifferentPackage": "انتخاب یک بسته دیگر",
     "confirmAndPay": "تأیید و پرداخت",
     "paymentSuccess": "پرداخت موفق",
-    "orderPlacedForProcessing": "سفارش شما ثبت شد و در حال پردازش است. لطفاً برای دستورالعمل‌های پرداخت، تاریخچه سفارشات خود را بررسی کنید."
+    "orderPlacedForProcessing": "سفارش شما ثبت شد و در حال پردازش است. لطفاً اطلاعات واریز بانکی خود را ارسال کنید.",
+    "offlinePaymentTitle": "جزئیات پرداخت آفلاین",
+    "submitBankInfo": "ارسال اطلاعات بانکی",
+    "offlinePaymentFormTitle": "ارسال جزئیات انتقال بانکی",
+    "offlinePaymentFormInstructions": "لطفاً جزئیات انتقال بانکی خود را در زیر وارد کنید. تیم ما پرداخت شما را ظرف ۲۴ ساعت بررسی و تأیید خواهد کرد.",
+    "transferDetails": "جزئیات انتقال",
+    "transferDetailsPlaceholder": "شناسه تراکنش، تاریخ، مبلغ و سایر اطلاعات مربوطه را اینجا وارد کنید...",
+    "submitDetails": "ارسال جزئیات",
+    "detailsSubmittedSuccess": "جزئیات انتقال بانکی شما با موفقیت ارسال شد.",
+    "detailsSubmittedError": "ارسال جزئیات ناموفق بود: {{error}}",
+    "backToOrders": "بازگشت به سفارش‌ها",
+    "detailsCannotBeEmpty": "جزئیات نمی‌تواند خالی باشد."
 }

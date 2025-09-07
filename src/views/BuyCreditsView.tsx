@@ -115,7 +115,7 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
     const [isPaying, setIsPaying] = useState(false);
     const [modalState, setModalState] = useState({ isOpen: false, title: '', message: '' });
     const [createdOrder, setCreatedOrder] = useState<any | null>(null);
-    const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
+    const [paymentMethod, setPaymentMethod] = useState('credit_card');
     
     const [packages, setPackages] = useState<any[]>([]);
     const [packagesLoading, setPackagesLoading] = useState(true);
@@ -253,7 +253,7 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
             const token = await sdk.getToken();
             if (!token) throw new Error("Authentication token not found.");
             
-            await fetch(`${config.app_backend}/items/orders/${createdOrder.id}`, {
+            const response = await fetch(`${config.app_backend}/items/orders/${createdOrder.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -262,9 +262,17 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                 body: JSON.stringify({ order_status: 'processing' })
             });
 
+            if (!response.ok) {
+                const errorData = await response.json();
+                const errorMessage = errorData?.errors?.[0]?.message || 'Failed to update order status.';
+                throw new Error(errorMessage);
+            }
+
             addToast(t('orderPlacedForProcessing'), 'success');
+            const orderForNextStep = { ...createdOrder };
             setCreatedOrder(null);
-            handleViewHistory();
+            setView('OfflinePayment', { order: orderForNextStep });
+
         } catch (error: any) {
             addToast(t('purchaseFailedMessage', { error: error.message }), 'error');
         } finally {
@@ -419,8 +427,8 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                     <h3>{t('paymentMethod')}</h3>
                     <div className="form-group" style={{ marginBottom: '2rem' }}>
                         <select className="full-width" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
-                            <option value="bank_transfer">{t('paymentMethodBank')}</option>
                             <option value="credit_card">{t('paymentMethodCard')}</option>
+                            <option value="bank_transfer">{t('paymentMethodBank')}</option>
                         </select>
                     </div>
                     

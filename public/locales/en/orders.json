@@ -24,5 +24,6 @@
     "failed": "Failed",
     "orderDetails": "Order Details",
     "orderId": "Order ID",
-    "continueOrder": "Continue Order"
+    "continueOrder": "Continue Order",
+    "noOrderSelected": "No order was selected for payment. Please go back and try again."
 }

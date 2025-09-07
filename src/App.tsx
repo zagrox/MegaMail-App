@@ -32,12 +32,13 @@ import { List, Template, Module } from './api/types';
 import ListDetailView from './views/ListDetailView';
 import ContactDetailView from './views/ContactDetailView';
 import UnlockModuleModal from './components/UnlockModuleModal';
+import OfflinePaymentView from './views/OfflinePaymentView';
 
 
 const App = () => {
     const { isAuthenticated, user, logout, hasModuleAccess, loading: authLoading, allModules, moduleToUnlock, setModuleToUnlock } = useAuth();
     const { config } = useConfiguration();
-    const { t, i18n } = useTranslation(['common', 'emailLists', 'contacts']);
+    const { t, i18n } = useTranslation(['common', 'emailLists', 'contacts', 'buyCredits']);
     const [view, setView] = useState('Dashboard');
     const [templateToEdit, setTemplateToEdit] = useState<Template | null>(null);
     const [campaignToLoad, setCampaignToLoad] = useState<any | null>(null);
@@ -47,6 +48,7 @@ const App = () => {
     const [contactDetailOrigin, setContactDetailOrigin] = useState<{ view: string, data: any } | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [orderToResume, setOrderToResume] = useState<any | null>(null);
+    const [orderForOfflinePayment, setOrderForOfflinePayment] = useState<any | null>(null);
     const appContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -210,7 +212,7 @@ const App = () => {
         setView('Dashboard');
     };
 
-    const handleSetView = (newView: string, data?: { template?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any, campaign?: any, orderToResume?: any }) => {
+    const handleSetView = (newView: string, data?: { template?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any, campaign?: any, orderToResume?: any, order?: any }) => {
         if (newView === 'Email Builder' && data?.template) setTemplateToEdit(data.template);
         else setTemplateToEdit(null);
 
@@ -241,6 +243,12 @@ const App = () => {
             setOrderToResume(null);
         }
 
+        if (newView === 'OfflinePayment' && data?.order) {
+            setOrderForOfflinePayment(data.order);
+        } else {
+            setOrderForOfflinePayment(null);
+        }
+
         setView(newView);
         setIsMobileMenuOpen(false);
     }
@@ -250,6 +258,7 @@ const App = () => {
         'Statistics': { component: <StatisticsView apiKey={apiKey} />, title: t('statistics'), icon: ICONS.STATISTICS },
         'Account': { component: <AccountView apiKey={apiKey} user={user} setView={handleSetView} />, title: t('account'), icon: ICONS.ACCOUNT },
         'Buy Credits': { component: <BuyCreditsView apiKey={apiKey} user={user} setView={handleSetView} orderToResume={orderToResume} />, title: t('buyCredits'), icon: ICONS.BUY_CREDITS },
+        'OfflinePayment': { component: <OfflinePaymentView order={orderForOfflinePayment} setView={handleSetView} />, title: t('offlinePaymentTitle', { ns: 'buyCredits' }), icon: ICONS.PENCIL },
         'Contacts': { component: <ContactsView apiKey={apiKey} setView={handleSetView} />, title: t('contacts'), icon: ICONS.CONTACTS },
         'Email Lists': { component: <EmailListView apiKey={apiKey} setView={handleSetView} />, title: t('emailLists'), icon: ICONS.EMAIL_LISTS },
         'ListDetail': { component: <ListDetailView apiKey={apiKey} list={selectedList} setView={handleSetView} onBack={() => handleSetView('Email Lists')} />, title: selectedList ? t('contactsInList', { listName: selectedList.ListName }) : t('contacts'), icon: ICONS.CONTACTS },
@@ -339,7 +348,7 @@ const App = () => {
     );
     
     const currentView = views[view];
-    const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail' && view !== 'Marketing' && view !== 'CampaignDetail';
+    const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail' && view !== 'Marketing' && view !== 'CampaignDetail' && view !== 'OfflinePayment';
 
     return (
         <div ref={appContainerRef} className={`app-container ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>

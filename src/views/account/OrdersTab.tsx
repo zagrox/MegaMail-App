@@ -83,6 +83,11 @@ const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void })
         setView('Buy Credits', { orderToResume: order });
     };
 
+    const handleGoToOfflineForm = (order: any) => {
+        setSelectedOrder(null);
+        setView('OfflinePayment', { order: order });
+    };
+
     if (loading) {
         return <CenteredMessage><Loader /></CenteredMessage>;
     }
@@ -99,6 +104,7 @@ const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void })
                     onClose={() => setSelectedOrder(null)}
                     order={selectedOrder}
                     onContinueOrder={handleContinueOrder}
+                    onGoToOfflineForm={handleGoToOfflineForm}
                 />
             )}
             <div className="account-tab-card-header">
