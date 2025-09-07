@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -44,7 +41,7 @@ const AccountView = ({ apiKey, user, setView }: { apiKey: string, user: any, set
     const tabs = [
         { id: 'general', label: t('general'), icon: ICONS.DASHBOARD, component: <GeneralTab accountData={accountData} contactsCountData={contactsCountData} contactsCountLoading={contactsCountLoading} installPrompt={installPrompt} handleInstallClick={handleInstallClick} /> },
         { id: 'profile', label: t('profile'), icon: ICONS.ACCOUNT, component: <ProfileTab accountData={accountData} user={user} /> },
-        { id: 'orders', label: t('orders'), icon: ICONS.BUY_CREDITS, component: <OrdersTab /> },
+        { id: 'orders', label: t('orders'), icon: ICONS.BUY_CREDITS, component: <OrdersTab setView={setView} /> },
         { id: 'modules', label: t('modules'), icon: ICONS.BOX, component: <ModulesTab setView={setView} /> },
         { id: 'domains', label: t('domains'), icon: ICONS.DOMAINS, component: <DomainsView apiKey={apiKey} /> },
         { id: 'notifications', label: t('notifications'), icon: ICONS.BELL, component: <NotificationsTab /> },

@@ -46,6 +46,7 @@ const App = () => {
     const [selectedContactEmail, setSelectedContactEmail] = useState<string | null>(null);
     const [contactDetailOrigin, setContactDetailOrigin] = useState<{ view: string, data: any } | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [orderToResume, setOrderToResume] = useState<any | null>(null);
     const appContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -209,7 +210,7 @@ const App = () => {
         setView('Dashboard');
     };
 
-    const handleSetView = (newView: string, data?: { template?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any, campaign?: any }) => {
+    const handleSetView = (newView: string, data?: { template?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any, campaign?: any, orderToResume?: any }) => {
         if (newView === 'Email Builder' && data?.template) setTemplateToEdit(data.template);
         else setTemplateToEdit(null);
 
@@ -233,6 +234,13 @@ const App = () => {
             setSelectedCampaign(null);
         }
 
+        if (newView === 'Buy Credits' && data?.orderToResume) {
+            setOrderToResume(data.orderToResume);
+        } else {
+            // Clear it for any other navigation action to avoid resuming a stale order.
+            setOrderToResume(null);
+        }
+
         setView(newView);
         setIsMobileMenuOpen(false);
     }
@@ -241,7 +249,7 @@ const App = () => {
         'Dashboard': { component: <DashboardView setView={handleSetView} apiKey={apiKey} user={user} />, title: t('dashboard'), icon: ICONS.DASHBOARD },
         'Statistics': { component: <StatisticsView apiKey={apiKey} />, title: t('statistics'), icon: ICONS.STATISTICS },
         'Account': { component: <AccountView apiKey={apiKey} user={user} setView={handleSetView} />, title: t('account'), icon: ICONS.ACCOUNT },
-        'Buy Credits': { component: <BuyCreditsView apiKey={apiKey} user={user} setView={handleSetView} />, title: t('buyCredits'), icon: ICONS.BUY_CREDITS },
+        'Buy Credits': { component: <BuyCreditsView apiKey={apiKey} user={user} setView={handleSetView} orderToResume={orderToResume} />, title: t('buyCredits'), icon: ICONS.BUY_CREDITS },
         'Contacts': { component: <ContactsView apiKey={apiKey} setView={handleSetView} />, title: t('contacts'), icon: ICONS.CONTACTS },
         'Email Lists': { component: <EmailListView apiKey={apiKey} setView={handleSetView} />, title: t('emailLists'), icon: ICONS.EMAIL_LISTS },
         'ListDetail': { component: <ListDetailView apiKey={apiKey} list={selectedList} setView={handleSetView} onBack={() => handleSetView('Email Lists')} />, title: selectedList ? t('contactsInList', { listName: selectedList.ListName }) : t('contacts'), icon: ICONS.CONTACTS },

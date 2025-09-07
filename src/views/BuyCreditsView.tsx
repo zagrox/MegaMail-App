@@ -9,6 +9,7 @@ import CenteredMessage from '../components/CenteredMessage';
 import sdk from '../api/directus';
 import { useConfiguration } from '../contexts/ConfigurationContext';
 import Loader from '../components/Loader';
+import { useToast } from '../contexts/ToastContext';
 
 const CreditSelector = ({ packages, onPurchase, isSubmitting }: { packages: any[], onPurchase: (pkg: any) => void, isSubmitting: boolean }) => {
     const { t, i18n } = useTranslation(['buyCredits', 'common']);
@@ -106,13 +107,15 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
     );
 };
 
-const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, setView: (view: string, data?: any) => void }) => {
+const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: string, user: any, setView: (view: string, data?: any) => void, orderToResume?: any | null }) => {
     const { t, i18n } = useTranslation(['buyCredits', 'common', 'orders']);
     const { config } = useConfiguration();
+    const { addToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isPaying, setIsPaying] = useState(false);
     const [modalState, setModalState] = useState({ isOpen: false, title: '', message: '' });
     const [createdOrder, setCreatedOrder] = useState<any | null>(null);
+    const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
     
     const [packages, setPackages] = useState<any[]>([]);
     const [packagesLoading, setPackagesLoading] = useState(true);
@@ -120,6 +123,12 @@ const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, 
 
     const { data: accountData, loading: creditLoading, error: creditError } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
     
+    useEffect(() => {
+        if (orderToResume) {
+            setCreatedOrder(orderToResume);
+        }
+    }, [orderToResume]);
+
     useEffect(() => {
         if (!config?.app_backend) {
             if (!packagesLoading) setPackagesLoading(true);
@@ -232,9 +241,39 @@ const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, 
         }
     };
 
-    const handleConfirmAndPay = async () => {
+    const handleViewHistory = () => {
+        sessionStorage.setItem('account-tab', 'orders');
+        setView('Account');
+    };
+
+    const handleBankTransferPayment = async () => {
         if (!createdOrder) return;
-        if (!config?.app_backend) {
+        setIsPaying(true);
+        try {
+            const token = await sdk.getToken();
+            if (!token) throw new Error("Authentication token not found.");
+            
+            await fetch(`${config.app_backend}/items/orders/${createdOrder.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ order_status: 'processing' })
+            });
+
+            addToast(t('orderPlacedForProcessing'), 'success');
+            setCreatedOrder(null);
+            handleViewHistory();
+        } catch (error: any) {
+            addToast(t('purchaseFailedMessage', { error: error.message }), 'error');
+        } finally {
+            setIsPaying(false);
+        }
+    };
+    
+    const handleOnlinePayment = async () => {
+         if (!config?.app_backend) {
             setModalState({ isOpen: true, title: t('error'), message: 'Application backend is not configured.' });
             return;
         }
@@ -342,14 +381,19 @@ const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, 
             });
             setIsPaying(false);
         }
+    }
+
+    const handleConfirmAndPay = async () => {
+        if (!createdOrder) return;
+        
+        if (paymentMethod === 'bank_transfer') {
+            await handleBankTransferPayment();
+        } else {
+            await handleOnlinePayment();
+        }
     };
     
     const closeModal = () => setModalState({ isOpen: false, title: '', message: '' });
-
-    const handleViewHistory = () => {
-        sessionStorage.setItem('account-tab', 'orders');
-        setView('Account');
-    };
 
     if (createdOrder) {
         return (
@@ -374,9 +418,9 @@ const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, 
     
                     <h3>{t('paymentMethod')}</h3>
                     <div className="form-group" style={{ marginBottom: '2rem' }}>
-                        <select className="full-width">
-                            <option>{t('paymentMethodBank')}</option>
-                            <option>{t('paymentMethodCard')}</option>
+                        <select className="full-width" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
+                            <option value="bank_transfer">{t('paymentMethodBank')}</option>
+                            <option value="credit_card">{t('paymentMethodCard')}</option>
                         </select>
                     </div>
                     
@@ -386,7 +430,7 @@ const BuyCreditsView = ({ apiKey, user, setView }: { apiKey: string, user: any, 
                             <span>{t('buyDifferentPackage')}</span>
                         </button>
                         <button className="btn btn-primary" onClick={handleConfirmAndPay} disabled={isPaying}>
-                            {isPaying ? <Loader /> : <Icon>{ICONS.LOCK_OPEN}</Icon>}
+                            {isPaying ? <Loader /> : <Icon>{paymentMethod === 'credit_card' ? ICONS.LOCK_OPEN : ICONS.CHECK}</Icon>}
                             <span>{t('confirmAndPay')}</span>
                         </button>
                     </div>

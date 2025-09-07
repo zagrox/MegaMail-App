@@ -23,5 +23,6 @@
     "pending": "Pending",
     "failed": "Failed",
     "orderDetails": "Order Details",
-    "orderId": "Order ID"
+    "orderId": "Order ID",
+    "continueOrder": "Continue Order"
 }

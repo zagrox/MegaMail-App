@@ -30,5 +30,6 @@
     "paymentMethodCard": "کارت اعتباری/بانکی",
     "buyDifferentPackage": "انتخاب یک بسته دیگر",
     "confirmAndPay": "تأیید و پرداخت",
-    "paymentSuccess": "پرداخت موفق"
+    "paymentSuccess": "پرداخت موفق",
+    "orderPlacedForProcessing": "سفارش شما ثبت شد و در حال پردازش است. لطفاً برای دستورالعمل‌های پرداخت، تاریخچه سفارشات خود را بررسی کنید."
 }

@@ -12,7 +12,7 @@ import { formatDateRelative } from '../../utils/helpers';
 import Badge from '../../components/Badge';
 import { useOrderStatuses } from '../../hooks/useOrderStatuses';
 
-const OrdersTab = () => {
+const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void }) => {
     const { t, i18n } = useTranslation(['orders', 'common', 'buyCredits']);
     const { user } = useAuth();
     const [orders, setOrders] = useState<any[]>([]);
@@ -78,6 +78,11 @@ const OrdersTab = () => {
         }
     };
 
+    const handleContinueOrder = (order: any) => {
+        setSelectedOrder(null); // Close the modal first
+        setView('Buy Credits', { orderToResume: order });
+    };
+
     if (loading) {
         return <CenteredMessage><Loader /></CenteredMessage>;
     }
@@ -93,6 +98,7 @@ const OrdersTab = () => {
                     isOpen={!!selectedOrder}
                     onClose={() => setSelectedOrder(null)}
                     order={selectedOrder}
+                    onContinueOrder={handleContinueOrder}
                 />
             )}
             <div className="account-tab-card-header">

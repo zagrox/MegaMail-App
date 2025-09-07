@@ -23,5 +23,6 @@
     "pending": "در انتظار",
     "failed": "ناموفق",
     "orderDetails": "جزئیات سفارش",
-    "orderId": "شناسه سفارش"
+    "orderId": "شناسه سفارش",
+    "continueOrder": "ادامه سفارش"
 }

@@ -30,5 +30,6 @@
     "paymentMethodCard": "Credit/Debit Card",
     "buyDifferentPackage": "Choose a Different Package",
     "confirmAndPay": "Confirm and Pay",
-    "paymentSuccess": "Payment Successful"
+    "paymentSuccess": "Payment Successful",
+    "orderPlacedForProcessing": "Your order has been placed and is now processing. Please check your order history for payment instructions."
 }
