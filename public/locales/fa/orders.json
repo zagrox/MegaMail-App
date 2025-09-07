@@ -25,5 +25,16 @@
     "orderDetails": "جزئیات سفارش",
     "orderId": "شناسه سفارش",
     "continueOrder": "ادامه سفارش",
-    "noOrderSelected": "سفارشی برای پرداخت انتخاب نشده است. لطفاً بازگشته و دوباره تلاش کنید."
+    "noOrderSelected": "سفارشی برای پرداخت انتخاب نشده است. لطفاً بازگشته و دوباره تلاش کنید.",
+    "invoiceTitle": "فاکتور",
+    "viewInvoice": "مشاهده فاکتور",
+    "billTo": "به نام",
+    "issueDate": "تاریخ صدور",
+    "print": "چاپ",
+    "paid": "پرداخت شده",
+    "quantity": "تعداد",
+    "unitPrice": "قیمت واحد",
+    "subtotal": "جمع جزء",
+    "tax": "مالیات (۰٪)",
+    "thankYouForYourBusiness": "از خرید شما متشکریم!"
 }

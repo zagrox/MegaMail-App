@@ -88,6 +88,11 @@ const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void })
         setView('OfflinePayment', { order: order });
     };
 
+    const handleViewInvoice = (order: any) => {
+        setSelectedOrder(null);
+        setView('Invoice', { order: order });
+    };
+
     if (loading) {
         return <CenteredMessage><Loader /></CenteredMessage>;
     }
@@ -105,6 +110,7 @@ const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void })
                     order={selectedOrder}
                     onContinueOrder={handleContinueOrder}
                     onGoToOfflineForm={handleGoToOfflineForm}
+                    onViewInvoice={handleViewInvoice}
                 />
             )}
             <div className="account-tab-card-header">

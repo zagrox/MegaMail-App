@@ -25,5 +25,16 @@
     "orderDetails": "Order Details",
     "orderId": "Order ID",
     "continueOrder": "Continue Order",
-    "noOrderSelected": "No order was selected for payment. Please go back and try again."
+    "noOrderSelected": "No order was selected for payment. Please go back and try again.",
+    "invoiceTitle": "Invoice",
+    "viewInvoice": "View Invoice",
+    "billTo": "Bill To",
+    "issueDate": "Issue Date",
+    "print": "Print",
+    "paid": "Paid",
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+    "subtotal": "Subtotal",
+    "tax": "Tax (0%)",
+    "thankYouForYourBusiness": "Thank you for your business!"
 }

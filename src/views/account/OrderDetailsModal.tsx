@@ -7,7 +7,7 @@ import Icon, { ICONS } from '../../components/Icon';
 import { useOrderStatuses } from '../../hooks/useOrderStatuses';
 import { useStatusStyles } from '../../hooks/useStatusStyles';
 
-const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder, onGoToOfflineForm }: { isOpen: boolean, onClose: () => void, order: any, onContinueOrder?: (order: any) => void, onGoToOfflineForm?: (order: any) => void }) => {
+const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder, onGoToOfflineForm, onViewInvoice }: { isOpen: boolean, onClose: () => void, order: any, onContinueOrder?: (order: any) => void, onGoToOfflineForm?: (order: any) => void, onViewInvoice?: (order: any) => void }) => {
     const { t, i18n } = useTranslation(['orders', 'buyCredits', 'common']);
     const { statusesMap, loading: statusesLoading } = useOrderStatuses();
     const { getStatusStyle } = useStatusStyles();
@@ -15,6 +15,7 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder, onGoToOffl
     const valueCellStyle: React.CSSProperties = { textAlign: i18n.dir() === 'rtl' ? 'left' : 'right' };
 
     const showPayButton = ['pending', 'failed'].includes(order.order_status);
+    const showInvoiceButton = order.order_status === 'completed';
     const lastTransaction = order.transactions?.length > 0 ? order.transactions[order.transactions.length - 1] : null;
     const paymentUrl = lastTransaction ? `https://gateway.zibal.ir/start/${lastTransaction.trackid}` : '#';
 
@@ -50,18 +51,28 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder, onGoToOffl
             <div className="form-actions" style={{ justifyContent: 'space-between', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)', marginTop: '1.5rem' }}>
                 <button className="btn" onClick={onClose}>{t('close')}</button>
                 
-                {showPayButton && onContinueOrder && (
-                    <button className="btn btn-primary" onClick={() => onContinueOrder(order)}>
-                        <Icon>{ICONS.LOCK_OPEN}</Icon>
-                        <span>{t('continueOrder')}</span>
-                    </button>
-                )}
-                {order.order_status === 'processing' && onGoToOfflineForm && (
-                    <button className="btn btn-primary" onClick={() => onGoToOfflineForm(order)}>
-                        <Icon>{ICONS.PENCIL}</Icon>
-                        <span>{t('submitBankInfo', { ns: 'buyCredits' })}</span>
-                    </button>
-                )}
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    {order.order_status === 'processing' && onGoToOfflineForm && (
+                        <button className="btn btn-primary" onClick={() => onGoToOfflineForm(order)}>
+                            <Icon>{ICONS.PENCIL}</Icon>
+                            <span>{t('submitBankInfo', { ns: 'buyCredits' })}</span>
+                        </button>
+                    )}
+
+                    {showPayButton && onContinueOrder && (
+                        <button className="btn btn-primary" onClick={() => onContinueOrder(order)}>
+                            <Icon>{ICONS.LOCK_OPEN}</Icon>
+                            <span>{t('continueOrder')}</span>
+                        </button>
+                    )}
+                    
+                    {showInvoiceButton && onViewInvoice && (
+                        <button className="btn btn-primary" onClick={() => onViewInvoice(order)}>
+                            <Icon>{ICONS.FILE_TEXT}</Icon>
+                            <span>{t('viewInvoice')}</span>
+                        </button>
+                    )}
+                </div>
             </div>
         </Modal>
     );
