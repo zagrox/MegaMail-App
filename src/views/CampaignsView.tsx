@@ -11,12 +11,14 @@ import { useStatusStyles } from '../hooks/useStatusStyles';
 import { useToast } from '../contexts/ToastContext';
 import Button from '../components/Button';
 import { formatDateRelative } from '../utils/helpers';
+import ConfirmModal from '../components/ConfirmModal';
 
-const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { campaign: any; onSelect: () => void; onEdit: () => void; stats: { Delivered: number, Opened: number, Clicked: number } | null; loadingStats: boolean; }) => {
+const CampaignCard = ({ campaign, onSelect, onEdit, onDelete, onPause, stats, loadingStats, processingCampaign }: { campaign: any; onSelect: () => void; onEdit: () => void; onDelete: () => void; onPause: () => void; stats: { Delivered: number, Opened: number, Clicked: number } | null; loadingStats: boolean; processingCampaign: string | null; }) => {
     const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common']);
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(campaign.Status);
     const isDraft = campaign.Status === 'Draft';
+    const isSending = campaign.Status === 'Sending';
     const content = campaign.Content?.[0];
 
     const fromString = content?.From || '';
@@ -81,14 +83,31 @@ const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { cam
                     </div>
                 )}
             </div>
-            <div className="campaign-card-footer">
+            <div className="campaign-card-footer" style={{justifyContent: 'flex-end', gap: '0.5rem'}}>
                 {isDraft ? (
-                    <Button className="btn-secondary" onClick={onEdit} disabled={loadingStats}>
-                        <Icon>{ICONS.PENCIL}</Icon>
-                        <span>{t('edit')}</span>
-                    </Button>
+                    <>
+                        <Button className="btn-secondary" onClick={onEdit} disabled={loadingStats || !!processingCampaign}>
+                            <Icon>{ICONS.PENCIL}</Icon>
+                            <span>{t('edit')}</span>
+                        </Button>
+                         <Button className="btn-danger" onClick={onDelete} disabled={loadingStats || !!processingCampaign}>
+                            {processingCampaign === campaign.Name ? <Loader /> : <Icon>{ICONS.DELETE}</Icon>}
+                            <span>{t('delete')}</span>
+                        </Button>
+                    </>
+                ) : isSending ? (
+                     <>
+                        <Button className="btn-secondary" onClick={onPause} disabled={loadingStats || !!processingCampaign}>
+                            {processingCampaign === campaign.Name ? <Loader /> : <Icon>{ICONS.PAUSE}</Icon>}
+                            <span>{t('pause', { ns: 'campaigns' })}</span>
+                        </Button>
+                        <Button className="btn-secondary" onClick={onSelect} disabled={loadingStats || !!processingCampaign}>
+                            <Icon>{ICONS.STATISTICS}</Icon>
+                            <span>{t('viewReport', { ns: 'campaigns' })}</span>
+                        </Button>
+                    </>
                 ) : (
-                    <Button className="btn-secondary" onClick={onSelect} disabled={loadingStats}>
+                    <Button className="btn-secondary" onClick={onSelect} disabled={loadingStats || !!processingCampaign}>
                         <Icon>{ICONS.STATISTICS}</Icon>
                         <span>{t('viewReport', { ns: 'campaigns' })}</span>
                     </Button>
@@ -98,11 +117,12 @@ const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { cam
     );
 };
 
-const CampaignRow = ({ campaign, onSelect, onEdit, stats, loadingStats }: { campaign: any; onSelect: () => void; onEdit: () => void; stats: { Delivered: number, Opened: number } | null; loadingStats: boolean; }) => {
+const CampaignRow = ({ campaign, onSelect, onEdit, onDelete, onPause, stats, loadingStats, processingCampaign }: { campaign: any; onSelect: () => void; onEdit: () => void; onDelete: () => void; onPause: () => void; stats: { Delivered: number, Opened: number } | null; loadingStats: boolean; processingCampaign: string | null; }) => {
     const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common']);
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(campaign.Status);
     const isDraft = campaign.Status === 'Draft';
+    const isSending = campaign.Status === 'Sending';
     const content = campaign.Content?.[0];
 
     const openRate = useMemo(() => {
@@ -113,7 +133,7 @@ const CampaignRow = ({ campaign, onSelect, onEdit, stats, loadingStats }: { camp
     return (
         <tr>
             <td>
-                <button className="table-link-button" onClick={onSelect}>
+                <button className="table-link-button" onClick={isDraft ? onEdit : onSelect}>
                     <strong>{campaign.Name}</strong>
                 </button>
                 <div className="campaign-row-subject">{content?.Subject || t('noSubject')}</div>
@@ -131,15 +151,31 @@ const CampaignRow = ({ campaign, onSelect, onEdit, stats, loadingStats }: { camp
                 )}
             </td>
             <td>
-                <div className="action-buttons" style={{justifyContent: 'flex-end'}}>
-                    {isDraft && (
-                        <button onClick={onEdit} className="btn btn-secondary" disabled={loadingStats} style={{padding: '0.5rem 1rem'}}>
-                            {loadingStats ? <Loader/> : <span>{t('edit')}</span>}
+                 <div className="action-buttons" style={{justifyContent: 'flex-end'}}>
+                    {isDraft ? (
+                        <>
+                            <button onClick={onEdit} className="btn btn-secondary" disabled={loadingStats || !!processingCampaign} style={{padding: '0.5rem 1rem'}}>
+                                <span>{t('edit')}</span>
+                            </button>
+                            <button className="btn-icon btn-icon-danger" onClick={onDelete} aria-label={t('delete')} disabled={!!processingCampaign}>
+                                {processingCampaign === campaign.Name ? <div style={{width: '20px', height: '20px'}}><Loader/></div> : <Icon>{ICONS.DELETE}</Icon>}
+                            </button>
+                        </>
+                    ) : isSending ? (
+                        <>
+                            <button onClick={onPause} className="btn btn-secondary" disabled={loadingStats || !!processingCampaign} style={{padding: '0.5rem 1rem'}}>
+                                {processingCampaign === campaign.Name ? <Loader /> : <Icon>{ICONS.PAUSE}</Icon>}
+                                <span>{t('pause')}</span>
+                            </button>
+                            <button className="btn-icon" onClick={onSelect} aria-label={t('viewCampaignStats')}>
+                                <Icon>{ICONS.EYE}</Icon>
+                            </button>
+                        </>
+                    ) : (
+                        <button className="btn-icon" onClick={onSelect} aria-label={t('viewCampaignStats')}>
+                            <Icon>{ICONS.EYE}</Icon>
                         </button>
                     )}
-                    <button className="btn-icon" onClick={onSelect} aria-label={t('viewCampaignStats')}>
-                        <Icon>{ICONS.EYE}</Icon>
-                    </button>
                 </div>
             </td>
         </tr>
@@ -147,7 +183,7 @@ const CampaignRow = ({ campaign, onSelect, onEdit, stats, loadingStats }: { camp
 };
 
 const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void }) => {
-    const { t } = useTranslation('campaigns');
+    const { t } = useTranslation(['campaigns', 'common']);
     const { addToast } = useToast();
     const [searchQuery, setSearchQuery] = useState('');
     const [campaignStats, setCampaignStats] = useState<Record<string, { data?: any; loading: boolean; error?: any; }>>({});
@@ -155,6 +191,9 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const [refetchIndex, setRefetchIndex] = useState(0);
     const [loadingCampaignName, setLoadingCampaignName] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [campaignToDelete, setCampaignToDelete] = useState<any | null>(null);
+    const [processingCampaign, setProcessingCampaign] = useState<string | null>(null);
+
 
     const CAMPAIGNS_PER_PAGE = 20;
 
@@ -164,6 +203,8 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
         search: searchQuery,
         orderBy: 'DateAdded desc',
     }, refetchIndex);
+
+    const refetch = () => setRefetchIndex(i => i + 1);
 
     const paginatedCampaigns = useMemo(() => {
         return Array.isArray(campaignsData) ? campaignsData : [];
@@ -178,13 +219,11 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             return;
         }
     
-        // Identify campaigns on the current page that need stats.
         const campaignsToFetch = paginatedCampaigns.filter(
             c => c.Status !== 'Draft' && !campaignStats[c.Name]
         );
     
         if (campaignsToFetch.length > 0) {
-            // Set loading state for all new campaigns at once.
             setCampaignStats(prev => {
                 const newStats = { ...prev };
                 campaignsToFetch.forEach(campaign => {
@@ -193,7 +232,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                 return newStats;
             });
     
-            // Fetch all stats in parallel.
             Promise.all(
                 campaignsToFetch.map(campaign =>
                     apiFetchV4(`/statistics/campaigns/${encodeURIComponent(campaign.Name)}`, apiKey)
@@ -213,7 +251,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                         }))
                 )
             ).then(results => {
-                // Update state with all results at once.
                 setCampaignStats(prev => {
                     const newStats = { ...prev };
                     for (const res of results) {
@@ -245,9 +282,46 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             setLoadingCampaignName(null);
         }
     };
+    
+    const handlePauseCampaign = async (campaignName: string) => {
+        setProcessingCampaign(campaignName);
+        try {
+            await apiFetchV4(`/campaigns/${encodeURIComponent(campaignName)}/pause`, apiKey, { method: 'PUT' });
+            addToast(t('campaignPausedSuccess', { name: campaignName }), 'success');
+            refetch();
+        } catch (e: any) {
+            addToast(t('campaignPausedError', { error: e.message }), 'error');
+        } finally {
+            setProcessingCampaign(null);
+        }
+    };
+    
+    const confirmDeleteCampaign = async () => {
+        if (!campaignToDelete) return;
+        setProcessingCampaign(campaignToDelete.Name);
+        try {
+            await apiFetchV4(`/campaigns/${encodeURIComponent(campaignToDelete.Name)}`, apiKey, { method: 'DELETE' });
+            addToast(t('campaignDeletedSuccess', { name: campaignToDelete.Name }), 'success');
+            refetch();
+        } catch (e: any) {
+            addToast(t('campaignDeletedError', { error: e.message }), 'error');
+        } finally {
+            setCampaignToDelete(null);
+            setProcessingCampaign(null);
+        }
+    };
 
     return (
         <div>
+             <ConfirmModal
+                isOpen={!!campaignToDelete}
+                onClose={() => setCampaignToDelete(null)}
+                onConfirm={confirmDeleteCampaign}
+                title={t('deleteCampaign', { name: campaignToDelete?.Name })}
+                isDestructive
+            >
+                <p>{t('confirmDeleteCampaign', { name: campaignToDelete?.Name })}</p>
+            </ConfirmModal>
             <div className="view-header">
                 <div className="search-bar" style={{ flexGrow: 1 }}>
                     <Icon>{ICONS.SEARCH}</Icon>
@@ -298,8 +372,11 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                                         campaign={campaign}
                                         onSelect={() => handleSelectCampaign(campaign)}
                                         onEdit={() => handleEditCampaign(campaign)}
+                                        onDelete={() => setCampaignToDelete(campaign)}
+                                        onPause={() => handlePauseCampaign(campaign.Name)}
                                         stats={statsInfo?.data}
                                         loadingStats={statsInfo?.loading || loadingCampaignName === campaign.Name}
+                                        processingCampaign={processingCampaign}
                                    />
                                );
                             })}
@@ -324,8 +401,11 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                                                 campaign={campaign}
                                                 onSelect={() => handleSelectCampaign(campaign)}
                                                 onEdit={() => handleEditCampaign(campaign)}
+                                                onDelete={() => setCampaignToDelete(campaign)}
+                                                onPause={() => handlePauseCampaign(campaign.Name)}
                                                 stats={statsInfo?.data}
                                                 loadingStats={statsInfo?.loading || loadingCampaignName === campaign.Name}
+                                                processingCampaign={processingCampaign}
                                             />
                                         );
                                     })}

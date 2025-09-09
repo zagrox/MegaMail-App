@@ -26,5 +26,12 @@
     "delivered": "Delivered",
     "opened": "Opened",
     "clicked": "Clicked",
-    "interactionBreakdown": "Interaction Breakdown"
+    "interactionBreakdown": "Interaction Breakdown",
+    "pause": "Pause",
+    "campaignPausedSuccess": "Campaign '{{name}}' has been paused.",
+    "campaignPausedError": "Failed to pause campaign: {{error}}",
+    "deleteCampaign": "Delete Campaign '{{name}}'",
+    "confirmDeleteCampaign": "Are you sure you want to delete the draft campaign '{{name}}'? This action cannot be undone.",
+    "campaignDeletedSuccess": "Campaign '{{name}}' has been deleted.",
+    "campaignDeletedError": "Failed to delete campaign: {{error}}"
 }
