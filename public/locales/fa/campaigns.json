@@ -1,3 +1,4 @@
+
 {
     "searchCampaignsPlaceholder": "جستجو بر اساس کمپین یا موضوع...",
     "viewCampaignStats": "مشاهده آمار",
@@ -13,5 +14,17 @@
     "report": "گزارش",
     "performance": "کارایی",
     "metric": "متریک",
-    "rate": "نرخ"
+    "rate": "نرخ",
+    "sortRecentFirst": "جدیدترین",
+    "sortOldestFirst": "قدیمی‌ترین",
+    "sortNameAZ": "نام (الف-ی)",
+    "sortNameZA": "نام (ی-الف)",
+    "created": "ایجاد شده",
+    "sent": "ارسال شده",
+    "from": "از طرف",
+    "viewReport": "مشاهده گزارش",
+    "delivered": "تحویل شده",
+    "opened": "باز شده",
+    "clicked": "کلیک شده",
+    "interactionBreakdown": "تفکیک تعامل"
 }

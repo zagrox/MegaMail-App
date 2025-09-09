@@ -1,3 +1,4 @@
+
 {
     "searchCampaignsPlaceholder": "Search by campaign or subject...",
     "viewCampaignStats": "View stats",
@@ -13,5 +14,17 @@
     "report": "Report",
     "performance": "Performance",
     "metric": "Metric",
-    "rate": "Rate"
+    "rate": "Rate",
+    "sortRecentFirst": "Most Recent",
+    "sortOldestFirst": "Oldest First",
+    "sortNameAZ": "Name (A-Z)",
+    "sortNameZA": "Name (Z-A)",
+    "created": "Created",
+    "sent": "Sent",
+    "from": "From",
+    "viewReport": "View Report",
+    "delivered": "Delivered",
+    "opened": "Opened",
+    "clicked": "Clicked",
+    "interactionBreakdown": "Interaction Breakdown"
 }

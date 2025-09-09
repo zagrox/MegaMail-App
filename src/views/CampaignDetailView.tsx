@@ -13,7 +13,7 @@ import { useStatusStyles } from '../hooks/useStatusStyles';
 import OverallActivityChart from '../components/OverallActivityChart';
 
 const DetailedStatsTable = ({ stats }: { stats: any }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['common', 'campaigns']);
 
     const recipients = Number(stats.Recipients || 0);
     const delivered = Number(stats.Delivered || 0);
@@ -31,9 +31,9 @@ const DetailedStatsTable = ({ stats }: { stats: any }) => {
         { label: t('bounced'), value: stats.Bounced, totalForPercent: recipients },
         { label: t('unsubscribed'), value: stats.Unsubscribed, totalForPercent: delivered },
         { label: t('complaints'), value: stats.Complaints, totalForPercent: delivered },
-        { label: t('inProgress'), value: stats.InProgress, totalForPercent: null },
-        { label: t('manualCancel'), value: stats.ManualCancel, totalForPercent: null },
-        { label: t('notDelivered'), value: stats.NotDelivered, totalForPercent: null },
+        { label: t('inProgress', { ns: 'campaigns' }), value: stats.InProgress, totalForPercent: null },
+        { label: t('manualCancel', { ns: 'campaigns' }), value: stats.ManualCancel, totalForPercent: null },
+        { label: t('notDelivered', { ns: 'campaigns' }), value: stats.NotDelivered, totalForPercent: null },
     ];
 
     return (
@@ -42,9 +42,9 @@ const DetailedStatsTable = ({ stats }: { stats: any }) => {
                 <table className="simple-table">
                     <thead>
                         <tr>
-                            <th>{t('metric')}</th>
+                            <th>{t('metric', { ns: 'campaigns' })}</th>
                             <th style={{textAlign: 'right'}}>{t('total')}</th>
-                            <th style={{textAlign: 'right'}}>{t('rate')}</th>
+                            <th style={{textAlign: 'right'}}>{t('rate', { ns: 'campaigns' })}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -86,7 +86,7 @@ const SummaryItem = ({ label, value }: { label: string, value: React.ReactNode }
 };
 
 const CampaignSummary = ({ campaignDetails, stats, campaign, accountData }: { campaignDetails: any, stats: any, campaign: any, accountData: any }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['send-wizard', 'sendEmail', 'common']);
 
     const content = campaignDetails?.Content?.[0] || {};
     const options = campaignDetails?.Options || {};
@@ -116,26 +116,26 @@ const CampaignSummary = ({ campaignDetails, stats, campaign, accountData }: { ca
 
     // Tracking status
     const trackingStatus = [
-        options.TrackOpens && 'Opens',
-        options.TrackClicks && 'Clicks'
-    ].filter(Boolean).join(' & ') || 'Disabled';
+        options.TrackOpens && t('trackOpens', { ns: 'sendEmail' }),
+        options.TrackClicks && t('trackClicks', { ns: 'sendEmail' })
+    ].filter(Boolean).join(' & ') || t('disabled', { ns: 'send-wizard' });
 
     // Optimization status
-    let optimizationStatus = 'Disabled';
+    let optimizationStatus = t('disabled', { ns: 'send-wizard' });
     if (options.DeliveryOptimization === 'ToEngagedFirst') {
-        optimizationStatus = t('sendToEngagedFirst');
+        optimizationStatus = t('sendToEngagedFirst', { ns: 'sendEmail' });
     } else if (options.EnableSendTimeOptimization) {
-        optimizationStatus = t('sendAtOptimalTime');
+        optimizationStatus = t('sendAtOptimalTime', { ns: 'sendEmail' });
     }
 
     // Send time
-    let sendTime = 'N/A';
+    let sendTime = t('unknown', { ns: 'common' });
     if (options.ScheduleFor) {
         sendTime = new Date(options.ScheduleFor).toLocaleString(i18n.language, { dateStyle: 'medium', timeStyle: 'short' });
     } else if (campaign.DateSent) {
         sendTime = new Date(campaign.DateSent).toLocaleString(i18n.language, { dateStyle: 'medium', timeStyle: 'short' });
     } else if (campaign.Status !== 'Draft') {
-        sendTime = 'Sent Immediately';
+        sendTime = t('immediately', { ns: 'send-wizard' });
     }
     
     const userBalance = accountData?.emailcredits ?? 0;
@@ -150,38 +150,38 @@ const CampaignSummary = ({ campaignDetails, stats, campaign, accountData }: { ca
 
     return (
         <div className="final-summary-container">
-            <h3>{t('Final Summary')}</h3>
+            <h3>{t('finalSummary', { ns: 'send-wizard' })}</h3>
             <dl className="final-summary-grid">
-                <SummaryItem label="From Name" value={fromName} />
-                <SummaryItem label="Subject" value={content.Subject} />
+                <SummaryItem label={t('fromName', { ns: 'sendEmail' })} value={fromName} />
+                <SummaryItem label={t('subject', { ns: 'sendEmail' })} value={content.Subject} />
                 <SummaryItem
-                    label="Recipients"
+                    label={t('recipients', { ns: 'common' })}
                     value={
                         stats ? (
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                                 <span style={recipientValueStyle}>{stats.Recipients?.toLocaleString(i18n.language)}</span>
-                                {!hasEnoughCredits && isNaN(stats.Recipients) && <small style={{ color: 'var(--danger-color)' }}>Insufficient funds</small>}
+                                {!hasEnoughCredits && isNaN(stats.Recipients) && <small style={{ color: 'var(--danger-color)' }}>{t('insufficientFunds', { ns: 'send-wizard' })}</small>}
                             </div>
                         ) : '...'
                     }
                 />
-                <SummaryItem label="From Email" value={fromEmail} />
-                <SummaryItem label="Reply To" value={content.ReplyTo} />
+                <SummaryItem label={t('fromEmail', { ns: 'sendEmail' })} value={fromEmail} />
+                <SummaryItem label={t('replyTo', { ns: 'sendEmail' })} value={content.ReplyTo} />
 
                 <hr className="separator" />
 
-                <SummaryItem label="Campaign Name" value={campaignDetails.Name} />
-                <SummaryItem label="Template" value={content.TemplateName} />
-                <SummaryItem label="Send Time" value={sendTime} />
-                <SummaryItem label="Tracking" value={trackingStatus} />
-                <SummaryItem label="Time Optimization" value={optimizationStatus} />
+                <SummaryItem label={t('campaignName', { ns: 'sendEmail' })} value={campaignDetails.Name} />
+                <SummaryItem label={t('template', { ns: 'sendEmail' })} value={content.TemplateName} />
+                <SummaryItem label={t('sendTime', { ns: 'send-wizard' })} value={sendTime} />
+                <SummaryItem label={t('tracking', { ns: 'sendEmail' })} value={trackingStatus} />
+                <SummaryItem label={t('timeOptimization', { ns: 'send-wizard' })} value={optimizationStatus} />
             </dl>
         </div>
     );
 };
 
 const StatsPieChart = ({ stats }: { stats: any }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['common', 'campaigns']);
 
     const data = useMemo(() => [
         { label: t('opened'), value: stats.Opened ?? 0, color: '#10B981' },
@@ -217,7 +217,7 @@ const StatsPieChart = ({ stats }: { stats: any }) => {
 
     return (
         <div className="card">
-            <div className="card-header"><h3>Interaction Breakdown</h3></div>
+            <div className="card-header"><h3>{t('interactionBreakdown', { ns: 'campaigns' })}</h3></div>
             <div style={{ display: 'flex', alignItems: 'center', padding: '1.5rem', gap: '2rem', flexWrap: 'wrap' }}>
                 <svg viewBox="0 0 100 100" width="200" height="200" style={{flexShrink: 0}}>
                     {slices.map(slice => (
@@ -247,7 +247,7 @@ const StatsPieChart = ({ stats }: { stats: any }) => {
 
 
 const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string; campaign: any | null; onBack: () => void; }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common', 'mediaManager']);
     const { getStatusStyle } = useStatusStyles();
     const [activeTab, setActiveTab] = useState('report');
 
@@ -325,7 +325,7 @@ const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string; camp
         },
         {
             id: 'content',
-            label: t('content'),
+            label: t('content', { ns: 'sendEmail' }),
             icon: ICONS.FILE_TEXT,
             component: (
                  <CampaignSummary campaignDetails={campaignDetails} stats={stats} campaign={campaign} accountData={accountData} />
@@ -333,17 +333,17 @@ const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string; camp
         },
         {
             id: 'template',
-            label: t('template'),
+            label: t('template', { ns: 'sendEmail' }),
             icon: ICONS.ARCHIVE,
             component: (
                 emailBody ? (
                     <iframe
                         srcDoc={emailBody}
-                        title={t('preview')}
+                        title={t('preview', { ns: 'mediaManager' })}
                         className="campaign-detail-content-preview"
                     />
                 ) : (
-                   detailsLoading ? <Loader /> : <CenteredMessage>{t('couldNotLoadPreview')}</CenteredMessage>
+                   detailsLoading ? <Loader /> : <CenteredMessage>{t('couldNotLoadPreview', { ns: 'mediaManager' })}</CenteredMessage>
                 )
             )
         }

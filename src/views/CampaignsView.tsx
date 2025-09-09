@@ -9,26 +9,11 @@ import Icon, { ICONS } from '../components/Icon';
 import Badge from '../components/Badge';
 import { useStatusStyles } from '../hooks/useStatusStyles';
 import { useToast } from '../contexts/ToastContext';
-import LineLoader from '../components/LineLoader';
 import Button from '../components/Button';
+import { formatDateRelative } from '../utils/helpers';
 
-const ProgressBar = ({ value, max }: { value: number; max: number }) => {
-    const percentage = max > 0 ? (value / max) * 100 : 0;
-    let colorClass = '';
-    if (percentage >= 20) {
-        colorClass = 'success';
-    } else if (percentage >= 10) {
-        colorClass = 'warning';
-    }
-    return (
-        <div className={`progress-bar-container ${colorClass}`}>
-            <div className="progress-bar-fill" style={{ width: `${percentage}%` }} />
-        </div>
-    );
-};
-
-const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { campaign: any; onSelect: () => void; onEdit: () => void; stats: { Delivered: number, Opened: number } | null; loadingStats: boolean; }) => {
-    const { t, i18n } = useTranslation(['campaigns', 'sendEmail']);
+const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { campaign: any; onSelect: () => void; onEdit: () => void; stats: { Delivered: number, Opened: number, Clicked: number } | null; loadingStats: boolean; }) => {
+    const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common']);
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(campaign.Status);
     const isDraft = campaign.Status === 'Draft';
@@ -36,92 +21,128 @@ const CampaignCard = ({ campaign, onSelect, onEdit, stats, loadingStats }: { cam
 
     const fromString = content?.From || '';
     let fromName = content?.FromName;
-    let fromEmail = fromString;
-
-    const angleBracketMatch = fromString.match(/(.*)<(.*)>/);
-    if (angleBracketMatch && angleBracketMatch.length === 3) {
-        if (!fromName) {
+    if (!fromName) {
+        const angleBracketMatch = fromString.match(/(.*)<.*>/);
+        if (angleBracketMatch) {
             fromName = angleBracketMatch[1].trim().replace(/"/g, '');
-        }
-        fromEmail = angleBracketMatch[2].trim();
-    } else {
-        const lastSpaceIndex = fromString.lastIndexOf(' ');
-        if (lastSpaceIndex !== -1 && fromString.substring(lastSpaceIndex + 1).includes('@')) {
-            const potentialName = fromString.substring(0, lastSpaceIndex).trim();
-            const potentialEmail = fromString.substring(lastSpaceIndex + 1).trim();
-            if (!fromName) {
-                fromName = potentialName;
-            }
-            fromEmail = potentialEmail;
         }
     }
 
+    const openRate = useMemo(() => {
+        if (!stats || !stats.Delivered) return '0.0%';
+        return `${((stats.Opened / stats.Delivered) * 100).toFixed(1)}%`;
+    }, [stats]);
+
+    const clickRate = useMemo(() => {
+        if (!stats || !stats.Delivered) return '0.0%';
+        return `${((stats.Clicked / stats.Delivered) * 100).toFixed(1)}%`;
+    }, [stats]);
+
     return (
         <div className="card campaign-card">
-            <div className="campaign-card-header" onClick={onSelect} role="button" tabIndex={0} onKeyPress={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect()}>
-                <h3>{campaign.Name}</h3>
-                <Badge text={statusStyle.text} type={statusStyle.type} iconPath={statusStyle.iconPath} />
-            </div>
-            <div className="campaign-card-body">
-                <p className="campaign-detail">
-                    <strong>{t('subject', { ns: 'sendEmail' })}:</strong> {content?.Subject || t('noSubject')}
-                </p>
-                {fromName && (
-                    <p className="campaign-detail">
-                        <strong>{t('fromName', { ns: 'sendEmail' })}:</strong> {fromName}
-                    </p>
-                )}
-                {fromEmail && (
-                    <p className="campaign-detail">
-                        <strong>{t('fromEmail', { ns: 'sendEmail' })}:</strong> {fromEmail}
-                    </p>
-                )}
-                {content?.Preheader && (
-                    <p className="campaign-detail">
-                        <strong>{t('preheader', { ns: 'sendEmail' })}:</strong> {content.Preheader}
-                    </p>
+            <div className="campaign-card-content">
+                <div className="campaign-card-header">
+                    <div className="campaign-card-title-group">
+                        <h3 className="campaign-card-title">{campaign.Name}</h3>
+                        <p className="campaign-card-date">
+                            {isDraft ? t('created', { ns: 'campaigns' }) : t('sent', { ns: 'campaigns' })} {formatDateRelative(campaign.DateAdded, i18n.language)}
+                        </p>
+                    </div>
+                    <Badge text={statusStyle.text} type={statusStyle.type} iconPath={statusStyle.iconPath} />
+                </div>
+                <div className="campaign-card-body">
+                    <p className="campaign-card-subject">{content?.Subject || t('noSubject')}</p>
+                    {fromName && <p className="campaign-card-from">{t('from', { ns: 'campaigns' })}: {fromName}</p>}
+                </div>
+                {!isDraft && (
+                    <div className="campaign-card-stats">
+                        {loadingStats ? (
+                            <div style={{gridColumn: '1 / -1'}}><CenteredMessage><Loader /></CenteredMessage></div>
+                        ) : stats ? (
+                            <>
+                                <div className="campaign-stat-item">
+                                    <span className="stat-value">{stats.Delivered.toLocaleString(i18n.language)}</span>
+                                    <span className="stat-label">{t('delivered')}</span>
+                                </div>
+                                <div className="campaign-stat-item">
+                                    <span className="stat-value">{openRate}</span>
+                                    <span className="stat-label">{t('opened')}</span>
+                                </div>
+                                <div className="campaign-stat-item">
+                                    <span className="stat-value">{clickRate}</span>
+                                    <span className="stat-label">{t('clicked')}</span>
+                                </div>
+                            </>
+                        ) : (
+                            <div style={{gridColumn: '1 / -1', textAlign: 'center', color: 'var(--subtle-text-color)', fontSize: '0.9rem'}}>
+                                {t('noStatsForCampaign')}
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
             <div className="campaign-card-footer">
-                <div className="campaign-card-footer-stats" style={{ width: '100%', paddingRight: '1rem' }}>
-                    {loadingStats ? (
-                        <div style={{width: '80px'}}><LineLoader /></div>
-                    ) : stats ? (
-                        stats.Delivered > 0 ? (
-                            <div style={{ width: '100%' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>{t('openRate')}</span>
-                                    <span style={{ fontSize: '0.9rem', fontWeight: '600' }}>
-                                        {((stats.Opened / stats.Delivered) * 100).toFixed(1)}%
-                                    </span>
-                                </div>
-                                <ProgressBar value={stats.Opened} max={stats.Delivered} />
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '0.25rem', color: 'var(--subtle-text-color)' }}>
-                                    <span>{stats.Opened.toLocaleString(i18n.language)} {t('opened')}</span>
-                                    <span>{stats.Delivered.toLocaleString(i18n.language)} {t('delivered')}</span>
-                                </div>
-                            </div>
-                        ) : (
-                            <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>0 {t('delivered')}</span>
-                        )
-                    ) : (
-                        isDraft ? (
-                            <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>&nbsp;</span>
-                        ) : (
-                            <span style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)' }}>{t('noStatsForCampaign')}</span>
-                        )
-                    )}
-                </div>
-                <div className="action-buttons" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                     {isDraft && (
-                        <button onClick={onEdit} className="btn" disabled={loadingStats}>
-                             {loadingStats ? <Loader/> : <span>{t('edit')}</span>}
-                        </button>
-                    )}
-                    <button onClick={onSelect} className="link-button campaign-card-view-link">{t('viewCampaignStats')} &rarr;</button>
-                </div>
+                {isDraft ? (
+                    <Button className="btn-secondary" onClick={onEdit} disabled={loadingStats}>
+                        <Icon>{ICONS.PENCIL}</Icon>
+                        <span>{t('edit')}</span>
+                    </Button>
+                ) : (
+                    <Button className="btn-secondary" onClick={onSelect} disabled={loadingStats}>
+                        <Icon>{ICONS.STATISTICS}</Icon>
+                        <span>{t('viewReport', { ns: 'campaigns' })}</span>
+                    </Button>
+                )}
             </div>
         </div>
+    );
+};
+
+const CampaignRow = ({ campaign, onSelect, onEdit, stats, loadingStats }: { campaign: any; onSelect: () => void; onEdit: () => void; stats: { Delivered: number, Opened: number } | null; loadingStats: boolean; }) => {
+    const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common']);
+    const { getStatusStyle } = useStatusStyles();
+    const statusStyle = getStatusStyle(campaign.Status);
+    const isDraft = campaign.Status === 'Draft';
+    const content = campaign.Content?.[0];
+
+    const openRate = useMemo(() => {
+        if (loadingStats || !stats || !stats.Delivered) return '-';
+        return `${((stats.Opened / stats.Delivered) * 100).toFixed(1)}%`;
+    }, [stats, loadingStats]);
+
+    return (
+        <tr>
+            <td>
+                <button className="table-link-button" onClick={onSelect}>
+                    <strong>{campaign.Name}</strong>
+                </button>
+                <div className="campaign-row-subject">{content?.Subject || t('noSubject')}</div>
+            </td>
+            <td>
+                <Badge text={statusStyle.text} type={statusStyle.type} iconPath={statusStyle.iconPath} />
+            </td>
+            <td>
+                {loadingStats ? (
+                    <div style={{width: '60px'}}><Loader /></div>
+                ) : !isDraft ? (
+                    <div style={{fontWeight: 500}}>{openRate}</div>
+                ) : (
+                    <span>-</span>
+                )}
+            </td>
+            <td>
+                <div className="action-buttons" style={{justifyContent: 'flex-end'}}>
+                    {isDraft && (
+                        <button onClick={onEdit} className="btn btn-secondary" disabled={loadingStats} style={{padding: '0.5rem 1rem'}}>
+                            {loadingStats ? <Loader/> : <span>{t('edit')}</span>}
+                        </button>
+                    )}
+                    <button className="btn-icon" onClick={onSelect} aria-label={t('viewCampaignStats')}>
+                        <Icon>{ICONS.EYE}</Icon>
+                    </button>
+                </div>
+            </td>
+        </tr>
     );
 };
 
@@ -133,19 +154,20 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const [offset, setOffset] = useState(0);
     const [refetchIndex, setRefetchIndex] = useState(0);
     const [loadingCampaignName, setLoadingCampaignName] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-    const CAMPAIGNS_PER_PAGE = 10;
+    const CAMPAIGNS_PER_PAGE = 20;
 
-    const { data: campaigns, loading, error } = useApiV4('/campaigns', apiKey, {
+    const { data: campaignsData, loading, error } = useApiV4('/campaigns', apiKey, {
         limit: CAMPAIGNS_PER_PAGE,
         offset,
         search: searchQuery,
+        orderBy: 'DateAdded desc',
     }, refetchIndex);
 
     const paginatedCampaigns = useMemo(() => {
-        if (!Array.isArray(campaigns)) return [];
-        return campaigns;
-    }, [campaigns]);
+        return Array.isArray(campaignsData) ? campaignsData : [];
+    }, [campaignsData]);
     
     useEffect(() => {
         setOffset(0);
@@ -181,6 +203,7 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                             data: {
                                 Delivered: result?.Delivered ?? 0,
                                 Opened: result?.Opened ?? 0,
+                                Clicked: result?.Clicked ?? 0,
                             }
                         }))
                         .catch(error => ({
@@ -238,6 +261,14 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                     />
                 </div>
                 <div className="header-actions">
+                    <div className="view-switcher">
+                        <button onClick={() => setViewMode('grid')} className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`} aria-label="Grid view">
+                            <Icon>{ICONS.DASHBOARD}</Icon>
+                        </button>
+                        <button onClick={() => setViewMode('list')} className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`} aria-label="List view">
+                            <Icon>{ICONS.EMAIL_LISTS}</Icon>
+                        </button>
+                    </div>
                     <Button className="btn-primary" onClick={() => setView('Send Email')} action="create_campaign">
                         <Icon>{ICONS.PLUS}</Icon> {t('createCampaign')}
                     </Button>
@@ -257,31 +288,61 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                     </CenteredMessage>
                 ) : (
                     <>
-                    <div className="campaign-grid">
-                        {paginatedCampaigns.map((campaign: any) => {
-                           const statsInfo = campaign.Status !== 'Draft' ? campaignStats[campaign.Name] : null;
-                           return (
-                               <CampaignCard 
-                                    key={campaign.Name} 
-                                    campaign={campaign}
-                                    onSelect={() => handleSelectCampaign(campaign)}
-                                    onEdit={() => handleEditCampaign(campaign)}
-                                    stats={statsInfo?.data}
-                                    loadingStats={statsInfo?.loading || loadingCampaignName === campaign.Name}
-                               />
-                           );
-                        })}
-                    </div>
+                    {viewMode === 'grid' ? (
+                        <div className="campaign-grid">
+                            {paginatedCampaigns.map((campaign: any) => {
+                               const statsInfo = campaign.Status !== 'Draft' ? campaignStats[campaign.Name] : null;
+                               return (
+                                   <CampaignCard 
+                                        key={campaign.Name} 
+                                        campaign={campaign}
+                                        onSelect={() => handleSelectCampaign(campaign)}
+                                        onEdit={() => handleEditCampaign(campaign)}
+                                        stats={statsInfo?.data}
+                                        loadingStats={statsInfo?.loading || loadingCampaignName === campaign.Name}
+                                   />
+                               );
+                            })}
+                        </div>
+                    ) : (
+                        <div className="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>{t('name', { ns: 'common' })}</th>
+                                        <th>{t('status', { ns: 'common' })}</th>
+                                        <th>{t('openRate', { ns: 'common' })}</th>
+                                        <th style={{ textAlign: 'right' }}>{t('action', { ns: 'common' })}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {paginatedCampaigns.map((campaign: any) => {
+                                        const statsInfo = campaign.Status !== 'Draft' ? campaignStats[campaign.Name] : null;
+                                        return (
+                                            <CampaignRow
+                                                key={campaign.Name}
+                                                campaign={campaign}
+                                                onSelect={() => handleSelectCampaign(campaign)}
+                                                onEdit={() => handleEditCampaign(campaign)}
+                                                stats={statsInfo?.data}
+                                                loadingStats={statsInfo?.loading || loadingCampaignName === campaign.Name}
+                                            />
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
 
                     {(paginatedCampaigns.length > 0 || offset > 0) && (
                         <div className="pagination-controls">
                             <button onClick={() => setOffset(o => Math.max(0, o - CAMPAIGNS_PER_PAGE))} disabled={offset === 0 || loading}>
                                 <Icon>{ICONS.CHEVRON_LEFT}</Icon>
-                                <span>{t('previous')}</span>
+                                <span>{t('previous', { ns: 'common' })}</span>
                             </button>
-                            <span className="pagination-page-info">{t('page', { page: offset / CAMPAIGNS_PER_PAGE + 1 })}</span>
+                            <span className="pagination-page-info">{t('page', { ns: 'common', page: offset / CAMPAIGNS_PER_PAGE + 1 })}</span>
                             <button onClick={() => setOffset(o => o + CAMPAIGNS_PER_PAGE)} disabled={!paginatedCampaigns || paginatedCampaigns.length < CAMPAIGNS_PER_PAGE || loading}>
-                                <span>{t('next')}</span>
+                                <span>{t('next', { ns: 'common' })}</span>
                                 <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                             </button>
                         </div>
