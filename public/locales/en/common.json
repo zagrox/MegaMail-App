@@ -1,3 +1,4 @@
+
 {
     "appName": "MegaMail",
     "dashboard": "Dashboard",
@@ -12,7 +13,7 @@
     "emailLists": "Email Lists",
     "allowUnsubscribe": "Allow Unsubscribe",
     "segments": "Segments",
-    "sendEmail": "Send Email",
+    "sendEmail": "Quick Send",
     "marketing": "Marketing",
     "marketingCampaign": "Marketing Campaign",
     "emailBuilder": "Email Builder",

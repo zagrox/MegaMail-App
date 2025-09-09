@@ -1,5 +1,12 @@
 
 {
+    "quickSend": "ارسال سریع",
+    "quickSendDesc": "یک قالب از پیش ساخته شده را به سرعت برای مخاطبین خود ارسال کنید.",
+    "estimatedRecipients": "گیرندگان تخمینی",
+    "changeTemplate": "تغییر",
+    "finalSummaryText": "شما در حال ارسال کمپین '{{template}}' به حدود {{count}} گیرنده هستید.",
+    "fillAllFields": "لطفاً قبل از ارسال، یک قالب، گیرندگان را انتخاب کرده و تمام فیلدهای الزامی را پر کنید.",
+    "campaignNameRequired": "نام کمپین (یا موضوع) الزامی است.",
     "selectCampaignType": "انتخاب نوع کمپین",
     "selectAudience": "انتخاب مخاطب",
     "designContent": "طراحی محتوا",

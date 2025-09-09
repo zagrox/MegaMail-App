@@ -1,5 +1,12 @@
 
 {
+    "quickSend": "Quick Send",
+    "quickSendDesc": "Quickly send a pre-made template to your contacts.",
+    "estimatedRecipients": "Estimated Recipients",
+    "changeTemplate": "Change",
+    "finalSummaryText": "You're about to send the '{{template}}' campaign to approximately {{count}} recipients.",
+    "fillAllFields": "Please select a template, recipients, and fill out all required fields before sending.",
+    "campaignNameRequired": "Campaign Name (or Subject) is required.",
     "selectCampaignType": "Select Campaign Type",
     "selectAudience": "Select Audience",
     "designContent": "Design Content",
