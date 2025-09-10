@@ -1,5 +1,4 @@
-
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiFetchV4 } from '../api/elasticEmail';
 import useApiV4 from '../hooks/useApiV4';
@@ -74,82 +73,100 @@ const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
+        const action = campaignData.sendAction === 'later' ? 'draft' : 'send';
+
         try {
-            const isDraftAction = campaignData.sendAction === 'later';
-    
-            const verifiedDomains = (domains || []).filter((d: any) =>
-                String(d.Spf).toLowerCase() === 'true' &&
-                String(d.Dkim).toLowerCase() === 'true'
-            );
-    
-            if (!isDraftAction && verifiedDomains.length === 0) {
-                throw new Error(t('noVerifiedDomainError'));
+            if (action === 'send') {
+                const isRecipientSelected =
+                    campaignData.recipientTarget === 'all' ||
+                    (campaignData.recipientTarget === 'list' && campaignData.recipients.listNames.length > 0) ||
+                    (campaignData.recipientTarget === 'segment' && campaignData.recipients.segmentNames.length > 0);
+
+                if (!isRecipientSelected) {
+                    throw new Error(t('selectRecipientsToSend', { ns: 'sendEmail' }));
+                }
             }
-    
-            const defaultFromEmail = (verifiedDomains.length > 0)
-                ? (verifiedDomains[0].DefaultSender || `mailer@${verifiedDomains[0].Domain}`)
-                : 'draft-email@example.com'; 
-    
-            const payload: any = {
+
+            // 1. Construct a temporary state object that mirrors SendEmailView's `campaign` state.
+            const verifiedDomains = (domains || []).filter((d: any) => String(d.Spf).toLowerCase() === 'true' && String(d.Dkim).toLowerCase() === 'true');
+            const defaultFromEmail = (verifiedDomains.length > 0) ? (verifiedDomains[0].DefaultSender || `mailer@${verifiedDomains[0].Domain}`) : 'draft@example.com';
+
+            let plainDefaultEmail = defaultFromEmail;
+            const emailMatch = defaultFromEmail.match(/<([^>]+)>/);
+            if (emailMatch?.[1]) {
+                plainDefaultEmail = emailMatch[1];
+            } else {
+                const parts = defaultFromEmail.split(/[\s(<>)]+/).filter(p => p.includes('@'));
+                if (parts.length > 0) plainDefaultEmail = parts[0];
+            }
+
+            const campaignForPayload = {
                 Name: campaignData.campaignName,
-                Content: [
-                    {
-                        From: campaignData.fromName ? `${campaignData.fromName} <${defaultFromEmail}>` : defaultFromEmail,
-                        ReplyTo: campaignData.enableReplyTo ? campaignData.replyTo : undefined,
-                        Subject: campaignData.subject,
-                        TemplateName: campaignData.template,
-                        Utm: campaignData.utmEnabled ? campaignData.utm : undefined,
-                    }
-                ],
+                Content: [{
+                    From: plainDefaultEmail,
+                    FromName: campaignData.fromName,
+                    ReplyTo: campaignData.enableReplyTo ? campaignData.replyTo : '',
+                    Subject: campaignData.subject,
+                    TemplateName: campaignData.template || '',
+                    Utm: campaignData.utmEnabled ? campaignData.utm : null,
+                    Body: null
+                }],
+                Recipients: {
+                    ListNames: campaignData.recipientTarget === 'list' ? campaignData.recipients.listNames : [],
+                    SegmentNames: campaignData.recipientTarget === 'segment' ? campaignData.recipients.segmentNames : []
+                },
                 Options: {
                     TrackOpens: campaignData.trackOpens,
                     TrackClicks: campaignData.trackClicks,
-                    ScheduleFor: campaignData.sendAction === 'schedule' && campaignData.scheduleDateTime
-                        ? new Date(campaignData.scheduleDateTime).toISOString()
-                        : null,
                     DeliveryOptimization: campaignData.deliveryOptimization,
                     EnableSendTimeOptimization: campaignData.enableSendTimeOptimization,
+                    ScheduleFor: (action === 'send' && campaignData.sendAction === 'schedule' && campaignData.scheduleDateTime)
+                        ? new Date(campaignData.scheduleDateTime).toISOString()
+                        : undefined,
                 }
             };
-            
-            if (isDraftAction) {
-                payload.Status = 'Draft';
-            } else {
-                payload.Status = 'Active';
-                if (campaignData.sendAction === 'schedule' && payload.Options.ScheduleFor) {
-                    payload.Options.Trigger = { Count: 1 };
-                }
-            }
-            
-            const hasLists = campaignData.recipients.listNames && campaignData.recipients.listNames.length > 0;
-            const hasSegments = campaignData.recipients.segmentNames && campaignData.recipients.segmentNames.length > 0;
 
-            if (campaignData.recipientTarget === 'all' && !isDraftAction) {
-                // Send to All Contacts - API requires a special empty object.
-                payload.Recipients = {};
-            } else if (hasLists || hasSegments) {
-                // Send to specific lists/segments OR save a draft with them selected.
-                payload.Recipients = {
-                    ListNames: hasLists ? campaignData.recipients.listNames : [],
-                    SegmentNames: hasSegments ? campaignData.recipients.segmentNames : []
-                };
-            } else {
-                // This is a draft with no specific recipients, so we omit the Recipients key.
-                // Or, this is an invalid send attempt, which will be caught by the API.
+            // 2. Now use the exact, proven logic from SendEmailView.tsx to finalize the payload
+            const payload = JSON.parse(JSON.stringify(campaignForPayload));
+
+            payload.Content = payload.Content.map((c: any) => {
+                const fromEmail = c.From;
+                const fromName = c.FromName?.trim();
+                const combinedFrom = fromName ? `${fromName} <${fromEmail}>` : fromEmail;
+                const newContent = { ...c, From: combinedFrom };
+                delete newContent.FromName;
+                return newContent;
+            });
+
+            payload.Status = action === 'send' ? 'Active' : 'Draft';
+            payload.Content = payload.Content.map((c: any) => ({...c, Body: null, TemplateName: c.TemplateName || null}));
+                
+            let finalRecipients: { ListNames?: string[]; SegmentNames?: string[] } = {};
+            switch (campaignData.recipientTarget) {
+                case 'list':
+                    finalRecipients = { ListNames: payload.Recipients.ListNames || [] };
+                    break;
+                case 'segment':
+                    finalRecipients = { SegmentNames: payload.Recipients.SegmentNames || [] };
+                    break;
+                case 'all':
+                    finalRecipients = {};
+                    break;
+                default:
+                    finalRecipients = { ListNames: [], SegmentNames: [] };
+                    break;
             }
-    
-            if (!payload.Content[0].ReplyTo) delete payload.Content[0].ReplyTo;
-            if (!payload.Content[0].Utm || Object.values(payload.Content[0].Utm).every(v => !v)) delete payload.Content[0].Utm;
+            payload.Recipients = finalRecipients;
+
             if (!payload.Options.ScheduleFor) delete payload.Options.ScheduleFor;
-    
+
             await apiFetchV4('/campaigns', apiKey, { method: 'POST', body: payload });
             
             addToast(payload.Status === 'Draft' ? t('draftSavedSuccess', { ns: 'sendEmail' }) : t('emailSentSuccess', { ns: 'sendEmail' }), 'success');
             setView('Campaigns');
-    
+
         } catch (err: any) {
-            const isDraftAction = campaignData.sendAction === 'later';
-            const errorKey = isDraftAction ? 'draftSaveError' : 'emailSentError';
+            const errorKey = action === 'draft' ? 'draftSaveError' : 'emailSentError';
             addToast(t(errorKey, { ns: 'sendEmail', error: err.message }), 'error');
         } finally {
             setIsSubmitting(false);
