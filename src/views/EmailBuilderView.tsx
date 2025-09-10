@@ -216,8 +216,8 @@ const renderBlockToHtml = (block: any): string => {
                 const colors = s.iconColor === 'color' 
                     ? { bg: socialInfo.brandColor, icon: 'FFFFFF' }
                     : iconColors[s.iconColor] || iconColors.gray;
- 
-                const iconUrl = `https://cdn.simpleicons.org/${item.network.toLowerCase()}/${colors.icon}`;
+                
+                const networkSlug = socialInfo.slug;
  
                 const borderRadius = s.iconStyle === 'circle' ? '50%' : s.iconStyle === 'rounded' ? '6px' : '0px';
  
@@ -232,20 +232,28 @@ const renderBlockToHtml = (block: any): string => {
                 const spacerTd = index > 0 ? `<td width="${s.iconSpacing}"></td>` : '';
  
                 if (s.iconStyle === 'default') {
+                    let color;
+                    if (s.iconColor === 'color') {
+                        color = socialInfo.brandColor.replace('#', '');
+                    } else {
+                        color = (iconColors[s.iconColor] || iconColors.gray).bg.replace('#', '');
+                    }
+                    const defaultIconUrl = `https://cdn.simpleicons.org/${networkSlug}/${color}`;
                     return `
                         ${spacerTd}
                         <td>
                             <a href="${item.url}" target="_blank" rel="noopener noreferrer">
-                                <img src="${iconUrl.replace(colors.icon, colors.bg.replace('#',''))}" alt="${item.network}" width="${s.iconSize}" height="${s.iconSize}" style="border:0; display:block;"/>
+                                <img src="${defaultIconUrl}" alt="${item.network}" width="${s.iconSize}" height="${s.iconSize}" style="border:0; display:block;"/>
                             </a>
                         </td>
                     `;
                 }
  
+                const iconUrl = `https://cdn.simpleicons.org/${networkSlug}/${colors.icon}`;
                 return `
                     ${spacerTd}
                     <td bgcolor="${colors.bg}" style="${iconTdStyle}">
-                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="display:block; width:100%; height:100%; text-align:center;">
+                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="display:block; width:100%; text-align:center;">
                             <!--[if mso]><i style="letter-spacing: ${s.iconSize/2}px;mso-font-width:-100%;mso-text-raise:15px">&nbsp;</i><![endif]-->
                             <img src="${iconUrl}" alt="${item.network}" width="${s.iconSize * 0.6}" height="${s.iconSize * 0.6}" style="border:0; margin: 0 auto; vertical-align: middle;" />
                             <!--[if mso]><i style="letter-spacing: ${s.iconSize/2}px;mso-font-width:-100%">&nbsp;</i><![endif]-->
@@ -254,19 +262,24 @@ const renderBlockToHtml = (block: any): string => {
                 `;
             }).join('');
  
-            const wrapperStyle = styleObjectToString({
+            const wrapperTableStyle = styleObjectToString({
                 backgroundColor: s.backgroundColor || 'transparent',
+            });
+
+            const cellStyle = styleObjectToString({
                 paddingTop: s.paddingTop,
-                paddingRight: s.paddingRight,
                 paddingBottom: s.paddingBottom,
                 paddingLeft: s.paddingLeft,
+                paddingRight: s.paddingRight,
             });
- 
+            
+            const tableAlign = `align="${s.alignment || 'center'}"`;
+
             return `
-                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="${wrapperStyle}">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="${wrapperTableStyle}">
                     <tr>
-                        <td align="${s.alignment || 'center'}">
-                            <table border="0" cellpadding="0" cellspacing="0">
+                        <td style="${cellStyle}">
+                            <table ${tableAlign} border="0" cellpadding="0" cellspacing="0">
                                 <tr>${iconsHtml}</tr>
                             </table>
                         </td>
