@@ -218,8 +218,11 @@ const App = () => {
         if (newView === 'Email Builder' && data?.template) setTemplateToEdit(data.template);
         else setTemplateToEdit(null);
 
-        if (newView === 'Send Email' && data?.campaignToLoad) setCampaignToLoad(data.campaignToLoad);
-        else setCampaignToLoad(null);
+        if ((newView === 'Send Email' || newView === 'Marketing') && data?.campaignToLoad) {
+            setCampaignToLoad(data.campaignToLoad);
+        } else if (newView !== 'Send Email' && newView !== 'Marketing') {
+            setCampaignToLoad(null);
+        }
 
         if (newView === 'ListDetail' && data?.list) setSelectedList(data.list);
         else if (newView !== 'ContactDetail') setSelectedList(null);
@@ -279,7 +282,7 @@ const App = () => {
         'Templates': { component: <TemplatesView apiKey={apiKey} setView={handleSetView} />, title: t('templates'), icon: ICONS.ARCHIVE },
         'Email Builder': { component: <EmailBuilderView apiKey={apiKey} user={user} templateToEdit={templateToEdit} />, title: t('emailBuilder'), icon: ICONS.LAYERS },
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
-        'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} />, title: t('marketingCampaign'), icon: ICONS.TARGET },
+        'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('marketingCampaign'), icon: ICONS.TARGET },
         'Calendar': { component: <CalendarView />, title: t('calendar'), icon: ICONS.CALENDAR },
         'Domains': { component: <DomainsView apiKey={apiKey} />, title: t('domains'), icon: ICONS.DOMAINS },
         'SMTP': { component: <SmtpView apiKey={apiKey} user={user}/>, title: t('smtp'), icon: ICONS.SMTP }

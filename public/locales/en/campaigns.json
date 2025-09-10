@@ -33,5 +33,9 @@
     "deleteCampaign": "Delete Campaign '{{name}}'",
     "confirmDeleteCampaign": "Are you sure you want to delete the draft campaign '{{name}}'? This action cannot be undone.",
     "campaignDeletedSuccess": "Campaign '{{name}}' has been deleted.",
-    "campaignDeletedError": "Failed to delete campaign: {{error}}"
+    "campaignDeletedError": "Failed to delete campaign: {{error}}",
+    "wizard": "Wizard",
+    "quickEdit": "Quick Send",
+    "noPreviewAvailable": "This campaign does not have a previewable HTML template.",
+    "previewLoadError": "Failed to load template preview: {{error}}"
 }

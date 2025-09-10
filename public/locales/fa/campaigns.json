@@ -33,5 +33,9 @@
     "deleteCampaign": "حذف کمپین '{{name}}'",
     "confirmDeleteCampaign": "آیا از حذف پیش‌نویس کمپین '{{name}}' مطمئن هستید؟ این عمل قابل بازگشت نیست.",
     "campaignDeletedSuccess": "کمپین '{{name}}' حذف شد.",
-    "campaignDeletedError": "خطا در حذف کمپین: {{error}}"
+    "campaignDeletedError": "خطا در حذف کمپین: {{error}}",
+    "wizard": "ویزارد",
+    "quickEdit": "ویرایش سریع",
+    "noPreviewAvailable": "این کمپین قالب HTML قابل پیش‌نمایش ندارد.",
+    "previewLoadError": "بارگذاری پیش‌نمایش قالب ناموفق بود: {{error}}"
 }

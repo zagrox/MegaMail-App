@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiFetchV4 } from '../api/elasticEmail';
 import useApiV4 from '../hooks/useApiV4';
@@ -10,7 +10,7 @@ import Step4Settings from '../components/send_wizard/Step4Settings';
 import Step5Sending from '../components/send_wizard/Step5Sending';
 import Icon, { ICONS } from '../components/Icon';
 
-const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: string) => void }) => {
+const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, setView: (view: string, data?: any) => void, campaignToLoad?: any }) => {
     const { t } = useTranslation(['send-wizard', 'sendEmail', 'common']);
     const { addToast } = useToast();
     const [step, setStep] = useState(1);
@@ -49,6 +49,58 @@ const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const updateData = useCallback((newData: Partial<typeof campaignData>) => {
         setCampaignData(prev => ({ ...prev, ...newData }));
     }, []);
+
+    useEffect(() => {
+        if (campaignToLoad) {
+            const loadedContent = campaignToLoad.Content?.[0] || {};
+            const loadedRecipients = campaignToLoad.Recipients || {};
+            const loadedOptions = campaignToLoad.Options || {};
+
+            let recipientTarget: 'all' | 'list' | 'segment' | null = null;
+            if (loadedRecipients.ListNames?.length > 0) recipientTarget = 'list';
+            else if (loadedRecipients.SegmentNames?.length > 0) recipientTarget = 'segment';
+            else if (Object.keys(loadedRecipients).length === 0) recipientTarget = 'all';
+
+            const fromString = loadedContent.From || '';
+            let fromName = loadedContent.FromName;
+            if (!fromName) {
+                const angleBracketMatch = fromString.match(/(.*)<.*>/);
+                if (angleBracketMatch) {
+                    fromName = angleBracketMatch[1].trim().replace(/"/g, '');
+                }
+            }
+
+            const newCampaignData = {
+                type: 'regular',
+                recipientTarget,
+                recipients: {
+                    listNames: loadedRecipients.ListNames || [],
+                    segmentNames: loadedRecipients.SegmentNames || [],
+                },
+                template: loadedContent.TemplateName || null,
+                fromName: fromName || '',
+                subject: loadedContent.Subject || '',
+                enableReplyTo: !!loadedContent.ReplyTo,
+                replyTo: loadedContent.ReplyTo || '',
+                campaignName: campaignToLoad.Name || '',
+                trackOpens: loadedOptions.TrackOpens !== false,
+                trackClicks: loadedOptions.TrackClicks !== false,
+                sendTimeOptimization: loadedOptions.DeliveryOptimization !== 'None' || loadedOptions.EnableSendTimeOptimization,
+                deliveryOptimization: loadedOptions.DeliveryOptimization || 'None',
+                enableSendTimeOptimization: loadedOptions.EnableSendTimeOptimization || false,
+                utmEnabled: !!loadedContent.Utm,
+                utm: loadedContent.Utm || { Source: '', Medium: '', Campaign: '', Content: '' },
+                sendAction: 'schedule', // Default action
+                scheduleDateTime: '',
+            };
+
+            // This directly sets the state, merging the new data
+            setCampaignData(prev => ({ ...prev, ...newCampaignData }));
+            
+            setStep(2); // Start at recipients step
+            setMaxStep(5); // Allow navigation to all steps
+        }
+    }, [campaignToLoad]);
 
     const nextStep = () => setStep(s => {
         const next = s + 1;
@@ -160,7 +212,10 @@ const MarketingView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
 
             if (!payload.Options.ScheduleFor) delete payload.Options.ScheduleFor;
 
-            await apiFetchV4('/campaigns', apiKey, { method: 'POST', body: payload });
+            const method = campaignToLoad ? 'PUT' : 'POST';
+            const endpoint = campaignToLoad ? `/campaigns/${encodeURIComponent(campaignToLoad.Name)}` : '/campaigns';
+
+            await apiFetchV4(endpoint, apiKey, { method, body: payload });
             
             addToast(payload.Status === 'Draft' ? t('draftSavedSuccess', { ns: 'sendEmail' }) : t('emailSentSuccess', { ns: 'sendEmail' }), 'success');
             setView('Campaigns');

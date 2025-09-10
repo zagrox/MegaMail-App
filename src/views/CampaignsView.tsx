@@ -12,14 +12,38 @@ import { useToast } from '../contexts/ToastContext';
 import Button from '../components/Button';
 import { formatDateRelative } from '../utils/helpers';
 import ConfirmModal from '../components/ConfirmModal';
+import Modal from '../components/Modal';
 
-const CampaignCard = ({ campaign, onSelect, onEdit, onDelete, onPause, stats, loadingStats, processingCampaign }: { campaign: any; onSelect: () => void; onEdit: () => void; onDelete: () => void; onPause: () => void; stats: { Delivered: number, Opened: number, Clicked: number } | null; loadingStats: boolean; processingCampaign: string | null; }) => {
-    const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common']);
+const CampaignPreviewModal = ({ campaign, onClose }: { campaign: any | null, onClose: () => void }) => {
+    const { t } = useTranslation(['templates']);
+    const htmlContent = campaign?.Content?.[0]?.Body?.[0]?.Content || '';
+
+    return (
+        <Modal 
+            isOpen={!!campaign} 
+            onClose={onClose} 
+            title={campaign?.Name || t('previewTemplate')} 
+            size="fullscreen" 
+            bodyClassName="modal-body--no-padding"
+        >
+            <iframe 
+                srcDoc={htmlContent} 
+                className="preview-iframe" 
+                title={t('previewTemplate')} 
+                style={{ width: '100%', height: '100%', border: 'none' }}
+            />
+        </Modal>
+    );
+};
+
+const CampaignCard = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onPause, stats, loadingStats, processingCampaign, onPreviewTemplate, isLoadingPreview }: { campaign: any; onSelect: () => void; onEdit: () => void; onEditInWizard: () => void; onDelete: () => void; onPause: () => void; stats: { Delivered: number, Opened: number, Clicked: number } | null; loadingStats: boolean; processingCampaign: string | null; onPreviewTemplate: () => void; isLoadingPreview: boolean; }) => {
+    const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common', 'mediaManager', 'templates']);
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(campaign.Status);
     const isDraft = campaign.Status === 'Draft';
     const isSending = campaign.Status === 'Sending';
     const content = campaign.Content?.[0];
+    const templateName = content?.TemplateName;
 
     const fromString = content?.From || '';
     let fromName = content?.FromName;
@@ -47,14 +71,19 @@ const CampaignCard = ({ campaign, onSelect, onEdit, onDelete, onPause, stats, lo
                     <div className="campaign-card-title-group">
                         <h3 className="campaign-card-title">{campaign.Name}</h3>
                         <p className="campaign-card-date">
-                            {isDraft ? t('created', { ns: 'campaigns' }) : t('sent', { ns: 'campaigns' })} {formatDateRelative(campaign.DateAdded, i18n.language)}
+                            {formatDateRelative(campaign.DateAdded, i18n.language)}
                         </p>
                     </div>
                     <Badge text={statusStyle.text} type={statusStyle.type} iconPath={statusStyle.iconPath} />
                 </div>
                 <div className="campaign-card-body">
                     <p className="campaign-card-subject">{content?.Subject || t('noSubject')}</p>
-                    {fromName && <p className="campaign-card-from">{t('from', { ns: 'campaigns' })}: {fromName}</p>}
+                    {templateName && (
+                        <button className="campaign-card-template" onClick={onPreviewTemplate} disabled={isLoadingPreview || !!processingCampaign}>
+                            {isLoadingPreview ? <Loader /> : <Icon>{ICONS.ARCHIVE}</Icon>}
+                            <span>{templateName}</span>
+                        </button>
+                    )}
                 </div>
                 {!isDraft && (
                     <div className="campaign-card-stats">
@@ -88,11 +117,14 @@ const CampaignCard = ({ campaign, onSelect, onEdit, onDelete, onPause, stats, lo
                     <>
                         <Button className="btn-secondary" onClick={onEdit} disabled={loadingStats || !!processingCampaign}>
                             <Icon>{ICONS.PENCIL}</Icon>
-                            <span>{t('edit')}</span>
+                            <span>{t('quickEdit')}</span>
+                        </Button>
+                        <Button className="btn-secondary" onClick={onEditInWizard} disabled={loadingStats || !!processingCampaign}>
+                            <Icon>{ICONS.TARGET}</Icon>
+                            <span>{t('wizard')}</span>
                         </Button>
                          <Button className="btn-danger" onClick={onDelete} disabled={loadingStats || !!processingCampaign}>
                             {processingCampaign === campaign.Name ? <Loader /> : <Icon>{ICONS.DELETE}</Icon>}
-                            <span>{t('delete')}</span>
                         </Button>
                     </>
                 ) : isSending ? (
@@ -117,13 +149,14 @@ const CampaignCard = ({ campaign, onSelect, onEdit, onDelete, onPause, stats, lo
     );
 };
 
-const CampaignRow = ({ campaign, onSelect, onEdit, onDelete, onPause, stats, loadingStats, processingCampaign }: { campaign: any; onSelect: () => void; onEdit: () => void; onDelete: () => void; onPause: () => void; stats: { Delivered: number, Opened: number } | null; loadingStats: boolean; processingCampaign: string | null; }) => {
-    const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common']);
+const CampaignRow = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onPause, stats, loadingStats, processingCampaign, onPreviewTemplate, isLoadingPreview }: { campaign: any; onSelect: () => void; onEdit: () => void; onEditInWizard: () => void; onDelete: () => void; onPause: () => void; stats: { Delivered: number, Opened: number } | null; loadingStats: boolean; processingCampaign: string | null; onPreviewTemplate: () => void; isLoadingPreview: boolean; }) => {
+    const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common', 'mediaManager', 'templates']);
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(campaign.Status);
     const isDraft = campaign.Status === 'Draft';
     const isSending = campaign.Status === 'Sending';
     const content = campaign.Content?.[0];
+    const templateName = content?.TemplateName;
 
     const openRate = useMemo(() => {
         if (loadingStats || !stats || !stats.Delivered) return '-';
@@ -137,6 +170,15 @@ const CampaignRow = ({ campaign, onSelect, onEdit, onDelete, onPause, stats, loa
                     <strong>{campaign.Name}</strong>
                 </button>
                 <div className="campaign-row-subject">{content?.Subject || t('noSubject')}</div>
+                {templateName && (
+                    <button className="campaign-row-template" onClick={onPreviewTemplate} disabled={isLoadingPreview || !!processingCampaign}>
+                        {isLoadingPreview ? <Loader /> : <Icon>{ICONS.ARCHIVE}</Icon>}
+                        <span>{templateName}</span>
+                    </button>
+                )}
+                <div className="campaign-row-date">
+                    {formatDateRelative(campaign.DateAdded, i18n.language)}
+                </div>
             </td>
             <td>
                 <Badge text={statusStyle.text} type={statusStyle.type} iconPath={statusStyle.iconPath} />
@@ -155,7 +197,10 @@ const CampaignRow = ({ campaign, onSelect, onEdit, onDelete, onPause, stats, loa
                     {isDraft ? (
                         <>
                             <button onClick={onEdit} className="btn btn-secondary" disabled={loadingStats || !!processingCampaign} style={{padding: '0.5rem 1rem'}}>
-                                <span>{t('edit')}</span>
+                                <span>{t('quickEdit')}</span>
+                            </button>
+                             <button onClick={onEditInWizard} className="btn btn-secondary" disabled={loadingStats || !!processingCampaign} style={{padding: '0.5rem 1rem'}}>
+                                <span>{t('wizard')}</span>
                             </button>
                             <button className="btn-icon btn-icon-danger" onClick={onDelete} aria-label={t('delete')} disabled={!!processingCampaign}>
                                 {processingCampaign === campaign.Name ? <div style={{width: '20px', height: '20px'}}><Loader/></div> : <Icon>{ICONS.DELETE}</Icon>}
@@ -183,7 +228,7 @@ const CampaignRow = ({ campaign, onSelect, onEdit, onDelete, onPause, stats, loa
 };
 
 const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void }) => {
-    const { t } = useTranslation(['campaigns', 'common']);
+    const { t } = useTranslation(['campaigns', 'common', 'templates']);
     const { addToast } = useToast();
     const [searchQuery, setSearchQuery] = useState('');
     const [campaignStats, setCampaignStats] = useState<Record<string, { data?: any; loading: boolean; error?: any; }>>({});
@@ -193,7 +238,8 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [campaignToDelete, setCampaignToDelete] = useState<any | null>(null);
     const [processingCampaign, setProcessingCampaign] = useState<string | null>(null);
-
+    const [campaignToPreview, setCampaignToPreview] = useState<any | null>(null);
+    const [loadingPreview, setLoadingPreview] = useState<string | null>(null);
 
     const CAMPAIGNS_PER_PAGE = 20;
 
@@ -205,6 +251,53 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     }, refetchIndex);
 
     const refetch = () => setRefetchIndex(i => i + 1);
+
+    const handlePreviewTemplate = async (campaignName: string) => {
+        setLoadingPreview(campaignName);
+        try {
+            // Step 1: Fetch the full campaign
+            const fullCampaign = await apiFetchV4(`/campaigns/${encodeURIComponent(campaignName)}`, apiKey);
+    
+            // Step 2: Check for existing body content
+            if (fullCampaign?.Content?.[0]?.Body?.[0]?.Content) {
+                setCampaignToPreview(fullCampaign);
+                return; // Done
+            }
+    
+            // Step 3: If no body, check for a template name
+            const templateName = fullCampaign?.Content?.[0]?.TemplateName;
+            if (templateName) {
+                // Step 4: Fetch the template
+                const templateData = await apiFetchV4(`/templates/${encodeURIComponent(templateName)}`, apiKey);
+                
+                // Step 5 & 6: Check if template has content and create a preview object
+                if (templateData?.Body?.[0]?.Content) {
+                    const previewCampaignObject = {
+                        ...fullCampaign, // Use campaign name for the modal title
+                        Content: [{
+                            ...fullCampaign.Content[0],
+                            Body: [{
+                                Content: templateData.Body[0].Content,
+                                Charset: "utf-8",
+                                ContentType: "HTML"
+                            }]
+                        }]
+                    };
+                    setCampaignToPreview(previewCampaignObject);
+                } else {
+                    // Template exists but has no content
+                    addToast(t('noPreviewAvailable'), 'info');
+                }
+            } else {
+                // No body and no template name
+                addToast(t('noPreviewAvailable'), 'info');
+            }
+        } catch (e: any) {
+            addToast(t('previewLoadError', { error: e.message }), 'error');
+        } finally {
+            setLoadingPreview(null);
+        }
+    };
 
     const paginatedCampaigns = useMemo(() => {
         return Array.isArray(campaignsData) ? campaignsData : [];
@@ -283,6 +376,18 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
         }
     };
     
+    const handleEditInWizard = async (campaign: any) => {
+        setLoadingCampaignName(campaign.Name);
+        try {
+            const fullCampaign = await apiFetchV4(`/campaigns/${encodeURIComponent(campaign.Name)}`, apiKey);
+            setView('Marketing', { campaignToLoad: fullCampaign });
+        } catch (e: any) {
+            addToast(`Failed to load draft for editing in wizard: ${e.message}`, 'error');
+        } finally {
+            setLoadingCampaignName(null);
+        }
+    };
+
     const handlePauseCampaign = async (campaignName: string) => {
         setProcessingCampaign(campaignName);
         try {
@@ -313,6 +418,7 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
 
     return (
         <div>
+            <CampaignPreviewModal campaign={campaignToPreview} onClose={() => setCampaignToPreview(null)} />
              <ConfirmModal
                 isOpen={!!campaignToDelete}
                 onClose={() => setCampaignToDelete(null)}
@@ -372,11 +478,14 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                                         campaign={campaign}
                                         onSelect={() => handleSelectCampaign(campaign)}
                                         onEdit={() => handleEditCampaign(campaign)}
+                                        onEditInWizard={() => handleEditInWizard(campaign)}
                                         onDelete={() => setCampaignToDelete(campaign)}
                                         onPause={() => handlePauseCampaign(campaign.Name)}
                                         stats={statsInfo?.data}
                                         loadingStats={statsInfo?.loading || loadingCampaignName === campaign.Name}
                                         processingCampaign={processingCampaign}
+                                        onPreviewTemplate={() => handlePreviewTemplate(campaign.Name)}
+                                        isLoadingPreview={loadingPreview === campaign.Name}
                                    />
                                );
                             })}
@@ -401,11 +510,14 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                                                 campaign={campaign}
                                                 onSelect={() => handleSelectCampaign(campaign)}
                                                 onEdit={() => handleEditCampaign(campaign)}
+                                                onEditInWizard={() => handleEditInWizard(campaign)}
                                                 onDelete={() => setCampaignToDelete(campaign)}
                                                 onPause={() => handlePauseCampaign(campaign.Name)}
                                                 stats={statsInfo?.data}
                                                 loadingStats={statsInfo?.loading || loadingCampaignName === campaign.Name}
                                                 processingCampaign={processingCampaign}
+                                                onPreviewTemplate={() => handlePreviewTemplate(campaign.Name)}
+                                                isLoadingPreview={loadingPreview === campaign.Name}
                                             />
                                         );
                                     })}

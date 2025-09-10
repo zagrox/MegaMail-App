@@ -64,13 +64,43 @@
     font-size: 1.1rem;
     font-weight: 500;
     color: var(--text-color);
-    margin: 0.5rem 0;
+    margin: 0;
     word-break: break-word;
 }
 
-.campaign-card-from {
-    font-size: 0.9rem;
+.campaign-card-template, .campaign-row-template {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--subtle-background);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
     color: var(--subtle-text-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+.campaign-card-template:hover, .campaign-row-template:hover {
+    background-color: var(--border-color);
+    color: var(--text-color);
+}
+.campaign-card-template .icon, .campaign-row-template .icon {
+    width: 1rem;
+    height: 1rem;
+    color: var(--secondary-color);
+}
+.campaign-card-template .loader, .campaign-row-template .loader {
+    width: 1rem;
+    height: 1rem;
+    border-width: 2px;
+}
+.campaign-card-template:disabled, .campaign-row-template:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 .campaign-card-stats {
@@ -108,6 +138,10 @@
     align-items: center;
 }
 
+.campaign-card-footer .btn-danger {
+    padding: 0.75rem;
+}
+
 .campaign-row-subject {
     font-size: 0.9rem;
     color: var(--subtle-text-color);
@@ -116,4 +150,12 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 400px;
+}
+.campaign-row-template {
+    margin-top: 0.5rem;
+}
+.campaign-row-date {
+    font-size: 0.8rem;
+    color: var(--subtle-text-color);
+    margin-top: 0.5rem;
 }
