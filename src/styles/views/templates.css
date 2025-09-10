@@ -24,15 +24,12 @@
     overflow: hidden;
     cursor: pointer;
     border-bottom: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .template-card-preview-wrapper iframe {
     width: 800px; /* Standard email width */
     height: 600px; /* 4:3 ratio for the width */
-    transform: scale(0.375); /* 300px (card width) / 800px (iframe width) */
+    transform: scale(0.45); /* 300px (card width) / 800px (iframe width) */
     transform-origin: top left;
     border: none;
     pointer-events: none;

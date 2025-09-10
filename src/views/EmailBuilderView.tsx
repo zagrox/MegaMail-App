@@ -99,18 +99,58 @@ const renderBlockToHtml = (block: any): string => {
         case 'Footer':
             return `<div style="${styleStr}">${content.html || ''}</div>`;
         case 'Image': {
+            const s = style;
+            const c = content;
             const imgStyle = styleObjectToString({
-                display: 'block',
+                display: 'block', // Keep for gmail gap fix
                 maxWidth: '100%',
-                width: content.width === 'auto' ? 'auto' : `${parseInt(String(content.width), 10)}px`,
-                height: content.height === 'auto' ? 'auto' : `${parseInt(String(content.height), 10)}px`,
-                borderRadius: style.borderRadius ? `${parseInt(String(style.borderRadius), 10)}px` : '0px',
+                width: c.width === 'auto' ? 'auto' : `${parseInt(String(c.width), 10)}px`,
+                height: c.height === 'auto' ? 'auto' : `${parseInt(String(c.height), 10)}px`,
+                borderRadius: s.borderRadius ? `${parseInt(String(s.borderRadius), 10)}px` : '0px',
             });
-            const img = `<img src="${content.src}" alt="${content.alt || ''}" style="${imgStyle}" width="${content.width === 'auto' ? '' : parseInt(String(content.width), 10)}" />`;
-            const wrapper = content.href
-                ? `<a href="${content.href}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">${img}</a>`
+            // The width attribute is important for Outlook.
+            const imgWidth = c.width === 'auto' ? '' : `width="${parseInt(String(c.width), 10)}"`;
+
+            const img = `<img src="${c.src}" alt="${c.alt || ''}" style="${imgStyle}" ${imgWidth} />`;
+
+            // display: block on the link is also a good practice to avoid gaps.
+            const linkedImg = c.href
+                ? `<a href="${c.href}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: block;">${img}</a>`
                 : img;
-            return `<div style="${styleStr}">${wrapper}</div>`;
+
+            // This td handles padding and background for the whole block.
+            const outerTdStyle = styleObjectToString({
+                paddingTop: s.paddingTop,
+                paddingRight: s.paddingRight,
+                paddingBottom: s.paddingBottom,
+                paddingLeft: s.paddingLeft,
+                backgroundColor: s.backgroundColor || 'transparent',
+            });
+            
+            // This table will be aligned left/center/right. It will shrink to fit the image.
+            const imageTableAlign = `align="${s.textAlign || 'center'}"`;
+
+            // This td contains the image. It handles vertical alignment and gap fixes.
+            const innerTdStyle = styleObjectToString({
+                 fontSize: 0,
+                 lineHeight: 0,
+            });
+
+            return `
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td style="${outerTdStyle}">
+                            <table border="0" cellpadding="0" cellspacing="0" ${imageTableAlign}>
+                                <tr>
+                                    <td valign="${s.verticalAlign || 'middle'}" style="${innerTdStyle}">
+                                        ${linkedImg}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            `;
         }
         case 'Button': {
             const tableAlign = style.width === 'full' ? 'center' : style.textAlign;
