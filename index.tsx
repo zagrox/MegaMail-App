@@ -53,6 +53,7 @@ import './src/styles/views/send-wizard.css';
 import './src/styles/views/smtp.css';
 import './src/styles/views/templates.css';
 import './src/styles/views/invoice.css';
+import './src/styles/views/custom-fields.css';
 
 const root = createRoot(document.getElementById('root')!);
 root.render(

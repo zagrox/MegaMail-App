@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from './useApi';
 import useApiV4 from '../hooks/useApiV4';
 import { apiFetch, apiFetchV4, apiUploadV4 } from '../api/elasticEmail';
-import { Contact, List } from '../api/types';
+import { Contact, List, CustomField } from '../api/types';
 import { formatDateForDisplay } from '../utils/helpers';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
@@ -302,15 +302,44 @@ const ContactCard = React.memo(({ contact, onView, onDelete, isSelected, onToggl
 });
 
 
-const AddContactForm = ({ onSubmit }: { onSubmit: (data: {Email: string, FirstName: string, LastName: string}) => void }) => {
-    const { t } = useTranslation(['contacts', 'common', 'auth']);
+const AddContactForm = ({ apiKey, onSubmit }: { apiKey: string; onSubmit: (data: Partial<Contact>) => void }) => {
+    const { t } = useTranslation(['contacts', 'common', 'auth', 'customFields']);
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [dynamicFields, setDynamicFields] = useState<{ id: number; key: string; value: string }[]>([]);
+
+    const addDynamicField = () => {
+        setDynamicFields(prev => [...prev, { id: Date.now(), key: '', value: '' }]);
+    };
+
+    const updateDynamicField = (id: number, part: 'key' | 'value', fieldValue: string) => {
+        setDynamicFields(prev => prev.map(f => f.id === id ? { ...f, [part]: fieldValue } : f));
+    };
+
+    const removeDynamicField = (id: number) => {
+        setDynamicFields(prev => prev.filter(f => f.id !== id));
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSubmit({ Email: email, FirstName: firstName, LastName: lastName });
+        const payload: Partial<Contact> = {
+            Email: email,
+            FirstName: firstName,
+            LastName: lastName,
+        };
+        
+        const customFieldsPayload: Record<string, string> = {};
+        dynamicFields.forEach(field => {
+            if (field.key.trim()) {
+                customFieldsPayload[field.key.trim()] = field.value;
+            }
+        });
+
+        if (Object.keys(customFieldsPayload).length > 0) {
+            payload.CustomFields = customFieldsPayload;
+        }
+        onSubmit(payload);
     };
 
     return (
@@ -329,13 +358,31 @@ const AddContactForm = ({ onSubmit }: { onSubmit: (data: {Email: string, FirstNa
                     <input id="lastName" type="text" value={lastName} onChange={e => setLastName(e.target.value)} />
                 </div>
             </div>
+            
+            <div className="form-group full-width" style={{gap: '1rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)'}}>
+                <h4 style={{marginBottom: 0}}>{t('customFields')}</h4>
+                <div className="dynamic-fields-container">
+                    {dynamicFields.map(field => (
+                        <div key={field.id} className="dynamic-field-row">
+                            <input type="text" placeholder={t('fieldName', { ns: 'customFields' })} value={field.key} onChange={e => updateDynamicField(field.id, 'key', e.target.value)} />
+                            <input type="text" placeholder={t('fieldValue', { ns: 'customFields' })} value={field.value} onChange={e => updateDynamicField(field.id, 'value', e.target.value)} />
+                            <button type="button" className="btn-icon btn-icon-danger" onClick={() => removeDynamicField(field.id)} aria-label={t('delete')}><Icon>{ICONS.DELETE}</Icon></button>
+                        </div>
+                    ))}
+                </div>
+                <Button type="button" className="btn-secondary" onClick={addDynamicField} style={{alignSelf: 'flex-start'}}>
+                    <Icon>{ICONS.PLUS}</Icon>
+                    <span>{t('addField', { ns: 'customFields' })}</span>
+                </Button>
+            </div>
+
             <Button type="submit" className="btn-primary full-width">{t('addContact')}</Button>
         </form>
     );
 };
 
 const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void; }) => {
-    const { t } = useTranslation(['contacts', 'common']);
+    const { t } = useTranslation(['contacts', 'common', 'customFields']);
     const { addToast } = useToast();
     const [refetchIndex, setRefetchIndex] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
@@ -403,7 +450,7 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
 
     const contacts = useV2Api ? v2ContactsMapped : v4Data;
     const loading = useV2Api ? v2Loading : v4Loading;
-    const error = useV2Api ? v2Error : v4Error;
+    const error = useV2Api ? v2Error : v2Error;
     const paginatedContacts = Array.isArray(contacts) ? contacts : [];
 
     const refetch = () => setRefetchIndex(i => i + 1);
@@ -419,7 +466,7 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
         });
     };
 
-    const handleAddContact = async (contactData: {Email: string, FirstName: string, LastName: string}) => {
+    const handleAddContact = async (contactData: Partial<Contact>) => {
         try {
             await apiFetchV4('/contacts', apiKey, { method: 'POST', body: [contactData] });
             addToast(t('contactAddedSuccess', { email: contactData.Email }), 'success');
@@ -534,7 +581,7 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                 }}
             />
             <Modal title={t('addNewContact')} isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
-                <AddContactForm onSubmit={handleAddContact} />
+                <AddContactForm apiKey={apiKey} onSubmit={handleAddContact} />
             </Modal>
             <ConfirmModal
                 isOpen={!!contactToDelete}
@@ -607,6 +654,9 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                                 />
                             </div>
                             <div className="header-actions">
+                                <Button onClick={() => setView('Custom Fields')} className="btn-secondary">
+                                    <Icon>{ICONS.HASH}</Icon> {t('manageCustomFields', { ns: 'customFields' })}
+                                </Button>
                                 <Button onClick={() => setIsImportModalOpen(true)} action={AppActions.IMPORT_CONTACTS}>
                                     <Icon>{ICONS.UPLOAD}</Icon> {t('importContacts')}
                                 </Button>

@@ -1,5 +1,3 @@
-
-
 export type Contact = {
     Email: string;
     FirstName: string;
@@ -82,4 +80,9 @@ export type Configuration = {
     app_banner: string;
     app_backend: string;
     app_language: string;
+};
+export type CustomField = {
+    Name: string;
+    DataType: 'String' | 'Number' | 'Date' | 'Boolean';
+    DateAdded?: string;
 };

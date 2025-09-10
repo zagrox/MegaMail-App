@@ -1,0 +1,22 @@
+{
+    "manageCustomFields": "Custom Fields",
+    "manageCustomFieldsDesc": "Create and manage custom data fields to store additional information about your contacts.",
+    "addNewField": "Add New Field",
+    "fieldName": "Field Name",
+    "fieldType": "Field Type",
+    "string": "Text (String)",
+    "number": "Number",
+    "date": "Date",
+    "boolean": "True/False (Boolean)",
+    "addField": "Add Field",
+    "fieldAddedSuccess": "Custom field '{{name}}' was added successfully.",
+    "fieldAddedError": "Failed to add custom field: {{error}}",
+    "deleteFieldTitle": "Delete Field '{{name}}'",
+    "deleteFieldConfirm": "Are you sure you want to delete the custom field '{{name}}'? This action cannot be undone and will remove the field from all contacts.",
+    "fieldDeletedSuccess": "Custom field '{{name}}' has been deleted.",
+    "fieldDeletedError": "Failed to delete custom field: {{error}}",
+    "noCustomFields": "No Custom Fields Found",
+    "noCustomFieldsDesc": "Custom fields are discovered from your contacts. Add or import a contact with a new field to see it appear here.",
+    "discoveredFieldsDesc": "This is a list of custom fields discovered on your existing contacts. New fields are created automatically when you add or import contacts with them.",
+    "fieldValue": "Field Value"
+}
