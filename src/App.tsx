@@ -304,8 +304,6 @@ const App = () => {
         // Audience Management
         { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
         { name: t('emailLists'), view: 'Email Lists', icon: ICONS.EMAIL_LISTS },
-        { name: t('segments'), view: 'Segments', icon: ICONS.SEGMENTS },
-        { name: t('customFields'), view: 'Custom Fields', icon: ICONS.HASH },
         { type: 'divider' },
         // Content & Assets
         { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
