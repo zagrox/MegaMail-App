@@ -214,3 +214,28 @@ input:checked + .toggle-slider:before {
     margin: 1.5rem -1.5rem -1.5rem;
     border-radius: 0 0 8px 8px;
 }
+
+@media (max-width: 768px) {
+    .profile-hero {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .profile-hero > div:first-child {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    .profile-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .profile-actions {
+        width: 100%;
+        margin-top: 1rem;
+    }
+    .profile-actions .btn {
+        width: 100%;
+    }
+}

@@ -71,7 +71,7 @@ const ContactDetailView = ({ apiKey, contactEmail, onBack }: {
                         </div>
                     </div>
 
-                    <div className="card-grid" style={{ gridTemplateColumns: '1fr 1fr', alignItems: 'start' }}>
+                    <div className="card-grid contact-detail-grid">
                         <div className="account-tab-card">
                             <div className="account-tab-card-header"><h3>{t('contactDetails')}</h3></div>
                             <div className="account-tab-card-body">

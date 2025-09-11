@@ -108,11 +108,22 @@ html[data-theme='dark'] .contact-status-filter-item .badge {
         flex-direction: column;
         align-items: stretch;
     }
+    .header-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+    .header-actions .btn .btn-text {
+        display: none;
+    }
+    .header-actions .btn {
+        padding: 0.75rem;
+    }
 }
 
 .contacts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
 }
 .contact-card { 
@@ -264,4 +275,16 @@ html[data-theme='dark'] .contact-status-filter-item .badge {
 }
 .dynamic-field-row .btn-icon {
     margin-top: -0.25rem; /* Align better with inputs */
+}
+
+/* --- CONTACT DETAIL VIEW --- */
+.contact-detail-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+}
+
+@media (max-width: 992px) {
+    .contact-detail-grid {
+        grid-template-columns: 1fr;
+    }
 }

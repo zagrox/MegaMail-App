@@ -655,13 +655,13 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                             </div>
                             <div className="header-actions">
                                 <Button onClick={() => setView('Custom Fields')} className="btn-secondary">
-                                    <Icon>{ICONS.HASH}</Icon> {t('manageCustomFields', { ns: 'customFields' })}
+                                    <Icon>{ICONS.HASH}</Icon> <span className="btn-text">{t('manageCustomFields', { ns: 'customFields' })}</span>
                                 </Button>
                                 <Button onClick={() => setIsImportModalOpen(true)} action={AppActions.IMPORT_CONTACTS}>
-                                    <Icon>{ICONS.UPLOAD}</Icon> {t('importContacts')}
+                                    <Icon>{ICONS.UPLOAD}</Icon> <span className="btn-text">{t('importContacts')}</span>
                                 </Button>
                                 <Button className="btn-primary" onClick={() => setIsAddModalOpen(true)} action={AppActions.ADD_CONTACT}>
-                                    <Icon>{ICONS.USER_PLUS}</Icon> {t('addContact')}
+                                    <Icon>{ICONS.USER_PLUS}</Icon> <span className="btn-text">{t('addContact')}</span>
                                 </Button>
                             </div>
                         </div>
