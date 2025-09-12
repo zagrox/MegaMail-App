@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,11 +9,8 @@ import { ICONS } from '../components/Icon';
 import Tabs from '../components/Tabs';
 import GeneralTab from './account/GeneralTab';
 import ProfileTab from './account/ProfileTab';
-import ApiKeyTab from './account/ApiKeyTab';
 import SecurityTab from './account/SecurityTab';
 import ShareTab from './account/ShareTab';
-import DomainsView from './DomainsView';
-import SmtpView from './SmtpView';
 import OrdersTab from './account/OrdersTab';
 import ModulesTab from './account/ModulesTab';
 import NotificationsTab from './account/NotificationsTab';
@@ -43,10 +41,8 @@ const AccountView = ({ apiKey, user, setView }: { apiKey: string, user: any, set
         { id: 'profile', label: t('profile'), icon: ICONS.ACCOUNT, component: <ProfileTab accountData={accountData} user={user} /> },
         { id: 'orders', label: t('orders'), icon: ICONS.BUY_CREDITS, component: <OrdersTab setView={setView} /> },
         { id: 'modules', label: t('modules'), icon: ICONS.BOX, component: <ModulesTab setView={setView} /> },
-        { id: 'domains', label: t('domains'), icon: ICONS.DOMAINS, component: <DomainsView apiKey={apiKey} /> },
         { id: 'notifications', label: t('notifications'), icon: ICONS.BELL, component: <NotificationsTab /> },
         { id: 'security', label: t('security'), icon: ICONS.LOCK, component: <SecurityTab user={user} /> },
-        { id: 'smtp', label: t('smtp'), icon: ICONS.SMTP, component: <SmtpView apiKey={apiKey} user={user} /> },
         { id: 'share', label: t('share'), icon: ICONS.SHARE, component: <ShareTab apiKey={apiKey} /> },
     ];
     

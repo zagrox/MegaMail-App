@@ -1,3 +1,4 @@
+
 {
     "mainAccountCredentials": "Main Account Credentials",
     "server": "Server",
@@ -24,5 +25,7 @@
     "credentialCreatedSuccessTitle": "Credential Created!",
     "copyApiKeyNotice": "Your new API Key (password) is shown below. Copy it now, as you will not be able to see it again.",
     "apiKeyPassword": "API Key / Password",
-    "credentialCreatedSuccess": "Credential \"{{name}}\" created successfully."
+    "credentialCreatedSuccess": "Credential \"{{name}}\" created successfully.",
+    "revealSmtp": "Reveal SMTP",
+    "hideSmtp": "Hide SMTP"
 }

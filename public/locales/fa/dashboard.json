@@ -1,3 +1,4 @@
+
 {
     "welcomeMessage": "خوش آمدید، {{name}}!",
     "user": "کاربر",
@@ -24,6 +25,7 @@
     "templatesDesc": "ایجاد، مشاهده و مدیریت قالب‌ ایمیل.",
     "domainsDesc": "مدیریت و تأیید دامنه‌های شما.",
     "smtpDesc": "مشاهده اطلاعات SMTP شما.",
+    "apiDesc": "مشاهده و مدیریت کلیدهای API شما.",
     "buyCreditsDesc": "خرید اعتبار ایمیل بیشتر.",
     "returnToDashboard": "بازگشت به داشبورد"
 }

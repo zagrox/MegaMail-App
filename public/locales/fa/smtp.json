@@ -1,3 +1,4 @@
+
 {
     "mainAccountCredentials": "اطلاعات حساب اصلی",
     "server": "سرور",
@@ -24,5 +25,7 @@
     "credentialCreatedSuccessTitle": "اطلاعات ایجاد شد!",
     "copyApiKeyNotice": "کلید API جدید شما (رمز عبور) در زیر نشان داده شده است. اکنون آن را کپی کنید، زیرا دیگر قادر به دیدن آن نخواهید بود.",
     "apiKeyPassword": "کلید API / رمز عبور",
-    "credentialCreatedSuccess": "اطلاعات \"{{name}}\" با موفقیت ایجاد شد."
+    "credentialCreatedSuccess": "اطلاعات \"{{name}}\" با موفقیت ایجاد شد.",
+    "revealSmtp": "نمایش اطلاعات SMTP",
+    "hideSmtp": "پنهان کردن اطلاعات SMTP"
 }

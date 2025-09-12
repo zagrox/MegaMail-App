@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -17,7 +18,7 @@ import { readItems } from '@directus/sdk';
 import { AppActions } from '../config/actions';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
-    const { t, i18n } = useTranslation(['dashboard', 'common']);
+    const { t, i18n } = useTranslation(['dashboard', 'common', 'account']);
     const { hasModuleAccess, loading: authLoading, allModules, setModuleToUnlock } = useAuth();
     const { config, loading: configLoading } = useConfiguration();
     const apiParams = useMemo(() => ({ from: formatDateForApiV4(getPastDateByDays(365)) }), []);
@@ -79,6 +80,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
         { name: t('emailBuilder', { ns: 'common' }), icon: ICONS.LAYERS, desc: t('emailBuilderDesc'), view: 'Email Builder' },
         { name: t('domains', { ns: 'common' }), icon: ICONS.DOMAINS, desc: t('domainsDesc'), view: 'Domains' },
         { name: t('smtp', { ns: 'common' }), icon: ICONS.SMTP, desc: t('smtpDesc'), view: 'SMTP' },
+        { name: t('apiKey', { ns: 'account' }), icon: ICONS.KEY, desc: t('apiDesc'), view: 'API' },
     ], [t]);
 
     const dashboardTools = useMemo(() => {

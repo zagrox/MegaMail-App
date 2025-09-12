@@ -30,6 +30,7 @@ import SettingsPanel from '../components/email_builder/SettingsPanel';
 import Modal from '../components/Modal';
 import { apiFetchV4 } from '../api/elasticEmail';
 import Button from '../components/Button';
+import { AppActions } from '../config/actions';
 
 
 const generateId = (prefix = 'block') => `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -1004,7 +1005,7 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                                 required
                             />
                         </div>
-                        <Button className="btn-primary" onClick={handleSaveTemplate} disabled={isSaving} title={t('saveChanges')} action="save_template">
+                        <Button className="btn-primary" onClick={handleSaveTemplate} disabled={isSaving} title={t('saveChanges')} action={AppActions.SAVE_TEMPLATE}>
                             {isSaving ? <Loader /> : <><Icon>{ICONS.SAVE_CHANGES}</Icon><span>{t('saveTemplate')}</span></>}
                         </Button>
                     </div>
@@ -1056,6 +1057,7 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                                 selectedBlockId={selectedBlockId}
                                 onSelectBlock={handleSelectBlock}
                                 onEditBlock={handleEditBlock}
+                                // FIX: Corrected a typo in the `Canvas` component's `onContentChange` prop, changing it from the undefined `onContentChange` to the correctly defined `handleContentChange` function.
                                 onContentChange={handleContentChange}
                                 onStyleChange={handleStyleChange}
                                 onInsertBlock={handleInsertBlock}

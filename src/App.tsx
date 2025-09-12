@@ -1,3 +1,6 @@
+
+
+
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -21,8 +24,7 @@ import MarketingView from './views/SendWizardView';
 import CampaignsView from './views/CampaignsView';
 import CampaignDetailView from './views/CampaignDetailView';
 import TemplatesView from './views/TemplatesView';
-import DomainsView from './views/DomainsView';
-import SmtpView from './views/SmtpView';
+import SettingsView from './views/SettingsView';
 import CalendarView from './views/CalendarView';
 import Icon from './components/Icon';
 import EmbedView from './views/EmbedView';
@@ -40,7 +42,7 @@ import CustomFieldsView from './views/CustomFieldsView';
 const App = () => {
     const { isAuthenticated, user, logout, hasModuleAccess, loading: authLoading, allModules, moduleToUnlock, setModuleToUnlock } = useAuth();
     const { config } = useConfiguration();
-    const { t, i18n } = useTranslation(['common', 'emailLists', 'contacts', 'buyCredits']);
+    const { t, i18n } = useTranslation(['common', 'emailLists', 'contacts', 'buyCredits', 'account']);
     const [view, setView] = useState('Dashboard');
     const [templateToEdit, setTemplateToEdit] = useState<Template | null>(null);
     const [campaignToLoad, setCampaignToLoad] = useState<any | null>(null);
@@ -286,29 +288,25 @@ const App = () => {
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
         'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('marketingCampaign'), icon: ICONS.TARGET },
         'Calendar': { component: <CalendarView />, title: t('calendar'), icon: ICONS.CALENDAR },
-        'Domains': { component: <DomainsView apiKey={apiKey} />, title: t('domains'), icon: ICONS.DOMAINS },
-        'SMTP': { component: <SmtpView apiKey={apiKey} user={user}/>, title: t('smtp'), icon: ICONS.SMTP }
+        'Settings': { component: <SettingsView apiKey={apiKey} user={user} />, title: t('settings', { ns: 'account' }), icon: ICONS.SETTINGS },
     };
 
     const navItems = [
         // Overview
         { name: t('dashboard'), view: 'Dashboard', icon: ICONS.DASHBOARD },
+        { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
         { name: t('statistics'), view: 'Statistics', icon: ICONS.STATISTICS },
+        { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
+        { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
         { name: t('calendar'), view: 'Calendar', icon: ICONS.CALENDAR },
+        { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
+        
         { type: 'divider' },
         // Marketing
-        { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
+        { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
         { name: t('marketing'), view: 'Marketing', icon: ICONS.TARGET },
-        { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
-        { type: 'divider' },
-        // Audience Management
         { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
         { name: t('emailLists'), view: 'Email Lists', icon: ICONS.EMAIL_LISTS },
-        { type: 'divider' },
-        // Content & Assets
-        { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
-        { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
-        { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
     ];
     
     const logoUrl = config?.app_logo && config?.app_backend ? `${config.app_backend}/assets/${config.app_logo}` : '';
@@ -351,6 +349,10 @@ const App = () => {
              <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
                 <Icon>{ICONS.BUY_CREDITS}</Icon>
                 <span>{t('buyCredits')}</span>
+             </button>
+             <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
+                 <Icon>{ICONS.SETTINGS}</Icon>
+                 <span>{t('settings', { ns: 'account' })}</span>
              </button>
              <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
                  <Icon>{ICONS.ACCOUNT}</Icon>

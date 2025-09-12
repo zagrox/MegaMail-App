@@ -1,7 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import useApi from './useApi';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
 import ErrorMessage from '../components/ErrorMessage';
@@ -12,40 +11,8 @@ import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
 import { formatDateRelative } from '../utils/helpers';
 import Button from '../components/Button';
-
-const copyToClipboard = (text: string) => navigator.clipboard.writeText(text);
-
-const CopyButton = ({ value }: { value: string }) => {
-    const { t } = useTranslation(['smtp', 'common']);
-    const [copied, setCopied] = useState(false);
-
-    const handleCopy = () => {
-        copyToClipboard(value);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
-
-    return (
-        <button onClick={handleCopy} className="btn-icon">
-            <Icon>{copied ? ICONS.CHECK : ICONS.MAIL}</Icon>
-        </button>
-    );
-};
-
-const SecretValue = ({ value, type = "password" }: { value: string, type?: "text" | "password" }) => {
-    const { t } = useTranslation(['smtp', 'common']);
-    const [isVisible, setIsVisible] = useState(false);
-
-    return (
-        <div className="secret-value-wrapper">
-            <input type={isVisible ? 'text' : type} value={value} readOnly />
-            <button type="button" className="btn-icon" onClick={() => setIsVisible(!isVisible)}>
-                <Icon>{isVisible ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
-            </button>
-            <CopyButton value={value} />
-        </div>
-    );
-};
+import { AppActions } from '../config/actions';
+import useApi from './useApi';
 
 const AddSmtpCredentialModal = ({ isOpen, onClose, apiKey, onSuccess }: { isOpen: boolean, onClose: () => void, apiKey: string, onSuccess: (newKeyData: any) => void }) => {
     const { t } = useTranslation(['smtp', 'common']);
@@ -61,12 +28,15 @@ const AddSmtpCredentialModal = ({ isOpen, onClose, apiKey, onSuccess }: { isOpen
         }
         setIsSubmitting(true);
         try {
-            const newKeyData = await apiFetch('/account/addapikey', apiKey, {
+            const newKeyData = await apiFetch('/accesstoken/add', apiKey, {
                 method: 'POST',
-                params: { name, accessLevel: 'Smtp' }
+                params: {
+                    tokenName: name,
+                    accessLevel: '144115188075855872' // Use ModifyAccessTokens
+                }
             });
             addToast(t('credentialCreatedSuccess', { name }), 'success');
-            onSuccess({ ...newKeyData, name });
+            onSuccess({ apikey: newKeyData, name: name });
         } catch (err: any) {
             addToast(t('credentialCreateError') + `: ${err.message}`, 'error');
         } finally {
@@ -103,7 +73,7 @@ const NewApiKeyModal = ({ isOpen, onClose, newKeyData }: { isOpen: boolean, onCl
                 </div>
                 <div className="form-group">
                     <label>{t('apiKeyPassword')}</label>
-                    <SecretValue value={newKeyData?.apikey} type="text" />
+                    <input type="text" value={newKeyData?.apikey} readOnly />
                 </div>
                 <div className="form-actions" style={{ justifyContent: 'flex-end' }}>
                     <button type="button" className="btn btn-primary" onClick={onClose}>{t('done')}</button>
@@ -120,9 +90,17 @@ const SmtpView = ({ apiKey, user }: { apiKey: string, user: any }) => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [newKeyData, setNewKeyData] = useState<any | null>(null);
     const [keyToDelete, setKeyToDelete] = useState<any | null>(null);
+    const [isRevealed, setIsRevealed] = useState(false);
 
     const { data: mainCreds, loading: mainLoading, error: mainError } = useApi('/account/load', apiKey, {}, refetchIndex);
-    const { data: additionalCreds, loading: additionalLoading, error: additionalError } = useApi(user?.isApiKeyUser ? '' : '/account/loadapikeys', apiKey, {}, refetchIndex);
+    const { data: additionalCreds, loading: additionalLoading, error: additionalError } = useApi(user?.isApiKeyUser ? '' : '/accesstoken/list', apiKey, {}, refetchIndex);
+    
+    const smtpCreds = useMemo(() => {
+        if (!additionalCreds || !Array.isArray(additionalCreds)) {
+            return [];
+        }
+        return additionalCreds.filter(cred => cred.AccessLevel?.includes('Smtp') || cred.AccessLevel?.includes('ModifyAccessTokens'));
+    }, [additionalCreds]);
 
     const refetch = () => setRefetchIndex(i => i + 1);
 
@@ -139,11 +117,13 @@ const SmtpView = ({ apiKey, user }: { apiKey: string, user: any }) => {
     const confirmDelete = async () => {
         if (!keyToDelete) return;
         try {
-            await apiFetch('/account/deleteapikey', apiKey, {
+            await apiFetch('/accesstoken/delete', apiKey, {
                 method: 'POST',
-                params: { publicApiKeyID: keyToDelete.publicapikid }
+                params: {
+                    tokenName: keyToDelete.Name
+                }
             });
-            addToast(t('credentialDeletedSuccess', { name: keyToDelete.apikname }), 'success');
+            addToast(t('credentialDeletedSuccess', { name: keyToDelete.Name }), 'success');
             refetch();
         } catch (err: any) {
             addToast(t('credentialDeletedError', { error: err.message }), 'error');
@@ -158,7 +138,7 @@ const SmtpView = ({ apiKey, user }: { apiKey: string, user: any }) => {
             {newKeyData && <NewApiKeyModal isOpen={!!newKeyData} onClose={handleNewKeyModalClose} newKeyData={newKeyData} />}
             {keyToDelete && (
                 <ConfirmModal isOpen={!!keyToDelete} onClose={() => setKeyToDelete(null)} onConfirm={confirmDelete} title={t('delete')}>
-                    <p>{t('confirmDeleteCredential', { name: keyToDelete.apikname })}</p>
+                    <p>{t('confirmDeleteCredential', { name: keyToDelete.Name })}</p>
                 </ConfirmModal>
             )}
 
@@ -169,12 +149,25 @@ const SmtpView = ({ apiKey, user }: { apiKey: string, user: any }) => {
                     {mainError && <ErrorMessage error={mainError} />}
                     {mainCreds && (
                         <div className="smtp-card-body">
-                            <div className="smtp-detail-item"><label>{t('server')}</label><strong>smtp.mailzila.com</strong></div>
-                            <div className="smtp-detail-item"><label>{t('ports')}</label><strong>25, 2525, 587, 465</strong></div>
+                            <div className="smtp-detail-item"><label>{t('server')}</label><strong>{isRevealed ? 'smtp.mailzila.com' : '•••••••••••••••••'}</strong></div>
+                            <div className="smtp-detail-item"><label>{t('ports')}</label><strong>{isRevealed ? '25, 2525, 587, 465' : '•••••••••••••'}</strong></div>
                             <div className="smtp-detail-item"><label>{t('username')}</label><strong className="monospace">{mainCreds.email}</strong></div>
-                            <div className="smtp-detail-item full-span"><label>{t('passwordMainApiKey')}</label><SecretValue value={apiKey} /></div>
+                            <div className="smtp-detail-item full-span">
+                                <label>{t('passwordMainApiKey')}</label>
+                                <input type={isRevealed ? 'text' : 'password'} value={isRevealed ? apiKey : '••••••••••••••••••••••••••••••••••••••••'} readOnly />
+                            </div>
                         </div>
                     )}
+                </div>
+                 <div className="form-actions" style={{ backgroundColor: 'var(--subtle-background)', justifyContent: 'flex-end' }}>
+                    <Button
+                        className="btn-secondary"
+                        onClick={() => setIsRevealed(!isRevealed)}
+                        action={AppActions.REVEAL_SMTP_ACCESS}
+                    >
+                        <Icon>{isRevealed ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+                        <span>{isRevealed ? t('hideSmtp') : t('revealSmtp')}</span>
+                    </Button>
                 </div>
             </div>
 
@@ -196,21 +189,21 @@ const SmtpView = ({ apiKey, user }: { apiKey: string, user: any }) => {
                     <CenteredMessage><Loader /></CenteredMessage>
                 ) : additionalError ? (
                     <ErrorMessage error={additionalError} />
-                ) : !additionalCreds || additionalCreds.length === 0 ? (
+                ) : !smtpCreds || smtpCreds.length === 0 ? (
                     <CenteredMessage>{t('noAdditionalCredentials')}</CenteredMessage>
                 ) : (
                     <div className="card-grid smtp-additional-grid">
-                        {additionalCreds.map((cred: any) => (
-                            <div key={cred.publicapikid} className="card smtp-additional-card">
+                        {smtpCreds.map((cred: any) => (
+                            <div key={cred.Name} className="card smtp-additional-card">
                                 <div className="card-header">
                                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                        <h4>{cred.apikname}</h4>
+                                        <h4>{cred.Name}</h4>
                                         <button className="btn-icon btn-icon-danger" onClick={() => setKeyToDelete(cred)}><Icon>{ICONS.DELETE}</Icon></button>
                                     </div>
                                 </div>
                                 <div className="card-body">
-                                    <div className="smtp-additional-detail"><label>{t('accessLevel')}</label> <strong>{cred.accesslevel}</strong></div>
-                                    <div className="smtp-additional-detail"><label>{t('lastUsed')}</label> <strong>{formatDateRelative(cred.datelastused, i18n.language)}</strong></div>
+                                    <div className="smtp-additional-detail"><label>{t('accessLevel')}</label> <strong>{cred.AccessLevel}</strong></div>
+                                    <div className="smtp-additional-detail"><label>{t('lastUsed')}</label> <strong>{formatDateRelative(cred.LastUse, i18n.language) || 'Never'}</strong></div>
                                 </div>
                             </div>
                         ))}

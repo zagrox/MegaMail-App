@@ -18,8 +18,15 @@ const Button: React.FC<ButtonProps> = ({ action, children, className, onClick, .
             e.preventDefault();
             e.stopPropagation();
             
+            // Normalize action names for a case-insensitive, underscore-insensitive comparison,
+            // matching the logic in AuthContext's `canPerformAction`. This makes the feature
+            // locking more robust against minor inconsistencies in Directus configuration.
+            const normalize = (str: string) => str.toLowerCase().replace(/_/g, '');
+            const normalizedActionName = normalize(action!);
+
             const moduleForAction = allModules?.find(m => 
-                Array.isArray(m.locked_actions) && m.locked_actions.includes(action!)
+                Array.isArray(m.locked_actions) && 
+                m.locked_actions.some(lockedAction => normalize(lockedAction) === normalizedActionName)
             );
 
             if (moduleForAction) {
@@ -40,7 +47,6 @@ const Button: React.FC<ButtonProps> = ({ action, children, className, onClick, .
             aria-disabled={isLocked || props.disabled}
             {...props}
         >
-            {/* FIX: Changed path prop to children for Icon component */}
             {isLocked && <Icon style={{ marginRight: '0.5rem' }}>{ICONS.LOCK}</Icon>}
             {children}
         </button>

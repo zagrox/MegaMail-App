@@ -31,12 +31,18 @@ export const AppActions = {
 
   // --- For "SMTP" Module ---
   ADD_SMTP_CREDENTIAL: 'add_smtp_credential',
+  REVEAL_SMTP_ACCESS: 'reveal_access',
 
   // --- For "Media Manager" Module ---
   UPLOAD_FILE: 'upload_file',
 
   // --- For "Templates" & "Email Builder" Modules ---
   CREATE_TEMPLATE: 'create_template',
+  SAVE_TEMPLATE: 'save_template',
+  
+  // --- For "API" Module ---
+  REVEAL_API_KEY: 'Reveal_Key',
+  GENERATE_API_KEY: 'Generate_Key',
 
   // --- A general-purpose action for wizard navigation, typically not locked ---
   WIZARD_NEXT_STEP: 'wizard_next_step'

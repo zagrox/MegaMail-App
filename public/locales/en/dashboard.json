@@ -1,3 +1,4 @@
+
 {
     "welcomeMessage": "Welcome back, {{name}}!",
     "user": "User",
@@ -24,6 +25,7 @@
     "templatesDesc": "Manage email templates.",
     "domainsDesc": "Manage and verify your domains.",
     "smtpDesc": "View your SMTP credentials.",
+    "apiDesc": "View and manage your API keys.",
     "buyCreditsDesc": "Purchase more email credits.",
     "returnToDashboard": "Return to Dashboard"
 }
