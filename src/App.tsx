@@ -1,6 +1,5 @@
 
 
-
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -57,36 +56,41 @@ const App = () => {
     const appContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // For logged-out users, the backend config is the source of truth.
-        if (!user) {
-            if (config?.app_language) {
-                const langCode = config.app_language.split('-')[0];
-                if (langCode !== i18n.language) {
-                    i18n.changeLanguage(langCode);
-                }
-            }
-            return;
+        // This effect determines the correct language for the UI based on a clear priority,
+        // ensuring the language selected on the login screen is respected during onboarding.
+        if (authLoading || !config) {
+            return; // Wait until essential data is loaded.
         }
 
-        // For logged-in users, priority is:
-        // 1. User's profile setting
-        if (user.language) {
-            const langCode = user.language.split('-')[0];
-            if (langCode !== i18n.language) {
-                i18n.changeLanguage(langCode);
-            }
-            return;
+        const i18nextLng = localStorage.getItem('i18nextLng')?.split('-')[0];
+        const userLang = user?.language?.split('-')[0];
+        const configLang = config.app_language?.split('-')[0];
+        const isUserOnboarding = user && !user.elastickey;
+
+        let targetLang: string | undefined;
+
+        // PRIORITY 1: A user currently in the onboarding flow. Respect their language choice from the login screen above all else.
+        if (isUserOnboarding && i18nextLng) {
+            targetLang = i18nextLng;
+        }
+        // PRIORITY 2: A logged-in, fully onboarded user's saved preference from their profile.
+        else if (userLang) {
+            targetLang = userLang;
+        }
+        // PRIORITY 3: A guest user's session preference (also covers onboarding users if they somehow clear localStorage).
+        else if (i18nextLng) {
+            targetLang = i18nextLng;
+        }
+        // PRIORITY 4: The app's default language from the backend configuration.
+        else if (configLang) {
+            targetLang = configLang;
         }
 
-        // 2. App default (only if user hasn't manually switched in this session)
-        const lngInStorage = localStorage.getItem('i18nextLng');
-        if (config?.app_language && !lngInStorage) {
-            const langCode = config.app_language.split('-')[0];
-            if (langCode !== i18n.language) {
-                i18n.changeLanguage(langCode);
-            }
+        // Apply the determined language if it's different from the current one.
+        if (targetLang && targetLang !== i18n.language) {
+            i18n.changeLanguage(targetLang);
         }
-    }, [user, config, i18n]);
+    }, [user, config, authLoading, i18n.language, i18n]);
 
     const urlParams = new URLSearchParams(window.location.search);
     const isEmbedMode = urlParams.get('embed') === 'true';

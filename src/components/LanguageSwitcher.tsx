@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -7,8 +8,8 @@ const LanguageSwitcher = () => {
     const { updateUser, user } = useAuth();
     
     const options = [
-        { value: 'en', label: 'English', directusValue: 'en-US', dir: 'ltr' },
-        { value: 'fa', label: 'فارسی', directusValue: 'fa-IR', dir: 'rtl' },
+        { value: 'en', label: 'English', directusValue: 'english', dir: 'ltr' },
+        { value: 'fa', label: 'فارسی', directusValue: 'persian', dir: 'rtl' },
     ];
 
     const handleLanguageChange = (langCode: string) => {

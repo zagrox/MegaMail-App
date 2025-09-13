@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { apiFetch } from '../api/elasticEmail';
@@ -6,6 +6,7 @@ import { useToast } from '../contexts/ToastContext';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
 import { useConfiguration } from '../contexts/ConfigurationContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const TOTAL_STEPS = 4;
 
@@ -95,14 +96,26 @@ const Step2 = () => {
 };
 
 const Step3 = ({ data, setData }: { data: any, setData: Function }) => {
-    const { t } = useTranslation(['onboarding', 'common', 'account']);
+    const { t, i18n } = useTranslation(['onboarding', 'common', 'account']);
+    const { setTheme } = useTheme();
     
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setData({ ...data, [e.target.name]: e.target.value });
     };
 
     const handleTypeChange = (type: 'personal' | 'business') => {
         setData({ ...data, type });
+    };
+
+    const handleLanguageChange = (lang: 'persian' | 'english') => {
+        const langCode = lang === 'persian' ? 'fa' : 'en';
+        i18n.changeLanguage(langCode); // Change UI language immediately
+        setData({ ...data, language: lang }); // Update local form state
+    };
+    
+    const handleDisplayChange = (display: 'light' | 'dark' | 'auto') => {
+        setTheme(display);
+        setData({ ...data, display });
     };
 
     return (
@@ -121,36 +134,49 @@ const Step3 = ({ data, setData }: { data: any, setData: Function }) => {
                 <div className="form-grid">
                     <div className="form-group">
                         <label htmlFor="mobile">{t('mobile', { ns: 'account' })}*</label>
-                        <input id="mobile" name="mobile" type="tel" placeholder="09123456789" value={data.mobile} onChange={handleChange} required />
+                        <input id="mobile" name="mobile" type="tel" placeholder="09123456789" value={data.mobile} onChange={handleInputChange} required />
                     </div>
-                     <div className="form-group">
-                        <label htmlFor="language">{t('appLanguage')}*</label>
-                        <select id="language" name="language" value={data.language} onChange={handleChange} required>
-                            <option value="en-US">{t('english')}</option>
-                            <option value="fa-IR">{t('persian')}</option>
-                        </select>
+                    <div className="form-group">
+                        <label>{t('appLanguage')}</label>
+                        <div className="language-switcher">
+                            <button type="button" className={`language-btn ${data.language === 'english' ? 'active' : ''}`} onClick={() => handleLanguageChange('english')}>
+                                <span>{t('english')}</span>
+                            </button>
+                            <button type="button" className={`language-btn ${data.language === 'persian' ? 'active' : ''}`} onClick={() => handleLanguageChange('persian')}>
+                                <span>{t('persian')}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
                  {data.type === 'business' && (
                     <div className="form-group full-width">
                         <label htmlFor="company">{t('company', { ns: 'account' })}</label>
-                        <input id="company" name="company" type="text" placeholder={t('company', { ns: 'account' })} value={data.company} onChange={handleChange} />
+                        <input id="company" name="company" type="text" placeholder={t('company', { ns: 'account' })} value={data.company} onChange={handleInputChange} />
                     </div>
                 )}
 
                 <div className="form-grid">
                      <div className="form-group">
                         <label htmlFor="website">{t('website', { ns: 'account' })}</label>
-                        <input id="website" name="website" type="url" placeholder="https://example.com" value={data.website} onChange={handleChange} />
+                        <input id="website" name="website" type="url" placeholder="https://example.com" value={data.website} onChange={handleInputChange} />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="display">{t('displayMode')}</label>
-                        <select id="display" name="display" value={data.display} onChange={handleChange}>
-                            <option value="auto">{t('auto')}</option>
-                            <option value="light">{t('light')}</option>
-                            <option value="dark">{t('dark')}</option>
-                        </select>
+                        <label>{t('displayMode')}</label>
+                        <div className="theme-switcher">
+                            <button type="button" className={`theme-btn ${data.display === 'light' ? 'active' : ''}`} onClick={() => handleDisplayChange('light')}>
+                                <Icon>{ICONS.SUN}</Icon>
+                                <span>{t('light')}</span>
+                            </button>
+                            <button type="button" className={`theme-btn ${data.display === 'dark' ? 'active' : ''}`} onClick={() => handleDisplayChange('dark')}>
+                                <Icon>{ICONS.MOON}</Icon>
+                                <span>{t('dark')}</span>
+                            </button>
+                            <button type="button" className={`theme-btn ${data.display === 'auto' ? 'active' : ''}`} onClick={() => handleDisplayChange('auto')}>
+                                <Icon>{ICONS.DESKTOP}</Icon>
+                                <span>{t('auto')}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -172,7 +198,7 @@ const Step4 = () => {
 };
 
 const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
-    const { t } = useTranslation(['onboarding', 'common', 'account', 'auth']);
+    const { t, i18n } = useTranslation(['onboarding', 'common', 'account', 'auth']);
     const { user, updateUser, updateUserEmail, createElasticSubaccount } = useAuth();
     const { addToast } = useToast();
     const { config, loading: configLoading } = useConfiguration();
@@ -184,11 +210,23 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
     const [profileData, setProfileData] = useState({
         type: 'personal',
         mobile: user?.mobile || '',
-        language: 'fa-IR',
+        language: i18n.language === 'fa' ? 'persian' : 'english',
         display: 'auto',
         website: user?.website || '',
         company: user?.company || '',
     });
+
+    // This effect ensures the language form state stays in sync
+    // with the UI language, which is controlled by the main App component.
+    useEffect(() => {
+        const currentLangValue = i18n.language === 'fa' ? 'persian' : 'english';
+        if (profileData.language !== currentLangValue) {
+            setProfileData(prevData => ({
+                ...prevData,
+                language: currentLangValue,
+            }));
+        }
+    }, [i18n.language, profileData.language]);
 
     const [apiKey, setApiKey] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -206,7 +244,24 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
         }
         setLoading(true);
         try {
-            await updateUser(profileData);
+            // Create a payload from the form state.
+            const payload: any = { ...profileData };
+            
+            // Set text_direction based on language choice for the main user record.
+            payload.text_direction = payload.language === 'persian' ? 'rtl' : 'ltr';
+    
+            // Set theme_light and theme_dark for the main user record based on display choice.
+            // The 'display' field itself will be passed through to be saved in the profile record.
+            if (profileData.display === 'dark') {
+                payload.theme_light = false;
+                payload.theme_dark = true;
+            } else {
+                // Default to light theme for 'light' and 'auto' settings.
+                payload.theme_light = true;
+                payload.theme_dark = false;
+            }
+
+            await updateUser(payload);
             addToast(t('profileUpdateSuccess', { ns: 'account' }), 'success');
             handleNext();
         } catch (err: any) {
@@ -317,12 +372,12 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
                                     </div>
                                     <h2>{t('accountExistsTitle')}</h2>
                                     <p>{t('accountExistsSubtitle', { email: user?.email })}</p>
-                                    <div className="onboarding-actions" style={{ borderTop: 'none', padding: 0, marginTop: '2.5rem', justifyContent: 'center' }}>
-                                        <button className="btn btn-secondary" onClick={() => setAccountExistsState('apiKey')}>
-                                            {t('useApiKey')}
-                                        </button>
+                                    <div className="onboarding-choice-group">
                                         <button className="btn btn-primary" onClick={() => setAccountExistsState('newEmail')}>
                                             {t('useDifferentEmail')}
+                                        </button>
+                                        <button className="btn" onClick={() => setAccountExistsState('apiKey')}>
+                                            {t('useApiKey')}
                                         </button>
                                     </div>
                                 </div>

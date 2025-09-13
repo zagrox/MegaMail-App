@@ -1,3 +1,4 @@
+
 /* --- ONBOARDING VIEW --- */
 .onboarding-container {
   width: 100%;
@@ -297,6 +298,123 @@
     color: var(--text-color);
     font-weight: 600;
 }
+
+.form-radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75rem;
+    background-color: var(--input-background-color);
+    min-height: calc(1.5rem + 1.7em);
+}
+
+.form-radio-group .custom-radio {
+    padding-left: 28px;
+    margin-bottom: 0;
+}
+
+.form-radio-group .radio-checkmark {
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    height: 18px;
+    width: 18px;
+}
+
+.form-radio-group .radio-label {
+    font-weight: normal;
+    font-size: 0.95rem;
+}
+
+.form-radio-group .custom-radio .radio-checkmark:after {
+    top: 3px;
+    left: 3px;
+    width: 8px;
+    height: 8px;
+}
+
+.form-radio-group .radio-label {
+    position: relative;
+    top: -2px;
+}
+
+/* --- THEME & LANGUAGE SWITCHER FOR ONBOARDING --- */
+.onboarding-step .theme-switcher,
+.onboarding-step .language-switcher {
+    display: flex;
+    gap: 0.35rem;
+    background-color: var(--input-background-color);
+    border: 1px solid var(--border-color);
+    padding: 0.35rem;
+    border-radius: 8px;
+    width: 100%;
+}
+.onboarding-step .theme-switcher button,
+.onboarding-step .language-switcher button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    font-weight: 500;
+    color: var(--subtle-text-color);
+    transition: all 0.2s;
+}
+.onboarding-step .theme-switcher button.active,
+.onboarding-step .language-switcher button.active {
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+html[data-theme='dark'] .onboarding-step .theme-switcher button.active,
+html[data-theme='dark'] .onboarding-step .language-switcher button.active {
+    border-color: var(--border-color);
+}
+
+.onboarding-choice-group {
+    display: flex;
+    justify-content: center;
+    background-color: var(--subtle-background);
+    padding: 0.35rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    max-width: 450px;
+    margin: 2.5rem auto 0;
+}
+
+.onboarding-choice-group .btn {
+    flex: 1;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+    font-weight: 500;
+}
+
+.onboarding-choice-group .btn:not(.btn-primary) {
+    background-color: transparent;
+    color: var(--subtle-text-color);
+}
+
+.onboarding-choice-group .btn:not(.btn-primary):hover {
+    background-color: rgba(var(--border-color-rgb), 0.5);
+    color: var(--text-color);
+}
+
+.onboarding-choice-group .btn.btn-primary {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
 
 @media (max-width: 768px) {
   .onboarding-box { max-width: 100%; border-radius: 0; }
