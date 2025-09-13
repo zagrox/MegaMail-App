@@ -38,6 +38,7 @@ interface AuthContextType {
     register: (details: any) => Promise<any>;
     logout: () => void;
     updateUser: (data: any) => Promise<void>;
+    updateUserEmail: (newEmail: string) => Promise<void>;
     changePassword: (passwords: { old: string; new: string }) => Promise<void>;
     requestPasswordReset: (email: string) => Promise<void>;
     resetPassword: (token: string, password: string) => Promise<void>;
@@ -267,6 +268,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     }
 
+    const updateUserEmail = async (newEmail: string) => {
+        if (!user || !user.id || user.isApiKeyUser) {
+            throw new Error("User not authenticated or is an API key user.");
+        }
+        
+        // Update the email in Directus
+        await sdk.request(sdkUpdateUser(user.id, { email: newEmail.toLowerCase() }));
+        
+        // Refresh the local user state to reflect the change
+        await getMe();
+    };
+
     const changePassword = async (passwords: { old: string; new: string }) => {
         if (!user?.id) throw new Error('User not authenticated or ID is missing.');
         await sdk.request(sdkUpdateUser(user.id, { password: passwords.new }));
@@ -293,11 +306,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const FLOW_ID = '736aa130-adf4-4ab0-a117-7e7647b403ea';
         if (!user || !user.id) throw new Error("Current user not found.");
     
-        await sdk.request(() => ({
-            method: 'POST', path: `/flows/trigger/${FLOW_ID}`,
+        const token = await sdk.getToken();
+        if (!token) throw new Error("Authentication token not found.");
+        
+        const response = await fetch(`${sdk.url}flows/trigger/${FLOW_ID}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({ email, password }),
-            headers: { 'Content-Type': 'application/json' },
-        }));
+        });
+    
+        // Always try to parse the body to check for logical errors.
+        let responseBody;
+        try {
+            responseBody = await response.json();
+        } catch (e) {
+            // If body is not JSON and response is not ok, throw a generic error.
+            if (!response.ok) {
+                 throw new Error(`Request failed with status ${response.status}`);
+            }
+            // If body is not JSON but response IS ok, it might be a weird success case. Proceed.
+            responseBody = {};
+        }
+
+        // Now, check for errors in the response.
+        // First, check the HTTP status code.
+        if (!response.ok) {
+            const errorMessage = responseBody?.errors?.[0]?.message || responseBody?.message || JSON.stringify(responseBody);
+            throw new Error(errorMessage);
+        }
+
+        // Second, check for the specific logical error message in the body, even on a 200 OK.
+        // This is the key fix to catch the "account already exists" error.
+        const responseText = JSON.stringify(responseBody);
+        if (responseText.includes("AN ACCOUNT ALREADY EXISTS FOR THAT EMAIL ADDRESS")) {
+            throw new Error("AN ACCOUNT ALREADY EXISTS FOR THAT EMAIL ADDRESS");
+        }
     
         await new Promise(resolve => setTimeout(resolve, 3000));
         await getMe(); // Re-fetch user data to get new API key
@@ -373,6 +419,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         logout,
         updateUser,
+        updateUserEmail,
         changePassword,
         requestPasswordReset,
         resetPassword,

@@ -172,8 +172,8 @@ const Step4 = () => {
 };
 
 const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
-    const { t } = useTranslation(['onboarding', 'common', 'account']);
-    const { user, updateUser, createElasticSubaccount } = useAuth();
+    const { t } = useTranslation(['onboarding', 'common', 'account', 'auth']);
+    const { user, updateUser, updateUserEmail, createElasticSubaccount } = useAuth();
     const { addToast } = useToast();
     const { config, loading: configLoading } = useConfiguration();
     
@@ -181,7 +181,6 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
     const [loading, setLoading] = useState(false);
     const [demoLoading, setDemoLoading] = useState(false);
 
-    // Step 3 state
     const [profileData, setProfileData] = useState({
         type: 'personal',
         mobile: user?.mobile || '',
@@ -191,10 +190,11 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
         company: user?.company || '',
     });
 
-    // Step 4 state (including fallback)
     const [apiKey, setApiKey] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [newUserFlowFailed, setNewUserFlowFailed] = useState(false);
+    const [accountExistsState, setAccountExistsState] = useState<'none' | 'prompt' | 'newEmail' | 'apiKey'>('none');
+    const [newEmail, setNewEmail] = useState('');
 
     const handleNext = () => setStep(s => Math.min(s + 1, TOTAL_STEPS));
     const handleBack = () => setStep(s => Math.max(s - 1, 1));
@@ -216,7 +216,6 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
         }
     };
     
-    // This is the manual API key submission for the *fallback* case.
     const handleApiKeySubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -247,7 +246,6 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
         }
     };
 
-    // This is the primary action for step 4, triggering the unified backend flow.
     const handleFinalizeSetup = async () => {
         if (!user || !user.email) {
             addToast(t('userEmailNotFound'), 'error');
@@ -255,18 +253,40 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
         }
 
         setLoading(true);
-        setNewUserFlowFailed(false); // Reset on new attempt
+        setNewUserFlowFailed(false);
+        setAccountExistsState('none');
         try {
-            // This password is for the new Elastic Email subaccount, not the user's Directus password.
-            // It's temporary and the user will use an API key to interact with the system.
             const randomPassword = Math.random().toString(36).slice(-12);
             await createElasticSubaccount(user.email, randomPassword);
-            // The createElasticSubaccount function in AuthContext handles refreshing the user data,
-            // which will make the user?.elastickey available and exit the onboarding flow.
+            addToast(t('accountConnectedSuccess'), 'success');
+        } catch (err: any) {
+            if (err.message && err.message.includes('AN ACCOUNT ALREADY EXISTS FOR THAT EMAIL ADDRESS')) {
+                setAccountExistsState('prompt');
+            } else {
+                addToast(err.message, 'error');
+                setNewUserFlowFailed(true);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdateEmailAndRetry = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newEmail || !newEmail.includes('@')) {
+            addToast("Please enter a valid email address.", 'error');
+            return;
+        }
+        setLoading(true);
+        try {
+            await updateUserEmail(newEmail);
+            addToast("Email updated successfully. Retrying account creation...", 'info');
+            const randomPassword = Math.random().toString(36).slice(-12);
+            await createElasticSubaccount(newEmail, randomPassword);
             addToast(t('accountConnectedSuccess'), 'success');
         } catch (err: any) {
             addToast(err.message, 'error');
-            setNewUserFlowFailed(true);
+            setAccountExistsState('newEmail');
         } finally {
             setLoading(false);
         }
@@ -288,7 +308,63 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
                     {step === 3 && <Step3 data={profileData} setData={setProfileData} />}
                     {step === 4 && (
                         <div className="onboarding-step">
-                            <Step4 />
+                            {accountExistsState === 'none' && !newUserFlowFailed && <Step4 />}
+
+                            {accountExistsState === 'prompt' && (
+                                <div className="onboarding-step">
+                                    <div className="feature-display-icon" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)' }}>
+                                        <Icon style={{ color: 'var(--warning-color)' }}>{ICONS.COMPLAINT}</Icon>
+                                    </div>
+                                    <h2>{t('accountExistsTitle')}</h2>
+                                    <p>{t('accountExistsSubtitle', { email: user?.email })}</p>
+                                    <div className="onboarding-actions" style={{ borderTop: 'none', padding: 0, marginTop: '2.5rem', justifyContent: 'center' }}>
+                                        <button className="btn btn-secondary" onClick={() => setAccountExistsState('apiKey')}>
+                                            {t('useApiKey')}
+                                        </button>
+                                        <button className="btn btn-primary" onClick={() => setAccountExistsState('newEmail')}>
+                                            {t('useDifferentEmail')}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {accountExistsState === 'newEmail' && (
+                                <form className="onboarding-api-key-form" onSubmit={handleUpdateEmailAndRetry}>
+                                    <h2>{t('updateEmailTitle')}</h2>
+                                    <p>{t('updateEmailSubtitle', { appName: t('appName') })}</p>
+                                    <div className="input-group">
+                                        <span className="input-icon"><Icon>{ICONS.MAIL}</Icon></span>
+                                        <input name="newEmail" type="email" placeholder={t('emailAddress', { ns: 'auth' })} required value={newEmail} onChange={e => setNewEmail(e.target.value)} />
+                                    </div>
+                                    <div className="form-actions" style={{ justifyContent: 'center', border: 'none', padding: '1rem 0 0' }}>
+                                        <button type="button" className="btn btn-secondary" onClick={() => setAccountExistsState('prompt')} disabled={loading}>{t('back')}</button>
+                                        <button type="submit" className="btn btn-primary" disabled={loading}>
+                                            {loading ? <Loader /> : t('updateAndRetry')}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+                            
+                            {accountExistsState === 'apiKey' && (
+                                <form className="onboarding-api-key-form" onSubmit={handleApiKeySubmit}>
+                                    <h2>{t('connectWithApiKeyTitle')}</h2>
+                                    <p>{t('connectWithApiKeySubtitle')}</p>
+                                    <div className="input-group has-btn">
+                                        <span className="input-icon"><Icon>{ICONS.KEY}</Icon></span>
+                                        <input name="apikey" type={showPassword ? "text" : "password"} placeholder={t('enterYourApiKey')} required value={apiKey} onChange={e => setApiKey(e.target.value)} />
+                                        <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
+                                            <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+                                        </button>
+                                    </div>
+                                    <div className="form-actions" style={{ justifyContent: 'center', border: 'none', padding: '1rem 0 0' }}>
+                                        <button type="button" className="btn btn-secondary" onClick={() => setAccountExistsState('prompt')} disabled={loading}>{t('back')}</button>
+                                        <button type="submit" className="btn btn-primary" disabled={loading}>
+                                            {loading ? <Loader /> : t('verifyAndFinish')}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+
                             {newUserFlowFailed && (
                                 <form className="onboarding-api-key-form" onSubmit={handleApiKeySubmit}>
                                     <div className="info-message warning" style={{textAlign: 'left', maxWidth: '400px', margin: '2rem auto 0'}}>
@@ -316,15 +392,19 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
                     )}
                 </div>
                 <div className="onboarding-actions">
-                    <button className="btn btn-secondary" onClick={handleBack} disabled={step === 1 || loading || demoLoading} style={{ visibility: step > 1 ? 'visible' : 'hidden' }}>
+                    <button className="btn btn-secondary" onClick={handleBack} disabled={step === 1 || loading || demoLoading} style={{ visibility: (step > 1 && accountExistsState === 'none' && !newUserFlowFailed) ? 'visible' : 'hidden' }}>
                         {t('back')}
                     </button>
-                    {step < 3 && <button className="btn btn-primary" onClick={handleNext}>{step === 1 ? t('getStarted') : t('nextStep')}</button>}
-                    {step === 3 && <button className="btn btn-primary" onClick={handleProfileSubmit} disabled={loading || !isProfileStepComplete}>{loading ? <Loader/> : t('saveAndContinue')}</button>}
-                    {step === 4 && !newUserFlowFailed && (
-                        <button className="btn btn-primary" onClick={handleFinalizeSetup} disabled={loading}>
-                            {loading ? <Loader /> : t('finishSetup')}
-                        </button>
+                    {accountExistsState === 'none' && !newUserFlowFailed && (
+                        <>
+                            {step < 3 && <button className="btn btn-primary" onClick={handleNext}>{step === 1 ? t('getStarted') : t('nextStep')}</button>}
+                            {step === 3 && <button className="btn btn-primary" onClick={handleProfileSubmit} disabled={loading || !isProfileStepComplete}>{loading ? <Loader/> : t('saveAndContinue')}</button>}
+                            {step === 4 && (
+                                <button className="btn btn-primary" onClick={handleFinalizeSetup} disabled={loading}>
+                                    {loading ? <Loader /> : t('finishSetup')}
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

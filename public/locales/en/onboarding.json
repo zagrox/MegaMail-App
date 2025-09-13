@@ -39,5 +39,14 @@
     "comingSoon": "Coming Soon!",
     "welcomeToDemo": "Welcome to the demo version!",
     "userEmailNotFound": "User email not found. Cannot create account.",
-    "accountConnectedSuccess": "Your MegaMail account has been connected!"
+    "accountConnectedSuccess": "Your MegaMail account has been connected!",
+    "accountExistsTitle": "Account Already Exists",
+    "accountExistsSubtitle": "An Elastic Email sub-account with the email {{email}} already exists. How would you like to proceed?",
+    "useApiKey": "Use Existing API Key",
+    "useDifferentEmail": "Use a Different Email",
+    "updateEmailTitle": "Update Your Email Address",
+    "updateEmailSubtitle": "Please provide a new, unique email address to create your sub-account. This will also update your login email for {{appName}}.",
+    "updateAndRetry": "Update & Retry",
+    "connectWithApiKeyTitle": "Connect with API Key",
+    "connectWithApiKeySubtitle": "Enter the API key for your existing Elastic Email account to link it."
 }
