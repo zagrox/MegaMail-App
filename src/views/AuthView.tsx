@@ -74,6 +74,11 @@ const AuthView = () => {
          return t('createAccountSubtitle');
     }
 
+    const changeLanguage = (lang: string) => {
+        i18n.changeLanguage(lang);
+        localStorage.setItem('i18nextLng', lang);
+    };
+
     if (configLoading) {
         return (
             <div className="auth-container">
@@ -183,9 +188,9 @@ const AuthView = () => {
                 </div>
             </div>
             <div className="auth-language-switcher">
-                <button onClick={() => i18n.changeLanguage('en')} className={i18n.language.startsWith('en') ? 'active' : ''}>EN</button>
+                <button onClick={() => changeLanguage('en')} className={i18n.language.startsWith('en') ? 'active' : ''}>EN</button>
                 <span>/</span>
-                <button onClick={() => i18n.changeLanguage('fa')} className={i18n.language.startsWith('fa') ? 'active' : ''}>FA</button>
+                <button onClick={() => changeLanguage('fa')} className={i18n.language.startsWith('fa') ? 'active' : ''}>FA</button>
             </div>
         </div>
     );

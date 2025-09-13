@@ -15,6 +15,7 @@ const LanguageSwitcher = () => {
     const handleLanguageChange = (langCode: string) => {
         // Update UI immediately
         i18n.changeLanguage(langCode);
+        localStorage.setItem('i18nextLng', langCode);
 
         // If user is not an API user, sync to Directus
         if (user && !user.isApiKeyUser) {
