@@ -93,9 +93,10 @@
     "updateApiKey": "Update API Key",
     "apiKeyHiddenForSecurity": "Your API key is hidden for security. Reveal to view or copy.",
     "apiKeyWarning": "Warning: Treat your API key like a password. Do not share it publicly.",
-    "mailzilaIntegrationNote": "This section is only for Mailzila website clients to integrate their account with MegaMail to better manage their service.",
     "apiDocs": "API Documentation",
     "confirmApiKeyUpdateTitle": "Confirm API Key Update",
     "confirmApiKeyUpdateBody": "Are you sure you want to replace your current API key? This action is irreversible and the old key will be lost.",
-    "invalidApiKey": "The provided API Key is invalid or could not be verified."
+    "invalidApiKey": "The provided API Key is invalid or could not be verified.",
+    "exploreApiTitle": "Explore Our API",
+    "exploreApiDesc": "Integrate MegaMail's powerful sending capabilities into your own applications, websites, or services. Our robust API allows you to send emails, manage contacts, view statistics, and much more programmatically."
 }
