@@ -27,6 +27,7 @@ interface User {
     profileId?: string;
     purchasedModules: string[];
     type?: string;
+    display?: 'light' | 'dark' | 'auto';
 }
 
 interface AuthContextType {
@@ -80,7 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             // 2. Get the associated user profile from the 'profiles' collection
             const profiles = await sdk.request(readItems('profiles', {
                 filter: { user_created: { _eq: me.id } },
-                fields: ['id', 'company', 'website', 'mobile', 'elastickey', 'elasticid', 'type'],
+                fields: ['id', 'company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display', 'language'],
                 limit: 1
             }));
             

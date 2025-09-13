@@ -24,17 +24,27 @@ const ThemeSwitcher = () => {
 
         // If user is not an API user, sync to Directus
         if (user && !user.isApiKeyUser) {
-            let payload = {};
-            if (newTheme === 'light') {
-                payload = { theme_light: true, theme_dark: false };
-            } else if (newTheme === 'dark') {
-                payload = { theme_light: false, theme_dark: true };
-            } else {
-                // For 'auto', we don't update the backend as it's a client preference
-                // The 'auto' value is saved in localStorage by ThemeContext
-                return;
-            }
+            // The `display` field is in `profileFields` (in AuthContext), so `updateUser`
+            // will correctly save it to the `profiles` collection.
+            // We also keep the legacy theme fields for backward compatibility if needed,
+            // although the primary mechanism is now the 'display' field.
+            const payload: {
+                display: Theme;
+                theme_light?: boolean;
+                theme_dark?: boolean;
+            } = {
+                display: newTheme,
+            };
 
+            if (newTheme === 'dark') {
+                payload.theme_light = false;
+                payload.theme_dark = true;
+            } else {
+                // Default to light theme for 'light' and 'auto' settings.
+                payload.theme_light = true;
+                payload.theme_dark = false;
+            }
+            
             updateUser(payload).catch(error => {
                 console.warn("Failed to sync theme preference:", error);
                 // The UI has already updated, so we just log the error

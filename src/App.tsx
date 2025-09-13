@@ -61,34 +61,43 @@ const App = () => {
         if (authLoading || !config) {
             return; // Wait until essential data is loaded.
         }
-
-        const i18nextLng = localStorage.getItem('i18nextLng')?.split('-')[0];
-        const userLang = user?.language?.split('-')[0];
-        const configLang = config.app_language?.split('-')[0];
+    
+        // Maps a language name ('persian', 'english', 'fa-IR', etc.) to a 2-letter i18next code.
+        const mapLangToCode = (lang: string | undefined): string | undefined => {
+            if (!lang) return undefined;
+            const lowerLang = lang.toLowerCase();
+            if (lowerLang.startsWith('fa') || lowerLang.startsWith('persian')) return 'fa';
+            if (lowerLang.startsWith('en') || lowerLang.startsWith('english')) return 'en';
+            return undefined; // Return undefined for unknown languages
+        };
+    
+        const i18nextLngCode = mapLangToCode(localStorage.getItem('i18nextLng') || undefined);
+        const userLangCode = mapLangToCode(user?.language);
+        const configLangCode = mapLangToCode(config.app_language);
         const isUserOnboarding = user && !user.elastickey;
-
-        let targetLang: string | undefined;
-
+    
+        let targetLangCode: string | undefined;
+    
         // PRIORITY 1: A user currently in the onboarding flow. Respect their language choice from the login screen above all else.
-        if (isUserOnboarding && i18nextLng) {
-            targetLang = i18nextLng;
+        if (isUserOnboarding && i18nextLngCode) {
+            targetLangCode = i18nextLngCode;
         }
         // PRIORITY 2: A logged-in, fully onboarded user's saved preference from their profile.
-        else if (userLang) {
-            targetLang = userLang;
+        else if (userLangCode) {
+            targetLangCode = userLangCode;
         }
         // PRIORITY 3: A guest user's session preference (also covers onboarding users if they somehow clear localStorage).
-        else if (i18nextLng) {
-            targetLang = i18nextLng;
+        else if (i18nextLngCode) {
+            targetLangCode = i18nextLngCode;
         }
         // PRIORITY 4: The app's default language from the backend configuration.
-        else if (configLang) {
-            targetLang = configLang;
+        else if (configLangCode) {
+            targetLangCode = configLangCode;
         }
-
+    
         // Apply the determined language if it's different from the current one.
-        if (targetLang && targetLang !== i18n.language) {
-            i18n.changeLanguage(targetLang);
+        if (targetLangCode && targetLangCode !== i18n.language) {
+            i18n.changeLanguage(targetLangCode);
         }
     }, [user, config, authLoading, i18n.language, i18n]);
 
