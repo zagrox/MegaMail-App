@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from './Icon';
@@ -14,7 +15,12 @@ const EmbedCodeCard = ({ apiKey }: { apiKey: string }) => {
     const embedUrl = `${baseUrl}/?embed=true&apiKey=${apiKey}&view=${view}&lang=${i18n.language}`;
     const iframeCode = `<iframe src="${embedUrl}" width="100%" height="800px" style="border:1px solid #ccc; border-radius: 8px;" title="${appName} Dashboard"></iframe>`;
 
+    // Visually redact the API key for display purposes
+    const redactedApiKey = `...${apiKey.slice(-8)}`;
+    const displayCode = iframeCode.replace(apiKey, redactedApiKey);
+
     const handleCopy = () => {
+        // Copy the real, unredacted code
         navigator.clipboard.writeText(iframeCode);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -39,11 +45,12 @@ const EmbedCodeCard = ({ apiKey }: { apiKey: string }) => {
                 </div>
                 <div className="form-group">
                     <label htmlFor="embed-code">{t('embedCode')}</label>
-                    <textarea id="embed-code" readOnly value={iframeCode} style={{ height: '120px', fontFamily: 'monospace', fontSize: '0.85rem', resize: 'none' }} />
+                    <div className="embed-code-display">
+                        <pre><code>{displayCode}</code></pre>
+                    </div>
                 </div>
                 <div className="form-actions" style={{justifyContent: 'flex-end', padding: 0, border: 'none', margin: 0}}>
                     <button className="btn btn-secondary" onClick={handleCopy}>
-                        {/* FIX: Changed path prop to children for Icon component */}
                         <Icon>{copied ? ICONS.CHECK : ICONS.MAIL}</Icon> {copied ? t('copied', { ns: 'common' }) : t('copyEmbedCode')}
                     </button>
                 </div>

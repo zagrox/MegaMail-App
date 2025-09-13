@@ -54,5 +54,6 @@
     "template": "قالب",
     "useTemplate": "استفاده از قالب",
     "templates": "قالب‌ها",
-    "searchTemplatesPlaceholder": "جستجوی قالب‌ها..."
+    "searchTemplatesPlaceholder": "جستجوی قالب‌ها...",
+    "campaignNameHelpText": "برای کمپین خود نامی انتخاب کنید تا بعداً به راحتی آن را شناسایی کنید."
 }

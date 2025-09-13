@@ -1,3 +1,4 @@
+
 /* --- ACCOUNT & PROFILE STYLES --- */
 .account-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -213,6 +214,23 @@ input:checked + .toggle-slider:before {
     padding: 1rem 1.5rem;
     margin: 1.5rem -1.5rem -1.5rem;
     border-radius: 0 0 8px 8px;
+}
+
+.embed-code-display {
+    background-color: var(--subtle-background);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+}
+.embed-code-display pre {
+    margin: 0;
+}
+.embed-code-display code {
+    font-family: monospace;
+    font-size: 0.85rem;
+    word-break: break-all;
+    white-space: pre-wrap;
 }
 
 @media (max-width: 768px) {

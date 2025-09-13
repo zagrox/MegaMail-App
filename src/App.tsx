@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -283,7 +284,7 @@ const App = () => {
     const views: Record<string, { component: ReactNode, title: string, icon: React.ReactNode }> = {
         'Dashboard': { component: <DashboardView setView={handleSetView} apiKey={apiKey} user={user} />, title: t('dashboard'), icon: ICONS.DASHBOARD },
         'Statistics': { component: <StatisticsView apiKey={apiKey} />, title: t('statistics'), icon: ICONS.STATISTICS },
-        'Account': { component: <AccountView apiKey={apiKey} user={user} setView={handleSetView} />, title: t('account'), icon: ICONS.ACCOUNT },
+        'Account': { component: <AccountView apiKey={apiKey} user={user} setView={handleSetView} allModules={allModules} hasModuleAccess={hasModuleAccess} />, title: t('account'), icon: ICONS.ACCOUNT },
         'Buy Credits': { component: <BuyCreditsView apiKey={apiKey} user={user} setView={handleSetView} orderToResume={orderToResume} />, title: t('buyCredits'), icon: ICONS.BUY_CREDITS },
         'OfflinePayment': { component: <OfflinePaymentView order={orderForOfflinePayment} setView={handleSetView} />, title: t('offlinePaymentTitle', { ns: 'buyCredits' }), icon: ICONS.PENCIL },
         'Invoice': { component: <InvoiceView order={orderForInvoice} setView={handleSetView} />, title: t('invoiceTitle', { ns: 'orders' }), icon: ICONS.FILE_TEXT },
@@ -307,18 +308,17 @@ const App = () => {
     const navItems = [
         // Overview
         { name: t('dashboard'), view: 'Dashboard', icon: ICONS.DASHBOARD },
-        { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
         { name: t('statistics'), view: 'Statistics', icon: ICONS.STATISTICS },
         { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
         { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
+        { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
         { name: t('calendar'), view: 'Calendar', icon: ICONS.CALENDAR },
         { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
-        
         { type: 'divider' },
         // Marketing
+        { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
         { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
         { name: t('marketing'), view: 'Marketing', icon: ICONS.TARGET },
-        { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
         { name: t('emailLists'), view: 'Email Lists', icon: ICONS.EMAIL_LISTS },
     ];
     

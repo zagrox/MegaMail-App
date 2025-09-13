@@ -54,5 +54,6 @@
     "template": "Template",
     "useTemplate": "Use Template",
     "templates": "Templates",
-    "searchTemplatesPlaceholder": "Search templates..."
+    "searchTemplatesPlaceholder": "Search templates...",
+    "campaignNameHelpText": "Give your campaign a name for easy identification later."
 }

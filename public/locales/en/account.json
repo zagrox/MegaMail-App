@@ -98,5 +98,12 @@
     "confirmApiKeyUpdateBody": "Are you sure you want to replace your current API key? This action is irreversible and the old key will be lost.",
     "invalidApiKey": "The provided API Key is invalid or could not be verified.",
     "exploreApiTitle": "Explore Our API",
-    "exploreApiDesc": "Integrate MegaMail's powerful sending capabilities into your own applications, websites, or services. Our robust API allows you to send emails, manage contacts, view statistics, and much more programmatically."
+    "exploreApiDesc": "Integrate MegaMail's powerful sending capabilities into your own applications, websites, or services. Our robust API allows you to send emails, manage contacts, view statistics, and much more programmatically.",
+    "securityWarningTitle": "Security Warning",
+    "iUnderstandTheRisks": "I understand the security risks and wish to proceed.",
+    "proceed": "Proceed",
+    "generateEmbedCode": "Generate Embed Code",
+    "embedFeatureInfoTitle": "Embed Your Dashboard",
+    "embedFeatureInfoBody": "This feature allows you to embed a live view of your dashboard or statistics on your own website. Please be aware of the security implications before generating the code.",
+    "embedFeatureSecurityNotice": "Generating an embed code will expose your API key. This is a security risk. Only use this feature if you understand and accept the risks involved. It should only be used on trusted, private websites."
 }

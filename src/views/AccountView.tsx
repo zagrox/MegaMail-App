@@ -1,5 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import useApi from './useApi';
@@ -15,7 +16,7 @@ import OrdersTab from './account/OrdersTab';
 import ModulesTab from './account/ModulesTab';
 import NotificationsTab from './account/NotificationsTab';
 
-const AccountView = ({ apiKey, user, setView }: { apiKey: string, user: any, setView: (view: string, data?: any) => void }) => {
+const AccountView = ({ apiKey, user, setView, allModules, hasModuleAccess }: { apiKey: string, user: any, setView: (view: string, data?: any) => void, allModules: any, hasModuleAccess: (moduleName: string, allModules: any) => boolean }) => {
     const { t } = useTranslation(['account', 'common', 'orders', 'modules']);
     const { data: accountData, loading: accountLoading, error: accountError } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
     const { data: contactsCountData, loading: contactsCountLoading } = useApi('/contact/count', apiKey, { allContacts: true }, apiKey ? 1 : 0);
@@ -36,15 +37,23 @@ const AccountView = ({ apiKey, user, setView }: { apiKey: string, user: any, set
         installPrompt.prompt();
     };
 
-    const tabs = [
-        { id: 'general', label: t('general'), icon: ICONS.DASHBOARD, component: <GeneralTab accountData={accountData} contactsCountData={contactsCountData} contactsCountLoading={contactsCountLoading} installPrompt={installPrompt} handleInstallClick={handleInstallClick} /> },
-        { id: 'profile', label: t('profile'), icon: ICONS.ACCOUNT, component: <ProfileTab accountData={accountData} user={user} /> },
-        { id: 'orders', label: t('orders'), icon: ICONS.BUY_CREDITS, component: <OrdersTab setView={setView} /> },
-        { id: 'modules', label: t('modules'), icon: ICONS.BOX, component: <ModulesTab setView={setView} /> },
-        { id: 'notifications', label: t('notifications'), icon: ICONS.BELL, component: <NotificationsTab /> },
-        { id: 'security', label: t('security'), icon: ICONS.LOCK, component: <SecurityTab user={user} /> },
-        { id: 'share', label: t('share'), icon: ICONS.SHARE, component: <ShareTab apiKey={apiKey} /> },
-    ];
+    const tabs = useMemo(() => {
+        const baseTabs = [
+            { id: 'general', label: t('general'), icon: ICONS.DASHBOARD, component: <GeneralTab accountData={accountData} contactsCountData={contactsCountData} contactsCountLoading={contactsCountLoading} installPrompt={installPrompt} handleInstallClick={handleInstallClick} /> },
+            { id: 'profile', label: t('profile'), icon: ICONS.ACCOUNT, component: <ProfileTab accountData={accountData} user={user} /> },
+            { id: 'orders', label: t('orders'), icon: ICONS.BUY_CREDITS, component: <OrdersTab setView={setView} /> },
+            { id: 'modules', label: t('modules'), icon: ICONS.BOX, component: <ModulesTab setView={setView} /> },
+            { id: 'notifications', label: t('notifications'), icon: ICONS.BELL, component: <NotificationsTab /> },
+            { id: 'security', label: t('security'), icon: ICONS.LOCK, component: <SecurityTab user={user} /> },
+        ];
+
+        // Conditionally add the Share tab based on API module access
+        if (hasModuleAccess('API', allModules)) {
+            baseTabs.push({ id: 'share', label: t('share'), icon: ICONS.SHARE, component: <ShareTab apiKey={apiKey} /> });
+        }
+
+        return baseTabs;
+    }, [t, accountData, contactsCountData, contactsCountLoading, installPrompt, handleInstallClick, user, setView, hasModuleAccess, allModules, apiKey]);
     
     useEffect(() => {
         const initialTab = sessionStorage.getItem('account-tab');

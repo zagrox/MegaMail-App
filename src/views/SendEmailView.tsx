@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -462,7 +463,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                     </div>
                     <div className="card-body">
                          <div className="form-group">
-                            <label>{t('campaignNameHelpText', { defaultValue: 'Give your campaign a name for easy identification later.' })}</label>
+                            <label>{t('campaignNameHelpText')}</label>
                             <input
                                 type="text"
                                 value={campaign.Name}
