@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -321,21 +317,38 @@ const App = () => {
         'Settings': { component: <SettingsView apiKey={apiKey} user={user} />, title: t('settings', { ns: 'account' }), icon: ICONS.SETTINGS },
     };
 
-    const navItems = [
-        // Overview
-        { name: t('dashboard'), view: 'Dashboard', icon: ICONS.DASHBOARD },
-        { name: t('statistics'), view: 'Statistics', icon: ICONS.STATISTICS },
-        { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
-        { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
-        { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
-        { name: t('calendar'), view: 'Calendar', icon: ICONS.CALENDAR },
-        { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
-        { type: 'divider' },
-        // Marketing
-        { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
-        { name: t('marketing'), view: 'Marketing', icon: ICONS.TARGET },
-        { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
-        { name: t('emailLists'), view: 'Email Lists', icon: ICONS.EMAIL_LISTS },
+    const navGroups = [
+        {
+            title: null,
+            items: [
+                { name: t('dashboard'), view: 'Dashboard', icon: ICONS.DASHBOARD },
+                { name: t('statistics'), view: 'Statistics', icon: ICONS.STATISTICS },
+            ],
+        },
+        {
+            title: t('audience'),
+            items: [
+                { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
+                { name: t('emailLists'), view: 'Email Lists', icon: ICONS.EMAIL_LISTS },
+            ],
+        },
+        {
+            title: t('contents'),
+            items: [
+                { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
+                { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
+                { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
+            ],
+        },
+        {
+            title: t('campaigns'),
+            items: [
+                { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
+                { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
+                { name: t('marketing'), view: 'Marketing', icon: ICONS.TARGET },
+                { name: t('calendar'), view: 'Calendar', icon: ICONS.CALENDAR },
+            ],
+        },
     ];
     
     const logoUrl = config?.app_logo && config?.app_backend ? `${config.app_backend}/assets/${config.app_logo}` : '';
@@ -347,32 +360,37 @@ const App = () => {
             <span className="logo-font">{appName}</span>
         </div>
         <nav className="nav">
-            {navItems.map((item, index) => {
-                if ('type' in item && item.type === 'divider') {
-                    return <hr key={`divider-${index}`} className="nav-divider" />;
-                }
-                const navItem = item as { name: string; view: string; icon: React.ReactNode; };
-                const hasAccess = hasModuleAccess(navItem.view, allModules);
-
-                const moduleData = allModules?.find(m => m.modulename === navItem.view);
-                const isPurchasableModule = !!moduleData;
-
-                const isLocked = !hasAccess && (authLoading || !allModules || isPurchasableModule);
-                const isPromotional = isLocked && moduleData?.modulepro === true;
-
-                return (
-                    <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
-                        <Icon>{navItem.icon}</Icon>
-                        <span>{navItem.name}</span>
-                        {isLocked && (
-                            <Icon
-                                className="lock-icon"
-                                style={isPromotional ? { color: 'var(--success-color)' } : {}}
-                            >{isPromotional ? ICONS.GIFT : ICONS.LOCK}</Icon>
+            {navGroups.map((group, groupIndex) => (
+                <React.Fragment key={group.title || `group-${groupIndex}`}>
+                    <div className="nav-group">
+                        {group.title && (
+                            <div className="nav-group-header">
+                                <span>{group.title}</span>
+                            </div>
                         )}
-                    </button>
-                )
-            })}
+                        {group.items.map((navItem) => {
+                            const hasAccess = hasModuleAccess(navItem.view, allModules);
+                            const moduleData = allModules?.find(m => m.modulename === navItem.view);
+                            const isPurchasableModule = !!moduleData;
+                            const isLocked = !hasAccess && (authLoading || !allModules || isPurchasableModule);
+                            const isPromotional = isLocked && moduleData?.modulepro === true;
+            
+                            return (
+                                <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
+                                    <Icon>{navItem.icon}</Icon>
+                                    <span>{navItem.name}</span>
+                                    {isLocked && (
+                                        <Icon
+                                            className="lock-icon"
+                                            style={isPromotional ? { color: 'var(--success-color)' } : {}}
+                                        >{isPromotional ? ICONS.GIFT : ICONS.STAR}</Icon>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </React.Fragment>
+            ))}
         </nav>
         <div className="sidebar-footer-nav">
              <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>

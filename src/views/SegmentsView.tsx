@@ -14,6 +14,7 @@ import Icon, { ICONS } from '../components/Icon';
 import ConfirmModal from '../components/ConfirmModal';
 import LineLoader from '../components/LineLoader';
 import Button from '../components/Button';
+import EmptyState from '../components/EmptyState';
 
 const FIELD_TYPES: Record<string, 'date' | 'number' | 'boolean' | 'string'> = {
     DateAdded: 'date', DateUpdated: 'date', StatusChangeDate: 'date', ConsentDate: 'date',
@@ -305,41 +306,51 @@ const SegmentsView = ({ apiKey }: { apiKey: string }) => {
             {loading && <CenteredMessage><Loader /></CenteredMessage>}
             {error && <ErrorMessage error={error} />}
             {!loading && filteredSegments.length === 0 && (
-                 <CenteredMessage>
-                    {searchQuery ? t('noSegmentsForQuery', { query: searchQuery }) : t('noSegmentsFound')}
-                </CenteredMessage>
+                 searchQuery ? (
+                    <CenteredMessage>{t('noSegmentsForQuery', { query: searchQuery })}</CenteredMessage>
+                 ) : (
+                    <EmptyState
+                        icon={ICONS.SEGMENTS}
+                        title={t('noSegmentsFound')}
+                        message={t('noSegmentsFoundDesc')}
+                        ctaText={t('createSegment')}
+                        onCtaClick={() => setIsCreateModalOpen(true)}
+                    />
+                 )
             )}
 
-            <div className="card-grid list-grid">
-                {filteredSegments.map((seg: Segment) => (
-                    <div key={seg.Name} className="card segment-card">
-                        <div className="segment-card-header">
-                            <h3>{seg.Name}</h3>
-                            <div className="action-buttons">
-                                <button className="btn-icon btn-icon-primary" onClick={() => setSegmentToEditRules(seg)} aria-label={t('editSegmentRules')}><Icon>{ICONS.SETTINGS}</Icon></button>
-                                <button className="btn-icon btn-icon-primary" onClick={() => setSegmentToRename(seg)} aria-label={t('renameSegment')}><Icon>{ICONS.PENCIL}</Icon></button>
-                                <button className="btn-icon btn-icon-danger" onClick={() => setSegmentToDelete(seg.Name)} aria-label={t('deleteSegment')}><Icon>{ICONS.DELETE}</Icon></button>
+            {filteredSegments.length > 0 && (
+                <div className="card-grid list-grid">
+                    {filteredSegments.map((seg: Segment) => (
+                        <div key={seg.Name} className="card segment-card">
+                            <div className="segment-card-header">
+                                <h3>{seg.Name}</h3>
+                                <div className="action-buttons">
+                                    <button className="btn-icon btn-icon-primary" onClick={() => setSegmentToEditRules(seg)} aria-label={t('editSegmentRules')}><Icon>{ICONS.SETTINGS}</Icon></button>
+                                    <button className="btn-icon btn-icon-primary" onClick={() => setSegmentToRename(seg)} aria-label={t('renameSegment')}><Icon>{ICONS.PENCIL}</Icon></button>
+                                    <button className="btn-icon btn-icon-danger" onClick={() => setSegmentToDelete(seg.Name)} aria-label={t('deleteSegment')}><Icon>{ICONS.DELETE}</Icon></button>
+                                </div>
+                            </div>
+                            <div className="segment-card-body">
+                                <p>{t('rule')}:</p>
+                                <div className="segment-rule">{seg.Rule}</div>
+                            </div>
+                            <div className="segment-card-footer">
+                                <span>{t('contacts')}:</span>
+                                <strong>
+                                    {segmentCounts[seg.Name]?.loading ? (
+                                        <div style={{ width: '50px', display: 'inline-block' }}><LineLoader /></div>
+                                    ) : segmentCounts[seg.Name]?.error ? (
+                                        'N/A'
+                                    ) : (
+                                        segmentCounts[seg.Name]?.count?.toLocaleString(i18n.language) ?? '...'
+                                    )}
+                                </strong>
                             </div>
                         </div>
-                        <div className="segment-card-body">
-                             <p>{t('rule')}:</p>
-                             <div className="segment-rule">{seg.Rule}</div>
-                        </div>
-                        <div className="segment-card-footer">
-                            <span>{t('contacts')}:</span>
-                            <strong>
-                                {segmentCounts[seg.Name]?.loading ? (
-                                    <div style={{ width: '50px', display: 'inline-block' }}><LineLoader /></div>
-                                ) : segmentCounts[seg.Name]?.error ? (
-                                    'N/A'
-                                ) : (
-                                    segmentCounts[seg.Name]?.count?.toLocaleString(i18n.language) ?? '...'
-                                )}
-                            </strong>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

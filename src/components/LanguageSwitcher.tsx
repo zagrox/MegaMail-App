@@ -2,10 +2,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 
 const LanguageSwitcher = () => {
-    const { i18n } = useTranslation();
+    const { i18n, t } = useTranslation(['account']);
     const { updateUser, user } = useAuth();
+    const { addToast } = useToast();
     
     const options = [
         { value: 'en', label: 'English', directusValue: 'english', dir: 'ltr' },
@@ -13,9 +15,15 @@ const LanguageSwitcher = () => {
     ];
 
     const handleLanguageChange = (langCode: string) => {
+        if (i18n.language.startsWith(langCode)) return;
+
         // Update UI immediately
         i18n.changeLanguage(langCode);
         localStorage.setItem('i18nextLng', langCode);
+
+        const showSuccessToast = () => {
+            addToast(t('languageUpdateSuccess'), 'success');
+        };
 
         // If user is not an API user, sync to Directus
         if (user && !user.isApiKeyUser) {
@@ -25,11 +33,17 @@ const LanguageSwitcher = () => {
                     language: selectedOption.directusValue,
                     text_direction: selectedOption.dir,
                 };
-                updateUser(payload).catch(error => {
-                    console.warn("Failed to sync language preference:", error);
-                    // The UI has already updated, so we just log the error
-                });
+                updateUser(payload)
+                    .then(showSuccessToast)
+                    .catch(error => {
+                        console.warn("Failed to sync language preference:", error);
+                        // The UI has already updated optimistically, AuthContext will handle reverting on error.
+                        // We don't show an error toast here to avoid confusion.
+                    });
             }
+        } else {
+            // For guests or API key users, the change is local.
+            showSuccessToast();
         }
     };
 
@@ -38,7 +52,7 @@ const LanguageSwitcher = () => {
             {options.map(option => (
                 <button
                     key={option.value}
-                    className={`language-btn ${i18n.language === option.value ? 'active' : ''}`}
+                    className={`language-btn ${i18n.language.startsWith(option.value) ? 'active' : ''}`}
                     onClick={() => handleLanguageChange(option.value)}
                 >
                     <span>{option.label}</span>

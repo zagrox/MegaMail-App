@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
 import { apiFetch, apiFetchV4 } from '../api/elasticEmail';
@@ -13,6 +13,7 @@ import Icon, { ICONS } from '../components/Icon';
 import ConfirmModal from '../components/ConfirmModal';
 import LineLoader from '../components/LineLoader';
 import Button from '../components/Button';
+import EmptyState from '../components/EmptyState';
 
 
 const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void }) => {
@@ -27,6 +28,7 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const [listToDelete, setListToDelete] = useState<List | null>(null);
     const [listCounts, setListCounts] = useState<Record<string, { count: number | null; loading: boolean; error: boolean }>>({});
     const [updatingList, setUpdatingList] = useState<string | null>(null);
+    const newListNameInputRef = useRef<HTMLInputElement>(null);
 
 
     const LISTS_PER_PAGE = 25;
@@ -181,6 +183,7 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                 <div className="header-actions">
                     <form className="create-list-form" onSubmit={handleCreateList}>
                         <input
+                            ref={newListNameInputRef}
                             type="text"
                             placeholder={t('newListNamePlaceholder')}
                             value={newListName}
@@ -209,9 +212,17 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             
             {!loading && !error && (
                 filteredLists.length === 0 ? (
-                    <CenteredMessage>
-                        {searchQuery ? t('noListsForQuery', { query: searchQuery }) : t('noListsFound')}
-                    </CenteredMessage>
+                    searchQuery ? (
+                        <CenteredMessage>{t('noListsForQuery', { query: searchQuery })}</CenteredMessage>
+                    ) : (
+                        <EmptyState
+                            icon={ICONS.EMAIL_LISTS}
+                            title={t('noListsFound')}
+                            message={t('noListsFoundDesc')}
+                            ctaText={t('createList')}
+                            onCtaClick={() => newListNameInputRef.current?.focus()}
+                        />
+                    )
                 ) : (
                     <>
                     <div className="table-container">

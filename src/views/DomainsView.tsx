@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
 import { apiFetchV4 } from '../api/elasticEmail';
@@ -12,6 +12,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { useStatusStyles } from '../hooks/useStatusStyles';
 import Modal from '../components/Modal';
 import Button from '../components/Button';
+import EmptyState from '../components/EmptyState';
 
 const DNS_RECORDS_CONFIG = {
     SPF: {
@@ -196,6 +197,7 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
     const [expandedDomain, setExpandedDomain] = useState<string | null>(null);
     const [domainToDelete, setDomainToDelete] = useState<string | null>(null);
     const [domainToEdit, setDomainToEdit] = useState<any | null>(null);
+    const newDomainInputRef = useRef<HTMLInputElement>(null);
 
     const { getStatusStyle } = useStatusStyles();
 
@@ -271,6 +273,7 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
              <div className="view-header">
                 <form className="add-domain-form" onSubmit={handleAddDomain}>
                     <input
+                        ref={newDomainInputRef}
                         type="text"
                         placeholder="example.com"
                         value={newDomain}
@@ -284,7 +287,15 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
             </div>
             {loading && <CenteredMessage><Loader /></CenteredMessage>}
             {error && !isNotFoundError && <ErrorMessage error={error} />}
-            {showNoDomainsMessage && <CenteredMessage>{t('noDomainsFound')}</CenteredMessage>}
+            {showNoDomainsMessage && 
+                <EmptyState
+                    icon={ICONS.DOMAINS}
+                    title={t('noDomainsFound')}
+                    message={t('noDomainsFoundDesc')}
+                    ctaText={t('addDomain')}
+                    onCtaClick={() => newDomainInputRef.current?.focus()}
+                />
+            }
             
             {domainsList.length > 0 && 
             <div className="table-container">

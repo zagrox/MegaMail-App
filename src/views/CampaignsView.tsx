@@ -13,6 +13,7 @@ import Button from '../components/Button';
 import { formatDateRelative } from '../utils/helpers';
 import ConfirmModal from '../components/ConfirmModal';
 import Modal from '../components/Modal';
+import EmptyState from '../components/EmptyState';
 
 const CampaignPreviewModal = ({ campaign, onClose }: { campaign: any | null, onClose: () => void }) => {
     const { t } = useTranslation(['templates']);
@@ -460,12 +461,19 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
 
             {!loading && !error && (
                  (paginatedCampaigns.length === 0) ? (
-                    <CenteredMessage style={{height: '50vh'}}>
-                        <div className="info-message">
-                            <strong>{searchQuery ? t('noCampaignsForQuery', { query: searchQuery }) : t('noCampaignsFound')}</strong>
-                             {!searchQuery && <p>{t('noCampaignsSent')}</p>}
-                        </div>
-                    </CenteredMessage>
+                    searchQuery ? (
+                        <CenteredMessage style={{height: '50vh'}}>
+                            <p>{t('noCampaignsForQuery', { query: searchQuery })}</p>
+                        </CenteredMessage>
+                    ) : (
+                        <EmptyState
+                            icon={ICONS.CAMPAIGNS}
+                            title={t('noCampaignsFound')}
+                            message={t('noCampaignsFoundDesc')}
+                            ctaText={t('createCampaign')}
+                            onCtaClick={() => setView('Send Email')}
+                        />
+                    )
                 ) : (
                     <>
                     {viewMode === 'grid' ? (

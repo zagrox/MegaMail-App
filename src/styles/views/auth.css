@@ -50,7 +50,7 @@
     pointer-events: none;
 }
 .input-group input {
-    padding-inline-start: 2.5rem;
+    padding-inline-start: 3rem;
 }
 .input-group.has-btn input {
     padding-inline-end: 3rem;

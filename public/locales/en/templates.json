@@ -7,7 +7,8 @@
     "confirmDeleteTemplate": "Are you sure you want to delete the template \"{{name}}\"? This action cannot be undone.",
     "templateDeletedSuccess": "Template \"{{name}}\" saved successfully!",
     "templateDeletedError": "Failed to delete template: {{error}}",
-    "noTemplatesFound": "No templates found.",
+    "noTemplatesFound": "No templates created yet",
+    "noTemplatesFoundDesc": "Templates save you time and keep your branding consistent. Create your first reusable template now.",
     "createYourFirst": "Create your first one to get started!",
     "noTemplatesForQuery": "No templates found for \"{{query}}\"."
 }

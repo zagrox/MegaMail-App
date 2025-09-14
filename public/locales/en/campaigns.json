@@ -1,9 +1,9 @@
-
 {
     "searchCampaignsPlaceholder": "Search by campaign or subject...",
     "viewCampaignStats": "View stats",
     "noSubject": "(No Subject)",
-    "noCampaignsFound": "No campaigns found.",
+    "noCampaignsFound": "No campaigns yet",
+    "noCampaignsFoundDesc": "It looks like you haven't sent or saved any campaigns. Create one to engage your audience.",
     "noCampaignsForQuery": "No campaigns found for \"{{query}}\".",
     "noCampaignsSent": "No campaigns have been sent yet.",
     "statsForCampaign": "Stats for \"{{campaignName}}\"",

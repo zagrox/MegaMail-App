@@ -19,6 +19,7 @@ import BulkActionsBar from '../components/BulkActionsBar';
 import AddToListModal from '../components/AddToListModal';
 import Button from '../components/Button';
 import { AppActions } from '../config/actions';
+import EmptyState from '../components/EmptyState';
 
 const STATUS_ORDER = [
     'Active', 'Engaged', 'Transactional', 'Bounced', 'Unsubscribed',
@@ -686,9 +687,21 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                                     ))}
                                 </div>
                             ) : (
-                                <CenteredMessage>
-                                {searchQuery ? t('noContactsForQuery', { query: searchQuery }) : t('noContactsFound')}
-                                </CenteredMessage>
+                                searchQuery ? (
+                                    <CenteredMessage>
+                                        {t('noContactsForQuery', { query: searchQuery })}
+                                    </CenteredMessage>
+                                ) : (
+                                    <EmptyState
+                                        icon={ICONS.CONTACTS}
+                                        title={t('noContactsFound')}
+                                        message={t('noContactsFoundDesc')}
+                                        ctaText={t('addContact')}
+                                        onCtaClick={() => setIsAddModalOpen(true)}
+                                        secondaryCtaText={t('importContacts')}
+                                        onSecondaryCtaClick={() => setIsImportModalOpen(true)}
+                                    />
+                                )
                             )}
 
                             {contacts && (contacts.length > 0 || offset > 0) && (

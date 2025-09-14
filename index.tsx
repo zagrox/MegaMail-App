@@ -23,6 +23,7 @@ import './src/styles/components/badge.css';
 import './src/styles/components/button.css';
 import './src/styles/components/card.css';
 import './src/styles/components/charts.css';
+import './src/styles/components/empty-state.css';
 import './src/styles/components/forms.css';
 import './src/styles/components/modal.css';
 import './src/styles/components/multiselect.css';

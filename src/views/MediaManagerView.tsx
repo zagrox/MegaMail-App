@@ -14,6 +14,7 @@ import Icon, { ICONS } from '../components/Icon';
 import ConfirmModal from '../components/ConfirmModal';
 import FileUploadModal from '../components/media_manager/FileUploadModal';
 import Button from '../components/Button';
+import EmptyState from '../components/EmptyState';
 
 const FilePreviewModal = ({ isOpen, onClose, fileInfo, apiKey }: { isOpen: boolean; onClose: () => void; fileInfo: FileInfo | null; apiKey: string; }) => {
     const { t } = useTranslation(['mediaManager', 'common']);
@@ -309,48 +310,59 @@ const MediaManagerView = ({ apiKey }: { apiKey: string }) => {
             {loading && <CenteredMessage><Loader /></CenteredMessage>}
             {error && <ErrorMessage error={error} />}
             {!loading && !error && sortedAndFilteredFiles.length === 0 && (
-                <CenteredMessage style={{height: '50vh'}}>
-                    <div className="info-message">
-                         <strong>{searchQuery ? t('noFilesFound') : t('noFilesFound')}</strong>
-                         {!searchQuery && <p>{t('uploadNewFilePrompt')}</p>}
-                    </div>
-                </CenteredMessage>
+                searchQuery ? (
+                    <CenteredMessage style={{height: '50vh'}}>
+                        <p>{t('noFilesFoundForQuery', { query: searchQuery })}</p>
+                    </CenteredMessage>
+                ) : (
+                    <EmptyState
+                        icon={ICONS.FOLDER}
+                        title={t('noFilesFound')}
+                        message={t('uploadNewFilePrompt')}
+                        ctaText={t('uploadFile')}
+                        onCtaClick={() => setIsUploadModalOpen(true)}
+                    />
+                )
             )}
 
-            <div className={`file-container-view ${viewMode === 'grid' ? 'file-grid-view' : 'file-list-view'}`}>
-                {paginatedFiles.map((file: FileInfo) => (
-                    viewMode === 'grid' ? (
-                        <FileGridCard
-                            key={file.FileName}
-                            fileInfo={file}
-                            apiKey={apiKey}
-                            onView={setFileToPreview}
-                            onDelete={setFileToDelete}
-                        />
-                    ) : (
-                        <FileCard
-                            key={file.FileName}
-                            fileInfo={file}
-                            apiKey={apiKey}
-                            onView={setFileToPreview}
-                            onDelete={setFileToDelete}
-                        />
-                    )
-                ))}
-            </div>
-            
-            {totalPages > 1 && (
-                <div className="pagination-controls">
-                    <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1 || loading}>
-                        <Icon>{ICONS.CHEVRON_LEFT}</Icon>
-                        <span>{t('previous')}</span>
-                    </button>
-                    <span className="pagination-page-info">{t('page', { page: `${currentPage} / ${totalPages}` })}</span>
-                    <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || loading}>
-                        <span>{t('next')}</span>
-                        <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
-                    </button>
-                </div>
+            {paginatedFiles.length > 0 && (
+                <>
+                    <div className={`file-container-view ${viewMode === 'grid' ? 'file-grid-view' : 'file-list-view'}`}>
+                        {paginatedFiles.map((file: FileInfo) => (
+                            viewMode === 'grid' ? (
+                                <FileGridCard
+                                    key={file.FileName}
+                                    fileInfo={file}
+                                    apiKey={apiKey}
+                                    onView={setFileToPreview}
+                                    onDelete={setFileToDelete}
+                                />
+                            ) : (
+                                <FileCard
+                                    key={file.FileName}
+                                    fileInfo={file}
+                                    apiKey={apiKey}
+                                    onView={setFileToPreview}
+                                    onDelete={setFileToDelete}
+                                />
+                            )
+                        ))}
+                    </div>
+                    
+                    {totalPages > 1 && (
+                        <div className="pagination-controls">
+                            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1 || loading}>
+                                <Icon>{ICONS.CHEVRON_LEFT}</Icon>
+                                <span>{t('previous')}</span>
+                            </button>
+                            <span className="pagination-page-info">{t('page', { page: `${currentPage} / ${totalPages}` })}</span>
+                            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || loading}>
+                                <span>{t('next')}</span>
+                                <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, ReactNode, createContext, useContext } from 'react';
-import { readMe, registerUser, updateMe, updateUser as sdkUpdateUser, createItem, readItems, updateItem } from '@directus/sdk';
+// FIX: Removed `updateUser as sdkUpdateUser` as it was causing argument mismatch errors and is replaced by a raw request.
+import { readMe, registerUser, updateMe, createItem, readItems, updateItem } from '@directus/sdk';
 import sdk from '../api/directus';
 import { apiFetch } from '../api/elasticEmail';
 import type { Module } from '../api/types';
@@ -268,8 +269,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 promises.push(sdk.request(updateMe(userPayload)));
             }
             if (Object.keys(profilePayload).length > 0 && user.profileId) {
-                // FIX: The `updateItem` function was causing a TypeScript error regarding the number of arguments.
-                // Replaced with a raw request, which is a pattern used elsewhere in this file and is functionally equivalent.
+                // FIX: Corrected a call to the Directus SDK's `updateItem` function which was causing an argument mismatch error.
+                // Replaced it with a raw sdk.request to patch the profile item, which resolves the error and correctly updates user profiles.
                 promises.push(sdk.request(() => ({
                     method: 'PATCH',
                     path: `/items/profiles/${user.profileId}`,
@@ -295,8 +296,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             throw new Error("User not authenticated or is an API key user.");
         }
         
-        // Update the email in Directus
-        await sdk.request(sdkUpdateUser(user.id, { email: newEmail.toLowerCase() }));
+        // FIX: Use `updateMe` from the SDK to allow a user to update their own email.
+        // It's cleaner and correctly targets the `/users/me` endpoint.
+        await sdk.request(updateMe({ email: newEmail.toLowerCase() }));
         
         // Refresh the local user state to reflect the change
         await getMe();
@@ -304,7 +306,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const changePassword = async (passwords: { old: string; new: string }) => {
         if (!user?.id) throw new Error('User not authenticated or ID is missing.');
-        await sdk.request(sdkUpdateUser(user.id, { password: passwords.new }));
+        // FIX: The `updateMe` SDK helper has incorrect typings and does not allow the 'old_password' field,
+        // which is required for a user to change their own password. Using a raw request to PATCH /users/me instead.
+        await sdk.request(() => ({
+            method: 'PATCH',
+            path: '/users/me',
+            body: JSON.stringify({
+                password: passwords.new,
+                old_password: passwords.old,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+        }));
     };
 
     const requestPasswordReset = async (email: string, recaptchaToken?: string) => {

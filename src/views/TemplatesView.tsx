@@ -12,6 +12,7 @@ import Icon, { ICONS } from '../components/Icon';
 import ConfirmModal from '../components/ConfirmModal';
 import { Template } from '../api/types';
 import Button from '../components/Button';
+import EmptyState from '../components/EmptyState';
 
 // Helper to decode a Base64 string to UTF-8
 const decodeState = (base64: string): string => {
@@ -248,12 +249,19 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
             
             {!loading && !error && (
                 (detailedTemplates.length === 0) ? (
-                    <CenteredMessage style={{ height: '50vh' }}>
-                        <div className="info-message">
-                            <strong>{searchQuery ? t('noTemplatesForQuery', { query: searchQuery }) : t('noTemplatesFound')}</strong>
-                            {!searchQuery && <p>{t('createYourFirst')}</p>}
-                        </div>
-                    </CenteredMessage>
+                    searchQuery ? (
+                        <CenteredMessage style={{ height: '50vh' }}>
+                            <p>{t('noTemplatesForQuery', { query: searchQuery })}</p>
+                        </CenteredMessage>
+                    ) : (
+                        <EmptyState
+                            icon={ICONS.ARCHIVE}
+                            title={t('noTemplatesFound')}
+                            message={t('noTemplatesFoundDesc')}
+                            ctaText={t('createTemplate')}
+                            onCtaClick={() => setView('Email Builder')}
+                        />
+                    )
                 ) : (
                     <>
                         {viewMode === 'grid' ? (

@@ -51,8 +51,33 @@
 .nav {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem;
     flex-grow: 1;
+}
+.nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+.nav-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--subtle-text-color);
+    text-transform: uppercase;
+    margin: 1rem 0 0.5rem 0.75rem;
+    letter-spacing: 0.05em;
+}
+.nav-group-header span {
+    flex-shrink: 0;
+}
+.nav-group-header::after {
+    content: '';
+    flex-grow: 1;
+    height: 1px;
+    background-color: var(--border-color);
 }
 .nav-btn {
     display: flex;
@@ -78,11 +103,6 @@
 .nav-btn.active {
     background-color: var(--secondary-color);
     color: white;
-}
-.nav-divider {
-    border: none;
-    border-top: 1px solid var(--border-color);
-    margin: 0.5rem 0;
 }
 .sidebar-footer-nav {
     display: flex;
@@ -110,7 +130,7 @@
 .nav-btn.locked .lock-icon {
     position: absolute;
     inset-inline-end: 0.75rem;
-    color: var(--warning-color);
+    color: inherit;
     width: 1rem;
     height: 1rem;
 }

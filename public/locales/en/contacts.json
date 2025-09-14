@@ -1,4 +1,3 @@
-
 {
     "selectPage": "Select Page",
     "countSelected": "{{count}} selected",
@@ -15,7 +14,8 @@
     "contactDeletedError": "Failed to delete contact: {{error}}",
     "contactDetailsError": "Failed to load contact details.",
     "noContactsForQuery": "No contacts found for \"{{query}}\".",
-    "noContactsFound": "No contacts found. Add your first one!",
+    "noContactsFound": "Your audience is empty",
+    "noContactsFoundDesc": "You don't have any contacts yet. Add your first contact manually or import a list to get started.",
     "contactDetails": "Contact Details",
     "activity": "Activity",
     "totalSent": "Total Sent",

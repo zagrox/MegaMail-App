@@ -110,6 +110,7 @@ const Step3 = ({ data, setData }: { data: any, setData: Function }) => {
     const handleLanguageChange = (lang: 'persian' | 'english') => {
         const langCode = lang === 'persian' ? 'fa' : 'en';
         i18n.changeLanguage(langCode); // Change UI language immediately
+        localStorage.setItem('i18nextLng', langCode); // Persist choice for App component
         setData({ ...data, language: lang }); // Update local form state
     };
     

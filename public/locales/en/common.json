@@ -76,5 +76,8 @@
     "done": "Done",
     "openMenu": "Open menu",
     "pleaseFillRequiredFields": "Please fill all required fields.",
-    "permissionDeniedError": "Permission denied. Please upgrade your plan to access this feature."
+    "permissionDeniedError": "Permission denied. Please upgrade your plan to access this feature.",
+    "overview": "Overview",
+    "contents": "Contents",
+    "audience": "Audience"
 }

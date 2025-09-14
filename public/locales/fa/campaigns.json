@@ -1,9 +1,9 @@
-
 {
     "searchCampaignsPlaceholder": "جستجو بر اساس کمپین یا موضوع...",
     "viewCampaignStats": "مشاهده آمار",
     "noSubject": "(بدون موضوع)",
-    "noCampaignsFound": "کمپینی یافت نشد.",
+    "noCampaignsFound": "هنوز کمپینی وجود ندارد",
+    "noCampaignsFoundDesc": "به نظر می‌رسد هنوز هیچ کمپینی ارسال یا ذخیره نکرده‌اید. برای درگیر کردن مخاطبان خود، یکی ایجاد کنید.",
     "noCampaignsForQuery": "کمپینی برای \"{{query}}\" یافت نشد.",
     "noCampaignsSent": "هنوز کمپینی ارسال نشده است.",
     "statsForCampaign": "آمار برای \"{{campaignName}}\"",

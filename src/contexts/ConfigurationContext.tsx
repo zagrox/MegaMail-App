@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { readSingleton } from '@directus/sdk';
 import sdk from '../api/directus';
 import { Configuration } from '../api/types';
 
@@ -19,10 +18,23 @@ export const ConfigurationProvider = ({ children }: { children: ReactNode }) => 
     useEffect(() => {
         const fetchConfig = async () => {
             try {
-                // Using the Directus SDK to fetch the singleton configuration item.
-                // This ensures consistency with other API calls and may better handle
-                // authentication or CORS policies configured in the SDK.
-                const configData = await sdk.request(readSingleton('configuration'));
+                // FIX: Replaced the Directus SDK's `readSingleton` helper with a direct `fetch` call.
+                // This provides more robust error handling for non-JSON responses (like HTML error pages),
+                // which was causing the generic "[object Object]" error in the console.
+                const response = await fetch(`${sdk.url}items/configuration`);
+                
+                if (!response.ok) {
+                    let errorBody = '';
+                    try {
+                        errorBody = await response.text();
+                    } catch (e) {
+                        // Ignore if body is unreadable
+                    }
+                    throw new Error(`Server responded with status ${response.status}. ${errorBody}`);
+                }
+                
+                const result = await response.json();
+                const configData = result?.data; // For singletons, data is in a 'data' property
                 
                 if (configData) {
                     setConfig(configData as Configuration);
@@ -31,14 +43,15 @@ export const ConfigurationProvider = ({ children }: { children: ReactNode }) => 
                 }
             } catch (err: any) {
                 let errorMessage = 'Failed to fetch app configuration';
-                // Directus SDK errors have a specific structure
+                // This check is kept for potential SDK errors elsewhere, though less likely now.
                 if (err.errors && err.errors[0] && err.errors[0].message) {
                     errorMessage = err.errors[0].message;
                 } else if (err.message) {
                     errorMessage = err.message;
                 }
                 setError(errorMessage);
-                console.error("Configuration fetch error:", err);
+                // FIX: Log the error message directly to avoid "[object Object]".
+                console.error("Configuration fetch error:", err.message || err);
             } finally {
                 setLoading(false);
             }

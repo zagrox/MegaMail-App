@@ -13,6 +13,7 @@
     "displayModeSubtitle": "نحوه نمایش {{appName}} را انتخاب کنید. اولویت شما برای بازدید بعدی ذخیره خواهد شد.",
     "language": "زبان",
     "languageSubtitle": "زبان رابط کاربری برنامه را انتخاب کنید.",
+    "languageUpdateSuccess": "زبان پیش‌فرض ذخیره شد.",
     "themeLight": "روشن",
     "themeDark": "تاریک",
     "themeSystem": "سیستم",
