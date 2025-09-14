@@ -1,4 +1,5 @@
 import { ELASTIC_EMAIL_API_BASE, ELASTIC_EMAIL_API_V4_BASE } from './config';
+import emitter from './eventEmitter';
 
 // --- API Helper for v2 ---
 export const apiFetch = async (endpoint: string, apiKey: string, options: { method?: 'GET' | 'POST', params?: Record<string, any> } = {}) => {
@@ -22,6 +23,10 @@ export const apiFetch = async (endpoint: string, apiKey: string, options: { meth
     });
   } else { // GET
     response = await fetch(`${url}?${allParams.toString()}`);
+  }
+
+  if (response.status === 403) {
+    emitter.dispatchEvent(new CustomEvent('apiForbidden'));
   }
 
   const data = await response.json();
@@ -58,6 +63,9 @@ export const apiFetchV4 = async (endpoint: string, apiKey: string, options: { me
     const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
+        if (response.status === 403) {
+            emitter.dispatchEvent(new CustomEvent('apiForbidden'));
+        }
         let errorMessage = `An unknown API error occurred.`;
         try {
             const errorData = await response.json();
@@ -100,6 +108,9 @@ export const apiUploadV4 = async (endpoint: string, apiKey: string, formData: Fo
     });
 
     if (!response.ok) {
+        if (response.status === 403) {
+            emitter.dispatchEvent(new CustomEvent('apiForbidden'));
+        }
         let errorMessage = `An unknown API error occurred.`;
         try {
             const errorData = await response.json();

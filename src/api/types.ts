@@ -80,6 +80,8 @@ export type Configuration = {
     app_banner: string;
     app_backend: string;
     app_language: string;
+    app_recaptcha?: boolean;
+    app_recaptcha_key?: string;
 };
 export type CustomField = {
     Name: string;

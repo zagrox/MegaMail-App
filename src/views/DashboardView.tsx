@@ -1,4 +1,5 @@
 
+
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,6 +17,7 @@ import Button from '../components/Button';
 import sdk from '../api/directus';
 import { readItems } from '@directus/sdk';
 import { AppActions } from '../config/actions';
+import DOMPurify from 'https://esm.sh/dompurify@3.1.6';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
     const { t, i18n } = useTranslation(['dashboard', 'common', 'account']);
@@ -209,7 +211,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                         </div>
                     </div>
                     <div className="dashboard-branding-footer">
-                        <p dangerouslySetInnerHTML={{ __html: copyrightText }} />
+                        <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(copyrightText) }} />
                     </div>
                 </>
             )}

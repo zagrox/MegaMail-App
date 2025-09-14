@@ -75,5 +75,6 @@
     "copied": "Copied!",
     "done": "Done",
     "openMenu": "Open menu",
-    "pleaseFillRequiredFields": "Please fill all required fields."
+    "pleaseFillRequiredFields": "Please fill all required fields.",
+    "permissionDeniedError": "Permission denied. Please upgrade your plan to access this feature."
 }

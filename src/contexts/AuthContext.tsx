@@ -34,14 +34,14 @@ interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     loading: boolean;
-    login: (credentials: any) => Promise<void>;
+    login: (credentials: any, recaptchaToken?: string) => Promise<void>;
     loginWithApiKey: (apiKey: string) => Promise<void>;
-    register: (details: any) => Promise<any>;
+    register: (details: any, recaptchaToken?: string) => Promise<any>;
     logout: () => void;
     updateUser: (data: any) => Promise<void>;
     updateUserEmail: (newEmail: string) => Promise<void>;
     changePassword: (passwords: { old: string; new: string }) => Promise<void>;
-    requestPasswordReset: (email: string) => Promise<void>;
+    requestPasswordReset: (email: string, recaptchaToken?: string) => Promise<void>;
     resetPassword: (token: string, password: string) => Promise<void>;
     createElasticSubaccount: (email: string, password: string) => Promise<any>;
     hasModuleAccess: (moduleName: string, allModules: Module[] | null) => boolean;
@@ -189,10 +189,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         initializeAuth();
     }, [getMe, getApiKeyUser]);
     
-    const login = async (credentials: any) => {
+    const login = async (credentials: any, recaptchaToken?: string) => {
         setLoading(true);
         try {
-            await sdk.login(credentials.email.toLowerCase(), credentials.password);
+            // Use the SDK's built-in login, passing the recaptcha token in the options
+            await sdk.login(credentials.email.toLowerCase(), credentials.password, {
+                // The SDK will merge this body with email/password into the request
+                body: { 'g-recaptcha-response': recaptchaToken },
+            });
+            
+            // sdk.login handles token storage automatically.
             localStorage.removeItem('elastic_email_api_key');
             await getMe();
         } finally {
@@ -208,9 +214,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
     };
 
-    const register = async (details: any) => {
+    const register = async (details: any, recaptchaToken?: string) => {
         const { email, password, ...otherDetails } = details;
-        return await sdk.request(registerUser(email.toLowerCase(), password, otherDetails));
+        return await sdk.request(() => ({
+            method: 'POST',
+            path: '/users',
+            body: JSON.stringify({
+                email: email.toLowerCase(),
+                password: password,
+                ...otherDetails,
+                'g-recaptcha-response': recaptchaToken,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+        }));
     };
 
     const logout = async () => {
@@ -252,7 +268,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 promises.push(sdk.request(updateMe(userPayload)));
             }
             if (Object.keys(profilePayload).length > 0 && user.profileId) {
-                promises.push(sdk.request(updateItem('profiles', user.profileId, profilePayload)));
+                // FIX: The `updateItem` function was causing a TypeScript error regarding the number of arguments.
+                // Replaced with a raw request, which is a pattern used elsewhere in this file and is functionally equivalent.
+                promises.push(sdk.request(() => ({
+                    method: 'PATCH',
+                    path: `/items/profiles/${user.profileId}`,
+                    body: JSON.stringify(profilePayload),
+                    headers: { 'Content-Type': 'application/json' },
+                })));
             }
             await Promise.all(promises);
             // After successful API call, we can optionally refetch to sync any other server-side changes,
@@ -284,11 +307,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await sdk.request(sdkUpdateUser(user.id, { password: passwords.new }));
     };
 
-    const requestPasswordReset = async (email: string) => {
+    const requestPasswordReset = async (email: string, recaptchaToken?: string) => {
         const reset_url = `${window.location.origin}/#/reset-password`;
         await sdk.request(() => ({
             method: 'POST', path: '/auth/password/request',
-            body: JSON.stringify({ email: email.toLowerCase(), reset_url }),
+            body: JSON.stringify({ email: email.toLowerCase(), reset_url, 'g-recaptcha-response': recaptchaToken }),
             headers: { 'Content-Type': 'application/json' },
         }));
     };

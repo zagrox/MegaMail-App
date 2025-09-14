@@ -75,5 +75,6 @@
     "copied": "کپی شد!",
     "done": "انجام شد",
     "openMenu": "باز کردن منو",
-    "pleaseFillRequiredFields": "لطفا تمام فیلدهای الزامی را پر کنید."
+    "pleaseFillRequiredFields": "لطفا تمام فیلدهای الزامی را پر کنید.",
+    "permissionDeniedError": "دسترسی غیرمجاز. لطفاً برای دسترسی به این قابلیت، طرح خود را ارتقا دهید."
 }

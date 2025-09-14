@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -37,12 +38,15 @@ import UnlockModuleModal from './components/UnlockModuleModal';
 import OfflinePaymentView from './views/OfflinePaymentView';
 import InvoiceView from './views/InvoiceView';
 import CustomFieldsView from './views/CustomFieldsView';
+import { useToast } from './contexts/ToastContext';
+import emitter from './api/eventEmitter';
 
 
 const App = () => {
     const { isAuthenticated, user, logout, hasModuleAccess, loading: authLoading, allModules, moduleToUnlock, setModuleToUnlock } = useAuth();
     const { config } = useConfiguration();
     const { t, i18n } = useTranslation(['common', 'emailLists', 'contacts', 'buyCredits', 'account']);
+    const { addToast } = useToast();
     const [view, setView] = useState('Dashboard');
     const [templateToEdit, setTemplateToEdit] = useState<Template | null>(null);
     const [campaignToLoad, setCampaignToLoad] = useState<any | null>(null);
@@ -55,6 +59,18 @@ const App = () => {
     const [orderForOfflinePayment, setOrderForOfflinePayment] = useState<any | null>(null);
     const [orderForInvoice, setOrderForInvoice] = useState<any | null>(null);
     const appContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleForbidden = () => {
+            addToast(t('permissionDeniedError'), 'error');
+        };
+
+        emitter.addEventListener('apiForbidden', handleForbidden);
+        
+        return () => {
+            emitter.removeEventListener('apiForbidden', handleForbidden);
+        };
+    }, [addToast, t]);
 
     useEffect(() => {
         // This effect determines the correct language for the UI based on a clear priority,
@@ -359,13 +375,13 @@ const App = () => {
             })}
         </nav>
         <div className="sidebar-footer-nav">
-             <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
-                <Icon>{ICONS.BUY_CREDITS}</Icon>
-                <span>{t('buyCredits')}</span>
-             </button>
              <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
                  <Icon>{ICONS.SETTINGS}</Icon>
                  <span>{t('settings', { ns: 'account' })}</span>
+             </button>
+             <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
+                <Icon>{ICONS.BUY_CREDITS}</Icon>
+                <span>{t('buyCredits')}</span>
              </button>
              <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
                  <Icon>{ICONS.ACCOUNT}</Icon>

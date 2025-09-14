@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../contexts/ToastContext';
@@ -20,21 +20,21 @@ const AuthView = () => {
     const { addToast } = useToast();
     const { config, loading: configLoading } = useConfiguration();
 
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        if (params.has('register')) {
-            setMode('register');
-        }
-    }, []);
+    const formRef = useRef<HTMLFormElement>(null);
+    const recaptchaContainerRef = useRef<HTMLDivElement>(null);
+    const recaptchaWidgetId = useRef<number | null>(null);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const onRecaptchaResolved = useCallback(async (token?: string) => {
         setLoading(true);
-        const form = e.currentTarget;
+        const form = formRef.current;
+        if (!form) {
+            setLoading(false);
+            return;
+        }
 
         try {
             if (mode === 'login') {
-                await login({ email: loginEmail, password: loginPassword });
+                await login({ email: loginEmail, password: loginPassword }, token);
             } else if (mode === 'register') {
                 const email = (form.elements.namedItem('email') as HTMLInputElement).value;
                 const password = (form.elements.namedItem('password') as HTMLInputElement).value;
@@ -45,29 +45,80 @@ const AuthView = () => {
                 if (password !== confirm_password) {
                     throw new Error(t('passwordsDoNotMatch'));
                 }
-                await register({ email, password, first_name, last_name });
+                await register({ email, password, first_name, last_name }, token);
                 addToast(t('registrationSuccessMessage'), 'success');
                 setLoginEmail(email);
                 setLoginPassword('');
                 setMode('login');
             } else if (mode === 'forgot') {
                 const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-                await requestPasswordReset(email);
+                await requestPasswordReset(email, token);
                 addToast(t('passwordResetEmailSent'), 'success');
                 setMode('login');
             }
         } catch (err: any) {
             let errorMessage = err.message;
-            // Directus errors often come in an errors array
             if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
                 errorMessage = err.errors[0].message;
             }
             addToast(errorMessage || t('unknownError'), 'error');
         } finally {
             setLoading(false);
+            if (config?.app_recaptcha && (window as any).grecaptcha && recaptchaWidgetId.current !== null) {
+                (window as any).grecaptcha.reset(recaptchaWidgetId.current);
+            }
+        }
+    }, [addToast, config, login, loginEmail, loginPassword, mode, register, requestPasswordReset, t]);
+    
+    useEffect(() => {
+        if (!config?.app_recaptcha || !config.app_recaptcha_key) {
+            return;
+        }
+    
+        const checkGrecaptcha = () => {
+            if ((window as any).grecaptcha?.render && recaptchaContainerRef.current && recaptchaWidgetId.current === null) {
+                clearInterval(intervalId);
+                try {
+                    const widgetId = (window as any).grecaptcha.render(recaptchaContainerRef.current, {
+                        sitekey: config.app_recaptcha_key,
+                        size: 'invisible',
+                        callback: onRecaptchaResolved,
+                    });
+                    recaptchaWidgetId.current = widgetId;
+                } catch (e) {
+                    console.error("Error rendering reCAPTCHA", e);
+                }
+            }
+        };
+    
+        const intervalId = setInterval(checkGrecaptcha, 100);
+        return () => {
+            clearInterval(intervalId);
+            if (recaptchaContainerRef.current) {
+                recaptchaContainerRef.current.innerHTML = '';
+            }
+            recaptchaWidgetId.current = null;
+        };
+    }, [config, onRecaptchaResolved]);
+
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        
+        if (config?.app_recaptcha && (window as any).grecaptcha && recaptchaWidgetId.current !== null) {
+            (window as any).grecaptcha.execute(recaptchaWidgetId.current);
+        } else {
+            onRecaptchaResolved();
         }
     };
     
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('register')) {
+            setMode('register');
+        }
+    }, []);
+
     const getSubtitle = () => {
          if (mode === 'forgot') return t('forgotPasswordSubtitle');
          if (mode === 'login') return t('signInSubtitle');
@@ -93,7 +144,7 @@ const AuthView = () => {
                 <h1><span className="logo-font">{t('appName')}</span></h1>
                 <p>{getSubtitle()}</p>
 
-                <form className="auth-form" onSubmit={handleSubmit}>
+                <form className="auth-form" ref={formRef} onSubmit={handleSubmit}>
 
                     {mode === 'login' ? (
                          <>
@@ -169,6 +220,7 @@ const AuthView = () => {
                     <button type="submit" className="btn btn-primary" disabled={loading}>
                         {loading ? <Loader /> : (mode === 'forgot' ? t('sendResetLink') : mode === 'login' ? t('signIn') : t('signUp'))}
                     </button>
+                    <div ref={recaptchaContainerRef} />
                 </form>
 
                 <div className="auth-switch">

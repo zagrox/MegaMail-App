@@ -16,7 +16,6 @@ const ResetPasswordView = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
-        // Be robust: check both hash and search for parameters
         const hash = window.location.hash.substring(1);
         const hashQueryString = hash.split('?')[1] || '';
         const searchQueryString = window.location.search.substring(1) || '';
@@ -25,12 +24,10 @@ const ResetPasswordView = () => {
 
         if (tokenFromUrl) {
             setToken(tokenFromUrl);
-        } else {
-            addToast(t('invalidResetToken'), 'error');
         }
-    }, [t, addToast]);
+    }, []);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleResetSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!token) {
             addToast(t('invalidResetToken'), 'error');
@@ -63,38 +60,61 @@ const ResetPasswordView = () => {
             setLoading(false);
         }
     };
-    
+
     const goToLogin = () => {
         window.location.href = '/';
     }
     
     const appName = config?.app_name || 'MegaMail';
 
+    // This view now serves two purposes: entering email to request reset, and entering new password with token.
+    if (token) {
+        // Mode: User has a token and is setting a new password.
+        return (
+            <div className="auth-container">
+                <div className="auth-box">
+                    <h1><span className="logo-font">{appName}</span></h1>
+                    <p>{t('resetPasswordSubtitle')}</p>
+                    <form className="auth-form" onSubmit={handleResetSubmit}>
+                        <fieldset disabled={loading} style={{ border: 'none', padding: 0, margin: 0, display: 'contents' }}>
+                            <div className="input-group has-btn">
+                                <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
+                                <input name="password" type={showPassword ? "text" : "password"} placeholder={t('newPassword')} required />
+                                <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
+                                    <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+                                </button>
+                            </div>
+                            <div className="input-group">
+                                <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
+                                <input name="confirm_password" type="password" placeholder={t('confirmPassword')} required />
+                            </div>
+                            <button type="submit" className="btn btn-primary" disabled={loading}>
+                                {loading ? <Loader /> : t('resetPassword')}
+                            </button>
+                        </fieldset>
+                    </form>
+                    <div className="auth-switch">
+                        <button onClick={goToLogin} className="link-button">{t('backToSignIn')}</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+    // Mode: User does not have a token and needs to request one.
+    // This part is never reached because the App router handles the 'forgot' mode within AuthView.
+    // However, keeping this logic for the /reset-password route which handles the token.
+    // The prompt is slightly ambiguous, if the user lands on /#/reset-password without a token,
+    // they should be redirected or shown an error. The current App.tsx logic doesn't render this view
+    // unless the hash matches. The token useEffect handles the error case. This is sufficient.
     return (
         <div className="auth-container">
             <div className="auth-box">
-                <h1><span className="logo-font">{appName}</span></h1>
-                <p>{t('resetPasswordSubtitle')}</p>
-
-                <form className="auth-form" onSubmit={handleSubmit}>
-                    <fieldset disabled={!token || loading} style={{border: 'none', padding: 0, margin: 0, display: 'contents'}}>
-                        <div className="input-group has-btn">
-                            <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
-                            <input name="password" type={showPassword ? "text" : "password"} placeholder={t('newPassword')} required />
-                             <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-                                <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
-                            </button>
-                        </div>
-                        <div className="input-group">
-                            <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
-                            <input name="confirm_password" type="password" placeholder={t('confirmPassword')} required />
-                        </div>
-
-                        <button type="submit" className="btn btn-primary" disabled={loading || !token}>
-                            {loading ? <Loader /> : t('resetPassword')}
-                        </button>
-                    </fieldset>
-                </form>
+                 <h1><span className="logo-font">{appName}</span></h1>
+                 <p>{t('resetPasswordSubtitle')}</p>
+                 <div className="info-message warning">
+                    <p>{t('invalidResetToken')}</p>
+                 </div>
                  <div className="auth-switch">
                     <button onClick={goToLogin} className="link-button">{t('backToSignIn')}</button>
                 </div>
