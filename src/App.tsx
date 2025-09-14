@@ -316,9 +316,9 @@ const App = () => {
         { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
         { type: 'divider' },
         // Marketing
-        { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
         { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
         { name: t('marketing'), view: 'Marketing', icon: ICONS.TARGET },
+        { name: t('contacts'), view: 'Contacts', icon: ICONS.CONTACTS },
         { name: t('emailLists'), view: 'Email Lists', icon: ICONS.EMAIL_LISTS },
     ];
     
