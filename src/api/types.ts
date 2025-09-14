@@ -52,6 +52,14 @@ export type Template = {
     Subject?: string;
     Body: { Content: string }[];
 };
+export type PublicTemplate = {
+    id: number;
+    status: string;
+    template_name: string;
+    template_type: string[];
+    template_html: string; // This is a file ID
+    template_image: string | null; // This is a file ID
+};
 export type Module = {
     id: string;
     modulename: string;

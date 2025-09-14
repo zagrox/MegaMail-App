@@ -21,6 +21,7 @@ import MarketingView from './views/SendWizardView';
 import CampaignsView from './views/CampaignsView';
 import CampaignDetailView from './views/CampaignDetailView';
 import TemplatesView from './views/TemplatesView';
+import GalleryView from './views/GalleryView';
 import SettingsView from './views/SettingsView';
 import CalendarView from './views/CalendarView';
 import Icon from './components/Icon';
@@ -310,7 +311,8 @@ const App = () => {
         'Campaigns': { component: <CampaignsView apiKey={apiKey} setView={handleSetView} />, title: t('campaigns'), icon: ICONS.CAMPAIGNS },
         'CampaignDetail': { component: <CampaignDetailView apiKey={apiKey} campaign={selectedCampaign} onBack={() => handleSetView('Campaigns')} />, title: selectedCampaign?.Name || t('campaigns'), icon: ICONS.CAMPAIGNS },
         'Templates': { component: <TemplatesView apiKey={apiKey} setView={handleSetView} />, title: t('templates'), icon: ICONS.ARCHIVE },
-        'Email Builder': { component: <EmailBuilderView apiKey={apiKey} user={user} templateToEdit={templateToEdit} />, title: t('emailBuilder'), icon: ICONS.LAYERS },
+        'Gallery': { component: <GalleryView setView={handleSetView} />, title: t('gallery'), icon: ICONS.BOX },
+        'Email Builder': { component: <EmailBuilderView apiKey={apiKey} user={user} templateToEdit={templateToEdit} setView={handleSetView} />, title: t('emailBuilder'), icon: ICONS.LAYERS },
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
         'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('marketingCampaign'), icon: ICONS.TARGET },
         'Calendar': { component: <CalendarView />, title: t('calendar'), icon: ICONS.CALENDAR },
@@ -335,6 +337,7 @@ const App = () => {
         {
             title: t('contents'),
             items: [
+                { name: t('gallery'), view: 'Gallery', icon: ICONS.BOX },
                 { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
                 { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
                 { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },

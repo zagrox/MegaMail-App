@@ -79,5 +79,11 @@
     "permissionDeniedError": "دسترسی غیرمجاز. لطفاً برای دسترسی به این قابلیت، طرح خود را ارتقا دهید.",
     "overview": "نمای کلی",
     "contents": "محتواها",
-    "audience": "مخاطبان"
+    "audience": "مخاطبان",
+    "gallery": "گالری",
+    "chooseFromGallery": "از گالری",
+    "useThisTemplate": "استفاده از این قالب",
+    "loadingTemplate": "در حال بارگذاری قالب...",
+    "noGalleryTemplates": "هنوز قالبی در گالری موجود نیست.",
+    "noGalleryTemplatesDesc": "بعداً برای طرح‌های جدید دوباره سر بزنید."
 }

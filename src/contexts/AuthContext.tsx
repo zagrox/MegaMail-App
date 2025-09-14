@@ -269,8 +269,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 promises.push(sdk.request(updateMe(userPayload)));
             }
             if (Object.keys(profilePayload).length > 0 && user.profileId) {
-                // FIX: Corrected a call to the Directus SDK's `updateItem` function which was causing an argument mismatch error.
-                // Replaced it with a raw sdk.request to patch the profile item, which resolves the error and correctly updates user profiles.
+                // FIX: The `updateItem` function was causing an argument mismatch error (Expected 1-2 arguments, but got 3).
+                // Replaced with a raw PATCH request to correctly update the user's profile.
                 promises.push(sdk.request(() => ({
                     method: 'PATCH',
                     path: `/items/profiles/${user.profileId}`,

@@ -55,6 +55,7 @@ import './src/styles/views/smtp.css';
 import './src/styles/views/templates.css';
 import './src/styles/views/invoice.css';
 import './src/styles/views/custom-fields.css';
+import './src/styles/views/gallery.css';
 
 const root = createRoot(document.getElementById('root')!);
 root.render(

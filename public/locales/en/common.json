@@ -79,5 +79,11 @@
     "permissionDeniedError": "Permission denied. Please upgrade your plan to access this feature.",
     "overview": "Overview",
     "contents": "Contents",
-    "audience": "Audience"
+    "audience": "Audience",
+    "gallery": "Gallery",
+    "chooseFromGallery": "From Gallery",
+    "useThisTemplate": "Use This Template",
+    "loadingTemplate": "Loading template...",
+    "noGalleryTemplates": "No templates available in the gallery yet.",
+    "noGalleryTemplatesDesc": "Check back later for new designs."
 }

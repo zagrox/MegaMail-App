@@ -1,5 +1,3 @@
-
-
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -361,7 +359,7 @@ const findBlockById = (items: any[], id: string): any | null => {
 };
 
 
-const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; user: any; templateToEdit: Template | null; }) => {
+const EmailBuilderView = ({ apiKey, user, templateToEdit, setView }: { apiKey: string; user: any; templateToEdit: Template | null; setView: (view: string, data?: any) => void; }) => {
     const { t } = useTranslation(['emailBuilder', 'common']);
     const { addToast } = useToast();
     const [items, setItems] = useState<any[]>([]);
@@ -984,6 +982,9 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit }: { apiKey: string; us
                 {isUpdatingImage && <div className="page-overlay"><Loader /></div>}
                 <header className="email-builder-header">
                     <div className="email-builder-header-left">
+                        <button className="btn-icon" onClick={() => setView('Gallery')} title={t('gallery', { ns: 'common' })}>
+                            <Icon>{ICONS.BOX}</Icon>
+                        </button>
                         <button className="btn-icon" onClick={() => setIsTestSendVisible(prev => !prev)} title={t('sendTestEmail')}>
                             <Icon>{ICONS.SEND_EMAIL}</Icon>
                         </button>

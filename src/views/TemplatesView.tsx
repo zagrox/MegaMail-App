@@ -238,6 +238,9 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
                             <Icon>{ICONS.EMAIL_LISTS}</Icon>
                         </button>
                     </div>
+                    <Button className="btn-secondary" onClick={() => setView('Gallery')}>
+                        <Icon>{ICONS.BOX}</Icon> {t('chooseFromGallery')}
+                    </Button>
                     <Button className="btn-primary" onClick={() => setView('Email Builder')} action="create_template">
                         <Icon>{ICONS.PLUS}</Icon> {t('createTemplate')}
                     </Button>
