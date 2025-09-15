@@ -99,6 +99,9 @@ html[data-theme='dark'] .cta-banner {
     .cta-banner {
         display: none;
     }
+    .hide-on-mobile {
+        display: none;
+    }
     .dashboard-header {
         flex-direction: column;
         align-items: flex-start;

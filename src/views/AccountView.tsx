@@ -11,7 +11,6 @@ import Tabs from '../components/Tabs';
 import GeneralTab from './account/GeneralTab';
 import ProfileTab from './account/ProfileTab';
 import SecurityTab from './account/SecurityTab';
-import ShareTab from './account/ShareTab';
 import OrdersTab from './account/OrdersTab';
 import ModulesTab from './account/ModulesTab';
 import NotificationsTab from './account/NotificationsTab';
@@ -47,13 +46,8 @@ const AccountView = ({ apiKey, user, setView, allModules, hasModuleAccess }: { a
             { id: 'security', label: t('security'), icon: ICONS.LOCK, component: <SecurityTab user={user} /> },
         ];
 
-        // Conditionally add the Share tab based on API module access
-        if (hasModuleAccess('API', allModules)) {
-            baseTabs.push({ id: 'share', label: t('share'), icon: ICONS.SHARE, component: <ShareTab apiKey={apiKey} /> });
-        }
-
         return baseTabs;
-    }, [t, accountData, contactsCountData, contactsCountLoading, installPrompt, handleInstallClick, user, setView, hasModuleAccess, allModules, apiKey]);
+    }, [t, accountData, contactsCountData, contactsCountLoading, installPrompt, handleInstallClick, user, setView]);
     
     useEffect(() => {
         const initialTab = sessionStorage.getItem('account-tab');

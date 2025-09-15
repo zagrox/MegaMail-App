@@ -1,3 +1,6 @@
+
 {
-    "today": "امروز"
+    "today": "امروز",
+    "nextMonth": "ماه بعد",
+    "prevMonth": "ماه قبل"
 }

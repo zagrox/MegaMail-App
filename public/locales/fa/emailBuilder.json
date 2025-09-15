@@ -1,3 +1,4 @@
+
 {
     "newTemplateName": "قالب بدون عنوان",
     "saveTemplateSuccess": "قالب «{{name}}» با موفقیت ذخیره شد!",
@@ -132,5 +133,9 @@
     "iconColorDark": "تیره",
     "iconColorWhite": "سفید",
     "iconColorGray": "خاکستری",
-    "iconColorColor": "رنگی"
+    "iconColorColor": "رنگی",
+    "unsavedChangesTitle": "تغییرات ذخیره نشده",
+    "unsavedChangesMessage": "شما تغییرات ذخیره نشده‌ای در ایمیل ساز دارید. آیا مطمئن هستید که می‌خواهید خارج شوید؟ تغییرات شما از بین خواهد رفت.",
+    "leave": "خروج",
+    "saveAndClose": "ذخیره و خروج"
 }

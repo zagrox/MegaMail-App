@@ -37,6 +37,7 @@ import InvoiceView from './views/InvoiceView';
 import CustomFieldsView from './views/CustomFieldsView';
 import { useToast } from './contexts/ToastContext';
 import emitter from './api/eventEmitter';
+import UnsavedChangesModal from './components/UnsavedChangesModal';
 
 
 const App = () => {
@@ -56,6 +57,14 @@ const App = () => {
     const [orderForOfflinePayment, setOrderForOfflinePayment] = useState<any | null>(null);
     const [orderForInvoice, setOrderForInvoice] = useState<any | null>(null);
     const appContainerRef = useRef<HTMLDivElement>(null);
+
+    const emailBuilderRef = useRef<{ save: () => Promise<boolean> } | null>(null);
+    const [isBuilderDirty, setIsBuilderDirty] = useState(false);
+    const [leaveConfirmationState, setLeaveConfirmationState] = useState({
+        isOpen: false,
+        targetView: '',
+        targetData: null as any,
+    });
 
     useEffect(() => {
         const handleForbidden = () => {
@@ -245,6 +254,11 @@ const App = () => {
     };
 
     const handleSetView = (newView: string, data?: { template?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any, campaign?: any, orderToResume?: any, order?: any }) => {
+        if (view === 'Email Builder' && isBuilderDirty && newView !== 'Email Builder') {
+            setLeaveConfirmationState({ isOpen: true, targetView: newView, targetData: data });
+            return;
+        }
+
         if (newView === 'Email Builder' && data?.template) setTemplateToEdit(data.template);
         else setTemplateToEdit(null);
 
@@ -294,6 +308,31 @@ const App = () => {
         setIsMobileMenuOpen(false);
     }
     
+    const handleLeaveConfirmation = () => {
+        setIsBuilderDirty(false);
+        setLeaveConfirmationState({ isOpen: false, targetView: '', targetData: null });
+        setTimeout(() => {
+            handleSetView(leaveConfirmationState.targetView, leaveConfirmationState.targetData);
+        }, 0);
+    };
+
+    const handleCancelLeave = () => {
+        setLeaveConfirmationState({ isOpen: false, targetView: '', targetData: null });
+    };
+
+    const handleSaveAndLeave = async () => {
+        if (emailBuilderRef.current) {
+            const success = await emailBuilderRef.current.save();
+            if (success) {
+                setIsBuilderDirty(false); 
+                setLeaveConfirmationState({ isOpen: false, targetView: '', targetData: null });
+                setTimeout(() => {
+                    handleSetView(leaveConfirmationState.targetView, leaveConfirmationState.targetData);
+                }, 0);
+            }
+        }
+    };
+    
     const views: Record<string, { component: ReactNode, title: string, icon: React.ReactNode }> = {
         'Dashboard': { component: <DashboardView setView={handleSetView} apiKey={apiKey} user={user} />, title: t('dashboard'), icon: ICONS.DASHBOARD },
         'Statistics': { component: <StatisticsView apiKey={apiKey} />, title: t('statistics'), icon: ICONS.STATISTICS },
@@ -312,7 +351,7 @@ const App = () => {
         'CampaignDetail': { component: <CampaignDetailView apiKey={apiKey} campaign={selectedCampaign} onBack={() => handleSetView('Campaigns')} />, title: selectedCampaign?.Name || t('campaigns'), icon: ICONS.CAMPAIGNS },
         'Templates': { component: <TemplatesView apiKey={apiKey} setView={handleSetView} />, title: t('templates'), icon: ICONS.ARCHIVE },
         'Gallery': { component: <GalleryView setView={handleSetView} />, title: t('gallery'), icon: ICONS.IMAGE },
-        'Email Builder': { component: <EmailBuilderView apiKey={apiKey} user={user} templateToEdit={templateToEdit} setView={handleSetView} />, title: t('emailBuilder'), icon: ICONS.LAYERS },
+        'Email Builder': { component: <EmailBuilderView ref={emailBuilderRef} apiKey={apiKey} user={user} templateToEdit={templateToEdit} setView={handleSetView} onDirtyChange={setIsBuilderDirty} />, title: t('emailBuilder'), icon: ICONS.LAYERS },
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
         'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('marketingCampaign'), icon: ICONS.TARGET },
         'Calendar': { component: <CalendarView />, title: t('calendar'), icon: ICONS.CALENDAR },
@@ -335,21 +374,21 @@ const App = () => {
             ],
         },
         {
-            title: t('contents'),
-            items: [
-                { name: t('gallery'), view: 'Gallery', icon: ICONS.IMAGE },
-                { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
-                { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
-                { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
-            ],
-        },
-        {
             title: t('campaigns'),
             items: [
                 { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
                 { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
                 { name: t('marketing'), view: 'Marketing', icon: ICONS.TARGET },
                 { name: t('calendar'), view: 'Calendar', icon: ICONS.CALENDAR },
+            ],
+        },
+        {
+            title: t('contents'),
+            items: [
+                { name: t('gallery'), view: 'Gallery', icon: ICONS.IMAGE },
+                { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
+                { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
+                { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
             ],
         },
     ];
@@ -417,6 +456,12 @@ const App = () => {
 
     return (
         <div ref={appContainerRef} className={`app-container ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
+            <UnsavedChangesModal
+                isOpen={leaveConfirmationState.isOpen}
+                onCancel={handleCancelLeave}
+                onLeave={handleLeaveConfirmation}
+                onSaveAndLeave={handleSaveAndLeave}
+            />
             {moduleToUnlock && (
                 <UnlockModuleModal
                     module={moduleToUnlock}

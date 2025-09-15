@@ -1,3 +1,4 @@
+
 {
     "newTemplateName": "Untitled Template",
     "saveTemplateSuccess": "Template \"{{name}}\" saved successfully!",
@@ -132,5 +133,9 @@
     "iconColorDark": "Dark",
     "iconColorWhite": "White",
     "iconColorGray": "Gray",
-    "iconColorColor": "Color"
+    "iconColorColor": "Color",
+    "unsavedChangesTitle": "Unsaved Changes",
+    "unsavedChangesMessage": "You have unsaved changes in the email builder. Are you sure you want to leave? Your changes will be lost.",
+    "leave": "Leave",
+    "saveAndClose": "Save & Close"
 }

@@ -7,14 +7,14 @@
       "title_fa": "روز سال نو میلادی"
     },
     {
-      "date": "2024-01-15",
+      "date": "2025-01-20",
       "title_en": "Martin Luther King Jr. Day",
       "title_fa": "روز مارتین لوتر کینگ جونیور"
     },
     {
-      "date": "2025-01-20",
-      "title_en": "Martin Luther King Jr. Day",
-      "title_fa": "روز مارتین لوتر کینگ جونیور"
+      "gregorianDate": "02-11",
+      "title_en": "Assassination of Griboyedov",
+      "title_fa": "حمله به سفارت روسیه و قتل گریبایدوف"
     },
     {
       "gregorianDate": "02-14",
@@ -27,24 +27,14 @@
       "title_fa": "روز جهانی زن"
     },
     {
-      "gregorianDate": "03-17",
-      "title_en": "St. Patrick's Day",
-      "title_fa": "روز سنت پاتریک"
+      "gregorianDate": "03-14",
+      "title_en": "Pi Day",
+      "title_fa": "روز جهانی عدد پی π"
     },
     {
-      "date": "2024-03-31",
-      "title_en": "Easter Sunday",
-      "title_fa": "یکشنبه عید پاک"
-    },
-    {
-      "date": "2025-04-20",
-      "title_en": "Easter Sunday",
-      "title_fa": "یکشنبه عید پاک"
-    },
-    {
-      "gregorianDate": "04-01",
-      "title_en": "April Fools' Day",
-      "title_fa": "دروغ اول آوریل"
+      "gregorianDate": "03-20",
+      "title_en": "International Day of Happiness",
+      "title_fa": "روز جهانی شادی"
     },
     {
       "gregorianDate": "04-22",
@@ -52,29 +42,34 @@
       "title_fa": "روز زمین"
     },
     {
+      "gregorianDate": "04-27",
+      "title_en": "World Design Day",
+      "title_fa": "روز جهانی طراحی و گرافیک"
+    },
+    {
       "gregorianDate": "05-01",
       "title_en": "International Labour Day",
       "title_fa": "روز جهانی کارگر"
     },
     {
-      "gregorianDate": "05-04",
-      "title_en": "Star Wars Day",
-      "title_fa": "روز جنگ ستارگان"
+      "gregorianDate": "05-05",
+      "title_en": "International Midwives' Day",
+      "title_fa": "روز جهانی ماما"
     },
     {
-      "date": "2024-05-12",
-      "title_en": "Mother's Day",
-      "title_fa": "روز مادر"
+      "gregorianDate": "05-08",
+      "title_en": "World Red Cross and Red Crescent Day",
+      "title_fa": "روز جهانی صلیب سرخ و هلال احمر"
     },
     {
-      "date": "2025-05-11",
-      "title_en": "Mother's Day",
-      "title_fa": "روز مادر"
+      "gregorianDate": "05-12",
+      "title_en": "International Nurses Day",
+      "title_fa": "روز جهانی پرستار"
     },
     {
-      "date": "2024-05-27",
-      "title_en": "Memorial Day (US)",
-      "title_fa": "روز یادبود (آمریکا)"
+      "gregorianDate": "05-18",
+      "title_en": "International Museum Day",
+      "title_fa": "روز جهانی موزه و میراث فرهنگی"
     },
     {
       "date": "2025-05-26",
@@ -82,39 +77,59 @@
       "title_fa": "روز یادبود (آمریکا)"
     },
     {
+      "gregorianDate": "05-31",
+      "title_en": "World No Tobacco Day",
+      "title_fa": "روز جهانی بدون دخانیات"
+    },
+    {
       "gregorianDate": "06-05",
       "title_en": "World Environment Day",
       "title_fa": "روز جهانی محیط زیست"
     },
     {
-      "date": "2024-06-16",
+      "gregorianDate": "06-10",
+      "title_en": "World Handicrafts Day",
+      "title_fa": "روز جهانی صنایع دستی"
+    },
+    {
+      "gregorianDate": "06-12",
+      "title_en": "World Day Against Child Labour",
+      "title_fa": "روز جهانی مبارزه با کار کودکان"
+    },
+    {
+      "gregorianDate": "06-14",
+      "title_en": "World Blood Donor Day",
+      "title_fa": "روز جهانی اهدای خون"
+    },
+    {
+      "gregorianDate": "06-16",
       "title_en": "Father's Day",
-      "title_fa": "روز پدر"
+      "title_fa": "روز جهانی پدر"
     },
     {
-      "date": "2025-06-15",
-      "title_en": "Father's Day",
-      "title_fa": "روز پدر"
+      "gregorianDate": "06-17",
+      "title_en": "World Day to Combat Desertification",
+      "title_fa": "روز جهانی بیابان زدایی"
     },
     {
-        "gregorianDate": "06-30",
-        "title_en": "Social Media Day",
-        "title_fa": "روز شبکه های اجتماعی"
+      "gregorianDate": "06-26",
+      "title_en": "International Day Against Drug Abuse",
+      "title_fa": "روز جهانی مبارزه با مواد مخدر"
     },
     {
-      "gregorianDate": "07-04",
-      "title_en": "Independence Day (US)",
-      "title_fa": "روز استقلال (آمریکا)"
+      "gregorianDate": "08-01",
+      "title_en": "Start of World Breastfeeding Week",
+      "title_fa": "آغاز هفته جهانی شیردهی"
     },
     {
-        "gregorianDate": "07-07",
-        "title_en": "World Chocolate Day",
-        "title_fa": "روز جهانی شکلات"
+      "gregorianDate": "08-13",
+      "title_en": "International Lefthanders Day",
+      "title_fa": "روز جهانی چپ دست ها"
     },
     {
-      "date": "2024-09-02",
-      "title_en": "Labor Day (US)",
-      "title_fa": "روز کارگر (آمریکا)"
+      "gregorianDate": "08-19",
+      "title_en": "World Photography Day",
+      "title_fa": "روز جهانی عکاسی"
     },
     {
       "date": "2025-09-01",
@@ -122,9 +137,44 @@
       "title_fa": "روز کارگر (آمریکا)"
     },
     {
+      "gregorianDate": "09-10",
+      "title_en": "World Suicide Prevention Day",
+      "title_fa": "روز جهانی پیشگیری از خودکشی"
+    },
+    {
+      "gregorianDate": "09-11",
+      "title_en": "September 11 attacks",
+      "title_fa": "حمله به برج‌های دوقلوی مرکز تجارت جهانی"
+    },
+    {
+      "gregorianDate": "09-13",
+      "title_en": "Programmers' Day",
+      "title_fa": "روز گرامیداشت برنامه نویسان"
+    },
+    {
+      "gregorianDate": "09-21",
+      "title_en": "International Day of Peace",
+      "title_fa": "روز جهانی صلح"
+    },
+    {
+      "gregorianDate": "09-27",
+      "title_en": "World Tourism Day",
+      "title_fa": "روز جهانی جهانگردی"
+    },
+    {
+      "gregorianDate": "09-30",
+      "title_en": "International Translation Day",
+      "title_fa": "روز جهانی ترجمه و مترجم"
+    },
+    {
       "gregorianDate": "10-01",
-      "title_en": "International Coffee Day",
-      "title_fa": "روز جهانی قهوه"
+      "title_en": "International Day of Older Persons",
+      "title_fa": "روز جهانی سالمندان"
+    },
+    {
+      "gregorianDate": "10-04",
+      "title_en": "World Space Week begins",
+      "title_fa": "آغاز هفته جهانی فضا"
     },
     {
       "gregorianDate": "10-05",
@@ -132,9 +182,39 @@
       "title_fa": "روز جهانی معلم"
     },
     {
-      "gregorianDate": "10-24",
-      "title_en": "United Nations Day",
-      "title_fa": "روز ملل متحد"
+      "gregorianDate": "10-09",
+      "title_en": "World Post Day",
+      "title_fa": "روز جهانی پست"
+    },
+    {
+      "gregorianDate": "10-10",
+      "title_en": "World Day Against the Death Penalty",
+      "title_fa": "روز جهانی مبارزه با حکم اعدام"
+    },
+    {
+      "gregorianDate": "10-11",
+      "title_en": "International Day of the Girl Child",
+      "title_fa": "روز جهانی دختر"
+    },
+    {
+      "gregorianDate": "10-14",
+      "title_en": "World Standards Day",
+      "title_fa": "روز جهانی استاندارد"
+    },
+    {
+      "gregorianDate": "10-15",
+      "title_en": "White Cane Safety Day",
+      "title_fa": "روز جهانی عصای سفید"
+    },
+    {
+      "gregorianDate": "10-16",
+      "title_en": "World Food Day",
+      "title_fa": "روز جهانی غذا"
+    },
+    {
+      "gregorianDate": "10-17",
+      "title_en": "International Day for the Eradication of Poverty",
+      "title_fa": "روز جهانی ریشه کنی فقر"
     },
     {
       "gregorianDate": "10-31",
@@ -142,9 +222,19 @@
       "title_fa": "هالووین"
     },
     {
-      "date": "2024-11-28",
-      "title_en": "Thanksgiving (US)",
-      "title_fa": "روز شکرگزاری (آمریکا)"
+      "gregorianDate": "11-14",
+      "title_en": "World Diabetes Day",
+      "title_fa": "روز جهانی دیابت"
+    },
+    {
+      "gregorianDate": "11-19",
+      "title_en": "International Men's Day",
+      "title_fa": "روز جهانی آقایان"
+    },
+    {
+      "gregorianDate": "11-20",
+      "title_en": "Universal Children's Day",
+      "title_fa": "روز جهانی کودک"
     },
     {
       "date": "2025-11-27",
@@ -152,39 +242,34 @@
       "title_fa": "روز شکرگزاری (آمریکا)"
     },
     {
-        "date": "2024-11-29",
-        "title_en": "Black Friday",
-        "title_fa": "جمعه سیاه"
+      "gregorianDate": "11-25",
+      "title_en": "International Day for the Elimination of Violence against Women",
+      "title_fa": "روز جهانی مبارزه با خشونت علیه زنان"
     },
     {
-        "date": "2025-11-28",
-        "title_en": "Black Friday",
-        "title_fa": "جمعه سیاه"
+      "gregorianDate": "12-01",
+      "title_en": "World AIDS Day",
+      "title_fa": "روز جهانی ایدز"
     },
     {
-        "date": "2024-12-02",
-        "title_en": "Cyber Monday",
-        "title_fa": "دوشنبه سایبری"
+      "gregorianDate": "12-03",
+      "title_en": "International Day of Persons with Disabilities",
+      "title_fa": "روز جهانی معلولان"
     },
     {
-        "date": "2025-12-01",
-        "title_en": "Cyber Monday",
-        "title_fa": "دوشنبه سایبری"
+      "gregorianDate": "12-10",
+      "title_en": "Human Rights Day",
+      "title_fa": "روز جهانی حقوق بشر"
     },
     {
-      "gregorianDate": "12-24",
-      "title_en": "Christmas Eve",
-      "title_fa": "شب کریسمس"
+      "gregorianDate": "12-11",
+      "title_en": "International Mountain Day",
+      "title_fa": "روز جهانی کوهستان"
     },
     {
       "gregorianDate": "12-25",
       "title_en": "Christmas Day",
-      "title_fa": "روز کریسمس"
-    },
-    {
-      "gregorianDate": "12-31",
-      "title_en": "New Year's Eve",
-      "title_fa": "شب سال نو میلادی"
+      "title_fa": "روز جشن کریسمس"
     },
     {
       "jalaliDate": "01-01",
@@ -222,14 +307,54 @@
       "title_fa": "روز بزرگداشت سعدی"
     },
     {
+      "jalaliDate": "02-02",
+      "title_en": "Plant Festival",
+      "title_fa": "جشن گیاه آوری"
+    },
+    {
+      "jalaliDate": "02-03",
+      "title_en": "Sheikh Baha'i Day; National Entrepreneurship Day; Architecture Day",
+      "title_fa": "روز بزرگداشت شیخ بهایی؛ روزملی کارآفرینی؛ روز معماری"
+    },
+    {
+      "jalaliDate": "02-04",
+      "title_en": "Bandar Abbas explosion tragedy",
+      "title_fa": "فاجعه ی انفجار بندر عباس"
+    },
+    {
+      "jalaliDate": "02-09",
+      "title_en": "National Psychologist and Counselor Day",
+      "title_fa": "روز ملی روانشناس و مشاور"
+    },
+    {
+      "jalaliDate": "02-10",
+      "title_en": "40th Day of Nowruz Festival; National Persian Gulf Day",
+      "title_fa": "جشن چهلم نوروز؛ روز ملی خلیج فارس"
+    },
+    {
       "jalaliDate": "02-12",
       "title_en": "Teacher's Day",
       "title_fa": "روز معلم"
     },
     {
-        "jalaliDate": "02-25",
-        "title_en": "Ferdowsi Day",
-        "title_fa": "روز بزرگداشت فردوسی"
+      "jalaliDate": "02-15",
+      "title_en": "Mid-Spring Festival; Shiraz Day",
+      "title_fa": "جشن میانه بهار/جشن بهاربد؛ روز شیراز"
+    },
+    {
+      "jalaliDate": "02-22",
+      "title_en": "Maryam Mirzakhani's Birthday, International Women in Mathematics Day",
+      "title_fa": "زادروز مریم میرزاخانی، روز جهانی زن در ریاضیات"
+    },
+    {
+      "jalaliDate": "02-25",
+      "title_en": "Ferdowsi Day",
+      "title_fa": "روز بزرگداشت فردوسی"
+    },
+    {
+      "jalaliDate": "02-27",
+      "title_en": "Communications and Public Relations Day",
+      "title_fa": "روز ارتباطات و روابط عمومی"
     },
     {
       "jalaliDate": "02-28",
@@ -237,9 +362,39 @@
       "title_fa": "روز بزرگداشت خیام"
     },
     {
+      "jalaliDate": "03-01",
+      "title_en": "Productivity and Consumption Optimization Day",
+      "title_fa": "روز بهره وری و بهینه سازی مصرف"
+    },
+    {
+      "jalaliDate": "03-01",
+      "title_en": "Mulla Sadra Day",
+      "title_fa": "روز بزرگداشت ملاصدرا"
+    },
+    {
+      "jalaliDate": "03-02",
+      "title_en": "Metropol Building collapse in Abadan",
+      "title_fa": "فروریختن ساختمان متروپل در آبادان"
+    },
+    {
+      "jalaliDate": "03-03",
+      "title_en": "Liberation of Khorramshahr, Day of Resistance, Sacrifice and Victory",
+      "title_fa": "فتح خرمشهر، روز مقاومت، ایثار و پیروزی"
+    },
+    {
+      "jalaliDate": "03-04",
+      "title_en": "Dezful Day, Day of Resistance and Steadfastness",
+      "title_fa": "روز دزفول، روز مقاومت و پایداری"
+    },
+    {
+      "jalaliDate": "03-06",
+      "title_en": "Khordadegan Festival",
+      "title_fa": "خرداد روز، جشن خردادگان"
+    },
+    {
       "jalaliDate": "03-14",
       "title_en": "Demise of Imam Khomeini",
-      "title_fa": "رحلت امام خمینی"
+      "title_fa": "رحلت حضرت امام خمینی"
     },
     {
       "jalaliDate": "03-15",
@@ -247,14 +402,219 @@
       "title_fa": "قیام ۱۵ خرداد"
     },
     {
+      "jalaliDate": "03-25",
+      "title_en": "National Flower and Plant Day",
+      "title_fa": "روز ملی گل و گیاه"
+    },
+    {
+      "jalaliDate": "03-31",
+      "title_en": "Anniversary of Manjil-Rudbar earthquake",
+      "title_fa": "سالروز زلزله رودبار و منجیل"
+    },
+    {
+      "jalaliDate": "04-01",
+      "title_en": "Ab Pashounak Festival, Start of Summer",
+      "title_fa": "جشن آب پاشونک، جشن آغاز تابستان"
+    },
+    {
+      "jalaliDate": "04-07",
+      "title_en": "Hafte Tir bombing; Judiciary Day",
+      "title_fa": "انفجار دفتر حزب جمهوری اسلامی؛ روز قوه قضاییه"
+    },
+    {
+      "jalaliDate": "04-08",
+      "title_en": "Day of Fight against Chemical and Microbial Weapons",
+      "title_fa": "روز مبارزه با سلاح های شیمیایی و میکروبی"
+    },
+    {
+      "jalaliDate": "04-10",
+      "title_en": "Industry and Mine Day",
+      "title_fa": "روز صنعت و معدن"
+    },
+    {
+      "jalaliDate": "04-10",
+      "title_en": "Babak Khorramdin's Birthday",
+      "title_fa": "زادروز بابک خرمدین"
+    },
+    {
+      "jalaliDate": "04-10",
+      "title_en": "Saib Tabrizi Day",
+      "title_fa": "روز بزرگداشت صائب تبریزی"
+    },
+    {
+      "jalaliDate": "04-12",
+      "title_en": "Iran Air Flight 655 shot down",
+      "title_fa": "شلیک به پرواز ۶۵۵ ایران ایر"
+    },
+    {
       "jalaliDate": "04-13",
-      "title_en": "Tirgan",
-      "title_fa": "جشن تیرگان"
+      "title_en": "Tiregan Festival, Arash the Archer Day",
+      "title_fa": "جشن تیرگان، بزرگداشت آرش کمانگیر"
+    },
+    {
+      "jalaliDate": "04-14",
+      "title_en": "Pen Day",
+      "title_fa": "روز قلم"
+    },
+    {
+      "jalaliDate": "04-15",
+      "title_en": "Raw food festival",
+      "title_fa": "جشن خام خواری"
+    },
+    {
+      "jalaliDate": "04-22",
+      "title_en": "Khwarizmi's Birthday & National IT Day",
+      "title_fa": "زادروز محمد خوارزمی و روز ملی فناوری اطلاعات"
+    },
+    {
+      "jalaliDate": "04-25",
+      "title_en": "Welfare and Social Security Day",
+      "title_fa": "روز بهزیستی و تامین اجتماعی"
+    },
+    {
+      "jalaliDate": "04-27",
+      "title_en": "Acceptance of UN Resolution 598",
+      "title_fa": "اعلام پذیرش قطعنامه ۵۹۸"
+    },
+    {
+      "jalaliDate": "05-07",
+      "title_en": "Amordadegan Festival",
+      "title_fa": "روز جشن اَمردادگان"
+    },
+    {
+      "jalaliDate": "05-08",
+      "title_en": "Suhrawardi Day",
+      "title_fa": "روز بزرگداشت شیخ شهاب الدین سهروردی"
+    },
+    {
+      "jalaliDate": "05-10",
+      "title_en": "Summer's Chelleh Festival",
+      "title_fa": "جشن چله تابستان"
+    },
+    {
+      "jalaliDate": "05-14",
+      "title_en": "Constitutional Revolution Anniversary",
+      "title_fa": "سالروز صدور فرمان مشروطیت"
+    },
+    {
+      "jalaliDate": "05-17",
+      "title_en": "Journalist's Day",
+      "title_fa": "روز خبرنگار"
+    },
+    {
+      "jalaliDate": "05-28",
+      "title_en": "Anniversary of 28 Mordad coup",
+      "title_fa": "سالروز وقایع ۲۸ مرداد"
+    },
+    {
+      "jalaliDate": "05-28",
+      "title_en": "Anniversary of Cinema Rex fire",
+      "title_fa": "سالروز فاجعه آتش زدن سینما رکس آبادان"
+    },
+    {
+      "jalaliDate": "06-01",
+      "title_en": "Avicenna and Doctor's Day",
+      "title_fa": "روز بزرگداشت ابوعلی سینا و روز پزشک"
+    },
+    {
+      "jalaliDate": "06-02",
+      "title_en": "Start of Government Week",
+      "title_fa": "آغاز هفته دولت"
+    },
+    {
+      "jalaliDate": "06-04",
+      "title_en": "Cyrus the Great's Birthday",
+      "title_fa": "زادروز کوروش بزرگ"
+    },
+    {
+      "jalaliDate": "06-04",
+      "title_en": "Employee Day (Shahrivargan)",
+      "title_fa": "روز جشن شهریورگان"
+    },
+    {
+      "jalaliDate": "06-05",
+      "title_en": "Zakariya al-Razi and Pharmacist's Day",
+      "title_fa": "روز بزرگداشت محمدبن زکریای رازی و روز داروساز"
+    },
+    {
+      "jalaliDate": "06-08",
+      "title_en": "Prime Minister's office bombing, Day of Fight against Terrorism",
+      "title_fa": "انفجار در دفتر نخست‌وزیری، روز مبارزه با تروریسم"
+    },
+    {
+      "jalaliDate": "06-11",
+      "title_en": "Printing Industry Day",
+      "title_fa": "روز صنعت چاپ"
+    },
+    {
+      "jalaliDate": "06-12",
+      "title_en": "Martyrdom of Rais Ali Delvari",
+      "title_fa": "سالروز شهادت رئیسعلی دلواری"
+    },
+    {
+      "jalaliDate": "06-13",
+      "title_en": "Al-Biruni Day",
+      "title_fa": "روز بزرگداشت ابوریحان بیرونی"
+    },
+    {
+      "jalaliDate": "06-21",
+      "title_en": "Cinema Day",
+      "title_fa": "روز سینما"
+    },
+    {
+      "jalaliDate": "06-22",
+      "title_en": "Programmers' Day",
+      "title_fa": "روز گرامیداشت برنامه نویسان"
+    },
+    {
+      "jalaliDate": "06-27",
+      "title_en": "Persian Poetry and Literature Day & Shahriar Day",
+      "title_fa": "روز شعر و ادب پارسی و روز بزرگداشت استاد شهریار"
+    },
+    {
+      "jalaliDate": "06-31",
+      "title_en": "Start of Holy Defense Week",
+      "title_fa": "آغاز هفته دفاع مقدس"
+    },
+    {
+      "jalaliDate": "07-04",
+      "title_en": "National Soldiers' Day",
+      "title_fa": "روز گرامیداشت سربازان وطن"
+    },
+    {
+      "jalaliDate": "07-07",
+      "title_en": "Fire and Safety Day",
+      "title_fa": "روز آتش نشانی و ایمنی"
+    },
+    {
+      "jalaliDate": "07-07",
+      "title_en": "Anniversary of commanders' plane crash",
+      "title_fa": "سقوط هواپیمای حامل جمعی از فرماندهان جنگ"
+    },
+    {
+      "jalaliDate": "07-07",
+      "title_en": "Shams Tabrizi Day",
+      "title_fa": "روز بزرگداشت شمس تبریزی"
+    },
+    {
+      "jalaliDate": "07-08",
+      "title_en": "Rumi Day",
+      "title_fa": "روز بزرگداشت مولوی"
     },
     {
       "jalaliDate": "07-10",
       "title_en": "Mehregan",
-      "title_fa": "جشن مهرگان"
+      "title_fa": "روز جشن مهرگان"
+    },
+    {
+      "jalaliDate": "07-14",
+      "title_en": "Veterinary Day",
+      "title_fa": "روز دامپزشکی"
+    },
+    {
+      "jalaliDate": "07-16",
+      "title_en": "National Children's Day",
+      "title_fa": "روز ملی کودک"
     },
     {
       "jalaliDate": "07-20",
@@ -262,9 +622,99 @@
       "title_fa": "روز بزرگداشت حافظ"
     },
     {
+      "jalaliDate": "07-21",
+      "title_en": "Victory of Kaveh and Fereydun over Zahhak",
+      "title_fa": "روز پیروزی کاوه و فریدون بر ضحاک"
+    },
+    {
+      "jalaliDate": "07-26",
+      "title_en": "Physical Education and Sports Day",
+      "title_fa": "روز تربیت بدنی و ورزش"
+    },
+    {
+      "jalaliDate": "07-28",
+      "title_en": "Birthday of Sattar Khan",
+      "title_fa": "زادروز ستارخان"
+    },
+    {
+      "jalaliDate": "07-29",
+      "title_en": "National Mountaineer's Day",
+      "title_fa": "روز ملی کوهنورد"
+    },
+    {
+      "jalaliDate": "08-01",
+      "title_en": "Statistics and Planning Day",
+      "title_fa": "روز آمار و برنامه ریزی"
+    },
+    {
+      "jalaliDate": "08-01",
+      "title_en": "Abu'l-Fadl Bayhaqi Day",
+      "title_fa": "روز بزرگداشت ابوالفضل بیهقی"
+    },
+    {
       "jalaliDate": "08-07",
-      "title_en": "Cyrus the Great Day",
-      "title_fa": "روز کوروش بزرگ"
+      "title_en": "Cyrus the Great's entry into Babylon",
+      "title_fa": "سالروز ورود کوروش بزرگ به بابل"
+    },
+    {
+      "jalaliDate": "08-10",
+      "title_en": "Abanegan Festival",
+      "title_fa": "روز جشن آبانگان"
+    },
+    {
+      "jalaliDate": "08-13",
+      "title_en": "Student's Day",
+      "title_fa": "روز دانش آموز"
+    },
+    {
+      "jalaliDate": "08-14",
+      "title_en": "National Day of Mazandaran",
+      "title_fa": "روز ملی مازندران"
+    },
+    {
+      "jalaliDate": "08-15",
+      "title_en": "Mid-Autumn Festival",
+      "title_fa": "جشن میانه پاییز"
+    },
+    {
+      "jalaliDate": "08-18",
+      "title_en": "National Quality Day",
+      "title_fa": "روز ملی کیفیت"
+    },
+    {
+      "jalaliDate": "08-24",
+      "title_en": "Book and Reading Day",
+      "title_fa": "روز کتاب و کتابخوانی"
+    },
+    {
+      "jalaliDate": "09-01",
+      "title_en": "Azar Jashn",
+      "title_fa": "آذر جشن"
+    },
+    {
+      "jalaliDate": "09-05",
+      "title_en": "Basij Mostazafan Day",
+      "title_fa": "روز بسیج مستضعفان"
+    },
+    {
+      "jalaliDate": "09-07",
+      "title_en": "Anniversary of Operation Morvarid, Navy Day",
+      "title_fa": "سالروز عملیات مروارید و روز نیروی دریایی"
+    },
+    {
+      "jalaliDate": "09-09",
+      "title_en": "Azargan Festival",
+      "title_fa": "جشن آذرگان"
+    },
+    {
+      "jalaliDate": "09-13",
+      "title_en": "Insurance Day",
+      "title_fa": "روز بیمه"
+    },
+    {
+      "jalaliDate": "09-15",
+      "title_en": "Accountant's Day",
+      "title_fa": "روز حسابدار"
     },
     {
       "jalaliDate": "09-16",
@@ -272,24 +722,139 @@
       "title_fa": "روز دانشجو"
     },
     {
+      "jalaliDate": "09-21",
+      "title_en": "Anniversary of the salvation of Azerbaijan",
+      "title_fa": "سالروز نجات آذربایجان"
+    },
+    {
+      "jalaliDate": "09-25",
+      "title_en": "Research and Technology Day",
+      "title_fa": "روز پژوهش و فناوری"
+    },
+    {
       "jalaliDate": "09-30",
       "title_en": "Yalda Night",
-      "title_fa": "شب یلدا"
+      "title_fa": "جشن شب یلدا، شب چله"
+    },
+    {
+      "jalaliDate": "10-01",
+      "title_en": "Khorram Ruz Festival, first Deygan festival",
+      "title_fa": "روز میلاد خورشید؛ جشن خرم روز، نخستین جشن دیگان"
+    },
+    {
+      "jalaliDate": "10-04",
+      "title_en": "Friendship Day",
+      "title_fa": "روز بزرگداشت دوستی"
     },
     {
       "jalaliDate": "10-05",
-      "title_en": "Death of Zoroaster",
-      "title_fa": "درگذشت زرتشت"
+      "title_en": "Bam earthquake anniversary",
+      "title_fa": "زمین لرزه ی بم ۱۳۸۲ خورشیدی"
     },
     {
-      "jalaliDate": "10-10",
-      "title_en": "National Persian Gulf Day",
-      "title_fa": "روز ملی خلیج فارس"
+      "jalaliDate": "10-05",
+      "title_en": "Martyrdom of Ashu Zartosht",
+      "title_fa": "سالروز شهادت اشو زرتشت"
     },
     {
-        "jalaliDate": "11-29",
-        "title_en": "Sepandarmazgan",
-        "title_fa": "سپندارمذگان"
+      "jalaliDate": "10-05",
+      "title_en": "Anniversary of Operation Karbala 4",
+      "title_fa": "سالروز عملیات کربلای ۴ ۱۳۶۵ خورشیدی"
+    },
+    {
+      "jalaliDate": "10-08",
+      "title_en": "Second Deygan festival",
+      "title_fa": "دی به آذر روز، دومین جشن دیگان"
+    },
+    {
+      "jalaliDate": "10-08",
+      "title_en": "Ya'qub ibn al-Layth al-Saffar Day",
+      "title_fa": "روز بزرگداشت یعقوب لیث صفاری"
+    },
+    {
+      "jalaliDate": "10-09",
+      "title_en": "Execution of patriots in Tabriz by Russian forces",
+      "title_fa": "اعدام میهن‌پرستان آذری در تبریز توسط قوای اشغالگر روس"
+    },
+    {
+      "jalaliDate": "10-13",
+      "title_en": "Martyrdom of General Qasem Soleimani",
+      "title_fa": "شهادت سردار حاج قاسم سلیمانی"
+    },
+    {
+      "jalaliDate": "10-15",
+      "title_en": "Third Deygan festival",
+      "title_fa": "دی به مهر روز، سومین جشن دیگان"
+    },
+    {
+      "jalaliDate": "10-16",
+      "title_en": "Sinking of the Sanchi tanker",
+      "title_fa": "غرق شدن کشتی سانچی"
+    },
+    {
+      "jalaliDate": "10-18",
+      "title_en": "Ukraine International Airlines Flight 752 shot down",
+      "title_fa": "شلیک به پرواز ۷۵۲ هواپیمایی اوکراین"
+    },
+    {
+      "jalaliDate": "10-19",
+      "title_en": "Death of Akbar Hashemi Rafsanjani",
+      "title_fa": "درگذشت اکبر هاشمی رفسنجانی"
+    },
+    {
+      "jalaliDate": "10-20",
+      "title_en": "Assassination of Amir Kabir",
+      "title_fa": "قتل امیرکبیر"
+    },
+    {
+      "jalaliDate": "10-23",
+      "title_en": "Fourth Deygan festival",
+      "title_fa": "دی به دین روز، چهارمین جشن دیگان"
+    },
+    {
+      "jalaliDate": "10-30",
+      "title_en": "Plasco Building fire and collapse",
+      "title_fa": "آتش‌سوزی و فروریختن ساختمان پلاسکو"
+    },
+    {
+      "jalaliDate": "11-01",
+      "title_en": "Ferdowsi's Birthday",
+      "title_fa": "زادروز فردوسی"
+    },
+    {
+      "jalaliDate": "11-02",
+      "title_en": "Bahman Day - Bahmanegan Festival",
+      "title_fa": "بهمن روز - جشن بهمنگان"
+    },
+    {
+      "jalaliDate": "11-05",
+      "title_en": "Nowruz-e-Kordi Festival",
+      "title_fa": "جشن نوسره"
+    },
+    {
+      "jalaliDate": "11-06",
+      "title_en": "Safi al-Din al-Urmawi and Iranian Music Day",
+      "title_fa": "بزرگداشت صفی‌الدین اُرمَوی و روز موسیقی ایرانی"
+    },
+    {
+      "jalaliDate": "11-10",
+      "title_en": "Sadeh Festival",
+      "title_fa": "جشن سده"
+    },
+    {
+      "jalaliDate": "11-12",
+      "title_en": "Return of Imam Khomeini to Iran",
+      "title_fa": "بازگشت امام خمینی (ره) به ایران"
+    },
+    {
+      "jalaliDate": "11-15",
+      "title_en": "Mid-Winter Festival",
+      "title_fa": "جشن میانه زمستان"
+    },
+    {
+      "jalaliDate": "11-19",
+      "title_en": "Air Force Day",
+      "title_fa": "روز نیروی هوایی"
     },
     {
       "jalaliDate": "11-22",
@@ -297,9 +862,44 @@
       "title_fa": "پیروزی انقلاب اسلامی"
     },
     {
+      "jalaliDate": "11-29",
+      "title_en": "Sepandarmazgan and Love Day",
+      "title_fa": "جشن سپندارمذگان و روز عشق"
+    },
+    {
+      "jalaliDate": "11-29",
+      "title_en": "Neyshabur train disaster",
+      "title_fa": "فاجعه انفجار قطار نیشابور"
+    },
+    {
+      "jalaliDate": "12-05",
+      "title_en": "Nasir al-Din al-Tusi and Engineer's Day",
+      "title_fa": "روز بزرگداشت خواجه نصیر الدین طوسی و روز مهندس"
+    },
+    {
+      "jalaliDate": "12-07",
+      "title_en": "Bar Association Independence Anniversary and Lawyer's Day",
+      "title_fa": "سالروز استقلال کانون وکلای دادگستری و روز وکیل مدافع"
+    },
+    {
+      "jalaliDate": "12-15",
+      "title_en": "Arbor Day",
+      "title_fa": "روز درختکاری"
+    },
+    {
+      "jalaliDate": "12-25",
+      "title_en": "End of Shahnameh composition",
+      "title_fa": "پایان سرایش شاهنامه"
+    },
+    {
+      "jalaliDate": "12-25",
+      "title_en": "Parvin E'tesami Day",
+      "title_fa": "روز بزرگداشت پروین اعتصامی"
+    },
+    {
       "jalaliDate": "12-29",
       "title_en": "Oil Nationalization Day",
-      "title_fa": "روز ملی شدن صنعت نفت"
+      "title_fa": "روز ملی شدن صنعت نفت ایران"
     }
   ]
 }

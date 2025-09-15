@@ -5,9 +5,12 @@ import { ICONS } from '../components/Icon';
 import DomainsView from './DomainsView';
 import SmtpView from './SmtpView';
 import ApiKeyView from './ApiKeyView';
+import ShareTab from './account/ShareTab';
+import { useAuth } from '../contexts/AuthContext';
 
 const SettingsView = ({ apiKey, user }: { apiKey: string, user: any }) => {
     const { t } = useTranslation(['common', 'account', 'domains', 'smtp']);
+    const { hasModuleAccess, allModules } = useAuth();
     const [activeTab, setActiveTab] = useState('domains');
 
     const tabs = [
@@ -30,6 +33,17 @@ const SettingsView = ({ apiKey, user }: { apiKey: string, user: any }) => {
             component: <ApiKeyView apiKey={apiKey} user={user} /> 
         },
     ];
+    
+    // Conditionally add the Embed tab based on API module access
+    if (hasModuleAccess('API', allModules)) {
+        tabs.push({ 
+            id: 'embed', 
+            label: t('embed', { ns: 'account' }), 
+            icon: ICONS.SHARE, 
+            component: <ShareTab apiKey={apiKey} /> 
+        });
+    }
+
 
     return (
         <div className="settings-view-container">

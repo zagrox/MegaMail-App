@@ -99,17 +99,50 @@ const CalendarView = () => {
     const monthYearFormatter = useMemo(() => new Intl.DateTimeFormat(calendarLocale, { month: 'long', year: 'numeric' }), [calendarLocale]);
     const jalaliDateFormatter = useMemo(() => new Intl.DateTimeFormat('fa-IR-u-ca-persian', { month: '2-digit', day: '2-digit', numberingSystem: 'latn' }), []);
 
+    const isRTL = i18n.dir() === 'rtl';
+
+    const NextButton = (
+        <Button onClick={handleNextMonth} className="btn-secondary">
+             {isRTL ? (
+                <>
+                    <span className="btn-text">{t('nextMonth', { ns: 'calendar' })}</span>
+                    <Icon>{ICONS.CHEVRON_LEFT}</Icon>
+                </>
+            ) : (
+                <>
+                    <span className="btn-text">{t('nextMonth', { ns: 'calendar' })}</span>
+                    <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
+                </>
+            )}
+        </Button>
+    );
+
+    const PrevButton = (
+        <Button onClick={handlePrevMonth} className="btn-secondary">
+            {isRTL ? (
+                <>
+                    <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
+                    <span className="btn-text">{t('prevMonth', { ns: 'calendar' })}</span>
+                </>
+            ) : (
+                <>
+                    <Icon>{ICONS.CHEVRON_LEFT}</Icon>
+                    <span className="btn-text">{t('prevMonth', { ns: 'calendar' })}</span>
+                </>
+            )}
+        </Button>
+    );
+
+
+
+
     return (
         <div className="calendar-container">
             <div className="calendar-header">
                 <div className="calendar-nav">
-                    <Button onClick={handlePrevMonth} className="btn-secondary">
-                        <Icon>{ICONS.CHEVRON_LEFT}</Icon>
-                    </Button>
+                    {isRTL ? PrevButton : NextButton}
                     <h2>{monthYearFormatter.format(currentDate)}</h2>
-                    <Button onClick={handleNextMonth} className="btn-secondary">
-                        <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
-                    </Button>
+                    {isRTL ? NextButton : PrevButton}
                 </div>
                 <Button onClick={handleGoToToday} className="btn-secondary">{t('today', { ns: 'calendar' })}</Button>
             </div>

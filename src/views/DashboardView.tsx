@@ -114,7 +114,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
             {!isEmbed && (
                 <>
                     <div className="dashboard-header">
-                        <div>
+                        <div className="hide-on-mobile">
                             <h2>{t('welcomeMessage', { name: welcomeName })}</h2>
                         </div>
                         <div className="dashboard-actions">
@@ -172,7 +172,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
             {!isEmbed && (
                 <>
                     <div className="dashboard-section">
-                        <div className="dashboard-section-header">
+                        <div className="dashboard-section-header hide-on-mobile">
                             <h3>{t('exploreYourTools')}</h3>
                             <p>{t('exploreYourToolsSubtitle')}</p>
                         </div>
@@ -223,7 +223,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                            )}
                         </div>
                     </div>
-                    <div className="dashboard-branding-footer">
+                    <div className="dashboard-branding-footer hide-on-mobile">
                         <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(copyrightText) }} />
                     </div>
                 </>

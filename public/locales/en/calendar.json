@@ -1,3 +1,6 @@
+
 {
-    "today": "Today"
+    "today": "Today",
+    "nextMonth": "Next Month",
+    "prevMonth": "Prev Month"
 }

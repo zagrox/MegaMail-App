@@ -1,6 +1,6 @@
 {
     "back": "Back",
-    "selectCampaignType": "Select Campaign Type",
+    "selectCampaignType": "Campaign Type",
     "selectCampaignType_desc": "Choose the type of campaign you want to create. A regular campaign sends a single email to your audience.",
     "regularCampaign": "REGULAR<br />CAMPAIGN",
     "abTestCampaign": "A/B TEST<br />CAMPAIGN",

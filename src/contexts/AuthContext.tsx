@@ -1,7 +1,4 @@
 
-
-
-
 import React, { useState, useEffect, useCallback, ReactNode, createContext, useContext } from 'react';
 // FIX: Removed `updateUser as sdkUpdateUser` as it was causing argument mismatch errors and is replaced by a raw request.
 // FIX: Added AuthenticationData type for use with raw login request.
@@ -76,7 +73,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             // Otherwise, it starts the network request in the background.
             const modulesPromise = allModules
                 ? Promise.resolve(allModules)
-                : sdk.request(readItems('modules', { fields: ['id', 'modulename', 'moduleprice', 'moduledetails', 'status', 'modulepro', 'modulediscount', 'modulecore', 'locked_actions'], limit: -1 }));
+                : sdk.request(readItems('modules', { 
+                    fields: ['id', 'modulename', 'moduleprice', 'moduledetails', 'status', 'modulepro', 'modulediscount', 'modulecore', 'locked_actions'], 
+                    limit: -1,
+                    filter: { status: { _eq: 'published' } } 
+                }));
 
             // 1. Get Directus user data
             const me = await sdk.request(readMe({
@@ -443,21 +444,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const isUnlocked = await pollForModuleUnlock();
     
                 if (isUnlocked) {
-                    // Success: refresh user data and create a notification.
+                    // Success: refresh user data. The server-side flow is responsible for notifications.
                     await getMe();
-                    try {
-                        const notificationPayload = {
-                            status: "published",
-                            recipient: user.id,
-                            icon: 'box',
-                            message: `Module "${moduleToBuy.modulename}" has been successfully unlocked.`,
-                            link: '/',
-                            read_status: false,
-                        };
-                        await sdk.request(createItem('notifications', notificationPayload));
-                    } catch (notificationError) {
-                        console.error("Could not create unlock notification, but module was unlocked.", notificationError);
-                    }
                     resolve();
                 } else {
                     // Failure: timeout

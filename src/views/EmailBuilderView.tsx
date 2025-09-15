@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     DndContext,
@@ -358,8 +358,15 @@ const findBlockById = (items: any[], id: string): any | null => {
     return null;
 };
 
+interface EmailBuilderViewProps {
+    apiKey: string;
+    user: any;
+    templateToEdit: Template | null;
+    setView: (view: string, data?: any) => void;
+    onDirtyChange: (isDirty: boolean) => void;
+}
 
-const EmailBuilderView = ({ apiKey, user, templateToEdit, setView }: { apiKey: string; user: any; templateToEdit: Template | null; setView: (view: string, data?: any) => void; }) => {
+const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, onDirtyChange }: EmailBuilderViewProps, ref) => {
     const { t } = useTranslation(['emailBuilder', 'common']);
     const { addToast } = useToast();
     const [items, setItems] = useState<any[]>([]);
@@ -392,14 +399,23 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit, setView }: { apiKey: s
         defaultTextColor: '#333333',
     });
 
+    const [isDirty, setIsDirty] = useState(false);
+    const isInitialLoad = useRef(true);
+
     const toBase64 = (blob: Blob) => new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(blob);
         reader.onload = () => resolve(reader.result as string);
         reader.onerror = error => reject(error);
     });
+
+    useImperativeHandle(ref, () => ({
+        save: async () => {
+            return await handleSaveTemplate();
+        }
+    }));
     
-     useEffect(() => {
+    useEffect(() => {
         const resetToNew = () => {
             setIsEditing(false);
             setOriginalTemplateName(null);
@@ -415,6 +431,8 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit, setView }: { apiKey: s
                 defaultFontFamily: "'Inter', Arial, sans-serif",
                 defaultTextColor: '#333333',
             });
+            setIsDirty(false);
+            isInitialLoad.current = true;
         };
 
         if (templateToEdit) {
@@ -437,6 +455,8 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit, setView }: { apiKey: s
                         setSubject(state.subject || templateToEdit.Subject || '');
                         setFromName(state.fromName || '');
                         setTemplateName(state.templateName || templateToEdit.Name);
+                        setIsDirty(false);
+                        isInitialLoad.current = true;
                         return; // Exit after successful parsing
                     } catch (e) {
                         console.error("Failed to parse template state from HTML.", e);
@@ -456,11 +476,28 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit, setView }: { apiKey: s
                 style: TOOLBAR_COMPONENTS.find(c => c.type === 'Text')!.defaultStyle,
             };
             setItems([fallbackBlock]);
+            setIsDirty(false);
+            isInitialLoad.current = true;
 
         } else {
             resetToNew();
         }
     }, [templateToEdit, addToast, t]);
+
+    useEffect(() => {
+        if (isInitialLoad.current) {
+            isInitialLoad.current = false;
+            return;
+        }
+        if (!isDirty) {
+            setIsDirty(true);
+        }
+    }, [items, globalStyles, templateName, subject, fromName]);
+
+    useEffect(() => {
+        onDirtyChange(isDirty);
+    }, [isDirty, onDirtyChange]);
+
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -525,10 +562,10 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit, setView }: { apiKey: s
         `;
     }, [items, globalStyles, subject, templateName, fromName]);
     
-    const handleSaveTemplate = async () => {
+    const handleSaveTemplate = async (): Promise<boolean> => {
         if (!templateName) {
             addToast(t('templateNameRequired'), 'error');
-            return;
+            return false;
         }
         setIsSaving(true);
     
@@ -555,18 +592,20 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit, setView }: { apiKey: s
             }
     
             addToast(t('saveTemplateSuccess', { name: templateName }), 'success');
-            setOriginalTemplateName(templateName); // After saving, the current name is the new original.
-            setIsEditing(true); // It's now an existing template.
+            setOriginalTemplateName(templateName); 
+            setIsEditing(true); 
+            setIsDirty(false);
+            return true;
     
         } catch (err: any) {
             let errorMessage = err.message;
-            // Provide more user-friendly error messages based on API responses.
             if (err.message?.includes('already exists')) {
                 errorMessage = `A template named "${templateName}" already exists. Please choose a different name.`;
             } else if (err.message?.includes('Could not find specified template name')) {
                 errorMessage = `The original template "${originalTemplateName}" was not found and could not be updated. It might have been deleted.`;
             }
             addToast(t('saveTemplateError', { error: errorMessage }), 'error');
+            return false;
         } finally {
             setIsSaving(false);
         }
@@ -1058,7 +1097,6 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit, setView }: { apiKey: s
                                 selectedBlockId={selectedBlockId}
                                 onSelectBlock={handleSelectBlock}
                                 onEditBlock={handleEditBlock}
-                                // FIX: Corrected a typo in the `Canvas` component's `onContentChange` prop, changing it from the undefined `onContentChange` to the correctly defined `handleContentChange` function.
                                 onContentChange={handleContentChange}
                                 onStyleChange={handleStyleChange}
                                 onInsertBlock={handleInsertBlock}
@@ -1119,6 +1157,6 @@ const EmailBuilderView = ({ apiKey, user, templateToEdit, setView }: { apiKey: s
             </DragOverlay>
         </DndContext>
     );
-};
+});
 
 export default EmailBuilderView;
