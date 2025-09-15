@@ -55,15 +55,61 @@
 .gallery-card-content {
     padding: 1rem;
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .gallery-card-content h3 {
     font-size: 1.1rem;
     font-weight: 600;
-    margin: 0;
+    margin: 0 0 0.75rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.gallery-card-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrapping on small cards */
+    gap: 1rem; /* Increase gap for clarity */
+    margin-bottom: 0.75rem;
+    min-height: 24px;
+}
+
+.meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.color-swatch div {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--surface-color);
+    box-shadow: 0 0 0 1px var(--border-color);
+    flex-shrink: 0;
+}
+
+.language-tag {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--subtle-text-color);
+}
+
+.language-tag .icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.gallery-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
 }
 
 .gallery-card-actions {

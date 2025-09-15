@@ -333,8 +333,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const resetPassword = async (token: string, password: string) => {
-        // FIX: Replaced deprecated `sdk.auth.password.reset` (line 316) with the correct SDK v11+ method `sdk.passwordReset`.
-        await sdk.passwordReset(token, password);
+        // FIX: The `sdk.passwordReset` method does not exist. Replaced with a raw request to the password reset endpoint.
+        await sdk.request(() => ({
+            method: 'POST',
+            path: '/auth/password/reset',
+            body: JSON.stringify({ token, password }),
+            headers: { 'Content-Type': 'application/json' },
+        }));
     };
 
     const createElasticSubaccount = async (email: string, password: string) => {

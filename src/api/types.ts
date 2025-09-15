@@ -59,6 +59,8 @@ export type PublicTemplate = {
     template_type: string[];
     template_html: string; // This is a file ID
     template_image: string | null; // This is a file ID
+    template_language?: string;
+    template_color?: string;
 };
 export type Module = {
     id: string;

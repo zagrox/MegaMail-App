@@ -8,15 +8,22 @@ import ErrorMessage from '../components/ErrorMessage';
 import Icon, { ICONS } from '../components/Icon';
 import { useToast } from '../contexts/ToastContext';
 import EmptyState from '../components/EmptyState';
+import Badge from '../components/Badge';
 
 const GalleryTemplateCard = ({ template, onSelect }: { template: PublicTemplate & { htmlContent?: string }, onSelect: () => void }) => {
-    const { t } = useTranslation(['common', 'templates']);
+    const { t } = useTranslation(['common', 'templates', 'onboarding']);
     const { config } = useConfiguration();
     const [isLoading, setIsLoading] = useState(true);
 
     const imageUrl = template.template_image && config?.app_backend
         ? `${config.app_backend}/assets/${template.template_image}`
         : null;
+
+    const languageMap: { [key: string]: string } = {
+        persian: t('persian', { ns: 'onboarding' }),
+        english: t('english', { ns: 'onboarding' })
+    };
+    const languageDisplay = template.template_language ? languageMap[template.template_language.toLowerCase()] || template.template_language : null;
 
     return (
         <div className="card gallery-template-card">
@@ -47,6 +54,26 @@ const GalleryTemplateCard = ({ template, onSelect }: { template: PublicTemplate 
             </div>
             <div className="gallery-card-content">
                 <h3>{template.template_name}</h3>
+                <div className="gallery-card-meta">
+                    {template.template_color && (
+                        <div className="meta-item color-swatch" title={template.template_color}>
+                            <div style={{ backgroundColor: template.template_color }}></div>
+                        </div>
+                    )}
+                    {languageDisplay && (
+                        <div className="meta-item language-tag">
+                            <Icon>{ICONS.LANGUAGE}</Icon>
+                            <span>{languageDisplay}</span>
+                        </div>
+                    )}
+                </div>
+                {template.template_type && template.template_type.length > 0 && (
+                    <div className="gallery-card-tags">
+                        {template.template_type.map(type => (
+                            <Badge key={type} text={type} type="default" />
+                        ))}
+                    </div>
+                )}
             </div>
             <div className="gallery-card-actions">
                 <button className="btn btn-primary" onClick={onSelect}>
@@ -79,7 +106,7 @@ const GalleryView = ({ setView }: { setView: (view: string, data?: any) => void 
             try {
                 const url = new URL(`${config.app_backend}/items/templates`);
                 url.searchParams.append('filter[status][_eq]', 'published');
-                url.searchParams.append('fields', 'id,template_name,template_type,template_html,template_image');
+                url.searchParams.append('fields', 'id,template_name,template_type,template_html,template_image,template_language,template_color');
 
                 const response = await fetch(url.toString());
 
@@ -169,9 +196,6 @@ const GalleryView = ({ setView }: { setView: (view: string, data?: any) => void 
                     <Loader />
                 </div>
             )}
-            <div className="view-header">
-                <h2>{t('gallery')}</h2>
-            </div>
             {loading && <CenteredMessage><Loader /></CenteredMessage>}
             {error && <ErrorMessage error={error} />}
 

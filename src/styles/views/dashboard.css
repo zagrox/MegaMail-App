@@ -102,11 +102,18 @@ html[data-theme='dark'] .cta-banner {
     .dashboard-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 1rem;
     }
     .dashboard-actions {
         width: 100%;
-        display: grid;
-        grid-template-columns: 1fr;
+        display: flex;
+        gap: 0.75rem;
+    }
+    .dashboard-actions .btn-credits {
+        flex-grow: 1;
+    }
+    .dashboard-actions .btn-notifications {
+        flex-shrink: 0;
     }
 }
 .dashboard-stats-grid {

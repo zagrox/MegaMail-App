@@ -311,7 +311,7 @@ const App = () => {
         'Campaigns': { component: <CampaignsView apiKey={apiKey} setView={handleSetView} />, title: t('campaigns'), icon: ICONS.CAMPAIGNS },
         'CampaignDetail': { component: <CampaignDetailView apiKey={apiKey} campaign={selectedCampaign} onBack={() => handleSetView('Campaigns')} />, title: selectedCampaign?.Name || t('campaigns'), icon: ICONS.CAMPAIGNS },
         'Templates': { component: <TemplatesView apiKey={apiKey} setView={handleSetView} />, title: t('templates'), icon: ICONS.ARCHIVE },
-        'Gallery': { component: <GalleryView setView={handleSetView} />, title: t('gallery'), icon: ICONS.BOX },
+        'Gallery': { component: <GalleryView setView={handleSetView} />, title: t('gallery'), icon: ICONS.IMAGE },
         'Email Builder': { component: <EmailBuilderView apiKey={apiKey} user={user} templateToEdit={templateToEdit} setView={handleSetView} />, title: t('emailBuilder'), icon: ICONS.LAYERS },
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
         'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('marketingCampaign'), icon: ICONS.TARGET },
@@ -337,7 +337,7 @@ const App = () => {
         {
             title: t('contents'),
             items: [
-                { name: t('gallery'), view: 'Gallery', icon: ICONS.BOX },
+                { name: t('gallery'), view: 'Gallery', icon: ICONS.IMAGE },
                 { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
                 { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
                 { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
