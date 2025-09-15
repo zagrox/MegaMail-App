@@ -28,7 +28,7 @@ import Icon from './components/Icon';
 import EmbedView from './views/EmbedView';
 import ResetPasswordView from './views/ResetPasswordView';
 import CallbackView from './views/CallbackView';
-import { List, Template, Module } from './api/types';
+import { List, Template } from './api/types';
 import ListDetailView from './views/ListDetailView';
 import ContactDetailView from './views/ContactDetailView';
 import UnlockModuleModal from './components/UnlockModuleModal';
@@ -113,7 +113,7 @@ const App = () => {
         if (targetLangCode && targetLangCode !== i18n.language) {
             i18n.changeLanguage(targetLangCode);
         }
-    }, [user, config, authLoading, i18n.language, i18n]);
+    }, [user?.language, user?.id, config, authLoading, i18n]);
 
     const urlParams = new URLSearchParams(window.location.search);
     const isEmbedMode = urlParams.get('embed') === 'true';

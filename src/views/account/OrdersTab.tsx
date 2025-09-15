@@ -13,7 +13,7 @@ import Badge from '../../components/Badge';
 import { useOrderStatuses } from '../../hooks/useOrderStatuses';
 
 const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void }) => {
-    const { t, i18n } = useTranslation(['orders', 'common', 'buyCredits']);
+    const { t, i18n } = useTranslation(['orders', 'common', 'buyCredits', 'dashboard']);
     const { user } = useAuth();
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -135,12 +135,14 @@ const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void })
                                 {orders.map(order => {
                                     const orderStatus = order.order_status;
                                     const statusInfo = !statusesLoading ? statusesMap[orderStatus] : null;
+                                    const isModulePurchase = order.project_name === 'MegaMail Module Purchase';
+                                    const currency = isModulePurchase ? t('credits', { ns: 'dashboard' }) : t('buyCredits:priceIRT');
 
                                     return (
                                         <tr key={order.id}>
                                             <td>{order.order_note}</td>
                                             <td>{formatDateRelative(order.date_created, i18n.language)}</td>
-                                            <td>{order.order_total.toLocaleString(i18n.language)} {t('buyCredits:priceIRT')}</td>
+                                            <td>{order.order_total.toLocaleString(i18n.language)} {currency}</td>
                                             <td>
                                                 {statusInfo ? (
                                                     <Badge text={statusInfo.text} color={statusInfo.color} iconPath={statusInfo.iconPath} />

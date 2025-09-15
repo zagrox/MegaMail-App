@@ -14,36 +14,42 @@ const LanguageSwitcher = () => {
         { value: 'fa', label: 'فارسی', directusValue: 'persian', dir: 'rtl' },
     ];
 
-    const handleLanguageChange = (langCode: string) => {
+    const handleLanguageChange = async (langCode: string) => {
         if (i18n.language.startsWith(langCode)) return;
 
-        // Update UI immediately
-        i18n.changeLanguage(langCode);
+        const previousLangCode = i18n.language;
         localStorage.setItem('i18nextLng', langCode);
 
-        const showSuccessToast = () => {
-            addToast(t('languageUpdateSuccess'), 'success');
-        };
+        try {
+            // Optimistically change the language in the UI and wait for it to complete
+            await i18n.changeLanguage(langCode);
 
-        // If user is not an API user, sync to Directus
-        if (user && !user.isApiKeyUser) {
-            const selectedOption = options.find(opt => opt.value === langCode);
-            if (selectedOption) {
-                const payload = {
-                    language: selectedOption.directusValue,
-                    text_direction: selectedOption.dir,
-                };
-                updateUser(payload)
-                    .then(showSuccessToast)
-                    .catch(error => {
+            // Now that the language is loaded, the `t` function will use the new language files
+            addToast(t('languageUpdateSuccess'), 'success');
+
+            // Sync the change to the backend in the background for logged-in users
+            if (user && !user.isApiKeyUser) {
+                const selectedOption = options.find(opt => opt.value === langCode);
+                if (selectedOption) {
+                    const payload = {
+                        language: selectedOption.directusValue,
+                        text_direction: selectedOption.dir,
+                    };
+                    updateUser(payload).catch(error => {
                         console.warn("Failed to sync language preference:", error);
-                        // The UI has already updated optimistically, AuthContext will handle reverting on error.
-                        // We don't show an error toast here to avoid confusion.
+                        // Notify user that saving the preference failed.
+                        // The UI change for this session will remain, but a reload will revert it.
+                        addToast('Failed to save language preference to your profile.', 'error');
+                        // Revert localStorage so the next page load uses the correct server language.
+                        localStorage.setItem('i18nextLng', previousLangCode);
                     });
+                }
             }
-        } else {
-            // For guests or API key users, the change is local.
-            showSuccessToast();
+        } catch (error) {
+            console.error("Failed to change language:", error);
+            // Revert localStorage if the language change itself (e.g., loading files) fails.
+            localStorage.setItem('i18nextLng', previousLangCode);
+            addToast("An error occurred while changing the language.", 'error');
         }
     };
 

@@ -1,5 +1,7 @@
 
 
+
+
 import React, { useState, useEffect, useCallback, ReactNode, createContext, useContext } from 'react';
 // FIX: Removed `updateUser as sdkUpdateUser` as it was causing argument mismatch errors and is replaced by a raw request.
 // FIX: Added AuthenticationData type for use with raw login request.
@@ -9,6 +11,7 @@ import sdk, { storage } from '../api/directus';
 import { apiFetch } from '../api/elasticEmail';
 import type { Module } from '../api/types';
 import { AppActions } from '../config/actions';
+import { DIRECTUS_CRM_URL } from '../api/config';
 
 interface User {
     id: string;
@@ -262,10 +265,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const updateUser = async (data: any) => {
         if (!user || !user.id || user.isApiKeyUser) throw new Error("User not authenticated for this action");
 
-        const originalUser = { ...user };
-        // Optimistic update
-        setUser(currentUser => currentUser ? { ...currentUser, ...data } : null);
-
         try {
             const meFields: { [key: string]: any } = {};
             const profileFields: { [key: string]: any } = {};
@@ -285,12 +284,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 await sdk.request(updateItem('profiles', user.profileId, profileFields));
             }
             
-            // Re-fetch to get the canonical state from the server after a successful update.
+            // Re-fetch to get the canonical state from the server AFTER a successful update.
             await getMe();
 
         } catch (error) {
             console.error("Failed to update user:", error);
-            setUser(originalUser); // Revert on failure
+            // No optimistic state to revert, just re-throw the error
             throw error;
         }
     };
@@ -381,35 +380,96 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return hasModuleAccess(moduleThatLocksAction.modulename, allModules);
     };
 
-    const purchaseModule = async (moduleId: string) => {
-        if (!user || !user.profileId || !user.elastickey) throw new Error("User profile not found or main API key missing.");
-
-        const moduleToBuy = allModules?.find(m => String(m.id) === String(moduleId));
-        if (!moduleToBuy) throw new Error("Module not found.");
-        
-        const accountData = await apiFetch('/account/load', user.elastickey);
-        const userBalance = accountData?.emailcredits ?? 0;
-
-        if (userBalance < moduleToBuy.moduleprice) {
-            throw new Error("Insufficient credits.");
-        }
-
-        // 1. Deduct credits
-        await apiFetch('/account/addsubaccountcredits', user.elastickey, {
-            method: 'POST',
-            params: {
-                credits: -moduleToBuy.moduleprice,
-                notes: `Purchased module: ${moduleToBuy.modulename}`
+    const purchaseModule = (moduleId: string): Promise<void> => {
+        return new Promise(async (resolve, reject) => {
+            if (!user || !user.profileId) {
+                return reject(new Error("User profile not found."));
+            }
+    
+            const moduleToBuy = allModules?.find(m => String(m.id) === String(moduleId));
+            if (!moduleToBuy) {
+                return reject(new Error("Module not found."));
+            }
+    
+            const webhookUrl = `${DIRECTUS_CRM_URL}/flows/trigger/974adeab-789f-428d-9433-b056e1c6da9b`;
+    
+            try {
+                // Step 1: Trigger the webhook. The flow handles all backend logic.
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${await sdk.getToken()}`
+                    },
+                    body: JSON.stringify({ module_id: moduleId })
+                });
+    
+                if (!response.ok) {
+                    try {
+                        const errorBody = await response.json();
+                        // Customize error for insufficient balance based on your flow's potential response
+                        if (errorBody.message?.toLowerCase().includes('balance')) {
+                            throw new Error("Insufficient credits.");
+                        }
+                        throw new Error(errorBody.message || `Webhook trigger failed with status ${response.status}`);
+                    } catch {
+                        throw new Error(`Webhook trigger failed with status ${response.status}`);
+                    }
+                }
+    
+                // Step 2: Poll for the result of the flow: the 'profiles_modules' item creation.
+                const pollForModuleUnlock = async (timeout = 15000, interval = 2000): Promise<boolean> => {
+                    const endTime = Date.now() + timeout;
+                    while (Date.now() < endTime) {
+                        try {
+                            const result = await sdk.request(readItems('profiles_modules', {
+                                filter: {
+                                    profile_id: { _eq: user.profileId },
+                                    module_id: { _eq: moduleId }
+                                },
+                                limit: 1
+                            }));
+                            if (result && result.length > 0) {
+                                return true; // Success!
+                            }
+                        } catch (pollError) {
+                            console.warn("Polling for module unlock encountered an error, retrying...", pollError);
+                        }
+                        await new Promise(res => setTimeout(res, interval));
+                    }
+                    return false; // Timeout
+                };
+    
+                const isUnlocked = await pollForModuleUnlock();
+    
+                if (isUnlocked) {
+                    // Success: refresh user data and create a notification.
+                    await getMe();
+                    try {
+                        const notificationPayload = {
+                            status: "published",
+                            recipient: user.id,
+                            icon: 'box',
+                            message: `Module "${moduleToBuy.modulename}" has been successfully unlocked.`,
+                            link: '/',
+                            read_status: false,
+                        };
+                        await sdk.request(createItem('notifications', notificationPayload));
+                    } catch (notificationError) {
+                        console.error("Could not create unlock notification, but module was unlocked.", notificationError);
+                    }
+                    resolve();
+                } else {
+                    // Failure: timeout
+                    await getMe(); // Refresh state just in case
+                    reject(new Error("Unlocking the module timed out. The transaction may still be processing. Please check your modules page again shortly or contact support."));
+                }
+    
+            } catch (error: any) {
+                console.error("Module purchase failed:", error);
+                return reject(new Error(error.message || "Could not initiate module purchase. Please contact support."));
             }
         });
-
-        // 2. Create relationship in Directus
-        await sdk.request(createItem('profiles_modules', {
-            profile_id: user.profileId,
-            module_id: moduleId
-        }));
-        
-        await getMe();
     };
 
     const value = {
