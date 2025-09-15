@@ -3,7 +3,8 @@ import { DIRECTUS_URL } from './config';
 
 // The Directus SDK expects a storage object with get and set methods.
 // We'll create a simple adapter for window.localStorage.
-const storage: AuthenticationStorage = {
+// FIX: Export storage so it can be used for manual token handling in AuthContext.
+export const storage: AuthenticationStorage = {
     get: () => {
         const data = window.localStorage.getItem('directus_storage');
         try {

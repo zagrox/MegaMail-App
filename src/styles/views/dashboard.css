@@ -40,7 +40,7 @@
     display: flex;
     align-items: center;
     gap: 2rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
     flex-wrap: wrap;
 }
 html[data-theme='dark'] .cta-banner {
@@ -111,10 +111,56 @@ html[data-theme='dark'] .cta-banner {
 }
 .dashboard-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-bottom: 2.5rem;
 }
+
+.narrow-stat-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    gap: 1rem;
+}
+
+.narrow-stat-card-icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--secondary-color);
+    flex-shrink: 0;
+}
+
+.narrow-stat-card-title {
+    font-size: 0.9rem;
+    color: var(--subtle-text-color);
+    margin-right: auto;
+    white-space: nowrap;
+}
+[dir="rtl"] .narrow-stat-card-title {
+    margin-right: 0;
+    margin-left: auto;
+}
+.narrow-stat-card-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    height: 1.5rem;
+}
+.narrow-stat-card-value .line-loader {
+    width: 60px;
+}
+
+@media (max-width: 992px) {
+    .dashboard-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
 .dashboard-section {
     margin-top: 2.5rem;
 }

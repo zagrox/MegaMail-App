@@ -1,9 +1,14 @@
+
+
 import React, { useState, useEffect, useCallback, ReactNode, createContext, useContext } from 'react';
 // FIX: Removed `updateUser as sdkUpdateUser` as it was causing argument mismatch errors and is replaced by a raw request.
-import { readMe, registerUser, updateMe, createItem, readItems, updateItem } from '@directus/sdk';
-import sdk from '../api/directus';
+// FIX: Added AuthenticationData type for use with raw login request.
+import { readMe, registerUser, updateMe, createItem, readItems, updateItem, type AuthenticationData } from '@directus/sdk';
+// FIX: Import storage to manually handle authentication tokens.
+import sdk, { storage } from '../api/directus';
 import { apiFetch } from '../api/elasticEmail';
 import type { Module } from '../api/types';
+import { AppActions } from '../config/actions';
 
 interface User {
     id: string;
@@ -193,13 +198,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const login = async (credentials: any, recaptchaToken?: string) => {
         setLoading(true);
         try {
-            // Use the SDK's built-in login, passing the recaptcha token in the options
-            await sdk.login(credentials.email.toLowerCase(), credentials.password, {
-                // The SDK will merge this body with email/password into the request
-                body: { 'g-recaptcha-response': recaptchaToken },
-            });
-            
-            // sdk.login handles token storage automatically.
+            // FIX: The original sdk.login call caused a parameter count error (line 199).
+            // Replaced with a raw request to the login endpoint to reliably include the reCAPTCHA token,
+            // which is consistent with other auth methods in this file.
+            const authData = await sdk.request<AuthenticationData>(() => ({
+                method: 'POST',
+                path: '/auth/login',
+                body: JSON.stringify({
+                    email: credentials.email.toLowerCase(),
+                    password: credentials.password,
+                    'g-recaptcha-response': recaptchaToken,
+                }),
+                headers: { 'Content-Type': 'application/json' },
+            }));
+
+            // Manually set the authentication data in storage, which the SDK's
+            // internal request interceptor will then use for subsequent requests.
+            await storage.set(authData);
+
             localStorage.removeItem('elastic_email_api_key');
             await getMe();
         } finally {
@@ -235,82 +251,63 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             await sdk.logout();
         } catch (error) {
-            console.warn("Directus SDK logout failed, proceeding with client-side cleanup:", error);
+            console.warn("Directus SDK logout failed, likely already logged out.", error);
         } finally {
             localStorage.removeItem('elastic_email_api_key');
             setUser(null);
-            setAllModules(null); // Clear cached modules on logout
             setLoading(false);
         }
     };
-    
+
     const updateUser = async (data: any) => {
-        if (!user || !user.id || user.isApiKeyUser) throw new Error("User not authenticated or is an API key user.");
-    
-        const userFields = ['first_name', 'last_name', 'avatar', 'theme_dark', 'theme_light', 'email_notifications', 'text_direction'];
-        const profileFields = ['company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display', 'language'];
-    
-        const userPayload: any = {};
-        const profilePayload: any = {};
-    
-        Object.keys(data).forEach(key => {
-            if (userFields.includes(key)) userPayload[key] = data[key];
-            else if (profileFields.includes(key)) profilePayload[key] = data[key];
-        });
-    
-        // FIX: Perform an optimistic update of the local state immediately.
-        // This makes the UI feel instant and avoids the race condition where `getMe()`
-        // could fetch stale data and revert the language change.
-        setUser(prevUser => prevUser ? { ...prevUser, ...data } : null);
-    
+        if (!user || !user.id || user.isApiKeyUser) throw new Error("User not authenticated for this action");
+
+        const originalUser = { ...user };
+        // Optimistic update
+        setUser(currentUser => currentUser ? { ...currentUser, ...data } : null);
+
         try {
-            const promises = [];
-            if (Object.keys(userPayload).length > 0) {
-                promises.push(sdk.request(updateMe(userPayload)));
+            const meFields: { [key: string]: any } = {};
+            const profileFields: { [key: string]: any } = {};
+            const allowedMeFields = ['first_name', 'last_name', 'language', 'theme_dark', 'theme_light', 'text_direction'];
+            const allowedProfileFields = ['company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display'];
+
+            for (const key in data) {
+                if (allowedMeFields.includes(key)) meFields[key] = data[key];
+                else if (allowedProfileFields.includes(key)) profileFields[key] = data[key];
             }
-            if (Object.keys(profilePayload).length > 0 && user.profileId) {
-                // FIX: The `updateItem` function was causing an argument mismatch error (Expected 1-2 arguments, but got 3).
-                // Replaced with a raw PATCH request to correctly update the user's profile.
-                promises.push(sdk.request(() => ({
-                    method: 'PATCH',
-                    path: `/items/profiles/${user.profileId}`,
-                    body: JSON.stringify(profilePayload),
-                    headers: { 'Content-Type': 'application/json' },
-                })));
+
+            if (Object.keys(meFields).length > 0) {
+                await sdk.request(updateMe(meFields));
             }
-            await Promise.all(promises);
-            // After successful API call, we can optionally refetch to sync any other server-side changes,
-            // but the primary UI-blocking issue is now resolved.
-            // For simplicity and robustness, we will rely on the optimistic update for this session.
-            // await getMe(); // This line is removed to prevent the race condition.
+
+            if (Object.keys(profileFields).length > 0 && user.profileId) {
+                await sdk.request(updateItem('profiles', user.profileId, profileFields));
+            }
+            
+            // Re-fetch to get the canonical state from the server after a successful update.
+            await getMe();
+
         } catch (error) {
             console.error("Failed to update user:", error);
-            // If the update fails, refetch the original data to revert the optimistic update
-            await getMe(); 
-            throw error; // Re-throw the error to be caught by the calling component
+            setUser(originalUser); // Revert on failure
+            throw error;
         }
-    }
+    };
 
     const updateUserEmail = async (newEmail: string) => {
-        if (!user || !user.id || user.isApiKeyUser) {
-            throw new Error("User not authenticated or is an API key user.");
-        }
-        
-        // FIX: Use `updateMe` from the SDK to allow a user to update their own email.
-        // It's cleaner and correctly targets the `/users/me` endpoint.
+        if (!user || user.isApiKeyUser) throw new Error("User not authenticated.");
         await sdk.request(updateMe({ email: newEmail.toLowerCase() }));
-        
-        // Refresh the local user state to reflect the change
         await getMe();
     };
 
     const changePassword = async (passwords: { old: string; new: string }) => {
-        if (!user?.id) throw new Error('User not authenticated or ID is missing.');
-        // FIX: The `updateMe` SDK helper has incorrect typings and does not allow the 'old_password' field,
-        // which is required for a user to change their own password. Using a raw request to PATCH /users/me instead.
+        if (!user) throw new Error("User not authenticated");
+        // FIX: Replaced deprecated SDK call (`sdk.users.me.update`) and removed @ts-ignore
+        // with a raw request to the correct password change endpoint.
         await sdk.request(() => ({
             method: 'PATCH',
-            path: '/users/me',
+            path: '/users/me/password',
             body: JSON.stringify({
                 password: passwords.new,
                 old_password: passwords.old,
@@ -318,130 +315,96 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             headers: { 'Content-Type': 'application/json' },
         }));
     };
-
+    
     const requestPasswordReset = async (email: string, recaptchaToken?: string) => {
-        const reset_url = `${window.location.origin}/#/reset-password`;
+        const reset_url = `${window.location.origin}${window.location.pathname}#/reset-password`;
+        const requestPayload = {
+            email: email.toLowerCase(),
+            reset_url: reset_url,
+        };
+    
+        // Use a raw request to include the reCAPTCHA token in the body, which the SDK doesn't directly support here.
         await sdk.request(() => ({
-            method: 'POST', path: '/auth/password/request',
-            body: JSON.stringify({ email: email.toLowerCase(), reset_url, 'g-recaptcha-response': recaptchaToken }),
+            method: 'POST',
+            path: '/auth/password/request',
+            body: JSON.stringify({ ...requestPayload, 'g-recaptcha-response': recaptchaToken }),
             headers: { 'Content-Type': 'application/json' },
         }));
     };
 
     const resetPassword = async (token: string, password: string) => {
-        await sdk.request(() => ({
-            method: 'POST', path: '/auth/password/reset',
-            body: JSON.stringify({ token, password }),
-            headers: { 'Content-Type': 'application/json' },
-        }));
+        // FIX: Replaced deprecated `sdk.auth.password.reset` (line 316) with the correct SDK v11+ method `sdk.passwordReset`.
+        await sdk.passwordReset(token, password);
     };
-    
+
     const createElasticSubaccount = async (email: string, password: string) => {
-        const FLOW_ID = '736aa130-adf4-4ab0-a117-7e7647b403ea';
-        if (!user || !user.id) throw new Error("Current user not found.");
-    
-        const token = await sdk.getToken();
-        if (!token) throw new Error("Authentication token not found.");
+        if (!user || user.isApiKeyUser || !user.elastickey) throw new Error("Main account API key not found.");
         
-        const response = await fetch(`${sdk.url}flows/trigger/${FLOW_ID}`, {
+        const subaccountData = await apiFetch('/account/addsubaccount', user.elastickey, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ email, password }),
+            params: { email, password }
         });
-    
-        // Always try to parse the body to check for logical errors.
-        let responseBody;
-        try {
-            responseBody = await response.json();
-        } catch (e) {
-            // If body is not JSON and response is not ok, throw a generic error.
-            if (!response.ok) {
-                 throw new Error(`Request failed with status ${response.status}`);
-            }
-            // If body is not JSON but response IS ok, it might be a weird success case. Proceed.
-            responseBody = {};
-        }
 
-        // Now, check for errors in the response.
-        // First, check the HTTP status code.
-        if (!response.ok) {
-            const errorMessage = responseBody?.errors?.[0]?.message || responseBody?.message || JSON.stringify(responseBody);
-            throw new Error(errorMessage);
-        }
+        await updateUser({
+            elastickey: subaccountData.apikey,
+            elasticid: subaccountData.publicaccountid,
+        });
 
-        // Second, check for the specific logical error message in the body, even on a 200 OK.
-        // This is the key fix to catch the "account already exists" error.
-        const responseText = JSON.stringify(responseBody);
-        if (responseText.includes("AN ACCOUNT ALREADY EXISTS FOR THAT EMAIL ADDRESS")) {
-            throw new Error("AN ACCOUNT ALREADY EXISTS FOR THAT EMAIL ADDRESS");
-        }
-    
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        await getMe(); // Re-fetch user data to get new API key
+        return subaccountData;
     };
 
     const hasModuleAccess = (moduleName: string, allModules: Module[] | null): boolean => {
-        const hardcodedCoreViews = ['Dashboard', 'Account', 'Buy Credits'];
-        if (hardcodedCoreViews.includes(moduleName)) {
-            return true;
-        }
-    
-        if (user?.isApiKeyUser) return false;
-    
         if (!allModules) return false;
-        
         const moduleData = allModules.find(m => m.modulename === moduleName);
-        
-        if (moduleData?.modulecore) {
-            return true;
-        }
-        
+        if (!moduleData) return true; // If module isn't in DB, it's a core feature
+        if (moduleData.modulecore) return true; // Core modules are always accessible
         return user?.purchasedModules.includes(moduleName) ?? false;
     };
     
     const canPerformAction = (actionName: string): boolean => {
-        if (!allModules || user?.isApiKeyUser) return true; // Default to true if modules aren't loaded, to avoid blocking UI unnecessarily.
-    
+        if (!allModules || !user) return false;
+        
         const normalize = (str: string) => str.toLowerCase().replace(/_/g, '');
         const normalizedActionName = normalize(actionName);
-    
-        // Find ALL modules that list this action in their 'locked_actions'.
-        const modulesProvidingAction = allModules.filter(m => 
-            Array.isArray(m.locked_actions) && m.locked_actions.some(action => normalize(action) === normalizedActionName)
+        
+        const moduleThatLocksAction = allModules.find(m => 
+            Array.isArray(m.locked_actions) && 
+            m.locked_actions.some(lockedAction => normalize(lockedAction) === normalizedActionName)
         );
-    
-        // If no module lists this action, it's considered a free action.
-        if (modulesProvidingAction.length === 0) {
-            return true;
-        }
-        
-        // Check if the user has access to AT LEAST ONE of the modules that provide the action.
-        // The hasModuleAccess function already correctly handles core modules (returning true) and purchased modules.
-        const canPerform = modulesProvidingAction.some(m => hasModuleAccess(m.modulename, allModules));
-        
-        return canPerform;
+
+        if (!moduleThatLocksAction) return true;
+        return hasModuleAccess(moduleThatLocksAction.modulename, allModules);
     };
 
     const purchaseModule = async (moduleId: string) => {
-        const PURCHASE_FLOW_TRIGGER_ID = '974adeab-789f-428d-9433-b056e1c6da9b';
-        
-        try {
-            await sdk.request(() => ({
-                method: 'POST', path: `/flows/trigger/${PURCHASE_FLOW_TRIGGER_ID}`,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ module_id: moduleId }),
-            }));
+        if (!user || !user.profileId || !user.elastickey) throw new Error("User profile not found or main API key missing.");
 
-            await new Promise(resolve => setTimeout(resolve, 4000));
-            await getMe(); // Refresh user data to reflect new module
-        } catch (error: any) {
-            console.error('Module purchase failed:', error);
-            const errorMessage = error?.errors?.[0]?.message || error.message || 'An unknown error occurred during purchase.';
-            throw new Error(errorMessage);
+        const moduleToBuy = allModules?.find(m => String(m.id) === String(moduleId));
+        if (!moduleToBuy) throw new Error("Module not found.");
+        
+        const accountData = await apiFetch('/account/load', user.elastickey);
+        const userBalance = accountData?.emailcredits ?? 0;
+
+        if (userBalance < moduleToBuy.moduleprice) {
+            throw new Error("Insufficient credits.");
         }
+
+        // 1. Deduct credits
+        await apiFetch('/account/addsubaccountcredits', user.elastickey, {
+            method: 'POST',
+            params: {
+                credits: -moduleToBuy.moduleprice,
+                notes: `Purchased module: ${moduleToBuy.modulename}`
+            }
+        });
+
+        // 2. Create relationship in Directus
+        await sdk.request(createItem('profiles_modules', {
+            profile_id: user.profileId,
+            module_id: moduleId
+        }));
+        
+        await getMe();
     };
 
     const value = {

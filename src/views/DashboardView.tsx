@@ -8,7 +8,6 @@ import useApiV4 from '../hooks/useApiV4';
 import { getPastDateByDays, formatDateForApiV4 } from '../utils/helpers';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
-import AccountDataCard from '../components/AccountDataCard';
 import Icon, { ICONS } from '../components/Icon';
 import { Module } from '../api/types';
 import { useConfiguration } from '../contexts/ConfigurationContext';
@@ -77,7 +76,9 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
         { name: t('emailLists', { ns: 'common' }), icon: ICONS.EMAIL_LISTS, desc: t('emailListsDesc'), view: 'Email Lists' },
         { name: t('segments', { ns: 'common' }), icon: ICONS.SEGMENTS, desc: t('segmentsDesc'), view: 'Segments' },
         { name: t('mediaManager', { ns: 'common' }), icon: ICONS.FOLDER, desc: t('mediaManagerDesc'), view: 'Media Manager' },
+        { name: t('gallery', { ns: 'common' }), icon: ICONS.IMAGE, desc: t('galleryDesc'), view: 'Gallery' },
         { name: t('campaigns', { ns: 'common' }), icon: ICONS.CAMPAIGNS, desc: t('campaignsDesc'), view: 'Campaigns' },
+        { name: t('calendar', { ns: 'common' }), icon: ICONS.CALENDAR, desc: t('calendarDesc'), view: 'Calendar' },
         { name: t('templates', { ns: 'common' }), icon: ICONS.ARCHIVE, desc: t('templatesDesc'), view: 'Templates' },
         { name: t('emailBuilder', { ns: 'common' }), icon: ICONS.LAYERS, desc: t('emailBuilderDesc'), view: 'Email Builder' },
         { name: t('domains', { ns: 'common' }), icon: ICONS.DOMAINS, desc: t('domainsDesc'), view: 'Domains' },
@@ -136,7 +137,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <p className="cta-banner-desc">{t('startEmailMarketingDesc')}</p>
                         </div>
                         <div className="cta-banner-action">
-                            <Button className="btn-primary" onClick={() => setView('Marketing')} action={AppActions.START_MARKETING_CAMPAIGN}>
+                            <Button className="btn-primary" onClick={() => setView('Marketing')}>
                                 <Icon>{ICONS.SEND_EMAIL}</Icon> {t('createCampaign', { ns: 'common' })}
                             </Button>
                         </div>
@@ -145,15 +146,27 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
             )}
 
             <div className="dashboard-stats-grid">
-                <AccountDataCard title={t('sendingReputation')} iconPath={ICONS.AWARD}>
-                    {accountLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : (accountData?.reputation ? `${accountData.reputation}%` : 'N/A')}
-                </AccountDataCard>
-                <AccountDataCard title={t('emailsSent365d')} iconPath={ICONS.MAIL}>
-                    {statsLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : (statsData?.EmailTotal?.toLocaleString(i18n.language) ?? '0')}
-                </AccountDataCard>
-                 <AccountDataCard title={t('totalContacts')} iconPath={ICONS.CONTACTS}>
-                    {contactsCountLoading ? <div style={{height: '1.5rem', display: 'flex', alignItems: 'center'}}><LineLoader/></div> : (contactsCountData?.toLocaleString(i18n.language) ?? '0')}
-                </AccountDataCard>
+                <div className="card narrow-stat-card">
+                    <Icon className="narrow-stat-card-icon">{ICONS.AWARD}</Icon>
+                    <span className="narrow-stat-card-title">{t('sendingReputation')}</span>
+                    <span className="narrow-stat-card-value">
+                        {accountLoading ? <LineLoader /> : (accountData?.reputation ? `${accountData.reputation}%` : 'N/A')}
+                    </span>
+                </div>
+                <div className="card narrow-stat-card">
+                    <Icon className="narrow-stat-card-icon">{ICONS.MAIL}</Icon>
+                    <span className="narrow-stat-card-title">{t('emailsSent365d')}</span>
+                    <span className="narrow-stat-card-value">
+                        {statsLoading ? <LineLoader /> : (statsData?.EmailTotal?.toLocaleString(i18n.language) ?? '0')}
+                    </span>
+                </div>
+                 <div className="card narrow-stat-card">
+                    <Icon className="narrow-stat-card-icon">{ICONS.CONTACTS}</Icon>
+                    <span className="narrow-stat-card-title">{t('totalContacts')}</span>
+                    <span className="narrow-stat-card-value">
+                        {contactsCountLoading ? <LineLoader /> : (contactsCountData?.toLocaleString(i18n.language) ?? '0')}
+                    </span>
+                </div>
             </div>
 
             {!isEmbed && (
