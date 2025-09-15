@@ -47,6 +47,7 @@ const App = () => {
     const { addToast } = useToast();
     const [view, setView] = useState('Dashboard');
     const [templateToEdit, setTemplateToEdit] = useState<Template | null>(null);
+    const [isNewFromGallery, setIsNewFromGallery] = useState(false);
     const [campaignToLoad, setCampaignToLoad] = useState<any | null>(null);
     const [selectedList, setSelectedList] = useState<List | null>(null);
     const [selectedCampaign, setSelectedCampaign] = useState<any | null>(null);
@@ -253,14 +254,23 @@ const App = () => {
         setView('Dashboard');
     };
 
-    const handleSetView = (newView: string, data?: { template?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any, campaign?: any, orderToResume?: any, order?: any }) => {
-        if (view === 'Email Builder' && isBuilderDirty && newView !== 'Email Builder') {
+    const handleSetView = (newView: string, data?: { template?: Template; galleryTemplate?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any, campaign?: any, orderToResume?: any, order?: any }, options?: { ignoreDirty?: boolean }) => {
+        // This guard prevents accidental navigation away from unsaved work in the builder.
+        if (!options?.ignoreDirty && view === 'Email Builder' && isBuilderDirty && newView !== 'Email Builder') {
             setLeaveConfirmationState({ isOpen: true, targetView: newView, targetData: data });
             return;
         }
 
-        if (newView === 'Email Builder' && data?.template) setTemplateToEdit(data.template);
-        else setTemplateToEdit(null);
+        const templateForBuilder = data?.template || data?.galleryTemplate || null;
+        const isFromGallery = !!data?.galleryTemplate;
+
+        if (newView === 'Email Builder' && templateForBuilder) {
+            setTemplateToEdit(templateForBuilder);
+            setIsNewFromGallery(isFromGallery);
+        } else {
+            setTemplateToEdit(null);
+            setIsNewFromGallery(false);
+        }
 
         if ((newView === 'Send Email' || newView === 'Marketing') && data?.campaignToLoad) {
             setCampaignToLoad(data.campaignToLoad);
@@ -310,9 +320,12 @@ const App = () => {
     
     const handleLeaveConfirmation = () => {
         setIsBuilderDirty(false);
+        const { targetView, targetData } = leaveConfirmationState;
         setLeaveConfirmationState({ isOpen: false, targetView: '', targetData: null });
+        // Use a timeout to ensure state updates are processed before navigation,
+        // and ignore the dirty check since the user explicitly chose to leave.
         setTimeout(() => {
-            handleSetView(leaveConfirmationState.targetView, leaveConfirmationState.targetData);
+            handleSetView(targetView, targetData, { ignoreDirty: true });
         }, 0);
     };
 
@@ -325,9 +338,12 @@ const App = () => {
             const success = await emailBuilderRef.current.save();
             if (success) {
                 setIsBuilderDirty(false); 
+                const { targetView, targetData } = leaveConfirmationState;
                 setLeaveConfirmationState({ isOpen: false, targetView: '', targetData: null });
+                // Use a timeout to ensure state updates are processed before navigation,
+                // and ignore the dirty check as the save was successful.
                 setTimeout(() => {
-                    handleSetView(leaveConfirmationState.targetView, leaveConfirmationState.targetData);
+                    handleSetView(targetView, targetData, { ignoreDirty: true });
                 }, 0);
             }
         }
@@ -351,7 +367,7 @@ const App = () => {
         'CampaignDetail': { component: <CampaignDetailView apiKey={apiKey} campaign={selectedCampaign} onBack={() => handleSetView('Campaigns')} />, title: selectedCampaign?.Name || t('campaigns'), icon: ICONS.CAMPAIGNS },
         'Templates': { component: <TemplatesView apiKey={apiKey} setView={handleSetView} />, title: t('templates'), icon: ICONS.ARCHIVE },
         'Gallery': { component: <GalleryView setView={handleSetView} />, title: t('gallery'), icon: ICONS.IMAGE },
-        'Email Builder': { component: <EmailBuilderView ref={emailBuilderRef} apiKey={apiKey} user={user} templateToEdit={templateToEdit} setView={handleSetView} onDirtyChange={setIsBuilderDirty} />, title: t('emailBuilder'), icon: ICONS.LAYERS },
+        'Email Builder': { component: <EmailBuilderView ref={emailBuilderRef} apiKey={apiKey} user={user} templateToEdit={templateToEdit} setView={handleSetView} onDirtyChange={setIsBuilderDirty} isNewFromGallery={isNewFromGallery} />, title: t('emailBuilder'), icon: ICONS.LAYERS },
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
         'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('marketingCampaign'), icon: ICONS.TARGET },
         'Calendar': { component: <CalendarView />, title: t('calendar'), icon: ICONS.CALENDAR },
@@ -374,21 +390,21 @@ const App = () => {
             ],
         },
         {
-            title: t('campaigns'),
-            items: [
-                { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
-                { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
-                { name: t('marketing'), view: 'Marketing', icon: ICONS.TARGET },
-                { name: t('calendar'), view: 'Calendar', icon: ICONS.CALENDAR },
-            ],
-        },
-        {
             title: t('contents'),
             items: [
                 { name: t('gallery'), view: 'Gallery', icon: ICONS.IMAGE },
                 { name: t('templates'), view: 'Templates', icon: ICONS.ARCHIVE },
                 { name: t('emailBuilder'), view: 'Email Builder', icon: ICONS.LAYERS },
                 { name: t('mediaManager'), view: 'Media Manager', icon: ICONS.FOLDER },
+            ],
+        },
+        {
+            title: t('campaigns'),
+            items: [
+                { name: t('campaigns'), view: 'Campaigns', icon: ICONS.CAMPAIGNS },
+                { name: t('sendEmail'), view: 'Send Email', icon: ICONS.SEND_EMAIL },
+                { name: t('marketing'), view: 'Marketing', icon: ICONS.TARGET },
+                { name: t('calendar'), view: 'Calendar', icon: ICONS.CALENDAR },
             ],
         },
     ];

@@ -364,9 +364,10 @@ interface EmailBuilderViewProps {
     templateToEdit: Template | null;
     setView: (view: string, data?: any) => void;
     onDirtyChange: (isDirty: boolean) => void;
+    isNewFromGallery?: boolean;
 }
 
-const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, onDirtyChange }: EmailBuilderViewProps, ref) => {
+const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, onDirtyChange, isNewFromGallery }: EmailBuilderViewProps, ref) => {
     const { t } = useTranslation(['emailBuilder', 'common']);
     const { addToast } = useToast();
     const [items, setItems] = useState<any[]>([]);
@@ -436,8 +437,14 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
         };
 
         if (templateToEdit) {
-            setIsEditing(true);
-            setOriginalTemplateName(templateToEdit.Name);
+            if (isNewFromGallery) {
+                setIsEditing(false);
+                setOriginalTemplateName(null);
+            } else {
+                setIsEditing(true);
+                setOriginalTemplateName(templateToEdit.Name);
+            }
+
             const htmlContent = templateToEdit.Body?.[0]?.Content;
             
             if (htmlContent) {
@@ -482,7 +489,7 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
         } else {
             resetToNew();
         }
-    }, [templateToEdit, addToast, t]);
+    }, [templateToEdit, isNewFromGallery, addToast, t]);
 
     useEffect(() => {
         if (isInitialLoad.current) {
@@ -492,7 +499,7 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
         if (!isDirty) {
             setIsDirty(true);
         }
-    }, [items, globalStyles, templateName, subject, fromName]);
+    }, [items, globalStyles, templateName, subject, fromName, isDirty]);
 
     useEffect(() => {
         onDirtyChange(isDirty);
@@ -1097,6 +1104,7 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
                                 selectedBlockId={selectedBlockId}
                                 onSelectBlock={handleSelectBlock}
                                 onEditBlock={handleEditBlock}
+// FIX: The prop 'onContentChange' was being passed an undefined variable 'onContentChange'. The correct handler is 'handleContentChange'.
                                 onContentChange={handleContentChange}
                                 onStyleChange={handleStyleChange}
                                 onInsertBlock={handleInsertBlock}

@@ -181,7 +181,7 @@ const GalleryView = ({ setView }: { setView: (view: string, data?: any) => void 
                 DateAdded: new Date().toISOString()
             };
 
-            setView('Email Builder', { template: newTemplate });
+            setView('Email Builder', { galleryTemplate: newTemplate });
 
         } catch (err: any) {
             addToast(err.message, 'error');
