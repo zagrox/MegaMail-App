@@ -6,40 +6,40 @@ const RULE_FIELDS = [
     {
         label: 'general', type: 'category',
         options: [
-            'Firstname', 'Lastname', 'ListName', 'Status', 'Source', 'UnsubscribeReason', 'Email',
-            'DateAdded', 'DateUpdated', 'StatusChangeDate', 'ConsentDate', 'ConsentIp', 'ConsentTracking',
-            'DaysSinceDateAdded', 'DaysSinceDateUpdated', 'DaysSinceConsentDate', 'CreatedFromIp', 'LastError'
+            'firstname', 'lastname', 'listname', 'status', 'source', 'unsubscribereason', 'email',
+            'dateadded', 'dateupdated', 'statuschangedate', 'consentdate', 'consentip', 'consenttracking',
+            'dayssincedateadded', 'dayssincedateupdated', 'dayssinceconsentdate', 'createdfromip', 'lasterror'
         ]
     },
     {
         label: 'statistics', type: 'category',
         options: [
-            'TotalSent', 'TotalOpens', 'TotalClicks', 'TotalBounces',
-            'LastSent', 'LastOpened', 'LastClicked', 'LastBounced',
-            'DaysSinceLastSent', 'DaysSinceLastOpened', 'DaysSinceLastClicked', 'DaysSinceLastBounced'
+            'totalsent', 'totalopens', 'totalclicks', 'totalbounces',
+            'lastsent', 'lastopened', 'lastclicked', 'lastbounced',
+            'dayssincelastsent', 'dayssincelastopened', 'dayssincelastclicked', 'dayssincelastbounced'
         ]
     },
     {
         label: 'custom', type: 'category',
         options: [
-            'Country', 'Mobile', 'Phone', 'Company' // Common custom fields
+            'country', 'mobile', 'phone', 'company' // Common custom fields
         ]
     }
 ];
 
 const OPERATORS = {
-    string: ['=', 'CONTAINS', 'NOTCONTAINS', 'STARTSWITH', 'ENDSWITH', 'ISEMPTY', 'ISNOTEMPTY'],
-    number: ['=', '>', '<', '>=', '<='],
-    date: ['Before', 'After'],
+    string: ['=', '!=', 'contains', 'not-contains', 'starts-with', 'ends-with', 'like', 'not-like', 'is-empty', 'is-not-empty'],
+    number: ['=', '!=', '>', '<', '>=', '<='],
+    date: ['>', '<', '=', '!='],
     boolean: ['=']
 };
 
 const FIELD_TYPES: Record<string, keyof typeof OPERATORS> = {
-    DateAdded: 'date', DateUpdated: 'date', StatusChangeDate: 'date', ConsentDate: 'date',
-    LastSent: 'date', LastOpened: 'date', LastClicked: 'date', LastBounced: 'date',
-    DaysSinceDateAdded: 'number', DaysSinceDateUpdated: 'number', DaysSinceConsentDate: 'number',
-    TotalSent: 'number', TotalOpens: 'number', TotalClicks: 'number', TotalBounces: 'number',
-    ConsentTracking: 'boolean',
+    dateadded: 'date', dateupdated: 'date', statuschangedate: 'date', consentdate: 'date',
+    lastsent: 'date', lastopened: 'date', lastclicked: 'date', lastbounced: 'date',
+    dayssincedateadded: 'number', dayssincedateupdated: 'number', dayssinceconsentdate: 'number',
+    totalsent: 'number', totalopens: 'number', totalclicks: 'number', totalbounces: 'number',
+    consenttracking: 'boolean',
 };
 
 const getOperatorsForField = (field: string) => {
@@ -48,26 +48,27 @@ const getOperatorsForField = (field: string) => {
 };
 
 const operatorRequiresValue = (operator: string) => {
-    return operator !== 'ISEMPTY' && operator !== 'ISNOTEMPTY';
+    return operator !== 'is-empty' && operator !== 'is-not-empty';
 };
 
 
-const RuleBuilder = ({ rules, setRules, conjunction, setConjunction }: { rules: any[]; setRules: Function; conjunction: string; setConjunction: Function }) => {
+const RuleBuilder = ({ rules, setRules }: { rules: any[]; setRules: Function; }) => {
     const { t } = useTranslation('segments');
 
     const updateRule = (index: number, field: string, value: any) => {
         const newRules = [...rules];
-        newRules[index][field] = value;
-        // If field changes, reset operator and value
+        const ruleToUpdate = { ...newRules[index], [field]: value };
+
         if (field === 'Field') {
-            newRules[index].Operator = getOperatorsForField(value)[0];
-            newRules[index].Value = '';
+            ruleToUpdate.Operator = getOperatorsForField(value)[0];
+            ruleToUpdate.Value = '';
         }
+        newRules[index] = ruleToUpdate;
         setRules(newRules);
     };
 
     const addRule = () => {
-        setRules([...rules, { Field: 'Email', Operator: 'CONTAINS', Value: '' }]);
+        setRules([...rules, { Field: 'email', Operator: 'contains', Value: '', conjunction: 'AND' }]);
     };
 
     const removeRule = (index: number) => {
@@ -76,46 +77,47 @@ const RuleBuilder = ({ rules, setRules, conjunction, setConjunction }: { rules: 
 
     return (
         <div className="rule-builder">
-            <div className="rule-conjunction-toggle">
-                <span>{t('match')}</span>
-                <button type="button" onClick={() => setConjunction('AND')} className={conjunction === 'AND' ? 'active' : ''}>{t('allAnd')}</button>
-                <span>{t('ofTheFollowing')}</span>
-            </div>
             <div className="rule-list">
                 {rules.map((rule, index) => (
-                    <div key={index} className="rule-row">
-                        <select value={rule.Field} onChange={(e) => updateRule(index, 'Field', e.target.value)}>
-                           {RULE_FIELDS.map(group => (
-                                <optgroup key={group.label} label={t(`segmentFieldCategory_${group.label}`)}>
-                                    {group.options.map(field => (
-                                        <option key={field} value={field}>{t(`segmentField_${field}`)}</option>
-                                    ))}
-                                </optgroup>
-                           ))}
-                        </select>
-                        <select value={rule.Operator} onChange={(e) => updateRule(index, 'Operator', e.target.value)}>
-                           {getOperatorsForField(rule.Field).map(op => (
-                               <option key={op} value={op}>{t(`segmentOperator_${op}`)}</option>
-                           ))}
-                        </select>
-                         <input
-                            type={FIELD_TYPES[rule.Field] === 'date' ? 'date' : FIELD_TYPES[rule.Field] === 'number' ? 'number' : 'text'}
-                            value={rule.Value}
-                            onChange={(e) => updateRule(index, 'Value', e.target.value)}
-                            placeholder={t('enterValue')}
-                            disabled={!operatorRequiresValue(rule.Operator)}
-                            aria-label="Rule value"
-                        />
-                         <button type="button" className="btn-icon btn-icon-danger remove-rule-btn" onClick={() => removeRule(index)}>
-                            {/* FIX: Changed path prop to children for Icon component */}
-                            <Icon>{ICONS.DELETE}</Icon>
-                        </button>
+                    <div key={index} className="rule-group">
+                        {index > 0 && (
+                            <div className="rule-conjunction-toggle">
+                                <button type="button" onClick={() => updateRule(index, 'conjunction', 'AND')} className={rule.conjunction === 'AND' ? 'active' : ''}>{t('and')}</button>
+                                <button type="button" onClick={() => updateRule(index, 'conjunction', 'OR')} className={rule.conjunction === 'OR' ? 'active' : ''}>{t('or')}</button>
+                            </div>
+                        )}
+                        <div className="rule-row">
+                            <select value={rule.Field} onChange={(e) => updateRule(index, 'Field', e.target.value)}>
+                               {RULE_FIELDS.map(group => (
+                                    <optgroup key={group.label} label={t(`segmentFieldCategory_${group.label}`)}>
+                                        {group.options.map(field => (
+                                            <option key={field} value={field}>{t(`segmentField_${field}`)}</option>
+                                        ))}
+                                    </optgroup>
+                               ))}
+                            </select>
+                            <select value={rule.Operator} onChange={(e) => updateRule(index, 'Operator', e.target.value)}>
+                               {getOperatorsForField(rule.Field).map(op => (
+                                   <option key={op} value={op}>{t(`segmentOperator_${op}`)}</option>
+                               ))}
+                            </select>
+                             <input
+                                type={FIELD_TYPES[rule.Field] === 'date' ? 'date' : FIELD_TYPES[rule.Field] === 'number' ? 'number' : 'text'}
+                                value={rule.Value}
+                                onChange={(e) => updateRule(index, 'Value', e.target.value)}
+                                placeholder={t('enterValue')}
+                                disabled={!operatorRequiresValue(rule.Operator)}
+                                aria-label="Rule value"
+                            />
+                             <button type="button" className="btn-icon btn-icon-danger remove-rule-btn" onClick={() => removeRule(index)}>
+                                <Icon>{ICONS.DELETE}</Icon>
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>
             <div className="add-rule-btn-container">
                 <button type="button" className="btn add-rule-btn" onClick={addRule}>
-                    {/* FIX: Changed path prop to children for Icon component */}
                     <Icon>{ICONS.PLUS}</Icon> {t('addAnotherRule')}
                 </button>
             </div>

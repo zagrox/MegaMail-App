@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
 import { apiFetch, apiFetchV4 } from '../api/elasticEmail';
@@ -17,19 +17,59 @@ import Button from '../components/Button';
 import EmptyState from '../components/EmptyState';
 
 const FIELD_TYPES: Record<string, 'date' | 'number' | 'boolean' | 'string'> = {
-    DateAdded: 'date', DateUpdated: 'date', StatusChangeDate: 'date', ConsentDate: 'date',
-    LastSent: 'date', LastOpened: 'date', LastClicked: 'date', LastBounced: 'date',
-    DaysSinceDateAdded: 'number', DaysSinceDateUpdated: 'number', DaysSinceConsentDate: 'number',
-    TotalSent: 'number', TotalOpens: 'number', TotalClicks: 'number', TotalBounces: 'number',
-    ConsentTracking: 'boolean',
+    dateadded: 'date', dateupdated: 'date', statuschangedate: 'date', consentdate: 'date',
+    lastsent: 'date', lastopened: 'date', lastclicked: 'date', lastbounced: 'date',
+    dayssincedateadded: 'number', dayssincedateupdated: 'number', dayssinceconsentdate: 'number',
+    totalsent: 'number', totalopens: 'number', totalclicks: 'number', totalbounces: 'number',
+    consenttracking: 'boolean',
+};
+
+const buildRuleString = (rules: any[]) => {
+    return rules.map((r, index) => {
+        const operator = r.Operator;
+        let rulePart;
+        
+        if (operator === 'is-empty' || operator === 'is-not-empty') {
+            rulePart = `${r.Field} ${operator}`;
+        } else {
+            const value = r.Value || '';
+            const fieldType = FIELD_TYPES[r.Field as keyof typeof FIELD_TYPES] || 'string';
+            let formattedValue = value;
+
+            if (fieldType === 'string' || fieldType === 'date') {
+                const escapedValue = value.replace(/'/g, "''");
+                formattedValue = `'${escapedValue}'`;
+            }
+            rulePart = `${r.Field} ${operator} ${formattedValue}`;
+        }
+
+        if (index > 0) {
+            return `${r.conjunction} ${rulePart}`;
+        }
+        return rulePart;
+    }).join(' ');
 };
 
 const CreateSegmentModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { isOpen: boolean, onClose: () => void, apiKey: string, onSuccess: Function, onError: Function }) => {
     const { t } = useTranslation(['segments', 'common']);
     const [name, setName] = useState('');
-    const [conjunction, setConjunction] = useState('AND');
-    const [rules, setRules] = useState([{ Field: 'Email', Operator: 'CONTAINS', Value: '' }]);
+    const [rules, setRules] = useState([{ Field: 'email', Operator: 'contains', Value: '', conjunction: 'AND' }]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [evaluation, setEvaluation] = useState<{ count: number | null, loading: boolean, error: string | null }>({ count: null, loading: false, error: null });
+
+    const ruleString = useMemo(() => buildRuleString(rules), [rules]);
+
+    const handleEvaluate = async () => {
+        if (!ruleString) return;
+        setEvaluation({ count: null, loading: true, error: null });
+        try {
+            const count = await apiFetch('/contact/count', apiKey, { params: { rule: ruleString } });
+            setEvaluation({ count: Number(count), loading: false, error: null });
+        } catch (e: any) {
+            setEvaluation({ count: null, loading: false, error: e.message });
+            onError(e.message);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,26 +79,6 @@ const CreateSegmentModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { i
         }
 
         setIsSubmitting(true);
-        const ruleString = rules.map(r => {
-            if (r.Operator === 'ISEMPTY' || r.Operator === 'ISNOTEMPTY') {
-                return `(${r.Field} ${r.Operator})`;
-            }
-
-            const value = r.Value || '';
-            const fieldType = FIELD_TYPES[r.Field as keyof typeof FIELD_TYPES] || 'string';
-            let formattedValue = value;
-
-            if (fieldType === 'string') {
-                const escapedValue = value.replace(/'/g, "''");
-                if (/\s/.test(value)) {
-                    formattedValue = `'${escapedValue}'`;
-                } else {
-                    formattedValue = escapedValue;
-                }
-            }
-            
-            return `(${r.Field} ${r.Operator} ${formattedValue})`;
-        }).join(` ${conjunction} `);
         
         try {
             await apiFetchV4('/segments', apiKey, {
@@ -81,7 +101,25 @@ const CreateSegmentModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { i
                     <label htmlFor="segment-name">{t('segmentName')}</label>
                     <input id="segment-name" type="text" value={name} onChange={e => setName(e.target.value)} required />
                 </div>
-                <RuleBuilder rules={rules} setRules={setRules} conjunction={conjunction} setConjunction={setConjunction} />
+                <RuleBuilder rules={rules} setRules={setRules} />
+                <div className="segment-evaluation-section">
+                    <div className="segment-rule-preview">
+                        <strong>{t('rule')}:</strong>
+                        <code>{ruleString}</code>
+                    </div>
+                    <div className="segment-evaluation-action">
+                        <button type="button" className="link-button" onClick={handleEvaluate} disabled={evaluation.loading}>
+                            {t('evaluate')}
+                        </button>
+                        {evaluation.loading && <Loader />}
+                        {evaluation.count !== null && (
+                             <span className="evaluation-result">{t('evaluationResult', { count: evaluation.count })}</span>
+                        )}
+                         {evaluation.error && (
+                             <span className="evaluation-result error">{t('evaluationError')}</span>
+                        )}
+                    </div>
+                </div>
                 <div className="form-actions">
                     <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>{t('cancel')}</button>
                     <button type="submit" className="btn btn-primary" disabled={isSubmitting}>{isSubmitting ? <Loader/> : t('createSegment')}</button>
@@ -91,38 +129,92 @@ const CreateSegmentModal = ({ isOpen, onClose, apiKey, onSuccess, onError }: { i
     );
 };
 
+const ALL_OPERATORS_SORTED = [
+    'is-not-empty', 'not-contains', 'starts-with', 'ends-with', 'not-like', 
+    'is-empty', 'is-not', '>=', '<=', '!=', '>', '<', '=', 'contains', 'like', 'is'
+];
+const NO_VALUE_OPERATORS = ['is-empty', 'is-not-empty'];
+const unquoteValue = (value: string = ''): string => {
+    let val = value.trim();
+    if (val.startsWith("'") && val.endsWith("'")) {
+        val = val.substring(1, val.length - 1);
+    }
+    return val.replace(/''/g, "'");
+};
+
+const parseRulePart = (partStr: string): { Field: string, Operator: string, Value: string } | null => {
+    partStr = partStr.trim();
+    
+    for (const op of NO_VALUE_OPERATORS) {
+        const opWithSpaces = ` ${op}`;
+        if (partStr.toLowerCase().endsWith(opWithSpaces)) {
+            const field = partStr.substring(0, partStr.length - opWithSpaces.length).trim();
+            return { Field: field, Operator: op, Value: '' };
+        }
+    }
+
+    for (const op of ALL_OPERATORS_SORTED) {
+        const opRegex = new RegExp(`\\s+(${op})\\s+`, 'i');
+        const match = partStr.match(opRegex);
+        if (match && match.index) {
+            const field = partStr.substring(0, match.index).trim();
+            const value = partStr.substring(match.index + match[0].length).trim();
+            return { Field: field, Operator: op, Value: unquoteValue(value) };
+        }
+    }
+    console.warn("Could not parse rule part:", partStr);
+    return null;
+};
+
 const EditSegmentRulesModal = ({ isOpen, onClose, apiKey, segment, onSuccess, onError }: { isOpen: boolean, onClose: () => void, apiKey: string, segment: Segment | null, onSuccess: (name: string) => void, onError: (msg: string) => void }) => {
     const { t } = useTranslation(['segments', 'common']);
-    const [conjunction, setConjunction] = useState('AND');
     const [rules, setRules] = useState<any[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const [evaluation, setEvaluation] = useState<{ count: number | null, loading: boolean, error: string | null }>({ count: null, loading: false, error: null });
+    
     useEffect(() => {
-        if (segment && segment.Rule) {
+        if (segment?.Rule) {
             const ruleString = segment.Rule;
-            const hasOr = ruleString.includes(' OR ');
-            setConjunction(hasOr ? 'OR' : 'AND');
+            const parts = ruleString.split(/\s+(AND|OR)\s+/i);
+            const parsedRules = [];
 
-            const ruleRegex = /\(([^ ]+) ([^ ]+)(?: (.*))?\)/g;
-            const matches = [...ruleString.matchAll(ruleRegex)];
-            
-            const unquoteValue = (value: string = ''): string => {
-                let val = value.trim();
-                if (val.startsWith("'") && val.endsWith("'")) {
-                    val = val.substring(1, val.length - 1);
+            let firstRulePart = parts.shift();
+            if (firstRulePart) {
+                const parsed = parseRulePart(firstRulePart);
+                if (parsed) {
+                    parsedRules.push({ ...parsed, conjunction: 'AND' });
                 }
-                return val.replace(/''/g, "'");
-            };
-
-            const parsedRules = matches.map(match => ({
-                Field: match[1],
-                Operator: match[2],
-                Value: unquoteValue(match[3])
-            }));
+            }
             
-            setRules(parsedRules.length > 0 ? parsedRules : [{ Field: 'Email', Operator: 'CONTAINS', Value: '' }]);
+            for (let i = 0; i < parts.length; i += 2) {
+                const conjunction = parts[i]?.toUpperCase();
+                const rulePart = parts[i+1];
+                if (rulePart && conjunction) {
+                    const parsed = parseRulePart(rulePart);
+                    if (parsed) {
+                        parsedRules.push({ ...parsed, conjunction });
+                    }
+                }
+            }
+            setRules(parsedRules.length > 0 ? parsedRules : [{ Field: 'email', Operator: 'contains', Value: '', conjunction: 'AND' }]);
+        } else if (segment) {
+             setRules([{ Field: 'email', Operator: 'contains', Value: '', conjunction: 'AND' }]);
         }
     }, [segment]);
+
+    const ruleString = useMemo(() => buildRuleString(rules), [rules]);
+
+    const handleEvaluate = async () => {
+        if (!ruleString) return;
+        setEvaluation({ count: null, loading: true, error: null });
+        try {
+            const count = await apiFetch('/contact/count', apiKey, { params: { rule: ruleString } });
+            setEvaluation({ count: Number(count), loading: false, error: null });
+        } catch (e: any) {
+            setEvaluation({ count: null, loading: false, error: e.message });
+            onError(e.message);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -132,31 +224,11 @@ const EditSegmentRulesModal = ({ isOpen, onClose, apiKey, segment, onSuccess, on
         }
 
         setIsSubmitting(true);
-        const ruleString = rules.map(r => {
-            if (r.Operator === 'ISEMPTY' || r.Operator === 'ISNOTEMPTY') {
-                return `(${r.Field} ${r.Operator})`;
-            }
-
-            const value = r.Value || '';
-            const fieldType = FIELD_TYPES[r.Field as keyof typeof FIELD_TYPES] || 'string';
-            let formattedValue = value;
-
-            if (fieldType === 'string') {
-                const escapedValue = value.replace(/'/g, "''");
-                if (/\s/.test(value)) {
-                    formattedValue = `'${escapedValue}'`;
-                } else {
-                    formattedValue = escapedValue;
-                }
-            }
-            
-            return `(${r.Field} ${r.Operator} ${formattedValue})`;
-        }).join(` ${conjunction} `);
         
         try {
             await apiFetchV4(`/segments/${encodeURIComponent(segment.Name)}`, apiKey, {
                 method: 'PUT',
-                body: { Rule: ruleString }
+                body: { Name: segment.Name, Rule: ruleString }
             });
             onSuccess(segment.Name);
         } catch (err: any) {
@@ -169,8 +241,25 @@ const EditSegmentRulesModal = ({ isOpen, onClose, apiKey, segment, onSuccess, on
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={t('editRulesForSegment', { name: segment?.Name })}>
             <form onSubmit={handleSubmit} className="rule-builder-form">
-                <div className="info-message warning">{t('segmentRuleSubRuleNotice')}</div>
-                <RuleBuilder rules={rules} setRules={setRules} conjunction={conjunction} setConjunction={setConjunction} />
+                <RuleBuilder rules={rules} setRules={setRules} />
+                <div className="segment-evaluation-section">
+                    <div className="segment-rule-preview">
+                        <strong>{t('rule')}:</strong>
+                        <code>{ruleString}</code>
+                    </div>
+                    <div className="segment-evaluation-action">
+                        <button type="button" className="link-button" onClick={handleEvaluate} disabled={evaluation.loading}>
+                            {t('evaluate')}
+                        </button>
+                        {evaluation.loading && <Loader />}
+                        {evaluation.count !== null && (
+                             <span className="evaluation-result">{t('evaluationResult', { count: evaluation.count })}</span>
+                        )}
+                         {evaluation.error && (
+                             <span className="evaluation-result error">{t('evaluationError')}</span>
+                        )}
+                    </div>
+                </div>
                 <div className="form-actions">
                     <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>{t('cancel')}</button>
                     <button type="submit" className="btn btn-primary" disabled={isSubmitting}>{isSubmitting ? <Loader/> : t('saveChanges')}</button>
@@ -236,7 +325,7 @@ const SegmentsView = ({ apiKey }: { apiKey: string }) => {
         try {
             await apiFetchV4(`/segments/${encodeURIComponent(segmentToRename.Name)}`, apiKey, {
                 method: 'PUT',
-                body: { Name: newName }
+                body: { Name: newName, Rule: segmentToRename.Rule }
             });
             addToast(t('segmentRenamedSuccess', { newName }), 'success');
             setSegmentToRename(null);
