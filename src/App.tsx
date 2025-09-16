@@ -38,6 +38,7 @@ import CustomFieldsView from './views/CustomFieldsView';
 import { useToast } from './contexts/ToastContext';
 import emitter from './api/eventEmitter';
 import UnsavedChangesModal from './components/UnsavedChangesModal';
+import GuidesView from './views/GuidesView';
 
 
 const App = () => {
@@ -361,7 +362,6 @@ const App = () => {
         'ListDetail': { component: <ListDetailView apiKey={apiKey} list={selectedList} setView={handleSetView} onBack={() => handleSetView('Email Lists')} />, title: selectedList ? t('contactsInList', { listName: selectedList.ListName }) : t('contacts'), icon: ICONS.CONTACTS },
         'ContactDetail': { component: <ContactDetailView apiKey={apiKey} contactEmail={selectedContactEmail || ''} onBack={() => contactDetailOrigin ? handleSetView(contactDetailOrigin.view, contactDetailOrigin.data) : handleSetView('Contacts')} />, title: selectedContactEmail || t('contactDetails'), icon: ICONS.ACCOUNT },
         'Segments': { component: <SegmentsView apiKey={apiKey} />, title: t('segments'), icon: ICONS.SEGMENTS },
-        // FIX: Removed unused `setView` prop from CustomFieldsView component call to fix type error. The component is informational and does not navigate.
         'Custom Fields': { component: <CustomFieldsView apiKey={apiKey} />, title: t('customFields'), icon: ICONS.HASH },
         'Media Manager': { component: <MediaManagerView apiKey={apiKey} />, title: t('mediaManager'), icon: ICONS.FOLDER },
         'Campaigns': { component: <CampaignsView apiKey={apiKey} setView={handleSetView} />, title: t('campaigns'), icon: ICONS.CAMPAIGNS },
@@ -373,6 +373,7 @@ const App = () => {
         'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('marketingCampaign'), icon: ICONS.TARGET },
         'Calendar': { component: <CalendarView />, title: t('calendar'), icon: ICONS.CALENDAR },
         'Settings': { component: <SettingsView apiKey={apiKey} user={user} />, title: t('settings', { ns: 'account' }), icon: ICONS.SETTINGS },
+        'Guides': { component: <GuidesView />, title: t('guides'), icon: ICONS.HELP_CIRCLE },
     };
 
     const navGroups = [
@@ -452,6 +453,10 @@ const App = () => {
             ))}
         </nav>
         <div className="sidebar-footer-nav">
+             <button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
+                 <Icon>{ICONS.HELP_CIRCLE}</Icon>
+                 <span>{t('guides')}</span>
+             </button>
              <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
                  <Icon>{ICONS.SETTINGS}</Icon>
                  <span>{t('settings', { ns: 'account' })}</span>

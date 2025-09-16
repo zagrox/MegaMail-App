@@ -57,6 +57,7 @@ import './src/styles/views/invoice.css';
 import './src/styles/views/custom-fields.css';
 import './src/styles/views/gallery.css';
 import './src/styles/views/forms.css';
+import './src/styles/views/guides.css';
 
 const root = createRoot(document.getElementById('root')!);
 root.render(
