@@ -255,10 +255,14 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                         <Icon>{ICONS.PLUS}</Icon>
                         <span>{t('createList')}</span>
                     </Button>
-                    <button className="btn btn-secondary" onClick={() => setView('Segments')}>
+                    <Button className="btn-secondary" onClick={() => setView('Segments')}>
                         <Icon>{ICONS.SEGMENTS}</Icon>
                         <span>{t('segments')}</span>
-                    </button>
+                    </Button>
+                    <Button className="btn-secondary" onClick={() => setView('Custom Fields')}>
+                        <Icon>{ICONS.HASH}</Icon>
+                        <span>{t('customFields')}</span>
+                    </Button>
                 </div>
             </div>
             

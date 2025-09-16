@@ -561,11 +561,14 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                                 <Button onClick={() => setIsImportModalOpen(true)} action={AppActions.IMPORT_CONTACTS}>
                                     <Icon>{ICONS.UPLOAD}</Icon> <span className="btn-text">{t('importContacts')}</span>
                                 </Button>
-                                <Button onClick={() => setView('Custom Fields')} className="btn-secondary">
-                                    <Icon>{ICONS.HASH}</Icon> <span className="btn-text">{t('manageCustomFields')}</span>
+                                <Button onClick={() => setView('Email Lists')} className="btn-secondary">
+                                    <Icon>{ICONS.EMAIL_LISTS}</Icon> <span className="btn-text">{t('emailLists', { ns: 'common' })}</span>
                                 </Button>
                                 <Button onClick={() => setView('Segments')} className="btn-secondary">
                                     <Icon>{ICONS.SEGMENTS}</Icon> <span className="btn-text">{t('segments', { ns: 'common' })}</span>
+                                </Button>
+                                <Button onClick={() => setView('Custom Fields')} className="btn-secondary">
+                                    <Icon>{ICONS.HASH}</Icon> <span className="btn-text">{t('manageCustomFields')}</span>
                                 </Button>
                             </div>
                         </div>
