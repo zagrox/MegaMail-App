@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo } from 'react';
 import WizardLayout from './WizardLayout';
 import Icon, { ICONS } from '../Icon';
@@ -10,6 +11,7 @@ import { Template } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../../contexts/ToastContext';
 import CenteredMessage from '../CenteredMessage';
+import EmptyState from '../EmptyState';
 
 // Decode a Base64 string to UTF-8 using modern browser APIs
 const decodeState = (base64: string): string => {
@@ -21,7 +23,7 @@ const decodeState = (base64: string): string => {
     return new TextDecoder().decode(bytes);
 };
 
-const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; apiKey: string; }) => {
+const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; apiKey: string; setView: (view: string, data?: any) => void; }) => {
     const { t } = useTranslation(['send-wizard', 'templates', 'sendEmail', 'common']);
     const { addToast } = useToast();
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
@@ -114,6 +116,11 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
             updateData({ [name]: checked });
         }
     };
+
+    const handleGoToBuilder = () => {
+        setIsTemplateModalOpen(false);
+        setView('Email Builder');
+    };
     
     const isNextDisabled = !data.template || !data.fromName || !data.subject;
 
@@ -131,20 +138,30 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey }: { onNext: ()
                         />
                     </div>
                     <div className="template-list-container">
-                        {templatesLoading ? <Loader /> : filteredTemplates.length > 0 ? (
-                            filteredTemplates.map((template: Template) => (
-                                <button
-                                    type="button"
-                                    key={template.Name}
-                                    className="template-list-item"
-                                    onClick={() => handleSelectTemplate(template.Name)}
-                                >
-                                    <span>{template.Name}</span>
-                                    <small>{template.Subject || t('noSubject', { ns: 'campaigns' })}</small>
-                                </button>
-                            ))
-                        ) : (
-                            <CenteredMessage>{t('noTemplatesForQuery', {query: templateSearchTerm, ns: 'templates'})}</CenteredMessage>
+                        {templatesLoading ? <Loader /> : (
+                            !Array.isArray(templates) || templates.length === 0 ? (
+                                <EmptyState
+                                    icon={ICONS.ARCHIVE}
+                                    title={t('noTemplatesFound', { ns: 'templates' })}
+                                    message={t('noTemplatesFoundDesc', { ns: 'templates' })}
+                                    ctaText={t('createTemplate', { ns: 'templates' })}
+                                    onCtaClick={handleGoToBuilder}
+                                />
+                            ) : filteredTemplates.length > 0 ? (
+                                filteredTemplates.map((template: Template) => (
+                                    <button
+                                        type="button"
+                                        key={template.Name}
+                                        className="template-list-item"
+                                        onClick={() => handleSelectTemplate(template.Name)}
+                                    >
+                                        <span>{template.Name}</span>
+                                        <small>{template.Subject || t('noSubject', { ns: 'campaigns' })}</small>
+                                    </button>
+                                ))
+                            ) : (
+                                <CenteredMessage>{t('noTemplatesForQuery', {query: templateSearchTerm, ns: 'templates'})}</CenteredMessage>
+                            )
                         )}
                     </div>
                 </div>

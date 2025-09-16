@@ -54,11 +54,42 @@ const TemplatePreviewModal = ({ isOpen, onClose, template }: { isOpen: boolean; 
     );
 };
 
-const TemplateCard = ({ template, onPreview, onEdit, onDelete }: { 
+const CreateCampaignModal = ({ isOpen, onClose, onSelect, templateName }: { isOpen: boolean, onClose: () => void, onSelect: (type: 'quick' | 'advanced') => void, templateName: string }) => {
+    const { t } = useTranslation(['templates', 'send-wizard']);
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title={t('createCampaignFrom', { templateName })}>
+            <div className="selection-grid" style={{ gridTemplateColumns: '1fr', gap: '1rem' }}>
+                <div
+                    className="selection-card selection-card--row"
+                    onClick={() => onSelect('quick')}
+                >
+                    <Icon>{ICONS.SEND_EMAIL}</Icon>
+                    <div className="selection-card__content">
+                        <h3>{t('quickSendCampaign')}</h3>
+                        <p>{t('quickSendCampaignDesc')}</p>
+                    </div>
+                </div>
+                <div
+                    className="selection-card selection-card--row"
+                    onClick={() => onSelect('advanced')}
+                >
+                    <Icon>{ICONS.TARGET}</Icon>
+                    <div className="selection-card__content">
+                        <h3>{t('advancedMarketingCampaign')}</h3>
+                        <p>{t('advancedMarketingCampaignDesc')}</p>
+                    </div>
+                </div>
+            </div>
+        </Modal>
+    );
+};
+
+const TemplateCard = ({ template, onPreview, onEdit, onDelete, onCreateCampaign }: { 
     template: Template & { fromName?: string, Body?: { Content: string }[] }; 
     onPreview: () => void; 
     onEdit: () => void; 
     onDelete: () => void;
+    onCreateCampaign: () => void;
 }) => {
     const { t, i18n } = useTranslation(['templates', 'common']);
     const detailsLoaded = !!template.Body && template.Body.length > 0;
@@ -90,16 +121,20 @@ const TemplateCard = ({ template, onPreview, onEdit, onDelete }: {
                 <button className="btn-icon" onClick={onDelete} disabled={!detailsLoaded} aria-label={t('deleteTemplate')}>
                     <Icon>{ICONS.DELETE}</Icon>
                 </button>
+                <Button className="btn-primary" onClick={onCreateCampaign} disabled={!detailsLoaded}>
+                    <Icon>{ICONS.SEND_EMAIL}</Icon> {t('createCampaign')}
+                </Button>
             </div>
         </div>
     );
 };
 
-const TemplateRow = ({ template, onPreview, onEdit, onDelete }: {
+const TemplateRow = ({ template, onPreview, onEdit, onDelete, onCreateCampaign }: {
     template: Template & { fromName?: string, Body?: { Content: string }[] };
     onPreview: () => void;
     onEdit: () => void;
     onDelete: () => void;
+    onCreateCampaign: () => void;
 }) => {
     const { t, i18n } = useTranslation(['templates', 'common']);
     const detailsLoaded = !!template.Body && template.Body.length > 0;
@@ -114,6 +149,7 @@ const TemplateRow = ({ template, onPreview, onEdit, onDelete }: {
             <td>{formatDateForDisplay(template.DateAdded, i18n.language)}</td>
             <td>
                 <div className="action-buttons" style={{justifyContent: 'flex-end'}}>
+                    <button className="btn-icon" onClick={onCreateCampaign} disabled={!detailsLoaded} title={t('createCampaign')}><Icon>{ICONS.SEND_EMAIL}</Icon></button>
                     <button className="btn-icon" onClick={onPreview} disabled={!detailsLoaded}><Icon>{ICONS.EYE}</Icon></button>
                     <button className="btn-icon" onClick={onEdit} disabled={!detailsLoaded}><Icon>{ICONS.PENCIL}</Icon></button>
                     <button className="btn-icon btn-icon-danger" onClick={onDelete} disabled={!detailsLoaded}><Icon>{ICONS.DELETE}</Icon></button>
@@ -123,7 +159,7 @@ const TemplateRow = ({ template, onPreview, onEdit, onDelete }: {
     );
 };
 
-const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: string, data?: { template: Template }) => void }) => {
+const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: string, data?: { template?: Template, campaignToLoad?: any }) => void }) => {
     const { t } = useTranslation(['templates', 'common', 'mediaManager']);
     const { addToast } = useToast();
     const [searchQuery, setSearchQuery] = useState('');
@@ -134,6 +170,8 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
     const TEMPLATES_PER_PAGE = 12;
     const [detailedTemplates, setDetailedTemplates] = useState<(Template & { fromName?: string })[]>([]);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [templateForCampaign, setTemplateForCampaign] = useState<Template | null>(null);
+    const [isLoadingFullTemplate, setIsLoadingFullTemplate] = useState(false);
 
     const { data: templatesFromApi, loading, error } = useApiV4(
         '/templates',
@@ -199,6 +237,63 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
         setView('Email Builder', { template: template });
     };
 
+    const handleCreateCampaignClick = (template: Template) => {
+        setTemplateForCampaign(template);
+    };
+    
+    const handleSelectCampaignType = async (type: 'quick' | 'advanced') => {
+        if (!templateForCampaign) return;
+    
+        const templateName = templateForCampaign.Name;
+        setTemplateForCampaign(null); // Close modal
+        setIsLoadingFullTemplate(true);
+        addToast(t('loadingTemplate', { ns: 'common' }), 'info');
+    
+        try {
+            const fullTemplate = await apiFetchV4(`/templates/${encodeURIComponent(templateName)}`, apiKey);
+    
+            const htmlContent = fullTemplate.Body?.[0]?.Content;
+            let fromName = '';
+            let subject = fullTemplate.Subject || '';
+            if (htmlContent) {
+                const state = extractStateFromHtml(htmlContent);
+                if (state) {
+                    fromName = state.fromName || '';
+                    subject = state.subject || fullTemplate.Subject || '';
+                }
+            }
+    
+            const campaignToLoad = {
+                Name: subject || fullTemplate.Name,
+                Content: [{
+                    TemplateName: fullTemplate.Name,
+                    Subject: subject,
+                    FromName: fromName,
+                    From: '',
+                    ReplyTo: '',
+                    Preheader: '',
+                    Body: null,
+                    Utm: null
+                }],
+                Recipients: { ListNames: [], SegmentNames: [] },
+                Options: {
+                    TrackOpens: true,
+                    TrackClicks: true,
+                    DeliveryOptimization: 'None',
+                    EnableSendTimeOptimization: false
+                }
+            };
+    
+            const view = type === 'quick' ? 'Send Email' : 'Marketing';
+            setView(view, { campaignToLoad });
+    
+        } catch (err: any) {
+            addToast(`Failed to load template: ${err.message}`, 'error');
+        } finally {
+            setIsLoadingFullTemplate(false);
+        }
+    };
+
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
         setOffset(0);
@@ -206,6 +301,17 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
 
     return (
         <div>
+            {isLoadingFullTemplate && (
+                <div className="page-overlay">
+                    <Loader />
+                </div>
+            )}
+            <CreateCampaignModal
+                isOpen={!!templateForCampaign}
+                onClose={() => setTemplateForCampaign(null)}
+                onSelect={handleSelectCampaignType}
+                templateName={templateForCampaign?.Name || ''}
+            />
             <TemplatePreviewModal isOpen={!!templateToPreview} onClose={() => setTemplateToPreview(null)} template={templateToPreview} />
             <ConfirmModal
                 isOpen={!!templateToDelete}
@@ -276,6 +382,7 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
                                         onPreview={() => handlePreview(template)}
                                         onEdit={() => handleEdit(template)}
                                         onDelete={() => setTemplateToDelete(template)}
+                                        onCreateCampaign={() => handleCreateCampaignClick(template)}
                                     />
                                 ))}
                             </div>
@@ -298,6 +405,7 @@ const TemplatesView = ({ apiKey, setView }: { apiKey: string; setView: (view: st
                                                 onPreview={() => handlePreview(template)}
                                                 onEdit={() => handleEdit(template)}
                                                 onDelete={() => setTemplateToDelete(template)}
+                                                onCreateCampaign={() => handleCreateCampaignClick(template)}
                                             />
                                         ))}
                                     </tbody>

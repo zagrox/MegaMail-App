@@ -10,5 +10,10 @@
     "noTemplatesFound": "No templates created yet",
     "noTemplatesFoundDesc": "Templates save you time and keep your branding consistent. Create your first reusable template now.",
     "createYourFirst": "Create your first one to get started!",
-    "noTemplatesForQuery": "No templates found for \"{{query}}\"."
+    "noTemplatesForQuery": "No templates found for \"{{query}}\".",
+    "createCampaignFrom": "Create Campaign from \"{{templateName}}\"",
+    "quickSendCampaign": "Quick Send Campaign",
+    "quickSendCampaignDesc": "A simple, single-email campaign. Great for newsletters and announcements.",
+    "advancedMarketingCampaign": "Advanced Marketing Campaign",
+    "advancedMarketingCampaignDesc": "A step-by-step wizard for more complex campaigns with advanced settings."
 }

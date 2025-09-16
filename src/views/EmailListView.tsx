@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
 import { apiFetch, apiFetchV4 } from '../api/elasticEmail';
@@ -14,6 +14,82 @@ import ConfirmModal from '../components/ConfirmModal';
 import LineLoader from '../components/LineLoader';
 import Button from '../components/Button';
 import EmptyState from '../components/EmptyState';
+import Modal from '../components/Modal';
+
+
+const CreateListModal = ({ isOpen, onClose, apiKey, onSuccess }: { isOpen: boolean, onClose: () => void, apiKey: string, onSuccess: (listName: string) => void }) => {
+    const { t } = useTranslation(['emailLists', 'common']);
+    const [newListName, setNewListName] = useState('');
+    const [allowUnsubscribe, setAllowUnsubscribe] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { addToast } = useToast();
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newListName) return;
+        setIsSubmitting(true);
+        try {
+            await apiFetchV4('/lists', apiKey, {
+                method: 'POST',
+                body: {
+                    ListName: newListName,
+                    AllowUnsubscribe: allowUnsubscribe
+                }
+            });
+            onSuccess(newListName);
+        } catch (err: any) {
+            addToast(t('listCreatedError', { error: err.message }), 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // Reset form when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            setNewListName('');
+            setAllowUnsubscribe(true);
+            setIsSubmitting(false);
+        }
+    }, [isOpen]);
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title={t('createList')}>
+            <form onSubmit={handleSubmit} className="modal-form">
+                <div className="form-group">
+                    <label htmlFor="new-list-name">{t('newListNamePlaceholder')}</label>
+                    <input
+                        id="new-list-name"
+                        type="text"
+                        value={newListName}
+                        onChange={(e) => setNewListName(e.target.value)}
+                        disabled={isSubmitting}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                     <label className="custom-checkbox" style={{flexDirection: 'row', alignItems: 'center', gap: '0.75rem'}}>
+                        <input
+                            type="checkbox"
+                            checked={allowUnsubscribe}
+                            onChange={(e) => setAllowUnsubscribe(e.target.checked)}
+                            disabled={isSubmitting}
+                        />
+                        <span className="checkbox-checkmark"></span>
+                        <span className="checkbox-label" style={{fontWeight: 'normal'}}>{t('allowUnsubscribe')}</span>
+                    </label>
+                    <p className="field-hint">{t('allowUnsubscribeHelpText')}</p>
+                </div>
+                <div className="form-actions">
+                    <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>{t('cancel')}</button>
+                    <button type="submit" className="btn btn-primary" disabled={!newListName || isSubmitting}>
+                        {isSubmitting ? <Loader /> : t('createList')}
+                    </button>
+                </div>
+            </form>
+        </Modal>
+    );
+};
 
 
 const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void }) => {
@@ -21,14 +97,12 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const { addToast } = useToast();
     const [refetchIndex, setRefetchIndex] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
-    const [newListName, setNewListName] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     
     const [listToRename, setListToRename] = useState<List | null>(null);
     const [listToDelete, setListToDelete] = useState<List | null>(null);
     const [listCounts, setListCounts] = useState<Record<string, { count: number | null; loading: boolean; error: boolean }>>({});
     const [updatingList, setUpdatingList] = useState<string | null>(null);
-    const newListNameInputRef = useRef<HTMLInputElement>(null);
 
 
     const LISTS_PER_PAGE = 25;
@@ -62,20 +136,10 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
         }
     };
 
-    const handleCreateList = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newListName) return;
-        setIsSubmitting(true);
-        try {
-            await apiFetchV4('/lists', apiKey, { method: 'POST', body: { ListName: newListName } });
-            addToast(t('listCreatedSuccess', { listName: newListName }), 'success');
-            setNewListName('');
-            refetch();
-        } catch (err: any) {
-            addToast(t('listCreatedError', { error: err.message }), 'error');
-        } finally {
-            setIsSubmitting(false);
-        }
+    const handleCreateSuccess = (listName: string) => {
+        setIsCreateModalOpen(false);
+        addToast(t('listCreatedSuccess', { listName }), 'success');
+        refetch();
     };
     
     const confirmDeleteList = async () => {
@@ -146,6 +210,12 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
 
     return (
         <div>
+            <CreateListModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                apiKey={apiKey}
+                onSuccess={handleCreateSuccess}
+            />
             {listToRename && (
                  <RenameModal
                     isOpen={!!listToRename}
@@ -181,25 +251,10 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                     />
                 </div>
                 <div className="header-actions">
-                    <form className="create-list-form" onSubmit={handleCreateList}>
-                        <input
-                            ref={newListNameInputRef}
-                            type="text"
-                            placeholder={t('newListNamePlaceholder')}
-                            value={newListName}
-                            onChange={(e) => setNewListName(e.target.value)}
-                            disabled={isSubmitting}
-                            required
-                        />
-                        <Button type="submit" className="btn-primary" disabled={!newListName || isSubmitting} action="create_list">
-                            {isSubmitting ? <Loader /> : (
-                                <>
-                                    <Icon>{ICONS.PLUS}</Icon>
-                                    <span>{t('createList')}</span>
-                                </>
-                            )}
-                        </Button>
-                    </form>
+                    <Button className="btn-primary" onClick={() => setIsCreateModalOpen(true)} action="create_list">
+                        <Icon>{ICONS.PLUS}</Icon>
+                        <span>{t('createList')}</span>
+                    </Button>
                     <button className="btn btn-secondary" onClick={() => setView('Segments')}>
                         <Icon>{ICONS.SEGMENTS}</Icon>
                         <span>{t('segments')}</span>
@@ -220,7 +275,7 @@ const EmailListView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                             title={t('noListsFound')}
                             message={t('noListsFoundDesc')}
                             ctaText={t('createList')}
-                            onCtaClick={() => newListNameInputRef.current?.focus()}
+                            onCtaClick={() => setIsCreateModalOpen(true)}
                         />
                     )
                 ) : (

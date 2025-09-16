@@ -34,6 +34,18 @@ export const formatDateRelative = (dateString: string | undefined, locale: strin
     const now = new Date();
     const seconds = Math.round((now.getTime() - date.getTime()) / 1000);
 
+    // If the date is in the future (seconds is negative), display "just now".
+    // This avoids confusing users with text like "in 2 seconds" for newly created items,
+    // which can happen due to minor clock skew between the server and client.
+    if (seconds < 0) {
+         try {
+            const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+            return rtf.format(0, 'second');
+        } catch (e) {
+            return `just now`; // Fallback for environments without full Intl support
+        }
+    }
+
     const minutes = Math.round(seconds / 60);
     const hours = Math.round(minutes / 60);
     const days = Math.round(hours / 24);

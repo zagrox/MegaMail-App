@@ -72,11 +72,9 @@
     padding: 0.75rem 1rem;
     border-top: 1px solid var(--border-color);
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-}
-.template-card-actions .btn {
-    flex-grow: 1;
+    gap: 0.5rem;
 }
 
 /* List View */
@@ -88,4 +86,30 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 400px;
+}
+
+/* From Create Campaign Modal */
+.selection-card--row {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1rem;
+    text-align: start; /* Use logical property for RTL support */
+}
+
+.selection-card--row .icon {
+    color: var(--secondary-color);
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+}
+
+.selection-card__content h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.selection-card__content p {
+    margin: 0.5rem 0 0;
+    color: var(--subtle-text-color);
+    font-size: 0.9rem;
 }

@@ -266,7 +266,11 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
             addToast(t('profileUpdateSuccess', { ns: 'account' }), 'success');
             handleNext();
         } catch (err: any) {
-            addToast(t('profileUpdateError', { error: err.message, ns: 'account' }), 'error');
+            let errorMessage = err.message;
+            if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
+                errorMessage = err.errors[0].message;
+            }
+            addToast(t('profileUpdateError', { error: errorMessage || t('unknownError', { ns: 'common' }), ns: 'account' }), 'error');
         } finally {
             setLoading(false);
         }

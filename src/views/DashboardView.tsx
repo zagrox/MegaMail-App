@@ -192,12 +192,23 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                                     const isPurchasable = !!item.moduleData;
                                     const isLocked = isPurchasable && !hasAccess;
                                     const isPromotional = isLocked && item.moduleData?.modulepro === true;
-
+            
                                     const handleClick = () => {
                                         if (isLocked) {
                                             if (item.moduleData) setModuleToUnlock(item.moduleData);
                                         } else {
-                                            setView(item.view);
+                                            const settingsMapping: { [key: string]: string } = {
+                                                'Domains': 'domains',
+                                                'SMTP': 'smtp',
+                                                'API': 'api',
+                                            };
+                                            const settingsTab = settingsMapping[item.view];
+                                            if (settingsTab) {
+                                                sessionStorage.setItem('settings-tab', settingsTab);
+                                                setView('Settings');
+                                            } else {
+                                                setView(item.view);
+                                            }
                                         }
                                     };
 

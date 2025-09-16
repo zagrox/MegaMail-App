@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
@@ -22,7 +20,12 @@ const ApiKeyTab = ({ apiKey: initialApiKey }: { apiKey: string }) => {
             await updateUser({ elastickey: newApiKey });
             addToast(t('apiKeyUpdateSuccess'), 'success');
         } catch (err: any) {
-            addToast(err.message || t('apiKeyUpdateError'), 'error');
+            let errorMessage = err.message; // For standard Errors and Elastic Email errors
+            if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
+                // For Directus SDK errors
+                errorMessage = err.errors[0].message;
+            }
+            addToast(errorMessage || t('apiKeyUpdateError'), 'error');
         } finally {
             setIsSaving(false);
         }

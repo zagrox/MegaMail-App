@@ -1,3 +1,4 @@
+
 {
     "searchListsPlaceholder": "جستجوی لیست‌ها...",
     "newListNamePlaceholder": "نام لیست جدید...",
@@ -19,5 +20,8 @@
     "listHasNoContacts": "این لیست هیچ مخاطبی ندارد.",
     "renameEntityType": "تغییر نام {{type}} \"{{name}}\"",
     "newEntityName": "نام جدید {{type}}",
-    "list": "لیست"
+    "list": "لیست",
+    "allowUnsubscribeHelpText": "اجازه لغو اشتراک توصیه می‌شود و در بسیاری از مناطق طبق قانون الزامی است.",
+    "listIsEmptyTitle": "این لیست خالی است",
+    "listIsEmptyMessage": "برای شروع ارسال کمپین، مخاطبین را به صورت دستی یا با وارد کردن یک فایل به این لیست اضافه کنید."
 }

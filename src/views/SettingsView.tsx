@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Tabs from '../components/Tabs';
 import { ICONS } from '../components/Icon';
@@ -14,42 +14,56 @@ const SettingsView = ({ apiKey, user }: { apiKey: string, user: any }) => {
     const { hasModuleAccess, allModules } = useAuth();
     const [activeTab, setActiveTab] = useState('domains');
 
-    const tabs = [
-        { 
-            id: 'domains', 
-            label: t('domains'), 
-            icon: ICONS.DOMAINS, 
-            component: <DomainsView apiKey={apiKey} /> 
-        },
-        { 
-            id: 'smtp', 
-            label: t('smtp'), 
-            icon: ICONS.SMTP, 
-            component: <SmtpView apiKey={apiKey} user={user} /> 
-        },
-        { 
-            id: 'api', 
-            label: t('apiKey', { ns: 'account' }), 
-            icon: ICONS.KEY, 
-            component: <ApiKeyView apiKey={apiKey} user={user} /> 
-        },
-        {
-            id: 'forms',
-            label: t('forms'),
-            icon: ICONS.FILE_TEXT,
-            component: <FormsTab apiKey={apiKey} />
-        },
-    ];
-    
-    // Conditionally add the Embed tab based on API module access
-    if (hasModuleAccess('API', allModules)) {
-        tabs.push({ 
-            id: 'embed', 
-            label: t('embed', { ns: 'account' }), 
-            icon: ICONS.SHARE, 
-            component: <ShareTab apiKey={apiKey} /> 
-        });
-    }
+    const tabs = useMemo(() => {
+        const baseTabs = [
+            { 
+                id: 'domains', 
+                label: t('domains'), 
+                icon: ICONS.DOMAINS, 
+                component: <DomainsView apiKey={apiKey} /> 
+            },
+            { 
+                id: 'smtp', 
+                label: t('smtp'), 
+                icon: ICONS.SMTP, 
+                component: <SmtpView apiKey={apiKey} user={user} /> 
+            },
+            { 
+                id: 'api', 
+                label: t('apiKey', { ns: 'account' }), 
+                icon: ICONS.KEY, 
+                component: <ApiKeyView apiKey={apiKey} user={user} /> 
+            },
+            {
+                id: 'forms',
+                label: t('forms'),
+                icon: ICONS.FILE_TEXT,
+                component: <FormsTab apiKey={apiKey} />
+            },
+        ];
+        
+        // Conditionally add the Embed tab based on API module access
+        if (hasModuleAccess('API', allModules)) {
+            baseTabs.push({ 
+                id: 'embed', 
+                label: t('embed', { ns: 'account' }), 
+                icon: ICONS.SHARE, 
+                component: <ShareTab apiKey={apiKey} /> 
+            });
+        }
+        return baseTabs;
+    }, [t, apiKey, user, hasModuleAccess, allModules]);
+
+    useEffect(() => {
+        const initialTab = sessionStorage.getItem('settings-tab');
+        if (initialTab) {
+            // Check if the tab from session storage is a valid tab to prevent errors
+            if (tabs.some(tab => tab.id === initialTab)) {
+                setActiveTab(initialTab);
+            }
+            sessionStorage.removeItem('settings-tab');
+        }
+    }, [tabs]);
 
 
     return (

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -12,6 +13,8 @@ import AddContactToListModal from '../components/AddContactToListModal';
 import { apiFetchV4 } from '../api/elasticEmail';
 import { useToast } from '../contexts/ToastContext';
 import ExportContactsModal from '../components/ExportContactsModal';
+import EmptyState from '../components/EmptyState';
+import ImportWizardModal from '../components/ImportWizardModal';
 
 const ListDetailView = ({ apiKey, list, onBack, setView }: {
     apiKey: string;
@@ -19,11 +22,12 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
     onBack: () => void;
     setView: (view: string, data?: any) => void;
 }) => {
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['emailLists', 'common', 'contacts']);
     const { getStatusStyle } = useStatusStyles();
     const { addToast } = useToast();
     const [isAddContactModalOpen, setIsAddContactModalOpen] = useState(false);
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [offset, setOffset] = useState(0);
     const [refetchIndex, setRefetchIndex] = useState(0);
@@ -44,7 +48,7 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
         try {
             await apiFetchV4(`/lists/${encodeURIComponent(listName)}/contacts`, apiKey, {
                 method: 'POST',
-                body: emails
+                body: { Emails: emails }
             });
             addToast(`${emails.length} contact(s) added to ${listName} successfully!`, 'success');
             setIsAddContactModalOpen(false);
@@ -95,11 +99,25 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                 listName={listName}
                 onSuccess={() => {
                     setIsExportModalOpen(false);
-                    addToast(t('exportStartedSuccess'), 'success');
+                    addToast(t('exportStartedSuccess', { ns: 'contacts' }), 'success');
                 }}
                 onError={(message) => {
-                    addToast(t('exportFailedError', { error: message }), 'error');
+                    addToast(t('exportFailedError', { ns: 'contacts', error: message }), 'error');
                 }}
+            />
+            <ImportWizardModal 
+                isOpen={isImportModalOpen}
+                onClose={() => setIsImportModalOpen(false)}
+                apiKey={apiKey}
+                onSuccess={() => {
+                    setIsImportModalOpen(false);
+                    addToast(t('importSuccessMessage', { ns: 'contacts' }), 'success');
+                    setTimeout(refetch, 2000);
+                }}
+                onError={(message) => {
+                    addToast(t('importFailedError', { ns: 'contacts', error: message }), 'error');
+                }}
+                initialListName={listName}
             />
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                 <button className="btn btn-secondary" onClick={onBack} style={{whiteSpace: 'nowrap'}}>
@@ -114,7 +132,7 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                     <Icon>{ICONS.SEARCH}</Icon>
                     <input
                         type="search"
-                        placeholder={t('searchContactsPlaceholder')}
+                        placeholder={t('searchContactsPlaceholder', { ns: 'contacts' })}
                         value={searchQuery}
                         onChange={(e) => {
                             setSearchQuery(e.target.value);
@@ -125,10 +143,10 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                 </div>
                 <div className="header-actions">
                     <button className="btn" onClick={() => setIsExportModalOpen(true)}>
-                        <Icon>{ICONS.DOWNLOAD}</Icon> {t('export')}
+                        <Icon>{ICONS.DOWNLOAD}</Icon> {t('export', { ns: 'contacts' })}
                     </button>
                     <button className="btn btn-primary" onClick={() => setIsAddContactModalOpen(true)}>
-                        <Icon>{ICONS.USER_PLUS}</Icon> {t('addContact')}
+                        <Icon>{ICONS.USER_PLUS}</Icon> {t('addContact', { ns: 'contacts' })}
                     </button>
                 </div>
             </div>
@@ -138,11 +156,21 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
             
             {!loading && !error && (
                  (paginatedContacts.length === 0) ? (
-                    <CenteredMessage style={{height: '50vh'}}>
-                        <div className="info-message">
-                            <strong>{searchQuery ? t('noContactsForQuery', { query: searchQuery }) : t('listHasNoContacts')}</strong>
-                        </div>
-                    </CenteredMessage>
+                    searchQuery ? (
+                         <CenteredMessage style={{height: '50vh'}}>
+                            <p>{t('noContactsForQuery', { ns: 'contacts', query: searchQuery })}</p>
+                        </CenteredMessage>
+                    ) : (
+                        <EmptyState
+                            icon={ICONS.CONTACTS}
+                            title={t('listIsEmptyTitle')}
+                            message={t('listIsEmptyMessage')}
+                            ctaText={t('addContact', { ns: 'contacts' })}
+                            onCtaClick={() => setIsAddContactModalOpen(true)}
+                            secondaryCtaText={t('importContacts', { ns: 'contacts' })}
+                            onSecondaryCtaClick={() => setIsImportModalOpen(true)}
+                        />
+                    )
                 ) : (
                     <>
                     <div className="table-container">
@@ -172,7 +200,7 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                                             <td><Badge text={statusStyle.text} type={statusStyle.type} color={statusStyle.color} iconPath={statusStyle.iconPath} /></td>
                                             <td>
                                                 <div className="action-buttons" style={{justifyContent: 'flex-end'}}>
-                                                   <button className="btn-icon btn-icon-danger" aria-label={t('deleteContact')}><Icon>{ICONS.DELETE}</Icon></button>
+                                                   <button className="btn-icon btn-icon-danger" aria-label={t('deleteContact', { ns: 'contacts' })}><Icon>{ICONS.DELETE}</Icon></button>
                                                 </div>
                                             </td>
                                         </tr>

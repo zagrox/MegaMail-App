@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiFetchV4 } from '../api/elasticEmail';
@@ -235,7 +236,7 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             case 2:
                 return <Step2Recipients onNext={nextStep} onBack={prevStep} data={campaignData} updateData={updateData} apiKey={apiKey} />;
             case 3:
-                return <Step3Content onNext={nextStep} onBack={prevStep} data={campaignData} updateData={updateData} apiKey={apiKey} />;
+                return <Step3Content onNext={nextStep} onBack={prevStep} data={campaignData} updateData={updateData} apiKey={apiKey} setView={setView} />;
             case 4:
                 return <Step4Settings onNext={nextStep} onBack={prevStep} data={campaignData} updateData={updateData} />;
             case 5:

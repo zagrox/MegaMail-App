@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -11,6 +12,7 @@ import CenteredMessage from '../components/CenteredMessage';
 import Modal from '../components/Modal';
 import MultiSelectSearch from '../components/MultiSelectSearch';
 import Button from '../components/Button';
+import EmptyState from '../components/EmptyState';
 
 const emptyContent = { From: '', FromName: '', ReplyTo: '', Subject: '', TemplateName: '', Preheader: '', Body: null, Utm: null };
 const initialCampaignState = {
@@ -415,6 +417,11 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         sessionStorage.setItem('account-tab', 'domains');
         setView('Account');
     };
+
+    const handleGoToBuilder = () => {
+        setIsTemplateModalOpen(false);
+        setView('Email Builder');
+    };
     
     const currentContent = campaign.Content[activeContent] || {};
         
@@ -434,20 +441,30 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                         />
                     </div>
                     <div className="template-list-container">
-                        {templatesLoading ? <Loader /> : filteredTemplates.length > 0 ? (
-                            filteredTemplates.map((template: Template) => (
-                                <button
-                                    type="button"
-                                    key={template.Name}
-                                    className="template-list-item"
-                                    onClick={() => handleSelectTemplate(template.Name)}
-                                >
-                                    <span>{template.Name}</span>
-                                    <small>{template.Subject || t('noSubject', { ns: 'campaigns' })}</small>
-                                </button>
-                            ))
-                        ) : (
-                            <CenteredMessage>{t('noTemplatesForQuery', {query: templateSearchTerm})}</CenteredMessage>
+                        {templatesLoading ? <Loader /> : (
+                            !Array.isArray(templates) || templates.length === 0 ? (
+                                <EmptyState
+                                    icon={ICONS.ARCHIVE}
+                                    title={t('noTemplatesFound', { ns: 'templates' })}
+                                    message={t('noTemplatesFoundDesc', { ns: 'templates' })}
+                                    ctaText={t('createTemplate', { ns: 'templates' })}
+                                    onCtaClick={handleGoToBuilder}
+                                />
+                            ) : filteredTemplates.length > 0 ? (
+                                filteredTemplates.map((template: Template) => (
+                                    <button
+                                        type="button"
+                                        key={template.Name}
+                                        className="template-list-item"
+                                        onClick={() => handleSelectTemplate(template.Name)}
+                                    >
+                                        <span>{template.Name}</span>
+                                        <small>{template.Subject || t('noSubject', { ns: 'campaigns' })}</small>
+                                    </button>
+                                ))
+                            ) : (
+                                <CenteredMessage>{t('noTemplatesForQuery', {query: templateSearchTerm, ns: 'templates'})}</CenteredMessage>
+                            )
                         )}
                     </div>
                 </div>

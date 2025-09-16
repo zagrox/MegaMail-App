@@ -1,3 +1,4 @@
+
 {
     "manageCustomFields": "Custom Fields",
     "manageCustomFieldsDesc": "Create and manage custom data fields to store additional information about your contacts.",
@@ -18,5 +19,6 @@
     "noCustomFields": "No Custom Fields Found",
     "noCustomFieldsDesc": "Custom fields are discovered from your contacts. Add or import a contact with a new field to see it appear here.",
     "discoveredFieldsDesc": "This is a list of custom fields discovered on your existing contacts. New fields are created automatically when you add or import contacts with them.",
-    "fieldValue": "Field Value"
+    "fieldValue": "Field Value",
+    "standardFields": "Standard Fields"
 }

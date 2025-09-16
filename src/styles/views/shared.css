@@ -84,3 +84,14 @@ tbody tr:hover {
 .header-actions, .create-list-form { display: flex; gap: 1rem; align-items: center; }
 .create-list-form .btn { flex-shrink: 0; white-space: nowrap; }
 .create-list-form input { min-width: 200px; }
+
+/* --- GLOBAL OVERLAY --- */
+.page-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: var(--overlay-background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}

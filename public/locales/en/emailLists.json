@@ -1,3 +1,4 @@
+
 {
     "searchListsPlaceholder": "Search lists...",
     "newListNamePlaceholder": "New list name...",
@@ -19,5 +20,8 @@
     "listHasNoContacts": "This list has no contacts.",
     "renameEntityType": "Rename {{type}} \"{{name}}\"",
     "newEntityName": "New {{type}} name",
-    "list": "List"
+    "list": "List",
+    "allowUnsubscribeHelpText": "Allowing unsubscribes is recommended and required by law in many regions.",
+    "listIsEmptyTitle": "This list is empty",
+    "listIsEmptyMessage": "Add contacts to this list manually or by importing a file to start sending them campaigns."
 }

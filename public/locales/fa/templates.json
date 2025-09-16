@@ -10,5 +10,10 @@
     "noTemplatesFound": "هنوز قالبی ایجاد نشده است",
     "noTemplatesFoundDesc": "قالب‌ها در وقت شما صرفه‌جویی می‌کنند و برند شما را یکپارچه نگه می‌دارند. اکنون اولین قالب قابل استفاده مجدد خود را ایجاد کنید.",
     "createYourFirst": "برای شروع اولین قالب خود را ایجاد کنید!",
-    "noTemplatesForQuery": "قالبی برای \"{{query}}\" یافت نشد."
+    "noTemplatesForQuery": "قالبی برای \"{{query}}\" یافت نشد.",
+    "createCampaignFrom": "ایجاد کمپین از «{{templateName}}»",
+    "quickSendCampaign": "کمپین ارسال سریع",
+    "quickSendCampaignDesc": "یک کمپین ساده و تک‌ایمیلی. عالی برای خبرنامه‌ها و اطلاعیه‌ها.",
+    "advancedMarketingCampaign": "کمپین بازاریابی پیشرفته",
+    "advancedMarketingCampaignDesc": "یک ویزارد گام به گام برای کمپین‌های پیچیده‌تر با تنظیمات پیشرفته."
 }

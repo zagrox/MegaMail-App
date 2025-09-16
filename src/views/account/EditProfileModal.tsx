@@ -51,7 +51,11 @@ export const EditProfileModal = ({ isOpen, onClose, user }: { isOpen: boolean, o
             addToast(t('profileUpdateSuccess'), 'success');
             onClose();
         } catch (err: any) {
-            addToast(t('profileUpdateError', { error: err.message }), 'error');
+            let errorMessage = err.message;
+            if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
+                errorMessage = err.errors[0].message;
+            }
+            addToast(t('profileUpdateError', { error: errorMessage || t('unknownError', { ns: 'common' }) }), 'error');
         } finally {
             setIsSaving(false);
         }
