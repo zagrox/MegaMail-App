@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from './useApi';
@@ -554,14 +555,17 @@ const ContactsView = ({ apiKey, setView }: { apiKey: string, setView: (view: str
                                 />
                             </div>
                             <div className="header-actions">
-                                <Button onClick={() => setView('Custom Fields')} className="btn-secondary">
-                                    <Icon>{ICONS.HASH}</Icon> <span className="btn-text">{t('manageCustomFields')}</span>
+                                <Button className="btn-primary" onClick={() => setIsAddModalOpen(true)} action={AppActions.ADD_CONTACT}>
+                                    <Icon>{ICONS.USER_PLUS}</Icon> <span className="btn-text">{t('addContact')}</span>
                                 </Button>
                                 <Button onClick={() => setIsImportModalOpen(true)} action={AppActions.IMPORT_CONTACTS}>
                                     <Icon>{ICONS.UPLOAD}</Icon> <span className="btn-text">{t('importContacts')}</span>
                                 </Button>
-                                <Button className="btn-primary" onClick={() => setIsAddModalOpen(true)} action={AppActions.ADD_CONTACT}>
-                                    <Icon>{ICONS.USER_PLUS}</Icon> <span className="btn-text">{t('addContact')}</span>
+                                <Button onClick={() => setView('Custom Fields')} className="btn-secondary">
+                                    <Icon>{ICONS.HASH}</Icon> <span className="btn-text">{t('manageCustomFields')}</span>
+                                </Button>
+                                <Button onClick={() => setView('Segments')} className="btn-secondary">
+                                    <Icon>{ICONS.SEGMENTS}</Icon> <span className="btn-text">{t('segments', { ns: 'common' })}</span>
                                 </Button>
                             </div>
                         </div>

@@ -361,7 +361,8 @@ const App = () => {
         'ListDetail': { component: <ListDetailView apiKey={apiKey} list={selectedList} setView={handleSetView} onBack={() => handleSetView('Email Lists')} />, title: selectedList ? t('contactsInList', { listName: selectedList.ListName }) : t('contacts'), icon: ICONS.CONTACTS },
         'ContactDetail': { component: <ContactDetailView apiKey={apiKey} contactEmail={selectedContactEmail || ''} onBack={() => contactDetailOrigin ? handleSetView(contactDetailOrigin.view, contactDetailOrigin.data) : handleSetView('Contacts')} />, title: selectedContactEmail || t('contactDetails'), icon: ICONS.ACCOUNT },
         'Segments': { component: <SegmentsView apiKey={apiKey} />, title: t('segments'), icon: ICONS.SEGMENTS },
-        'Custom Fields': { component: <CustomFieldsView apiKey={apiKey} setView={handleSetView} />, title: t('customFields'), icon: ICONS.HASH },
+        // FIX: Removed unused `setView` prop from CustomFieldsView component call to fix type error. The component is informational and does not navigate.
+        'Custom Fields': { component: <CustomFieldsView apiKey={apiKey} />, title: t('customFields'), icon: ICONS.HASH },
         'Media Manager': { component: <MediaManagerView apiKey={apiKey} />, title: t('mediaManager'), icon: ICONS.FOLDER },
         'Campaigns': { component: <CampaignsView apiKey={apiKey} setView={handleSetView} />, title: t('campaigns'), icon: ICONS.CAMPAIGNS },
         'CampaignDetail': { component: <CampaignDetailView apiKey={apiKey} campaign={selectedCampaign} onBack={() => handleSetView('Campaigns')} />, title: selectedCampaign?.Name || t('campaigns'), icon: ICONS.CAMPAIGNS },

@@ -5,6 +5,7 @@
     "deselectAllOnPage": "Deselect all on page",
     "searchContactsPlaceholder": "Search by name or email...",
     "importContacts": "Import Contacts",
+    "manageCustomFields": "Manage Custom Fields",
     "addContact": "Add Contact",
     "addNewContact": "Add New Contact",
     "contactAddedSuccess": "Contact {{email}} added successfully.",

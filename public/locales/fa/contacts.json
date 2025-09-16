@@ -5,6 +5,7 @@
     "deselectAllOnPage": "لغو انتخاب همه در این صفحه",
     "searchContactsPlaceholder": "جستجو بر اساس نام یا ایمیل...",
     "importContacts": "وارد کردن مخاطبین",
+    "manageCustomFields": "فیلدهای سفارشی",
     "addContact": "افزودن مخاطب",
     "addNewContact": "افزودن مخاطب جدید",
     "contactAddedSuccess": "مخاطب {{email}} با موفقیت اضافه شد.",
