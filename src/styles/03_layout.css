@@ -4,8 +4,11 @@
     height: 100%;
     background-color: var(--background-color);
 }
+[dir="rtl"] .app-container {
+    flex-direction: row-reverse;
+}
 .sidebar {
-    width: 225px;
+    width: 235px;
     background-color: var(--surface-color);
     border-inline-end: 1px solid var(--border-color);
     display: flex;
@@ -174,7 +177,7 @@
         inset-inline-start: 0;
         top: 0;
         bottom: 0;
-        z-index: 1000;
+        z-index: 1010;
         transform: translateX(var(--sidebar-translateX));
         height: 100%;
     }
@@ -186,7 +189,7 @@
         position: fixed;
         inset: 0;
         background: var(--overlay-background);
-        z-index: 999;
+        z-index: 1005;
         opacity: 0;
         transition: opacity 0.3s ease;
     }
