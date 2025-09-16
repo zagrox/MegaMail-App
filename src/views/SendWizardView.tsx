@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiFetchV4 } from '../api/elasticEmail';
@@ -58,9 +57,15 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             const loadedOptions = campaignToLoad.Options || {};
 
             let recipientTarget: 'all' | 'list' | 'segment' | null = null;
-            if (loadedRecipients.ListNames?.length > 0) recipientTarget = 'list';
-            else if (loadedRecipients.SegmentNames?.length > 0) recipientTarget = 'segment';
-            else if (Object.keys(loadedRecipients).length === 0) recipientTarget = 'all';
+            if (loadedRecipients.ListNames?.length > 0) {
+                recipientTarget = 'list';
+            } else if (loadedRecipients.SegmentNames?.length > 0 && loadedRecipients.SegmentNames.includes('All Contacts')) {
+                recipientTarget = 'all';
+            } else if (loadedRecipients.SegmentNames?.length > 0) {
+                recipientTarget = 'segment';
+            } else if (Object.keys(loadedRecipients).length === 0) {
+                recipientTarget = 'all';
+            }
 
             const fromString = loadedContent.From || '';
             let fromName = loadedContent.FromName;
@@ -203,7 +208,11 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                     finalRecipients = { SegmentNames: payload.Recipients.SegmentNames || [] };
                     break;
                 case 'all':
-                    finalRecipients = {};
+                    if (!campaignToLoad) {
+                        finalRecipients = { SegmentNames: ['All Contacts'] };
+                    } else {
+                        finalRecipients = {};
+                    }
                     break;
                 default:
                     finalRecipients = { ListNames: [], SegmentNames: [] };

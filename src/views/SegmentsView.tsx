@@ -15,6 +15,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import LineLoader from '../components/LineLoader';
 import Button from '../components/Button';
 import EmptyState from '../components/EmptyState';
+import useApi from './useApi';
 
 const FIELD_TYPES: Record<string, 'date' | 'number' | 'boolean' | 'string'> = {
     dateadded: 'date', dateupdated: 'date', statuschangedate: 'date', consentdate: 'date',
@@ -282,12 +283,13 @@ const SegmentsView = ({ apiKey }: { apiKey: string }) => {
     const [segmentCounts, setSegmentCounts] = useState<Record<string, { count: number | null; loading: boolean; error: boolean }>>({});
 
     const { data: segments, loading, error } = useApiV4('/segments', apiKey, {}, refetchIndex);
+    const { data: totalContactsCount, loading: totalContactsLoading } = useApi('/contact/count', apiKey, { allContacts: true }, refetchIndex);
     const refetch = () => setRefetchIndex(i => i + 1);
 
     useEffect(() => {
         if (segments && Array.isArray(segments) && apiKey) {
             segments.forEach((seg: Segment) => {
-                if (!segmentCounts[seg.Name]) { // Only fetch if not already there
+                if (seg.Name !== 'All Contacts' && !segmentCounts[seg.Name]) { // Only fetch if not already there and not the special segment
                     setSegmentCounts(prev => ({ ...prev, [seg.Name]: { count: null, loading: true, error: false } }));
                     apiFetch('/contact/count', apiKey, { params: { rule: seg.Rule } })
                         .then(count => {
@@ -410,34 +412,41 @@ const SegmentsView = ({ apiKey }: { apiKey: string }) => {
 
             {filteredSegments.length > 0 && (
                 <div className="card-grid list-grid">
-                    {filteredSegments.map((seg: Segment) => (
-                        <div key={seg.Name} className="card segment-card">
-                            <div className="segment-card-header">
-                                <h3>{seg.Name}</h3>
-                                <div className="action-buttons">
-                                    <button className="btn-icon btn-icon-primary" onClick={() => setSegmentToEditRules(seg)} aria-label={t('editSegmentRules')}><Icon>{ICONS.SETTINGS}</Icon></button>
-                                    <button className="btn-icon btn-icon-primary" onClick={() => setSegmentToRename(seg)} aria-label={t('renameSegment')}><Icon>{ICONS.PENCIL}</Icon></button>
-                                    <button className="btn-icon btn-icon-danger" onClick={() => setSegmentToDelete(seg.Name)} aria-label={t('deleteSegment')}><Icon>{ICONS.DELETE}</Icon></button>
+                    {filteredSegments.map((seg: Segment) => {
+                        const isAllContactsSegment = seg.Name === 'All Contacts';
+                        const countInfo = isAllContactsSegment
+                            ? { count: totalContactsCount, loading: totalContactsLoading, error: false }
+                            : segmentCounts[seg.Name];
+                        
+                        return (
+                            <div key={seg.Name} className="card segment-card">
+                                <div className="segment-card-header">
+                                    <h3>{isAllContactsSegment ? t('allContactsSegmentName') : seg.Name}</h3>
+                                    <div className="action-buttons">
+                                        <button className="btn-icon btn-icon-primary" onClick={() => !isAllContactsSegment && setSegmentToEditRules(seg)} disabled={isAllContactsSegment} aria-label={t('editSegmentRules')} title={isAllContactsSegment ? t('defaultSegmentCannotBeEdited') : t('editSegmentRules')}><Icon>{ICONS.SETTINGS}</Icon></button>
+                                        <button className="btn-icon btn-icon-primary" onClick={() => !isAllContactsSegment && setSegmentToRename(seg)} disabled={isAllContactsSegment} aria-label={t('renameSegment')} title={isAllContactsSegment ? t('defaultSegmentCannotBeEdited') : t('renameSegment')}><Icon>{ICONS.PENCIL}</Icon></button>
+                                        <button className="btn-icon btn-icon-danger" onClick={() => !isAllContactsSegment && setSegmentToDelete(seg.Name)} disabled={isAllContactsSegment} aria-label={t('deleteSegment')} title={isAllContactsSegment ? t('defaultSegmentCannotBeDeleted') : t('deleteSegment')}><Icon>{ICONS.DELETE}</Icon></button>
+                                    </div>
+                                </div>
+                                <div className="segment-card-body">
+                                    <p>{t('rule')}:</p>
+                                    <div className="segment-rule">{isAllContactsSegment ? t('allContactsSegmentRule') : seg.Rule}</div>
+                                </div>
+                                <div className="segment-card-footer">
+                                    <span>{t('contacts')}:</span>
+                                    <strong>
+                                        {countInfo?.loading ? (
+                                            <div style={{ width: '50px', display: 'inline-block' }}><LineLoader /></div>
+                                        ) : countInfo?.error ? (
+                                            'N/A'
+                                        ) : (
+                                            countInfo?.count?.toLocaleString(i18n.language) ?? '...'
+                                        )}
+                                    </strong>
                                 </div>
                             </div>
-                            <div className="segment-card-body">
-                                <p>{t('rule')}:</p>
-                                <div className="segment-rule">{seg.Rule}</div>
-                            </div>
-                            <div className="segment-card-footer">
-                                <span>{t('contacts')}:</span>
-                                <strong>
-                                    {segmentCounts[seg.Name]?.loading ? (
-                                        <div style={{ width: '50px', display: 'inline-block' }}><LineLoader /></div>
-                                    ) : segmentCounts[seg.Name]?.error ? (
-                                        'N/A'
-                                    ) : (
-                                        segmentCounts[seg.Name]?.count?.toLocaleString(i18n.language) ?? '...'
-                                    )}
-                                </strong>
-                            </div>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             )}
         </div>

@@ -1,3 +1,4 @@
+
 {
     "searchSegmentsPlaceholder": "جستجوی سگمنت‌ها...",
     "createSegment": "ایجاد سگمنت",
@@ -87,5 +88,9 @@
     "evaluationResult_one": "{{count}} مخاطب منطبق",
     "evaluationResult_other": "{{count}} مخاطب منطبق",
     "evaluationResult_zero": "۰ مخاطب منطبق",
-    "evaluationError": "ارزیابی ناموفق بود"
+    "evaluationError": "ارزیابی ناموفق بود",
+    "allContactsSegmentName": "همه مخاطبین",
+    "allContactsSegmentRule": "لیست کاملی از تمام مخاطبین شما.",
+    "defaultSegmentCannotBeEdited": "سگمنت پیش‌فرض «همه مخاطبین» قابل ویرایش نیست.",
+    "defaultSegmentCannotBeDeleted": "سگمنت پیش‌فرض «همه مخاطبین» قابل حذف نیست."
 }

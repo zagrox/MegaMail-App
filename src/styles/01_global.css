@@ -28,7 +28,7 @@ body {
 .logo-font {
   font-weight: 600;
   color: var(--primary-color);
-  font-size: 1.8rem;
+  font-size: 1.5rem;
 }
 html[data-theme='dark'] .logo-font {
     color: var(--text-color);

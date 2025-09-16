@@ -253,6 +253,16 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
 
     const refetch = () => setRefetchIndex(i => i + 1);
 
+    // FIX: Add a useEffect to reset the processing state after a data refetch is complete.
+    // This prevents race conditions when performing actions (like delete) in quick succession.
+    useEffect(() => {
+        // If a campaign operation was in progress and the main data has finished loading,
+        // we can reset the processing state to unlock the UI for the next action.
+        if (processingCampaign && !loading) {
+            setProcessingCampaign(null);
+        }
+    }, [loading, processingCampaign]);
+
     const handlePreviewTemplate = async (campaignName: string) => {
         setLoadingPreview(campaignName);
         try {
@@ -397,7 +407,7 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             refetch();
         } catch (e: any) {
             addToast(t('campaignPausedError', { error: e.message }), 'error');
-        } finally {
+            // FIX: Unlock the UI on failure.
             setProcessingCampaign(null);
         }
     };
@@ -411,9 +421,11 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             refetch();
         } catch (e: any) {
             addToast(t('campaignDeletedError', { error: e.message }), 'error');
-        } finally {
-            setCampaignToDelete(null);
+            // FIX: Unlock the UI on failure.
             setProcessingCampaign(null);
+        } finally {
+            // FIX: Always close the modal, but let the useEffect handle resetting the processing state on success.
+            setCampaignToDelete(null);
         }
     };
 
@@ -437,7 +449,7 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                         placeholder={t('searchCampaignsPlaceholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        disabled={loading}
+                        disabled={loading || !!processingCampaign}
                         aria-label={t('searchCampaignsPlaceholder')}
                     />
                 </div>
@@ -456,7 +468,7 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                 </div>
             </div>
 
-            {loading && <CenteredMessage><Loader /></CenteredMessage>}
+            {loading && !processingCampaign && <CenteredMessage><Loader /></CenteredMessage>}
             {error && <ErrorMessage error={error} />}
 
             {!loading && !error && (

@@ -1,5 +1,3 @@
-
-
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -210,6 +208,8 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
 
             if (loadedRecipients.ListNames?.length > 0) {
                 setRecipientTarget('list');
+            } else if (loadedRecipients.SegmentNames?.length > 0 && loadedRecipients.SegmentNames.includes('All Contacts')) {
+                setRecipientTarget('all');
             } else if (loadedRecipients.SegmentNames?.length > 0) {
                 setRecipientTarget('segment');
             } else if (Object.keys(loadedRecipients).length === 0) {
@@ -342,7 +342,11 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                 finalRecipients = { SegmentNames: campaign.Recipients.SegmentNames || [] };
                 break;
             case 'all':
-                finalRecipients = {}; // API expects empty object for all contacts
+                if (!isEditing) {
+                    finalRecipients = { SegmentNames: ['All Contacts'] };
+                } else {
+                    finalRecipients = {};
+                }
                 break;
             default: // recipientTarget is null
                 finalRecipients = { ListNames: [], SegmentNames: [] };
