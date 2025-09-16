@@ -85,5 +85,14 @@
     "useThisTemplate": "Use This Template",
     "loadingTemplate": "Loading template...",
     "noGalleryTemplates": "No templates available in the gallery yet.",
-    "noGalleryTemplatesDesc": "Check back later for new designs."
+    "noGalleryTemplatesDesc": "Check back later for new designs.",
+    "forms": "Forms",
+    "formsDesc": "Create and manage subscription forms.",
+    "yourSubscriptionForm": "Your Subscription Form",
+    "subscriptionFormDesc": "This is your ready-to-use, double opt-in subscription form, hosted by Elastic Email. Share this link on your website or social media to let people subscribe to your lists.",
+    "copyLink": "Copy Link",
+    "formPreview": "Form Preview",
+    "publicIdUnavailable": "Your Public Account ID is not available, so the subscription form URL cannot be generated.",
+    "addContactsToList": "Add new subscribers to this list:",
+    "back": "Back"
 }

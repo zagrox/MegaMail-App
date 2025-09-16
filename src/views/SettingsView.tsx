@@ -7,6 +7,7 @@ import SmtpView from './SmtpView';
 import ApiKeyView from './ApiKeyView';
 import ShareTab from './account/ShareTab';
 import { useAuth } from '../contexts/AuthContext';
+import FormsTab from './settings/FormsTab';
 
 const SettingsView = ({ apiKey, user }: { apiKey: string, user: any }) => {
     const { t } = useTranslation(['common', 'account', 'domains', 'smtp']);
@@ -31,6 +32,12 @@ const SettingsView = ({ apiKey, user }: { apiKey: string, user: any }) => {
             label: t('apiKey', { ns: 'account' }), 
             icon: ICONS.KEY, 
             component: <ApiKeyView apiKey={apiKey} user={user} /> 
+        },
+        {
+            id: 'forms',
+            label: t('forms'),
+            icon: ICONS.FILE_TEXT,
+            component: <FormsTab apiKey={apiKey} />
         },
     ];
     

@@ -97,8 +97,9 @@ export const apiFetchV4 = async (endpoint: string, apiKey: string, options: { me
     }
 };
 
-export const apiUploadV4 = async (endpoint: string, apiKey: string, formData: FormData) => {
-    const url = `${ELASTIC_EMAIL_API_V4_BASE}${endpoint}`;
+export const apiUploadV4 = async (endpoint: string, apiKey: string, formData: FormData, params: Record<string, any> = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+    const url = `${ELASTIC_EMAIL_API_V4_BASE}${endpoint}${queryParams ? `?${queryParams}` : ''}`;
     const response = await fetch(url, {
         method: 'POST',
         headers: {
