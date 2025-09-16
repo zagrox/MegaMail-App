@@ -24,6 +24,8 @@ const ApiKeyTab = ({ apiKey: initialApiKey }: { apiKey: string }) => {
             if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
                 // For Directus SDK errors
                 errorMessage = err.errors[0].message;
+            } else if (err.message && typeof err.message !== 'string') {
+                errorMessage = JSON.stringify(err.message);
             }
             addToast(errorMessage || t('apiKeyUpdateError'), 'error');
         } finally {

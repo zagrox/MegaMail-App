@@ -41,8 +41,10 @@ const SecurityTab = ({ user }: { user: any }) => {
             let errorMessage = err.message;
             if (err.errors && err.errors[0]?.message) {
                  errorMessage = err.errors[0].message;
+            } else if (err.message && typeof err.message !== 'string') {
+                errorMessage = JSON.stringify(err.message);
             }
-            addToast(`${t('passwordUpdateError')} ${errorMessage}`, 'error');
+            addToast(`${t('passwordUpdateError')} ${errorMessage || t('unknownError', { ns: 'common' })}`, 'error');
         } finally {
             setIsSaving(false);
         }
