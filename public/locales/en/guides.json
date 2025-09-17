@@ -1,3 +1,4 @@
+
 {
     "guidesTitle": "Guides & Tutorials",
     "guidesSubtitle": "Learn how to make the most out of MegaMail with these step-by-step guides for essential features.",
@@ -80,5 +81,25 @@
     "guideOrdersStep3Title": "Actions for 'Processing' Orders",
     "guideOrdersStep3Desc": "A <strong>Processing</strong> status means you selected 'Bank Transfer' but have not yet provided your payment details. Click the <strong>View</strong> icon, then click <strong>Submit Bank Info</strong> to go to the form where you can enter your transaction details for our team to review.",
     "guideOrdersStep4Title": "Actions for 'Completed' Orders",
-    "guideOrdersStep4Desc": "For any <strong>Completed</strong> order, you can view a detailed invoice. Click the <strong>View</strong> icon, and then click <strong>View Invoice</strong> to see a printable invoice for your records."
+    "guideOrdersStep4Desc": "For any <strong>Completed</strong> order, you can view a detailed invoice. Click the <strong>View</strong> icon, and then click <strong>View Invoice</strong> to see a printable invoice for your records.",
+
+    "needMoreHelp": "Need More Help?",
+    "aiAssistant": "AI Assistant",
+    "aiAssistantDesc": "Get help with writing content, subject lines, and more with our AI-powered assistant.",
+    "reportABug": "Report a Bug",
+    "reportABugDesc": "Found an issue? Let us know so we can fix it.",
+    "submitATicket": "Submit a Ticket",
+    "submitATicketDesc": "Have a question or need support? Open a ticket with our team.",
+    "apiDocumentation": "API Documentation",
+    "apiDocumentationDesc": "Integrate MegaMail with your applications using our powerful and flexible API.",
+    "bugReportModalTitle": "Report a Bug",
+    "bugReportFormIntro1": "Please use this form only for reporting continuous technical issues you encounter within the app.",
+    "bugReportFormIntro2": "For questions about your account, billing, or contacts, please submit a ticket instead.",
+    "bugReportFormDesc": "Please describe the issue you're facing in detail. The more information you provide, the faster we can help.",
+    "bugTitle": "Bug Title",
+    "bugTitlePlaceholder": "e.g., Unable to save template in Email Builder",
+    "bugDetails": "Bug Details",
+    "submitBugReport": "Submit Bug Report",
+    "bugReportSuccess": "Bug report submitted successfully. Our team will investigate the issue.",
+    "bugReportError": "Failed to submit bug report: {{error}}"
 }
