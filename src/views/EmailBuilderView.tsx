@@ -1104,7 +1104,7 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
                                 selectedBlockId={selectedBlockId}
                                 onSelectBlock={handleSelectBlock}
                                 onEditBlock={handleEditBlock}
-// FIX: The prop 'onContentChange' was being passed an undefined variable 'onContentChange'. The correct handler is 'handleContentChange'.
+// FIX: The prop 'onContentChange' was being passed an undefined variable. The correct handler is 'handleContentChange'.
                                 onContentChange={handleContentChange}
                                 onStyleChange={handleStyleChange}
                                 onInsertBlock={handleInsertBlock}

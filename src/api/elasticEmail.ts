@@ -56,7 +56,7 @@ export const apiFetchV4 = async (endpoint: string, apiKey: string, options: { me
     
     // FIX: Include PATCH method when checking if a request body should be added.
     if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
-        fetchOptions.headers['Content-Type'] = 'application/json';
+        (fetchOptions.headers as Record<string, string>)['Content-Type'] = 'application/json';
         fetchOptions.body = JSON.stringify(body);
     }
 

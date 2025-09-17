@@ -91,7 +91,7 @@ const SegmentedControl = ({ options, value, onChange, isIconOnly = false }: { op
 
 // Sortable Item Component for the social links list
 function SortableItem({ item, onUrlChange, onRemove }: { item: any, onUrlChange: (id: string, url: string) => void, onRemove: (id: string) => void }) {
-    const { t } = useTranslation('emailBuilder');
+    const { t } = useTranslation(['emailBuilder', 'common']);
     const {
         attributes,
         listeners,
@@ -127,7 +127,7 @@ function SortableItem({ item, onUrlChange, onRemove }: { item: any, onUrlChange:
 
 // Main Settings Component for the Social Block
 const SocialSettings = ({ block, onStyleChange, onContentChange }: { block: any, onStyleChange: any, onContentChange: any }) => {
-    const { t } = useTranslation('emailBuilder');
+    const { t } = useTranslation(['emailBuilder', 'common']);
     const s = block.style || {};
     const c = block.content || {};
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -198,10 +198,10 @@ const SocialSettings = ({ block, onStyleChange, onContentChange }: { block: any,
                         value={s.iconStyle || 'circle'}
                         onChange={(val) => handleStyleChange('iconStyle', val)}
                         options={[
-                            { value: 'default', label: t('iconStyleDefault') },
-                            { value: 'square', label: t('iconStyleSquare') },
-                            { value: 'rounded', label: t('iconStyleRounded') },
-                            { value: 'circle', label: t('iconStyleCircle') },
+                            { value: 'default', label: 'Default' },
+                            { value: 'square', label: 'Square' },
+                            { value: 'rounded', label: 'Rounded' },
+                            { value: 'circle', label: 'Circle' },
                         ]}
                     />
                 </LabeledControl>
@@ -210,10 +210,10 @@ const SocialSettings = ({ block, onStyleChange, onContentChange }: { block: any,
                         value={s.iconColor || 'gray'}
                         onChange={(val) => handleStyleChange('iconColor', val)}
                         options={[
-                            { value: 'dark', label: t('iconColorDark') },
-                            { value: 'white', label: t('iconColorWhite') },
-                            { value: 'gray', label: t('iconColorGray') },
-                            { value: 'color', label: t('iconColorColor') },
+                            { value: 'dark', label: 'Dark' },
+                            { value: 'white', label: 'White' },
+                            { value: 'gray', label: 'Gray' },
+                            { value: 'color', label: 'Color' },
                         ]}
                     />
                 </LabeledControl>

@@ -1,8 +1,9 @@
 
+
 import React, { useState, useEffect, useCallback, ReactNode, createContext, useContext } from 'react';
 // FIX: Removed `updateUser as sdkUpdateUser` as it was causing argument mismatch errors and is replaced by a raw request.
 // FIX: Added AuthenticationData type for use with raw login request.
-import { readMe, registerUser, updateMe, createItem, readItems, updateItem, type AuthenticationData } from '@directus/sdk';
+import { readMe, updateMe, createItem, readItems, updateItem, type AuthenticationData } from '@directus/sdk';
 // FIX: Import storage to manually handle authentication tokens.
 import sdk, { storage } from '../api/directus';
 import { apiFetch } from '../api/elasticEmail';
@@ -243,6 +244,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             body: JSON.stringify({
                 email: email.toLowerCase(),
                 password: password,
+                role: "0755b7f1-a1d8-4a5e-8557-4279b3651d62",
                 ...otherDetails,
                 'g-recaptcha-response': recaptchaToken,
             }),

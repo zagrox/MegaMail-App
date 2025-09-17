@@ -41,12 +41,12 @@
     "userEmailNotFound": "ایمیل کاربر یافت نشد. امکان ایجاد حساب وجود ندارد.",
     "accountConnectedSuccess": "حساب مگامیل شما با موفقیت متصل شد!",
     "accountExistsTitle": "حساب کاربری از قبل وجود دارد",
-    "accountExistsSubtitle": "یک حساب کاربری فرعی در Elastic Email با ایمیل {{email}} از قبل وجود دارد. چگونه می‌خواهید ادامه دهید؟",
+    "accountExistsSubtitle": "یک حساب کاربری فرعی در میلزیلا با ایمیل {{email}} از قبل وجود دارد. چگونه می‌خواهید ادامه دهید؟",
     "useApiKey": "استفاده از کلید API موجود",
     "useDifferentEmail": "استفاده از یک ایمیل دیگر",
     "updateEmailTitle": "آدرس ایمیل خود را به‌روز کنید",
     "updateEmailSubtitle": "لطفاً یک آدرس ایمیل جدید و منحصر به فرد برای ایجاد حساب فرعی خود ارائه دهید. این کار ایمیل ورود شما به {{appName}} را نیز به‌روز می‌کند.",
     "updateAndRetry": "به‌روزرسانی و تلاش مجدد",
     "connectWithApiKeyTitle": "اتصال با کلید API",
-    "connectWithApiKeySubtitle": "برای اتصال، کلید API حساب Elastic Email موجود خود را وارد کنید."
+    "connectWithApiKeySubtitle": "برای اتصال، کلید API حساب میلزیلا موجود خود را وارد کنید."
 }

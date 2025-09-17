@@ -16,7 +16,7 @@ import Button from '../components/Button';
 import sdk from '../api/directus';
 import { readItems } from '@directus/sdk';
 import { AppActions } from '../config/actions';
-import DOMPurify from 'https://esm.sh/dompurify@3.1.6';
+import DOMPurify from 'dompurify';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
     const { t, i18n } = useTranslation(['dashboard', 'common', 'account']);
@@ -52,8 +52,8 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                     filter
                 }));
                 
-                if (response && response.length > 0 && response[0].count) {
-                     setUnreadCount(Number(response[0].count));
+                if (response && response.length > 0 && (response[0] as any).count) {
+                     setUnreadCount(Number((response[0] as any).count));
                 }
             } catch (error) {
                 console.warn("Failed to fetch unread notification count:", error);
