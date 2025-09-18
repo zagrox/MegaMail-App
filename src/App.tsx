@@ -187,7 +187,7 @@ const App = () => {
                 "name": `${appName} - Email Marketing Platform`,
                 "short_name": appName,
                 "description": `Your complete email marketing solution, powered by ${appName}.`,
-                "start_url": ".",
+                "start_url": window.location.origin,
                 "display": "standalone",
                 "background_color": "#F7F9FC",
                 "theme_color": config.app_secondary_color || "#1A2B3C",
