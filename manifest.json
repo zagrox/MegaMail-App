@@ -2,7 +2,7 @@
   "name": "MegaMail - Email Marketing Platform",
   "short_name": "MegaMail",
   "description": "Your complete email marketing solution, powered by MegaMail",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#F7F9FC",
   "theme_color": "#1A2B3C",

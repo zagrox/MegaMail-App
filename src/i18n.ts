@@ -16,7 +16,17 @@ i18next
       escapeValue: false, // react already safes from xss
     },
     backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
+      // FIX: Replace 'translation.json' requests with 'common.json'.
+      // This handles cases where i18next might fall back to its internal default 'translation'
+      // namespace, ensuring it loads the correct 'common.json' file instead.
+      loadPath: (lngs, namespaces) => {
+        const lng = lngs[0];
+        const ns = namespaces[0];
+        if (ns === 'translation') {
+            return `/locales/${lng}/common.json`;
+        }
+        return `/locales/${lng}/${ns}.json`;
+      },
     },
   });
 
