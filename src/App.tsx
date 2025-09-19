@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -109,22 +110,22 @@ const App = () => {
         const configLangCode = mapLangToCode(config.app_language);
     
         let targetLangCode: string | undefined;
-
+    
+        // Determine if the user is in the onboarding flow (logged in but no elastic key yet).
+        const isOnboarding = user && !user.elastickey;
+    
         // This logic establishes the definitive hierarchy for the app's language.
-        // It ensures the app's configured default language is respected for new users,
-        // while allowing explicit user choices (via switcher or profile) to take precedence.
-
-        // PRIORITY 1: A language explicitly selected during the current session (from the language switcher).
-        // This overrides all other settings for the current session.
+        // An explicit choice from the language switcher ALWAYS wins.
         if (i18nextLngCode) {
             targetLangCode = i18nextLngCode;
-        }
-        // PRIORITY 2: An onboarded user's saved profile setting. This is the source of truth for returning users.
-        else if (userLangCode) {
+        } 
+        // A fully onboarded user's saved preference is next. This is ignored during onboarding.
+        else if (userLangCode && !isOnboarding) {
             targetLangCode = userLangCode;
         }
-        // PRIORITY 3: The app's default language from the backend. This is the base language for all new sessions.
-        else if (configLangCode) {
+        // For anyone else (onboarding users, new visitors, or users without a saved pref), 
+        // the app's configured default language is the source of truth.
+        else {
             targetLangCode = configLangCode;
         }
     
@@ -132,7 +133,7 @@ const App = () => {
         if (targetLangCode && targetLangCode !== i18n.language) {
             i18n.changeLanguage(targetLangCode);
         }
-    }, [user?.language, user?.id, config, authLoading, i18n]);
+    }, [user, config, authLoading, i18n]);
 
     const urlParams = new URLSearchParams(window.location.search);
     const isEmbedMode = urlParams.get('embed') === 'true';
