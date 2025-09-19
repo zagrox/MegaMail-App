@@ -271,8 +271,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             const meFields: { [key: string]: any } = {};
             const profileFields: { [key: string]: any } = {};
-            const allowedMeFields = ['first_name', 'last_name', 'language', 'theme_dark', 'theme_light', 'text_direction'];
-            const allowedProfileFields = ['company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display'];
+            // FIX: Moved 'language' from directus_users fields to profiles fields to save it in the correct collection.
+            const allowedMeFields = ['first_name', 'last_name', 'theme_dark', 'theme_light', 'text_direction'];
+            const allowedProfileFields = ['company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display', 'language'];
 
             for (const key in data) {
                 if (allowedMeFields.includes(key)) meFields[key] = data[key];

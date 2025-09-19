@@ -1,3 +1,4 @@
+
 .guides-view-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -165,7 +166,7 @@
 
 .help-card {
     padding: 1.5rem;
-    text-align: left;
+    text-align: start; /* FIX: Use logical property for LTR/RTL text alignment */
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
@@ -216,8 +217,8 @@
 
 .soon-badge-overlay {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    inset-block-start: 1rem; /* FIX: Use logical property for top position */
+    inset-inline-end: 1rem; /* FIX: Use logical property for right/left position */
     background-color: var(--warning-color);
     color: var(--primary-color);
     font-size: 0.7rem;
