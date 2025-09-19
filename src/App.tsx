@@ -43,7 +43,7 @@ import GuidesView from './views/GuidesView';
 
 const App = () => {
     const { isAuthenticated, user, logout, hasModuleAccess, loading: authLoading, allModules, moduleToUnlock, setModuleToUnlock } = useAuth();
-    const { config } = useConfiguration();
+    const { config, loading: configLoading } = useConfiguration();
     const { t, i18n } = useTranslation(['common', 'emailLists', 'contacts', 'buyCredits', 'account']);
     const { addToast } = useToast();
     const [view, setView] = useState('Dashboard');
@@ -240,6 +240,10 @@ const App = () => {
             container.removeEventListener('touchmove', handleTouchMove);
         };
     }, [isMobileMenuOpen, i18n, isEmbedMode, setIsMobileMenuOpen]);
+
+    if (configLoading) {
+        return <CenteredMessage style={{height: '100vh'}}><Loader /></CenteredMessage>;
+    }
 
     if (isResetPasswordMode) return <ResetPasswordView />;
     if (isCallbackMode) return <CallbackView />;
