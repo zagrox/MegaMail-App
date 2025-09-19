@@ -8,10 +8,12 @@ import Icon, { ICONS } from '../../components/Icon';
 import Badge from '../../components/Badge';
 import { useStatusStyles } from '../../hooks/useStatusStyles';
 import { useConfiguration } from '../../contexts/ConfigurationContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, installPrompt, handleInstallClick }: { accountData: any, contactsCountData: any, contactsCountLoading: boolean, installPrompt: any, handleInstallClick: () => void }) => {
     const { t, i18n } = useTranslation(['account', 'common']);
     const { logout } = useAuth();
+    const { setTheme } = useTheme();
     const { getStatusStyle } = useStatusStyles();
     
     const getReputationInfo = (reputation: number) => {
@@ -21,6 +23,11 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
         if (score >= 40) return { text: t('reputationAverage'), className: 'medium' };
         if (score >= 20) return { text: t('reputationPoor'), className: 'bad' };
         return { text: t('reputationVeryPoor'), className: 'bad' };
+    };
+
+    const handleLogout = () => {
+        setTheme('auto'); // Reset theme to auto-detect on logout
+        logout();
     };
     
     const accountStatus = accountData?.status || 'Active';
@@ -85,7 +92,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
                 </div>
                 <div className="account-tab-card-body">
                     <p>{t('logoutDescription')}</p>
-                    <button className="btn btn-secondary" onClick={logout} style={{maxWidth: '250px'}}>
+                    <button className="btn btn-secondary" onClick={handleLogout} style={{maxWidth: '250px'}}>
                         <Icon>{ICONS.LOGOUT}</Icon>
                         <span>{t('logout')}</span>
                     </button>

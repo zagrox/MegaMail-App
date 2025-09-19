@@ -39,6 +39,7 @@ import { useToast } from './contexts/ToastContext';
 import emitter from './api/eventEmitter';
 import UnsavedChangesModal from './components/UnsavedChangesModal';
 import GuidesView from './views/GuidesView';
+import { useTheme } from './contexts/ThemeContext';
 
 
 const App = () => {
@@ -46,6 +47,7 @@ const App = () => {
     const { config, loading: configLoading } = useConfiguration();
     const { t, i18n } = useTranslation(['common', 'emailLists', 'contacts', 'buyCredits', 'account']);
     const { addToast } = useToast();
+    const { theme, setTheme } = useTheme();
     const [view, setView] = useState('Dashboard');
     const [templateToEdit, setTemplateToEdit] = useState<Template | null>(null);
     const [isNewFromGallery, setIsNewFromGallery] = useState(false);
@@ -69,6 +71,15 @@ const App = () => {
     });
 
     useEffect(() => {
+        // Sync the application theme with the user's saved preference upon login or profile load.
+        // This ensures that if a user has a theme preference ('light', 'dark', or 'auto')
+        // saved in their profile, it is applied as soon as they are authenticated.
+        if (user?.display && user.display !== theme) {
+            setTheme(user.display);
+        }
+    }, [user?.display, theme, setTheme]);
+
+    useEffect(() => {
         const handleForbidden = () => {
             addToast(t('permissionDeniedError'), 'error');
         };
@@ -81,13 +92,10 @@ const App = () => {
     }, [addToast, t]);
 
     useEffect(() => {
-        // This effect determines the correct language for the UI based on a clear priority,
-        // ensuring the language selected on the login screen is respected during onboarding.
         if (authLoading || !config) {
             return; // Wait until essential data is loaded.
         }
     
-        // Maps a language name ('persian', 'english', 'fa-IR', etc.) to a 2-letter i18next code.
         const mapLangToCode = (lang: string | undefined): string | undefined => {
             if (!lang) return undefined;
             const lowerLang = lang.toLowerCase();
@@ -99,23 +107,23 @@ const App = () => {
         const i18nextLngCode = mapLangToCode(localStorage.getItem('i18nextLng') || undefined);
         const userLangCode = mapLangToCode(user?.language);
         const configLangCode = mapLangToCode(config.app_language);
-        const isUserOnboarding = user && !user.elastickey;
     
         let targetLangCode: string | undefined;
-    
-        // PRIORITY 1: A user currently in the onboarding flow. Respect their language choice from the login screen above all else.
-        if (isUserOnboarding && i18nextLngCode) {
+
+        // This logic establishes the definitive hierarchy for the app's language.
+        // It ensures the app's configured default language is respected for new users,
+        // while allowing explicit user choices (via switcher or profile) to take precedence.
+
+        // PRIORITY 1: A language explicitly selected during the current session (from the language switcher).
+        // This overrides all other settings for the current session.
+        if (i18nextLngCode) {
             targetLangCode = i18nextLngCode;
         }
-        // PRIORITY 2: A logged-in, fully onboarded user's saved preference from their profile.
+        // PRIORITY 2: An onboarded user's saved profile setting. This is the source of truth for returning users.
         else if (userLangCode) {
             targetLangCode = userLangCode;
         }
-        // PRIORITY 3: A guest user's session preference (also covers onboarding users if they somehow clear localStorage).
-        else if (i18nextLngCode) {
-            targetLangCode = i18nextLngCode;
-        }
-        // PRIORITY 4: The app's default language from the backend configuration.
+        // PRIORITY 3: The app's default language from the backend. This is the base language for all new sessions.
         else if (configLangCode) {
             targetLangCode = configLangCode;
         }
