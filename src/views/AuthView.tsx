@@ -9,7 +9,7 @@ import { useConfiguration } from '../contexts/ConfigurationContext';
 type AuthMode = 'login' | 'register' | 'forgot';
 
 const AuthView = () => {
-    const { login, register, requestPasswordReset } = useAuth();
+    const { login, register, requestPasswordReset, createInitialProfile } = useAuth();
     const [mode, setMode] = useState<AuthMode>('login');
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +45,12 @@ const AuthView = () => {
                 if (password !== confirm_password) {
                     throw new Error(t('passwordsDoNotMatch'));
                 }
-                await register({ email, password, first_name, last_name }, token);
+                const newUser = await register({ email, password, first_name, last_name }, token, config?.user_registration_role);
+                
+                if (newUser && newUser.id) {
+                    await createInitialProfile(newUser.id);
+                }
+
                 addToast(t('registrationSuccessMessage'), 'success');
                 setLoginEmail(email);
                 setLoginPassword('');
@@ -68,7 +73,7 @@ const AuthView = () => {
                 (window as any).grecaptcha.reset(recaptchaWidgetId.current);
             }
         }
-    }, [addToast, config, login, loginEmail, loginPassword, mode, register, requestPasswordReset, t]);
+    }, [addToast, config, login, loginEmail, loginPassword, mode, register, requestPasswordReset, t, createInitialProfile]);
     
     useEffect(() => {
         if (!config?.app_recaptcha || !config.app_recaptcha_key) {

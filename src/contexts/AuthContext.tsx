@@ -43,7 +43,8 @@ interface AuthContextType {
     loading: boolean;
     login: (credentials: any, recaptchaToken?: string) => Promise<void>;
     loginWithApiKey: (apiKey: string) => Promise<void>;
-    register: (details: any, recaptchaToken?: string) => Promise<any>;
+    register: (details: any, recaptchaToken?: string, roleId?: string) => Promise<any>;
+    createInitialProfile: (userId: string) => Promise<void>;
     logout: () => void;
     updateUser: (data: any) => Promise<void>;
     updateUserEmail: (newEmail: string) => Promise<void>;
@@ -236,19 +237,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
     };
 
-    const register = async (details: any, recaptchaToken?: string) => {
+    const register = async (details: any, recaptchaToken?: string, roleId?: string) => {
         const { email, password, ...otherDetails } = details;
-        return await sdk.request(() => ({
+        const requestPayload: { [key: string]: any } = {
+            email: email.toLowerCase(),
+            password: password,
+            ...otherDetails,
+        };
+        if (roleId) {
+            requestPayload.role = roleId;
+        }
+        if (recaptchaToken) {
+            requestPayload['g-recaptcha-response'] = recaptchaToken;
+        }
+
+        return await sdk.request<any>(() => ({
             method: 'POST',
             path: '/users',
-            body: JSON.stringify({
-                email: email.toLowerCase(),
-                password: password,
-                role: "0755b7f1-a1d8-4a5e-8557-4279b3651d62",
-                ...otherDetails,
-                'g-recaptcha-response': recaptchaToken,
-            }),
+            body: JSON.stringify(requestPayload),
             headers: { 'Content-Type': 'application/json' },
+        }));
+    };
+
+    const createInitialProfile = async (userId: string) => {
+        // This request will use the public role's permissions, as the user is not logged in yet.
+        await sdk.request(createItem('profiles', {
+            status: 'published',
+            user_created: userId,
         }));
     };
 
@@ -470,6 +485,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         loginWithApiKey,
         register,
+        createInitialProfile,
         logout,
         updateUser,
         updateUserEmail,
