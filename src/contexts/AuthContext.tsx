@@ -361,19 +361,72 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const createElasticSubaccount = async (email: string, password: string) => {
-        if (!user || user.isApiKeyUser || !user.elastickey) throw new Error("Main account API key not found.");
-        
-        const subaccountData = await apiFetch('/account/addsubaccount', user.elastickey, {
-            method: 'POST',
-            params: { email, password }
-        });
+        if (!user || user.isApiKeyUser) {
+            throw new Error("User not authenticated for this action");
+        }
 
-        await updateUser({
-            elastickey: subaccountData.apikey,
-            elasticid: subaccountData.publicaccountid,
-        });
+        const webhookUrl = `${DIRECTUS_CRM_URL}/flows/trigger/736aa130-adf4-4ab0-a117-7e7647b403ea`;
 
-        return subaccountData;
+        try {
+            // Step 1: Trigger the webhook. The flow handles all backend logic.
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${await sdk.getToken()}`
+                },
+                body: JSON.stringify({ email, password }) // Pass email and password to the flow
+            });
+
+            if (!response.ok) {
+                try {
+                    const errorBody = await response.json();
+                    // Let the calling function handle specific error messages like "account exists"
+                    throw new Error(errorBody.message || `Webhook trigger failed with status ${response.status}`);
+                } catch {
+                    throw new Error(`Webhook trigger failed with status ${response.status}`);
+                }
+            }
+
+            // The webhook is async. We need to poll to see if the user's profile was updated with an API key.
+            const pollForApiKey = async (timeout = 15000, interval = 2000): Promise<boolean> => {
+                const endTime = Date.now() + timeout;
+                while (Date.now() < endTime) {
+                    try {
+                        const profiles = await sdk.request(readItems('profiles', {
+                            filter: { user_created: { _eq: user.id } },
+                            fields: ['elastickey'],
+                            limit: 1
+                        }));
+                        if (profiles && profiles.length > 0 && profiles[0].elastickey) {
+                            return true; // Success! Key is present.
+                        }
+                    } catch (pollError) {
+                        console.warn("Polling for API key encountered an error, retrying...", pollError);
+                    }
+                    await new Promise(res => setTimeout(res, interval));
+                }
+                return false; // Timeout
+            };
+
+            const isKeyProvisioned = await pollForApiKey();
+
+            if (isKeyProvisioned) {
+                // Success: refresh user data to get the new API key.
+                await getMe();
+                // Not returning anything as the caller doesn't use it and getMe() updates state.
+                return;
+            } else {
+                // Failure: timeout
+                await getMe(); // Refresh state just in case
+                throw new Error("Account creation timed out. Please check your account page shortly or contact support.");
+            }
+
+        } catch (error: any) {
+            console.error("Subaccount creation failed:", error);
+            // Re-throw the error so the UI can handle it (e.g., show the 'account exists' prompt)
+            throw error;
+        }
     };
 
     const hasModuleAccess = (moduleName: string, allModules: Module[] | null): boolean => {
