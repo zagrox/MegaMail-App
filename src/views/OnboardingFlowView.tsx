@@ -320,7 +320,10 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
             await createElasticSubaccount(user.email, randomPassword);
             addToast(t('accountConnectedSuccess'), 'success');
         } catch (err: any) {
-            if (err.message && err.message.includes('AN ACCOUNT ALREADY EXISTS FOR THAT EMAIL ADDRESS')) {
+            if (
+                (err.message && err.message.includes('AN ACCOUNT ALREADY EXISTS FOR THAT EMAIL ADDRESS')) ||
+                (err.message && err.message.includes('Account creation timed out'))
+            ) {
                 setAccountExistsState('prompt');
             } else {
                 addToast(err.message, 'error');
