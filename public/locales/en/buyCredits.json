@@ -1,3 +1,4 @@
+
 {
     "yourCurrentBalance": "Your Current Balance",
     "choosePackage": "Choose a Package to Top Up",
@@ -42,5 +43,12 @@
     "detailsSubmittedSuccess": "Your bank transfer details have been submitted successfully.",
     "detailsSubmittedError": "Failed to submit details: {{error}}",
     "backToOrders": "Back to Orders",
-    "detailsCannotBeEmpty": "Details cannot be empty."
+    "detailsCannotBeEmpty": "Details cannot be empty.",
+    "pricingAndFees": "Pricing and Fees",
+    "pricingModalTitle": "Pricing Information",
+    "service": "Service / Module",
+    "costInCredits": "Cost in Credits",
+    "emailSendCost": "Each Email Send",
+    "oneCredit": "1 Credit",
+    "free": "FREE"
 }

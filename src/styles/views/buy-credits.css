@@ -53,6 +53,10 @@
     padding: 2px 4px;
     border-radius: 4px;
 }
+.balance-actions {
+    display: flex;
+    gap: 1rem;
+}
 /* New Credit Selector */
 .credit-selector-container {
     padding: 2.5rem;

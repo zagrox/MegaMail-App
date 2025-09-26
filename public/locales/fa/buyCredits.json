@@ -1,7 +1,8 @@
+
 {
     "yourCurrentBalance": "موجودی فعلی شما",
     "choosePackage": "یک بسته برای شارژ انتخاب کنید",
-    "viewHistory": "مشاهده تاریخچه",
+    "viewHistory": "سفارشات",
     "package": "بسته",
     "priceIRT": "تومان",
     "pricePerCreditIRT": "قیمت/اعتبار (تومان)",
@@ -42,5 +43,12 @@
     "detailsSubmittedSuccess": "جزئیات انتقال بانکی شما با موفقیت ارسال شد.",
     "detailsSubmittedError": "ارسال جزئیات ناموفق بود: {{error}}",
     "backToOrders": "بازگشت به سفارش‌ها",
-    "detailsCannotBeEmpty": "جزئیات نمی‌تواند خالی باشد."
+    "detailsCannotBeEmpty": "جزئیات نمی‌تواند خالی باشد.",
+    "pricingAndFees": "تعرفه‌ها",
+    "pricingModalTitle": "جدول تعرفه ها",
+    "service": "سرویس / ماژول",
+    "costInCredits": "هزینه (اعتبار)",
+    "emailSendCost": "ارسال هر ایمیل",
+    "oneCredit": "۱",
+    "free": "رایگان"
 }

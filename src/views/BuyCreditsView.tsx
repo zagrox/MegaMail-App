@@ -10,6 +10,75 @@ import sdk from '../api/directus';
 import { useConfiguration } from '../contexts/ConfigurationContext';
 import Loader from '../components/Loader';
 import { useToast } from '../contexts/ToastContext';
+import { readItems } from '@directus/sdk';
+import { Module } from '../api/types';
+
+const PricingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
+    const { t, i18n } = useTranslation(['buyCredits', 'common']);
+    const [modules, setModules] = useState<Module[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<any>(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            const fetchModules = async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const response = await sdk.request(readItems('modules', {
+                        filter: {
+                            status: { _eq: 'published' },
+                            moduleprice: { _nnull: true }
+                        },
+                        fields: ['modulename', 'moduleprice', 'id'],
+                        sort: ['moduleprice']
+                    }));
+                    setModules(response as Module[]);
+                } catch (err: any) {
+                    setError(err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchModules();
+        }
+    }, [isOpen]);
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title={t('pricingModalTitle')}>
+            {loading && <CenteredMessage><Loader /></CenteredMessage>}
+            {error && <ErrorMessage error={{ message: error.message, endpoint: 'GET /items/modules' }} />}
+            {!loading && !error && (
+                <div className="table-container-simple">
+                    <table className="simple-table">
+                        <thead>
+                            <tr>
+                                <th>{t('service')}</th>
+                                <th style={{ textAlign: 'right' }}>{t('costInCredits')}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>{t('emailSendCost')}</strong></td>
+                                <td style={{ textAlign: 'right', fontWeight: 'bold' }}>{t('oneCredit')}</td>
+                            </tr>
+                            {modules.map(module => (
+                                <tr key={module.id}>
+                                    <td>{module.modulename}</td>
+                                    <td style={{ textAlign: 'right' }}>
+                                        {Number(module.moduleprice) === 0 
+                                            ? <span style={{ fontWeight: 'bold', color: 'var(--success-color)' }}>{t('free')}</span>
+                                            : Number(module.moduleprice).toLocaleString(i18n.language)}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </Modal>
+    );
+};
 
 const CreditSelector = ({ packages, onPurchase, isSubmitting }: { packages: any[], onPurchase: (pkg: any) => void, isSubmitting: boolean }) => {
     const { t, i18n } = useTranslation(['buyCredits', 'common']);
@@ -86,7 +155,7 @@ const CreditSelector = ({ packages, onPurchase, isSubmitting }: { packages: any[
     );
 };
 
-const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistoryClick }: { creditLoading: boolean, creditError: any, accountData: any, onHistoryClick: () => void }) => {
+const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistoryClick, onPricingClick }: { creditLoading: boolean, creditError: any, accountData: any, onHistoryClick: () => void, onPricingClick: () => void }) => {
     const { t, i18n } = useTranslation(['buyCredits', 'common']);
     return (
         <div className="card balance-display-card">
@@ -99,10 +168,16 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
                     </span>
                 </div>
             </div>
-            <button className="btn btn-secondary" onClick={onHistoryClick}>
-                <Icon>{ICONS.CALENDAR}</Icon>
-                <span>{t('viewHistory')}</span>
-            </button>
+            <div className="balance-actions">
+                <button className="btn btn-secondary" onClick={onPricingClick}>
+                    <Icon>{ICONS.PRICE_TAG}</Icon>
+                    <span>{t('pricingAndFees')}</span>
+                </button>
+                <button className="btn btn-secondary" onClick={onHistoryClick}>
+                    <Icon>{ICONS.CALENDAR}</Icon>
+                    <span>{t('viewHistory')}</span>
+                </button>
+            </div>
         </div>
     );
 };
@@ -116,6 +191,7 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
     const [modalState, setModalState] = useState({ isOpen: false, title: '', message: '' });
     const [createdOrder, setCreatedOrder] = useState<any | null>(null);
     const [paymentMethod, setPaymentMethod] = useState('credit_card');
+    const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
     
     const [packages, setPackages] = useState<any[]>([]);
     const [packagesLoading, setPackagesLoading] = useState(true);
@@ -449,6 +525,7 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
 
     return (
         <div className="buy-credits-view">
+            <PricingModal isOpen={isPricingModalOpen} onClose={() => setIsPricingModalOpen(false)} />
              <Modal isOpen={modalState.isOpen} onClose={closeModal} title={modalState.title}>
                 <p style={{whiteSpace: "pre-wrap"}}>{modalState.message}</p>
             </Modal>
@@ -458,6 +535,7 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                 creditError={creditError}
                 accountData={accountData}
                 onHistoryClick={handleViewHistory}
+                onPricingClick={() => setIsPricingModalOpen(true)}
             />
             
             <h3 className="content-title" style={{marginTop: '1.5rem'}}>{t('choosePackage')}</h3>
