@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
@@ -54,44 +55,50 @@ const ReportBugModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('bugReportModalTitle')}>
-            <form onSubmit={handleSubmit} className="modal-form">
-                <div className="info-message" style={{ textAlign: 'inherit', alignItems: 'flex-start', width: '100%', margin: 0 }}>
-                    <p style={{ margin: 0 }}>{t('bugReportFormIntro1')}</p>
-                    <p style={{ margin: 0 }}>{t('bugReportFormIntro2')}</p>
-                </div>
-                <p>{t('bugReportFormDesc')}</p>
-                <div className="form-group">
-                    <label htmlFor="bug-title">{t('bugTitle')}</label>
-                    <input
-                        id="bug-title"
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder={t('bugTitlePlaceholder')}
-                        required
-                        disabled={isSubmitting}
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="bug-details">{t('bugDetails')}</label>
-                    <textarea
-                        id="bug-details"
-                        value={details}
-                        onChange={(e) => setDetails(e.target.value)}
-                        required
-                        disabled={isSubmitting}
-                        rows={5}
-                    />
-                </div>
-                <div className="form-actions">
-                    <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>{t('cancel', { ns: 'common' })}</button>
-                    <button type="submit" className="btn btn-primary" disabled={isSubmitting || !title || !details}>
-                        {isSubmitting ? <Loader /> : t('submitBugReport')}
-                    </button>
-                </div>
-            </form>
-        </Modal>
+        // FIX: Explicitly pass children to Modal component
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={t('bugReportModalTitle')}
+            children={
+                <form onSubmit={handleSubmit} className="modal-form">
+                    <div className="info-message" style={{ textAlign: 'inherit', alignItems: 'flex-start', width: '100%', margin: 0 }}>
+                        <p style={{ margin: 0 }}>{t('bugReportFormIntro1')}</p>
+                        <p style={{ margin: 0 }}>{t('bugReportFormIntro2')}</p>
+                    </div>
+                    <p>{t('bugReportFormDesc')}</p>
+                    <div className="form-group">
+                        <label htmlFor="bug-title">{t('bugTitle')}</label>
+                        <input
+                            id="bug-title"
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder={t('bugTitlePlaceholder')}
+                            required
+                            disabled={isSubmitting}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="bug-details">{t('bugDetails')}</label>
+                        <textarea
+                            id="bug-details"
+                            value={details}
+                            onChange={(e) => setDetails(e.target.value)}
+                            required
+                            disabled={isSubmitting}
+                            rows={5}
+                        />
+                    </div>
+                    <div className="form-actions">
+                        <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>{t('cancel', { ns: 'common' })}</button>
+                        <button type="submit" className="btn btn-primary" disabled={isSubmitting || !title || !details}>
+                            {isSubmitting ? <Loader /> : t('submitBugReport')}
+                        </button>
+                    </div>
+                </form>
+            }
+        />
     );
 };
 

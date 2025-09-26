@@ -1,5 +1,6 @@
 
 
+
 import React, { useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import WizardLayout from './WizardLayout';
@@ -129,7 +130,8 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         disabled={!hasEnoughCredits}
                     />
                     <div className="sending-option-card-content">
-                        <Icon className="sending-option-card-icon">{ICONS.CALENDAR}</Icon>
+                        {/* FIX: Explicitly pass children to Icon component */}
+                        <Icon className="sending-option-card-icon" children={ICONS.CALENDAR} />
                         <div className="sending-option-card-details">
                             <h4 className="sending-option-card-title">{t('schedule', { ns: 'sendEmail' })}</h4>
                             {data.sendAction === 'schedule' && (
@@ -159,7 +161,8 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         disabled={!hasEnoughCredits}
                     />
                     <div className="sending-option-card-content">
-                        <Icon className="sending-option-card-icon">{ICONS.SEND_EMAIL}</Icon>
+                        {/* FIX: Explicitly pass children to Icon component */}
+                        <Icon className="sending-option-card-icon" children={ICONS.SEND_EMAIL} />
                         <h4 className="sending-option-card-title">{t('sendNow', { ns: 'sendEmail' })}</h4> 
                     </div>
                 </label>
@@ -177,7 +180,8 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
                     />
                     <div className="sending-option-card-content">
-                        <Icon className="sending-option-card-icon">{ICONS.SAVE_CHANGES}</Icon>
+                        {/* FIX: Explicitly pass children to Icon component */}
+                        <Icon className="sending-option-card-icon" children={ICONS.SAVE_CHANGES} />
                         <h4 className="sending-option-card-title">{t('saveForLater')}</h4>
                     </div>
                 </label>

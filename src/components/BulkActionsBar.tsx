@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from './Icon';
@@ -21,12 +22,12 @@ const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ count, onDeselectAll, o
             <div className="bulk-actions-bar-actions">
                 <button className="btn btn-secondary" onClick={onAddToList}>
                     {/* FIX: Changed path prop to children for Icon component */}
-                    <Icon>{ICONS.PLUS}</Icon>
+                    <Icon children={ICONS.PLUS} />
                     <span>{t('addToListOptional')}</span>
                 </button>
                 <button className="btn btn-danger" onClick={onDelete}>
                     {/* FIX: Changed path prop to children for Icon component */}
-                    <Icon>{ICONS.DELETE}</Icon>
+                    <Icon children={ICONS.DELETE} />
                     <span>{t('delete')}</span>
                 </button>
             </div>

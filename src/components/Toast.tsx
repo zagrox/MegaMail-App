@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import Icon, { ICONS } from './Icon';
 
@@ -42,7 +43,7 @@ const Toast = ({ message, type, onDismiss }: ToastProps) => {
         <div className={`toast toast-${type}`} role="alert" aria-live="assertive" aria-atomic="true">
             <div className="toast-icon">
                 {/* FIX: Changed path prop to children for Icon component */}
-                <Icon>{config.icon}</Icon>
+                <Icon children={config.icon} />
             </div>
             <div className="toast-content">
                 <p className="toast-title">{config.title}</p>

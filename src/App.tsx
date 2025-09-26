@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -450,13 +451,15 @@ const App = () => {
             
                             return (
                                 <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
-                                    <Icon>{navItem.icon}</Icon>
+                                    {/* FIX: Explicitly pass children to Icon component */}
+                                    <Icon children={navItem.icon} />
                                     <span>{navItem.name}</span>
                                     {isLocked && (
+                                        // FIX: Explicitly pass children to Icon component
                                         <Icon
                                             className="lock-icon"
                                             style={isPromotional ? { color: 'var(--success-color)' } : {}}
-                                        >{isPromotional ? ICONS.GIFT : ICONS.STAR}</Icon>
+                                            children={isPromotional ? ICONS.GIFT : ICONS.STAR} />
                                     )}
                                 </button>
                             );
@@ -467,19 +470,23 @@ const App = () => {
         </nav>
         <div className="sidebar-footer-nav">
              <button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
-                 <Icon>{ICONS.HELP_CIRCLE}</Icon>
+                 {/* FIX: Explicitly pass children to Icon component */}
+                 <Icon children={ICONS.HELP_CIRCLE} />
                  <span>{t('guides')}</span>
              </button>
              <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
-                 <Icon>{ICONS.SETTINGS}</Icon>
+                 {/* FIX: Explicitly pass children to Icon component */}
+                 <Icon children={ICONS.SETTINGS} />
                  <span>{t('settings', { ns: 'account' })}</span>
              </button>
              <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
-                <Icon>{ICONS.BUY_CREDITS}</Icon>
+                {/* FIX: Explicitly pass children to Icon component */}
+                <Icon children={ICONS.BUY_CREDITS} />
                 <span>{t('buyCredits')}</span>
              </button>
              <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
-                 <Icon>{ICONS.ACCOUNT}</Icon>
+                 {/* FIX: Explicitly pass children to Icon component */}
+                 <Icon children={ICONS.ACCOUNT} />
                  <span>{t('account')}</span>
              </button>
         </div>
@@ -511,11 +518,13 @@ const App = () => {
             <div className="main-wrapper">
                 <header className="mobile-header">
                      <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)} aria-label={t('openMenu')}>
-                        <Icon>{ICONS.MENU}</Icon>
+                        {/* FIX: Explicitly pass children to Icon component */}
+                        <Icon children={ICONS.MENU} />
                     </button>
                     <h1 className="mobile-header-title">{currentView?.title || appName}</h1>
                     <button className="mobile-menu-toggle" onClick={() => handleSetView('Account')} aria-label={t('account')}>
-                        <Icon>{ICONS.ACCOUNT}</Icon>
+                        {/* FIX: Explicitly pass children to Icon component */}
+                        <Icon children={ICONS.ACCOUNT} />
                     </button>
                 </header>
                 <main className={`content ${view === 'Email Builder' || view === 'Marketing' ? 'content--no-padding' : ''}`}>

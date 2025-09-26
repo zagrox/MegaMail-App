@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -29,7 +30,7 @@ export const SortableNavCard = ({ id, item, setView }: { id: string; item: { nam
             onClick={() => setView(item.view)}
         >
             {/* FIX: Changed path prop to children for Icon component */}
-            <Icon className="nav-card-icon">{item.icon as any}</Icon>
+            <Icon className="nav-card-icon" children={item.icon as any} />
             <div className="nav-card-text-content">
                 <div className="nav-card-title">{item.name}</div>
                 <div className="nav-card-description">{item.desc}</div>

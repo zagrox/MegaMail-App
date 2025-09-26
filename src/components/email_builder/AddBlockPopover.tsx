@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TOOLBAR_COMPONENTS } from './Toolbar';
@@ -39,7 +40,7 @@ const AddBlockPopover = ({ onSelectBlockType, onClose }: AddBlockPopoverProps) =
                     onClick={() => handleSelect(comp.type)}
                 >
                     {/* FIX: Changed path prop to children for Icon component */}
-                    <Icon>{comp.icon}</Icon>
+                    <Icon children={comp.icon} />
                     <span>{t(comp.type.toLowerCase())}</span>
                 </button>
             ))}

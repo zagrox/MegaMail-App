@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -154,7 +155,8 @@ const AuthView = () => {
                     {mode === 'login' ? (
                          <>
                             <div className="input-group">
-                                <span className="input-icon"><Icon>{ICONS.MAIL}</Icon></span>
+                                {/* FIX: Explicitly pass children to Icon component */}
+                                <span className="input-icon"><Icon children={ICONS.MAIL} /></span>
                                 <input 
                                     name="email" 
                                     type="email" 
@@ -165,7 +167,8 @@ const AuthView = () => {
                                 />
                             </div>
                             <div className="input-group has-btn">
-                                <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
+                                {/* FIX: Explicitly pass children to Icon component */}
+                                <span className="input-icon"><Icon children={ICONS.LOCK} /></span>
                                 <input 
                                     name="password" 
                                     type={showPassword ? "text" : "password"} 
@@ -175,7 +178,8 @@ const AuthView = () => {
                                     onChange={(e) => setLoginPassword(e.target.value)}
                                 />
                                 <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-                                    <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+                                    {/* FIX: Explicitly pass children to Icon component */}
+                                    <Icon children={showPassword ? ICONS.EYE_OFF : ICONS.EYE} />
                                 </button>
                             </div>
                              <div style={{ textAlign: 'right', fontSize: '0.9rem', marginTop: '-0.5rem', marginBottom: '1rem' }}>
@@ -188,36 +192,44 @@ const AuthView = () => {
                         <>
                             <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                 <div className="input-group">
-                                    <span className="input-icon"><Icon>{ICONS.ACCOUNT}</Icon></span>
+                                    {/* FIX: Explicitly pass children to Icon component */}
+                                    <span className="input-icon"><Icon children={ICONS.ACCOUNT} /></span>
                                     <input name="first_name" type="text" placeholder={t('firstName')} required />
                                 </div>
                                 <div className="input-group">
-                                    <span className="input-icon"><Icon>{ICONS.ACCOUNT}</Icon></span>
+                                    {/* FIX: Explicitly pass children to Icon component */}
+                                    <span className="input-icon"><Icon children={ICONS.ACCOUNT} /></span>
                                     <input name="last_name" type="text" placeholder={t('lastName')} required />
                                 </div>
                             </div>
                             <div className="input-group">
-                                <span className="input-icon"><Icon>{ICONS.MAIL}</Icon></span>
+                                {/* FIX: Explicitly pass children to Icon component */}
+                                <span className="input-icon"><Icon children={ICONS.MAIL} /></span>
                                 <input name="email" type="email" placeholder={t('emailAddress')} required />
                             </div>
                             <div className="input-group has-btn">
-                                <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
+                                {/* FIX: Explicitly pass children to Icon component */}
+                                <span className="input-icon"><Icon children={ICONS.LOCK} /></span>
                                 <input name="password" type={showPassword ? "text" : "password"} placeholder={t('password')} required />
                                 <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-                                    <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+                                    {/* FIX: Explicitly pass children to Icon component */}
+                                    <Icon children={showPassword ? ICONS.EYE_OFF : ICONS.EYE} />
                                 </button>
                             </div>
                             <div className="input-group has-btn">
-                                <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
+                                {/* FIX: Explicitly pass children to Icon component */}
+                                <span className="input-icon"><Icon children={ICONS.LOCK} /></span>
                                 <input name="confirm_password" type={showConfirmPassword ? "text" : "password"} placeholder={t('confirmPassword')} required />
                                 <button type="button" className="input-icon-btn" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                                    <Icon>{showConfirmPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+                                    {/* FIX: Explicitly pass children to Icon component */}
+                                    <Icon children={showConfirmPassword ? ICONS.EYE_OFF : ICONS.EYE} />
                                 </button>
                             </div>
                         </>
                     ) : ( // mode === 'forgot'
                         <div className="input-group">
-                            <span className="input-icon"><Icon>{ICONS.MAIL}</Icon></span>
+                            {/* FIX: Explicitly pass children to Icon component */}
+                            <span className="input-icon"><Icon children={ICONS.MAIL} /></span>
                             <input name="email" type="email" placeholder={t('emailAddress')} required />
                         </div>
                     )}

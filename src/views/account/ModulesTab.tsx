@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
@@ -61,7 +62,7 @@ const ModuleCard = ({ module, isUnlocked, onUnlock, onInstantUnlock, isUnlocking
                             {isUnlocking ? <Loader /> : (
                                 <>
                                     {/* FIX: Changed path prop to children for Icon component */}
-                                    <Icon>{ICONS.LOCK}</Icon>
+                                    <Icon children={ICONS.LOCK} />
                                     <span>{t('unlock')}</span>
                                 </>
                             )}
@@ -187,11 +188,11 @@ const ModulesTab: React.FC<ModulesTabProps> = ({ setView }) => {
                      <div className="view-switcher">
                         <button onClick={() => setViewMode('card')} className={`view-mode-btn ${viewMode === 'card' ? 'active' : ''}`} aria-label={t('cardView', { ns: 'mediaManager' })}>
                             {/* FIX: Changed path prop to children for Icon component */}
-                            <Icon>{ICONS.DASHBOARD}</Icon>
+                            <Icon children={ICONS.DASHBOARD} />
                         </button>
                         <button onClick={() => setViewMode('table')} className={`view-mode-btn ${viewMode === 'table' ? 'active' : ''}`} aria-label={t('tableView', { ns: 'mediaManager' })}>
                             {/* FIX: Changed path prop to children for Icon component */}
-                            <Icon>{ICONS.EMAIL_LISTS}</Icon>
+                            <Icon children={ICONS.EMAIL_LISTS} />
                         </button>
                     </div>
                 </div>

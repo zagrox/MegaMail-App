@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readItems, updateItem } from '@directus/sdk';
@@ -204,7 +205,7 @@ const NotificationsTab = () => {
                     disabled={unreadCount === 0}
                 >
                     {/* FIX: Changed path prop to children for Icon component */}
-                    <Icon>{ICONS.CHECK}</Icon>
+                    <Icon children={ICONS.CHECK} />
                     <span>{t('markAllAsRead')}</span>
                 </button>
             </div>
@@ -229,7 +230,7 @@ const NotificationsTab = () => {
                             >
                                 <div className="notification-icon-wrapper">
                                     {/* FIX: Changed path prop to children for Icon component */}
-                                    <Icon>{getIconPath(n.icon)}</Icon>
+                                    <Icon children={getIconPath(n.icon)} />
                                 </div>
                                 <div className="notification-content">
                                     <p className="notification-message">{n.message}</p>

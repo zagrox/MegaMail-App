@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from './useApi';
@@ -45,38 +46,46 @@ const PricingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
     }, [isOpen]);
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('pricingModalTitle')}>
-            {loading && <CenteredMessage><Loader /></CenteredMessage>}
-            {error && <ErrorMessage error={{ message: error.message, endpoint: 'GET /items/modules' }} />}
-            {!loading && !error && (
-                <div className="table-container-simple">
-                    <table className="simple-table">
-                        <thead>
-                            <tr>
-                                <th>{t('service')}</th>
-                                <th style={{ textAlign: 'right' }}>{t('costInCredits')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>{t('emailSendCost')}</strong></td>
-                                <td style={{ textAlign: 'right', fontWeight: 'bold' }}>{t('oneCredit')}</td>
-                            </tr>
-                            {modules.map(module => (
-                                <tr key={module.id}>
-                                    <td>{module.modulename}</td>
-                                    <td style={{ textAlign: 'right' }}>
-                                        {Number(module.moduleprice) === 0 
-                                            ? <span style={{ fontWeight: 'bold', color: 'var(--success-color)' }}>{t('free')}</span>
-                                            : Number(module.moduleprice).toLocaleString(i18n.language)}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-        </Modal>
+        // FIX: Explicitly pass children to Modal component
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={t('pricingModalTitle')}
+            children={
+                <>
+                    {loading && <CenteredMessage><Loader /></CenteredMessage>}
+                    {error && <ErrorMessage error={{ message: error.message, endpoint: 'GET /items/modules' }} />}
+                    {!loading && !error && (
+                        <div className="table-container-simple">
+                            <table className="simple-table">
+                                <thead>
+                                    <tr>
+                                        <th>{t('service')}</th>
+                                        <th style={{ textAlign: 'right' }}>{t('costInCredits')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>{t('emailSendCost')}</strong></td>
+                                        <td style={{ textAlign: 'right', fontWeight: 'bold' }}>{t('oneCredit')}</td>
+                                    </tr>
+                                    {modules.map(module => (
+                                        <tr key={module.id}>
+                                            <td>{module.modulename}</td>
+                                            <td style={{ textAlign: 'right' }}>
+                                                {Number(module.moduleprice) === 0
+                                                    ? <span style={{ fontWeight: 'bold', color: 'var(--success-color)' }}>{t('free')}</span>
+                                                    : Number(module.moduleprice).toLocaleString(i18n.language)}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </>
+            }
+        />
     );
 };
 
@@ -160,7 +169,8 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
     return (
         <div className="card balance-display-card">
             <div className="balance-info">
-                <Icon className="balance-icon">{ICONS.BUY_CREDITS}</Icon>
+                {/* FIX: Explicitly pass children to Icon component */}
+                <Icon className="balance-icon" children={ICONS.BUY_CREDITS} />
                 <div>
                     <span className="balance-title">{t('yourCurrentBalance')}</span>
                     <span className="balance-amount">
@@ -170,11 +180,13 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
             </div>
             <div className="balance-actions">
                 <button className="btn btn-secondary" onClick={onPricingClick}>
-                    <Icon>{ICONS.PRICE_TAG}</Icon>
+                    {/* FIX: Explicitly pass children to Icon component */}
+                    <Icon children={ICONS.PRICE_TAG} />
                     <span>{t('pricingAndFees')}</span>
                 </button>
                 <button className="btn btn-secondary" onClick={onHistoryClick}>
-                    <Icon>{ICONS.CALENDAR}</Icon>
+                    {/* FIX: Explicitly pass children to Icon component */}
+                    <Icon children={ICONS.CALENDAR} />
                     <span>{t('viewHistory')}</span>
                 </button>
             </div>
@@ -484,7 +496,8 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
             <div className="order-confirmation-view">
                 <div className="card" style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
                     <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                        <Icon style={{ width: 48, height: 48, color: 'var(--success-color)' }}>{ICONS.CHECK}</Icon>
+                        {/* FIX: Explicitly pass children to Icon component */}
+                        <Icon style={{ width: 48, height: 48, color: 'var(--success-color)' }} children={ICONS.CHECK} />
                         <h2 style={{ marginTop: '1rem' }}>{t('orderSuccessMessage')}</h2>
                         <p>{t('orderSuccessSubtitle')}</p>
                     </div>
@@ -510,11 +523,13 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                     
                     <div className="form-actions" style={{justifyContent: 'space-between', padding: 0}}>
                         <button className="btn btn-secondary" onClick={() => setCreatedOrder(null)} disabled={isPaying}>
-                            <Icon>{ICONS.CHEVRON_LEFT}</Icon>
+                            {/* FIX: Explicitly pass children to Icon component */}
+                            <Icon children={ICONS.CHEVRON_LEFT} />
                             <span>{t('buyDifferentPackage')}</span>
                         </button>
                         <button className="btn btn-primary" onClick={handleConfirmAndPay} disabled={isPaying}>
-                            {isPaying ? <Loader /> : <Icon>{paymentMethod === 'credit_card' ? ICONS.LOCK_OPEN : ICONS.CHECK}</Icon>}
+                            {/* FIX: Explicitly pass children to Icon component */}
+                            {isPaying ? <Loader /> : <Icon children={paymentMethod === 'credit_card' ? ICONS.LOCK_OPEN : ICONS.CHECK} />}
                             <span>{t('confirmAndPay')}</span>
                         </button>
                     </div>
@@ -526,9 +541,13 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
     return (
         <div className="buy-credits-view">
             <PricingModal isOpen={isPricingModalOpen} onClose={() => setIsPricingModalOpen(false)} />
-             <Modal isOpen={modalState.isOpen} onClose={closeModal} title={modalState.title}>
-                <p style={{whiteSpace: "pre-wrap"}}>{modalState.message}</p>
-            </Modal>
+             {/* FIX: Explicitly pass children to Modal component */}
+             <Modal
+                isOpen={modalState.isOpen}
+                onClose={closeModal}
+                title={modalState.title}
+                children={<p style={{ whiteSpace: "pre-wrap" }}>{modalState.message}</p>}
+            />
 
             <BalanceDisplayCard
                 creditLoading={creditLoading}

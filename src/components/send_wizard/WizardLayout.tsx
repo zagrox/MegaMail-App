@@ -1,5 +1,6 @@
 
 
+
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../Icon';
@@ -50,11 +51,13 @@ const WizardLayout = ({
                     {isRTL ? (
                         <>
                             <span>{backButtonText || t('back')}</span>
-                            <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
+                            {/* FIX: Explicitly pass children to Icon component */}
+                            <Icon children={ICONS.CHEVRON_RIGHT} />
                         </>
                     ) : (
                         <>
-                            <Icon>{ICONS.CHEVRON_LEFT}</Icon>
+                            {/* FIX: Explicitly pass children to Icon component */}
+                            <Icon children={ICONS.CHEVRON_LEFT} />
                             <span>{backButtonText || t('back')}</span>
                         </>
                     )}
@@ -68,13 +71,15 @@ const WizardLayout = ({
                     >
                         {isRTL ? (
                             <>
-                                <Icon>{ICONS.CHEVRON_LEFT}</Icon>
+                                {/* FIX: Explicitly pass children to Icon component */}
+                                <Icon children={ICONS.CHEVRON_LEFT} />
                                 <span>{t('next')}</span>
                             </>
                         ) : (
                             <>
                                 <span>{t('next')}</span>
-                                <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
+                                {/* FIX: Explicitly pass children to Icon component */}
+                                <Icon children={ICONS.CHEVRON_RIGHT} />
                             </>
                         )}
                     </Button>
@@ -87,7 +92,8 @@ const WizardLayout = ({
                     >
                         {isSubmitting ? <Loader /> : (
                             <>
-                                <Icon>{ICONS.VERIFY}</Icon>
+                                {/* FIX: Explicitly pass children to Icon component */}
+                                <Icon children={ICONS.VERIFY} />
                                 <span>{t('submit', { ns: 'sendEmail' })}</span>
                             </>
                         )}

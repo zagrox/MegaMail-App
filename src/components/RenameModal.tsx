@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
@@ -23,20 +24,26 @@ const RenameModal = ({ isOpen, onClose, entityName, entityType, onSubmit }: { is
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('renameEntityType', { type: entityType, name: entityName, ns: 'emailLists' })}>
-            <form onSubmit={handleSubmit} className="modal-form">
-                <div className="form-group">
-                    <label htmlFor="new-entity-name">{t('newEntityName', { type: entityType, ns: 'emailLists' })}</label>
-                    <input id="new-entity-name" type="text" value={newName} onChange={e => setNewName(e.target.value)} required disabled={isSubmitting} />
-                </div>
-                <div className="form-actions" style={{ marginTop: '1rem' }}>
-                    <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>{t('cancel')}</button>
-                    <button type="submit" className="btn btn-primary" disabled={isSubmitting || !newName || newName === entityName}>
-                        {isSubmitting ? <Loader /> : t('saveChanges')}
-                    </button>
-                </div>
-            </form>
-        </Modal>
+        // FIX: Explicitly pass children to Modal component
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={t('renameEntityType', { type: entityType, name: entityName, ns: 'emailLists' })}
+            children={
+                <form onSubmit={handleSubmit} className="modal-form">
+                    <div className="form-group">
+                        <label htmlFor="new-entity-name">{t('newEntityName', { type: entityType, ns: 'emailLists' })}</label>
+                        <input id="new-entity-name" type="text" value={newName} onChange={e => setNewName(e.target.value)} required disabled={isSubmitting} />
+                    </div>
+                    <div className="form-actions" style={{ marginTop: '1rem' }}>
+                        <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>{t('cancel')}</button>
+                        <button type="submit" className="btn btn-primary" disabled={isSubmitting || !newName || newName === entityName}>
+                            {isSubmitting ? <Loader /> : t('saveChanges')}
+                        </button>
+                    </div>
+                </form>
+            }
+        />
     );
 };
 

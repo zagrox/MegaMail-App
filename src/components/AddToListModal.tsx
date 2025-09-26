@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -46,52 +47,58 @@ const AddToListModal: React.FC<AddToListModalProps> = ({ isOpen, onClose, onConf
     const noListsFound = !listsLoading && (!lists || lists.length === 0);
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('addToListOptional')}>
-            <form onSubmit={handleSubmit} className="modal-form">
-                <div className="form-group">
-                    <label htmlFor="list-select">{t('selectList')}</label>
-                    {listsLoading ? <Loader /> : (
-                        <select
-                            id="list-select"
-                            value={selectedList}
-                            onChange={(e) => setSelectedList(e.target.value)}
-                            disabled={noListsFound}
-                        >
-                            {noListsFound && <option value="">{t('noListsFound')}</option>}
-                            {lists && lists.map((list: List) => (
-                                <option key={list.ListName} value={list.ListName}>{list.ListName}</option>
-                            ))}
-                        </select>
-                    )}
-                </div>
-
-                <div className="form-actions" style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                    {/* Left side actions */}
-                    <div>
-                        {isCreateListLocked && (
-                            <Button 
-                                className="btn-secondary" 
-                                action={AppActions.CREATE_LIST}
-                                type="button"
-                                // Close the current modal when the unlock flow is triggered
-                                onClick={() => onClose()}
+        // FIX: Explicitly pass children to Modal component
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={t('addToListOptional')}
+            children={
+                <form onSubmit={handleSubmit} className="modal-form">
+                    <div className="form-group">
+                        <label htmlFor="list-select">{t('selectList')}</label>
+                        {listsLoading ? <Loader /> : (
+                            <select
+                                id="list-select"
+                                value={selectedList}
+                                onChange={(e) => setSelectedList(e.target.value)}
+                                disabled={noListsFound}
                             >
-                                <Icon>{ICONS.PLUS}</Icon>
-                                <span>{t('createList', { ns: 'emailLists' })}</span>
-                            </Button>
+                                {noListsFound && <option value="">{t('noListsFound')}</option>}
+                                {lists && lists.map((list: List) => (
+                                    <option key={list.ListName} value={list.ListName}>{list.ListName}</option>
+                                ))}
+                            </select>
                         )}
                     </div>
 
-                    {/* Right side actions */}
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>{t('cancel')}</button>
-                        <button type="submit" className="btn btn-primary" disabled={isSubmitting || !selectedList || listsLoading}>
-                            {isSubmitting ? <Loader /> : t('add')}
-                        </button>
+                    <div className="form-actions" style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                        {/* Left side actions */}
+                        <div>
+                            {isCreateListLocked && (
+                                <Button 
+                                    className="btn-secondary" 
+                                    action={AppActions.CREATE_LIST}
+                                    type="button"
+                                    // Close the current modal when the unlock flow is triggered
+                                    onClick={() => onClose()}
+                                >
+                                    <Icon>{ICONS.PLUS}</Icon>
+                                    <span>{t('createList', { ns: 'emailLists' })}</span>
+                                </Button>
+                            )}
+                        </div>
+
+                        {/* Right side actions */}
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>{t('cancel')}</button>
+                            <button type="submit" className="btn btn-primary" disabled={isSubmitting || !selectedList || listsLoading}>
+                                {isSubmitting ? <Loader /> : t('add')}
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </form>
-        </Modal>
+                </form>
+            }
+        />
     );
 };
 

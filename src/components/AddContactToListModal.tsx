@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
@@ -41,33 +42,39 @@ const AddContactToListModal: React.FC<AddContactToListModalProps> = ({ isOpen, o
     }, [isOpen]);
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={`${t('addContact')} to "${listName}"`}>
-            <form onSubmit={handleSubmit} className="modal-form">
-                <div className="form-group">
-                    <label htmlFor="emails-input">Email Addresses</label>
-                    <textarea
-                        id="emails-input"
-                        value={emails}
-                        onChange={e => setEmails(e.target.value)}
-                        rows={5}
-                        placeholder="user1@example.com, user2@example.com..."
-                        disabled={isSubmitting}
-                    />
-                    <p style={{fontSize: '0.8rem', color: 'var(--subtle-text-color)', marginTop: '0.5rem'}}>
-                        Enter one or more emails, separated by commas, spaces, or new lines.
-                    </p>
-                </div>
-                <div className="form-actions" style={{ marginTop: '1.5rem' }}>
-                    <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>
-                        {t('cancel')}
-                    </button>
-                    <button type="submit" className="btn btn-primary" disabled={isSubmitting || !emails.trim()}>
-                        {/* FIX: Changed path prop to children for Icon component */}
-                        {isSubmitting ? <Loader /> : <><Icon>{ICONS.USER_PLUS}</Icon><span>{t('addContact')}</span></>}
-                    </button>
-                </div>
-            </form>
-        </Modal>
+        // FIX: Explicitly pass children to Modal component
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={`${t('addContact')} to "${listName}"`}
+            children={
+                <form onSubmit={handleSubmit} className="modal-form">
+                    <div className="form-group">
+                        <label htmlFor="emails-input">Email Addresses</label>
+                        <textarea
+                            id="emails-input"
+                            value={emails}
+                            onChange={e => setEmails(e.target.value)}
+                            rows={5}
+                            placeholder="user1@example.com, user2@example.com..."
+                            disabled={isSubmitting}
+                        />
+                        <p style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)', marginTop: '0.5rem' }}>
+                            Enter one or more emails, separated by commas, spaces, or new lines.
+                        </p>
+                    </div>
+                    <div className="form-actions" style={{ marginTop: '1.5rem' }}>
+                        <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>
+                            {t('cancel')}
+                        </button>
+                        <button type="submit" className="btn btn-primary" disabled={isSubmitting || !emails.trim()}>
+                            {/* FIX: Changed path prop to children for Icon component */}
+                            {isSubmitting ? <Loader /> : <><Icon children={ICONS.USER_PLUS} /><span>{t('addContact')}</span></>}
+                        </button>
+                    </div>
+                </form>
+            }
+        />
     );
 };
 
