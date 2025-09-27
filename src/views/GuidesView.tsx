@@ -58,7 +58,6 @@ const GuidesView = () => {
     return (
         <div className="guides-view-container">
             <ReportBugModal isOpen={isBugModalOpen} onClose={() => setIsBugModalOpen(false)} />
-            <p className="view-subtitle">{t('guidesSubtitle')}</p>
             <div className="guides-layout">
                 <nav className="guides-nav">
                     {guideData.map((guide, index) => (
