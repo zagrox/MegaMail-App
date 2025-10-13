@@ -156,7 +156,8 @@ const AuthView = () => {
                 <div className="auth-branding-panel">
                     <div className="auth-branding-content">
                         {logoUrl && <img src={logoUrl} alt={`${t('appName')} logo`} className="auth-logo" />}
-                        <h1>{t('brandingTitle', { ns: 'auth' })}</h1>
+                        <h1>MEGAMAIL</h1>
+                        <h2>{t('brandingTitle', { ns: 'auth' })}</h2>
                         <p>{t('brandingSubtitle', { ns: 'auth', appName: t('appName') })}</p>
                     </div>
                 </div>
