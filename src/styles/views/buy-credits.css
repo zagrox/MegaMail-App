@@ -59,7 +59,7 @@
 }
 /* New Credit Selector */
 .credit-selector-container {
-    padding: 2.5rem;
+    padding: 2.5rem 1rem;
     max-width: none; /* Full width */
     margin: 0;
     display: flex;

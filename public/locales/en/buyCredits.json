@@ -44,7 +44,7 @@
     "detailsSubmittedError": "Failed to submit details: {{error}}",
     "backToOrders": "Back to Orders",
     "detailsCannotBeEmpty": "Details cannot be empty.",
-    "pricingAndFees": "Pricing and Fees",
+    "pricingAndFees": "Pricing",
     "pricingModalTitle": "Pricing Information",
     "service": "Service / Module",
     "costInCredits": "Cost in Credits",

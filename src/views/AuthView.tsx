@@ -153,14 +153,6 @@ const AuthView = () => {
     return (
         <div className="auth-container">
             <div className="auth-split-layout">
-                <div className="auth-branding-panel">
-                    <div className="auth-branding-content">
-                        {logoUrl && <img src={logoUrl} alt={`${t('appName')} logo`} className="auth-logo" />}
-                        <h1>MEGAMAIL</h1>
-                        <h2>{t('brandingTitle', { ns: 'auth' })}</h2>
-                        <p>{t('brandingSubtitle', { ns: 'auth', appName: t('appName') })}</p>
-                    </div>
-                </div>
                 <div className="auth-form-panel">
                     <div className="auth-box">
                         <h2>{mode === 'login' ? t('signIn') : mode === 'register' ? t('signUp') : t('forgotPasswordTitle')}</h2>
@@ -179,6 +171,7 @@ const AuthView = () => {
                                             required
                                             value={loginEmail}
                                             onChange={(e) => setLoginEmail(e.target.value)}
+                                            autoComplete="username"
                                         />
                                     </div>
                                     <div className="input-group has-btn">
@@ -190,6 +183,7 @@ const AuthView = () => {
                                             required 
                                             value={loginPassword}
                                             onChange={(e) => setLoginPassword(e.target.value)}
+                                            autoComplete="current-password"
                                         />
                                         <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
                                             <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
@@ -206,27 +200,27 @@ const AuthView = () => {
                                     <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                         <div className="input-group">
                                             <Icon>{ICONS.ACCOUNT}</Icon>
-                                            <input name="first_name" type="text" placeholder={t('firstName')} required />
+                                            <input name="first_name" type="text" placeholder={t('firstName')} required autoComplete="given-name" />
                                         </div>
                                         <div className="input-group">
                                             <Icon>{ICONS.ACCOUNT}</Icon>
-                                            <input name="last_name" type="text" placeholder={t('lastName')} required />
+                                            <input name="last_name" type="text" placeholder={t('lastName')} required autoComplete="family-name" />
                                         </div>
                                     </div>
                                     <div className="input-group">
                                         <Icon>{ICONS.MAIL}</Icon>
-                                        <input name="email" type="email" placeholder={t('emailAddress')} required />
+                                        <input name="email" type="email" placeholder={t('emailAddress')} required autoComplete="email" />
                                     </div>
                                     <div className="input-group has-btn">
                                         <Icon>{ICONS.LOCK}</Icon>
-                                        <input name="password" type={showPassword ? "text" : "password"} placeholder={t('password')} required />
+                                        <input name="password" type={showPassword ? "text" : "password"} placeholder={t('password')} required autoComplete="new-password" />
                                         <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
                                             <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
                                         </button>
                                     </div>
                                     <div className="input-group has-btn">
                                         <Icon>{ICONS.LOCK}</Icon>
-                                        <input name="confirm_password" type={showConfirmPassword ? "text" : "password"} placeholder={t('confirmPassword')} required />
+                                        <input name="confirm_password" type={showConfirmPassword ? "text" : "password"} placeholder={t('confirmPassword')} required autoComplete="new-password" />
                                         <button type="button" className="input-icon-btn" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                                             <Icon>{showConfirmPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
                                         </button>
@@ -235,7 +229,7 @@ const AuthView = () => {
                             ) : ( // mode === 'forgot'
                                 <div className="input-group">
                                     <Icon>{ICONS.MAIL}</Icon>
-                                    <input name="email" type="email" placeholder={t('emailAddress')} required />
+                                    <input name="email" type="email" placeholder={t('emailAddress')} required autoComplete="email" />
                                 </div>
                             )}
 
@@ -264,6 +258,14 @@ const AuthView = () => {
                     <div className="auth-language-switcher">
                         <button onClick={() => changeLanguage('en')} className={i18n.language.startsWith('en') ? 'active' : ''}>EN</button>
                         <button onClick={() => changeLanguage('fa')} className={i18n.language.startsWith('fa') ? 'active' : ''}>FA</button>
+                    </div>
+                </div>
+                <div className="auth-branding-panel">
+                    <div className="auth-branding-content">
+                        {logoUrl && <img src={logoUrl} alt={`${t('appName')} logo`} className="auth-logo" />}
+                        <h1>MEGAMAIL</h1>
+                        <h2>{t('brandingTitle', { ns: 'auth' })}</h2>
+                        <p>{t('brandingSubtitle', { ns: 'auth', appName: t('appName') })}</p>
                     </div>
                 </div>
             </div>

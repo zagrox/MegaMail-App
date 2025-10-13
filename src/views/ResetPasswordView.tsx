@@ -87,14 +87,14 @@ const ResetPasswordView = () => {
                                 <fieldset disabled={loading} style={{ border: 'none', padding: 0, margin: 0, display: 'contents' }}>
                                     <div className="input-group has-btn">
                                         <Icon>{ICONS.LOCK}</Icon>
-                                        <input name="password" type={showPassword ? "text" : "password"} placeholder={t('newPassword')} required />
+                                        <input name="password" type={showPassword ? "text" : "password"} placeholder={t('newPassword')} required autoComplete="new-password" />
                                         <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
                                             <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
                                         </button>
                                     </div>
                                     <div className="input-group">
                                         <Icon>{ICONS.LOCK}</Icon>
-                                        <input name="confirm_password" type="password" placeholder={t('confirmPassword')} required />
+                                        <input name="confirm_password" type="password" placeholder={t('confirmPassword')} required autoComplete="new-password" />
                                     </div>
                                     <button type="submit" className="btn btn-primary" disabled={loading}>
                                         {loading ? <Loader /> : t('resetPassword')}

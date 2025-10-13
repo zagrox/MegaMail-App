@@ -1,7 +1,4 @@
 
-
-
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from './useApi';
@@ -560,7 +557,7 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                 onPricingClick={() => setIsPricingModalOpen(true)}
             />
             
-            <h3 className="content-title" style={{marginTop: '1.5rem'}}>{t('choosePackage')}</h3>
+            <h3 className="content-title hide-on-mobile" style={{marginTop: '1.5rem'}}>{t('choosePackage')}</h3>
             
             {packagesLoading && <CenteredMessage><Loader/></CenteredMessage>}
             {packagesError && <ErrorMessage error={{endpoint: 'GET /items/packages', message: packagesError}} />}
