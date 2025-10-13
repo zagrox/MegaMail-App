@@ -18,7 +18,7 @@ const CalendarView = () => {
     const { t, i18n } = useTranslation(['common', 'calendar']);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [events, setEvents] = useState<CalendarEvent[]>([]);
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => window.innerWidth <= 767 ? 'list' : 'grid');
     const isJalali = i18n.language === 'fa';
 
     useEffect(() => {
