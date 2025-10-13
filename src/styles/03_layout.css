@@ -311,13 +311,13 @@
     }
 
     /* RTL Support for Toggle Button */
-    [dir="rtl"] .sidebar-collapse-toggle {
+    html[dir="rtl"] .sidebar-collapse-toggle {
         left: auto;
         right: 235px;
         transform: translateX(50%);
     }
 
-    [dir="rtl"].app-container.sidebar-collapsed .sidebar-collapse-toggle {
+    html[dir="rtl"] .app-container.sidebar-collapsed .sidebar-collapse-toggle {
         right: 80px;
     }
 }

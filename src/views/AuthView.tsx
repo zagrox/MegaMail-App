@@ -209,7 +209,7 @@ const AuthView = () => {
                                     </div>
                                     <div className="input-group">
                                         <Icon>{ICONS.MAIL}</Icon>
-                                        <input name="email" type="email" placeholder={t('emailAddress')} required autoComplete="email" />
+                                        <input name="email" type="email" placeholder={t('emailAddress')} required autoComplete="username" />
                                     </div>
                                     <div className="input-group has-btn">
                                         <Icon>{ICONS.LOCK}</Icon>
