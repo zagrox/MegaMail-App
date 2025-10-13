@@ -1,5 +1,7 @@
 
 
+
+
 import React, { useState, useMemo } from 'react';
 import WizardLayout from './WizardLayout';
 import Icon, { ICONS } from '../Icon';
@@ -129,6 +131,7 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
             <Modal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} title={t('templates')}>
                 <div className="template-selector-modal">
                     <div className="search-bar" style={{marginBottom: '1rem'}}>
+                        {/* FIX: Pass icon as child to Icon component */}
                         <Icon>{ICONS.SEARCH}</Icon>
                         <input
                             type="search"
@@ -178,6 +181,7 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
                 nextDisabled={isNextDisabled}
             >
                 <div className="wizard-step-intro">
+                    {/* FIX: Pass icon as child to Icon component */}
                     <Icon>{ICONS.MAIL}</Icon>
                     <p>{t('designContent_desc')}</p>
                 </div>
@@ -187,6 +191,7 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
                         {isLoadingTemplate ? <Loader /> : (data.template || t('useTemplate', { ns: 'sendEmail' }))}
                     </div>
                     <button className="btn btn-secondary" onClick={handlePreview} disabled={!data.template || isLoadingTemplate}>
+                        {/* FIX: Pass icon as child to Icon component */}
                         <Icon>{ICONS.EYE}</Icon> {t('previewTemplate', { ns: 'templates' })}
                     </button>
 

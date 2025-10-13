@@ -10,6 +10,7 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
     const timeoutRef = useRef<number | null>(null);
 
     const handleMouseEnter = () => {
+        if (!text) return;
         timeoutRef.current = window.setTimeout(() => {
             setIsVisible(true);
         }, 300); // 300ms delay before showing
@@ -27,7 +28,6 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
             className="tooltip-wrapper" 
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            style={{ position: 'relative', display: 'inline-block' }}
         >
             {children}
             {isVisible && (
@@ -35,14 +35,17 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
                     {text}
                 </div>
             )}
-            {/* FIX: Removed non-standard "jsx" prop to fix TypeScript error. This now injects a global style. */}
             <style>{`
+                .tooltip-wrapper {
+                    position: relative;
+                    display: block; /* Changed to block for full-width nav buttons */
+                }
                 .tooltip-content {
                     position: absolute;
-                    bottom: 100%;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    margin-bottom: 8px;
+                    bottom: 50%;
+                    left: 100%;
+                    transform: translateY(50%);
+                    margin-left: 12px;
                     padding: 8px 12px;
                     background-color: var(--tooltip-background);
                     color: white;
@@ -53,19 +56,34 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
                     pointer-events: none;
                     animation: fadeIn 0.15s ease-in;
                 }
+                html[dir="rtl"] .tooltip-content {
+                    left: auto;
+                    right: 100%;
+                    margin-left: 0;
+                    margin-right: 12px;
+                }
                 .tooltip-content::after {
                     content: '';
                     position: absolute;
-                    top: 100%;
-                    left: 50%;
-                    transform: translateX(-50%);
+                    top: 50%;
+                    right: 100%;
+                    transform: translateY(-50%);
                     border-width: 5px;
                     border-style: solid;
-                    border-color: var(--tooltip-background) transparent transparent transparent;
+                    border-color: transparent var(--tooltip-background) transparent transparent;
+                }
+                html[dir="rtl"] .tooltip-content::after {
+                    right: auto;
+                    left: 100%;
+                    border-color: transparent transparent transparent var(--tooltip-background);
                 }
                 @keyframes fadeIn {
-                    from { opacity: 0; transform: translateX(-50%) translateY(4px); }
-                    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+                    from { opacity: 0; transform: translateY(50%) translateX(4px); }
+                    to { opacity: 1; transform: translateY(50%) translateX(0); }
+                }
+                html[dir="rtl"] @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(50%) translateX(-4px); }
+                    to { opacity: 1; transform: translateY(50%) translateX(0); }
                 }
             `}</style>
         </div>

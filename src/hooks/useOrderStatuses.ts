@@ -20,11 +20,8 @@ const mapIconNameToPath = (iconName?: string): ReactNode | undefined => {
 
     // Handle special characters first
     switch(iconName) {
-        // FIX: Return JSX element instead of string key
         case '✓': return ICONS.CHECK;
-        // FIX: Return JSX element instead of string key
         case '⊗': return ICONS.X_CIRCLE;
-        // FIX: Return JSX element instead of string key
         case '❇': return ICONS.LOADING_SPINNER;
     }
 
@@ -34,24 +31,20 @@ const mapIconNameToPath = (iconName?: string): ReactNode | undefined => {
         case 'CHECK':
         case 'CHECKCIRCLE':
         case 'COMPLETED':
-            // FIX: Return JSX element instead of string key
             return ICONS.CHECK;
         case 'PENDING':
         case 'HOURGLASS':
         case 'HOURGLASSEMPTY':
         case 'SCHEDULE':
-            // FIX: Return JSX element instead of string key
             return ICONS.LOADING_SPINNER;
         case 'SYNC':
         case 'SETTINGS':
         case 'PROCESSING':
-             // FIX: Return JSX element instead of string key
              return ICONS.LOADING_SPINNER;
         case 'CANCEL':
         case 'CLOSE':
         case 'FAILED':
         case 'ERROR':
-            // FIX: Return JSX element instead of string key
             return ICONS.X_CIRCLE;
         default:
             const foundKey = Object.keys(ICONS).find(key => key.includes(normalizedName));

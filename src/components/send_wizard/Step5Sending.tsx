@@ -1,10 +1,10 @@
 import React, { useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import WizardLayout from './WizardLayout';
-import Icon, { ICONS } from '../../components/Icon';
+import Icon, { ICONS } from '../Icon';
 import useApiV4 from '../../hooks/useApiV4';
 import useApi from '../../views/useApi';
-import Loader from '../../components/Loader';
+import Loader from '../Loader';
 import { AppActions } from '../../config/actions';
 
 const SummaryItem = ({ label, value }: { label: string, value: React.ReactNode }) => {
@@ -159,7 +159,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         disabled={!hasEnoughCredits}
                     />
                     <div className="sending-option-card-content">
-                        {/* FIX: Changed to use JSX children for Icon component */}
+                        {/* FIX: Explicitly pass children to Icon component */}
                         <Icon className="sending-option-card-icon">{ICONS.SEND_EMAIL}</Icon>
                         <h4 className="sending-option-card-title">{t('sendNow', { ns: 'sendEmail' })}</h4> 
                     </div>
@@ -178,7 +178,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
                     />
                     <div className="sending-option-card-content">
-                        {/* FIX: Changed to use JSX children for Icon component */}
+                        {/* FIX: Explicitly pass children to Icon component */}
                         <Icon className="sending-option-card-icon">{ICONS.SAVE_CHANGES}</Icon>
                         <h4 className="sending-option-card-title">{t('saveForLater')}</h4>
                     </div>
@@ -207,16 +207,16 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                             )
                         } 
                     />
-                    <SummaryItem label={t('fromEmail', { ns: 'sendEmail' })} value={domainsLoading ? t('loading') : defaultFromEmail} />
-                    <SummaryItem label={t('replyTo', { ns: 'sendEmail' })} value={data.enableReplyTo ? data.replyTo : null} />
+                    <SummaryItem label={t('fromEmail')} value={domainsLoading ? t('loading') : defaultFromEmail} />
+                    <SummaryItem label={t('replyTo')} value={data.enableReplyTo ? data.replyTo : null} />
                     
                     <dt className="grid-separator"></dt>
                     
                     <SummaryItem label={t('campaignName', { ns: 'sendEmail' })} value={data.campaignName} />
                     <SummaryItem label={t('template', { ns: 'sendEmail' })} value={data.template} />
-                    <SummaryItem label={t('sendTime', { ns: 'send-wizard' })} value={sendTimeStatus} />
+                    <SummaryItem label={t('sendTime')} value={sendTimeStatus} />
                     <SummaryItem label={t('tracking', { ns: 'sendEmail' })} value={trackingStatus} />
-                    <SummaryItem label={t('timeOptimization', { ns: 'send-wizard' })} value={optimizationStatus} />
+                    <SummaryItem label={t('timeOptimization')} value={optimizationStatus} />
                 </dl>
             </div>
         </WizardLayout>

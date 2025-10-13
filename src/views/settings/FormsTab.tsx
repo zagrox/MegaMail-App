@@ -86,8 +86,7 @@ const FormsTab = ({ apiKey }: { apiKey: string }) => {
                     <div className="form-url-display">
                         <code>{subscribeUrl}</code>
                         <Button className="btn-secondary" onClick={handleCopy}>
-                            {/* FIX: Explicitly pass children to Icon component */}
-                            <Icon children={copied ? ICONS.CHECK : ICONS.MAIL} />
+                            <Icon>{copied ? ICONS.CHECK : ICONS.COPY}</Icon>
                             <span>{copied ? t('copied') : t('copyLink')}</span>
                         </Button>
                     </div>

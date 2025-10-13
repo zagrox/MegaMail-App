@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -43,6 +40,7 @@ import emitter from './api/eventEmitter';
 import UnsavedChangesModal from './components/UnsavedChangesModal';
 import GuidesView from './views/GuidesView';
 import { useTheme } from './contexts/ThemeContext';
+import Tooltip from './components/Tooltip';
 
 
 const App = () => {
@@ -64,6 +62,11 @@ const App = () => {
     const [orderForOfflinePayment, setOrderForOfflinePayment] = useState<any | null>(null);
     const [orderForInvoice, setOrderForInvoice] = useState<any | null>(null);
     const appContainerRef = useRef<HTMLDivElement>(null);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+        const storedValue = localStorage.getItem('sidebarCollapsed');
+        // Default to collapsed (true) on first visit
+        return storedValue === null ? true : storedValue === 'true';
+    });
 
     const emailBuilderRef = useRef<{ save: () => Promise<boolean> } | null>(null);
     const [isBuilderDirty, setIsBuilderDirty] = useState(false);
@@ -72,6 +75,16 @@ const App = () => {
         targetView: '',
         targetData: null as any,
     });
+
+    const isRTL = i18n.dir() === 'rtl';
+
+    useEffect(() => {
+        localStorage.setItem('sidebarCollapsed', String(isSidebarCollapsed));
+    }, [isSidebarCollapsed]);
+
+    const toggleSidebarCollapse = () => {
+        setIsSidebarCollapsed(prev => !prev);
+    };
 
     useEffect(() => {
         // Sync the application theme with the user's saved preference upon login or profile load.
@@ -238,7 +251,6 @@ const App = () => {
             const deltaX = currentX - touchStartX;
             if (Math.abs(deltaX) < 50) return; // Swipe threshold
             
-            const isRTL = i18n.dir() === 'rtl';
             if ((!isRTL && deltaX > 0) || (isRTL && deltaX < 0)) {
                 setIsMobileMenuOpen(true);
             }
@@ -250,7 +262,7 @@ const App = () => {
             container.removeEventListener('touchstart', handleTouchStart);
             container.removeEventListener('touchmove', handleTouchMove);
         };
-    }, [isMobileMenuOpen, i18n, isEmbedMode, setIsMobileMenuOpen]);
+    }, [isMobileMenuOpen, i18n, isEmbedMode, setIsMobileMenuOpen, isRTL]);
 
     if (configLoading) {
         return <CenteredMessage style={{height: '100vh'}}><Loader /></CenteredMessage>;
@@ -449,14 +461,12 @@ const App = () => {
                             const isPurchasableModule = !!moduleData;
                             const isLocked = !hasAccess && (authLoading || !allModules || isPurchasableModule);
                             const isPromotional = isLocked && moduleData?.modulepro === true;
-            
-                            return (
+                            
+                            const button = (
                                 <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
-                                    {/* FIX: Changed to use JSX children for Icon component */}
                                     <Icon>{navItem.icon}</Icon>
                                     <span>{navItem.name}</span>
                                     {isLocked && (
-                                        // FIX: Changed to use JSX children for Icon component
                                         <Icon
                                             className="lock-icon"
                                             style={isPromotional ? { color: 'var(--success-color)' } : {}}
@@ -464,32 +474,30 @@ const App = () => {
                                     )}
                                 </button>
                             );
+
+                            return isSidebarCollapsed ? <Tooltip key={navItem.view} text={navItem.name}>{button}</Tooltip> : button;
                         })}
                     </div>
                 </React.Fragment>
             ))}
         </nav>
         <div className="sidebar-footer-nav">
-             <button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
-                 {/* FIX: Changed to use JSX children for Icon component */}
+             <Tooltip text={t('guides')}><button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
                  <Icon>{ICONS.HELP_CIRCLE}</Icon>
                  <span>{t('guides')}</span>
-             </button>
-             <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
-                 {/* FIX: Changed to use JSX children for Icon component */}
+             </button></Tooltip>
+             <Tooltip text={t('settings', { ns: 'account' })}><button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
                  <Icon>{ICONS.SETTINGS}</Icon>
                  <span>{t('settings', { ns: 'account' })}</span>
-             </button>
-             <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
-                {/* FIX: Changed to use JSX children for Icon component */}
+             </button></Tooltip>
+             <Tooltip text={t('buyCredits')}><button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
                 <Icon>{ICONS.BUY_CREDITS}</Icon>
                 <span>{t('buyCredits')}</span>
-             </button>
-             <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
-                 {/* FIX: Changed to use JSX children for Icon component */}
+             </button></Tooltip>
+             <Tooltip text={t('account')}><button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
                  <Icon>{ICONS.ACCOUNT}</Icon>
                  <span>{t('account')}</span>
-             </button>
+             </button></Tooltip>
         </div>
       </>
     );
@@ -498,7 +506,7 @@ const App = () => {
     const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail' && view !== 'Marketing' && view !== 'CampaignDetail' && view !== 'OfflinePayment' && view !== 'Invoice';
 
     return (
-        <div ref={appContainerRef} className={`app-container ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
+        <div ref={appContainerRef} className={`app-container ${isMobileMenuOpen ? 'mobile-menu-open' : ''} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
             <UnsavedChangesModal
                 isOpen={leaveConfirmationState.isOpen}
                 onCancel={handleCancelLeave}
@@ -516,15 +524,16 @@ const App = () => {
             <aside className="sidebar">
                 <SidebarContent />
             </aside>
+            <button onClick={toggleSidebarCollapse} className="sidebar-collapse-toggle" aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
+               <Icon>{isRTL ? (isSidebarCollapsed ? ICONS.CHEVRON_LEFT : ICONS.CHEVRON_RIGHT) : (isSidebarCollapsed ? ICONS.CHEVRON_RIGHT : ICONS.CHEVRON_LEFT)}</Icon>
+            </button>
             <div className="main-wrapper">
                 <header className="mobile-header">
                      <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)} aria-label={t('openMenu')}>
-                        {/* FIX: Changed to use JSX children for Icon component */}
                         <Icon>{ICONS.MENU}</Icon>
                     </button>
                     <h1 className="mobile-header-title">{currentView?.title || appName}</h1>
                     <button className="mobile-menu-toggle" onClick={() => handleSetView('Account')} aria-label={t('account')}>
-                        {/* FIX: Changed to use JSX children for Icon component */}
                         <Icon>{ICONS.ACCOUNT}</Icon>
                     </button>
                 </header>

@@ -30,7 +30,6 @@ const ShareTab = ({ apiKey }: { apiKey: string }) => {
 
     return (
         <>
-            {/* FIX: Pass content as children to the Modal component. */}
             <Modal isOpen={isConfirmModalOpen} onClose={handleModalClose} title={t('securityWarningTitle')}>
                 <div className="modal-form">
                     <p>{t('embedFeatureSecurityNotice')}</p>
@@ -63,7 +62,6 @@ const ShareTab = ({ apiKey }: { apiKey: string }) => {
                     </div>
                     <div className="form-actions" style={{justifyContent: 'flex-end'}}>
                         <button className="btn btn-primary" onClick={handleGenerateClick}>
-                            {/* FIX: Changed to use JSX children for Icon component */}
                             <Icon>{ICONS.SHARE}</Icon>
                             <span>{t('generateEmbedCode')}</span>
                         </button>
@@ -83,7 +81,6 @@ const ShareTab = ({ apiKey }: { apiKey: string }) => {
                             className="btn btn-primary"
                             style={{ maxWidth: '250px' }}
                         >
-                            {/* FIX: Changed to use JSX children for Icon component */}
                             <Icon>{ICONS.MAIL}</Icon>
                             <span>{t('contactUsForDetails')}</span>
                         </a>

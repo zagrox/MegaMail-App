@@ -30,7 +30,6 @@ export const useStatusStyles = () => {
             case 'delivered':
             case 'engaged':
             case 'success':
-                // FIX: Return JSX element instead of string key
                 return { text: originalStatus, type: 'success', iconPath: ICONS.CHECK, color };
 
             // Warning / In-progress states
@@ -40,7 +39,6 @@ export const useStatusStyles = () => {
             case 'checking':
             case 'stale':
             case 'notconfirmed':
-                // FIX: Return JSX element instead of string key
                 return { text: originalStatus, type: 'warning', iconPath: ICONS.LOADING_SPINNER, color };
             
             case 'missing':
@@ -54,7 +52,6 @@ export const useStatusStyles = () => {
             case 'draft':
             case 'review':
             case 'info':
-                 // FIX: Return JSX element instead of string key
                  return { text: originalStatus, type: 'info', iconPath: ICONS.LOADING_SPINNER, color };
 
             // Danger / Error states
@@ -69,7 +66,6 @@ export const useStatusStyles = () => {
             case 'manualcancel':
             case 'notdelivered':
             case 'invalid':
-                // FIX: Return JSX element instead of string key
                 return { text: originalStatus, type: 'danger', iconPath: ICONS.X_CIRCLE, color };
             
             // Default

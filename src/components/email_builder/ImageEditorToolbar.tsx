@@ -41,7 +41,6 @@ const PaddingControl = ({ style, onStyleChange }: { style: any, onStyleChange: a
                     onClick={() => setIsLinked(!isLinked)}
                     title={t('paddingLinked')}
                 >
-                    {/* FIX: Changed path prop to children for Icon component */}
                     <Icon>{ICONS.LINK}</Icon>
                 </button>
 
@@ -105,11 +104,8 @@ const ImageEditorToolbar = ({ block, canvasWrapperRef, onStyleChange, onContentC
     return (
         <div ref={toolbarRef} className="editor-toolbar image-editor-toolbar" style={toolbarState} onMouseDown={e => e.preventDefault()}>
             <div className="editor-toolbar-section">
-                {/* FIX: Changed path prop to children for Icon component */}
                 <button onClick={() => handleStyleChange('textAlign', 'left')} className={currentStyle.textAlign === 'left' ? 'active' : ''} title={t('alignLeft')}><Icon>{ICONS.ALIGN_LEFT}</Icon></button>
-                {/* FIX: Changed path prop to children for Icon component */}
                 <button onClick={() => handleStyleChange('textAlign', 'center')} className={currentStyle.textAlign === 'center' ? 'active' : ''} title={t('alignCenter')}><Icon>{ICONS.ALIGN_CENTER}</Icon></button>
-                {/* FIX: Changed path prop to children for Icon component */}
                 <button onClick={() => handleStyleChange('textAlign', 'right')} className={currentStyle.textAlign === 'right' ? 'active' : ''} title={t('alignRight')}><Icon>{ICONS.ALIGN_RIGHT}</Icon></button>
             </div>
             
@@ -154,7 +150,6 @@ const ImageEditorToolbar = ({ block, canvasWrapperRef, onStyleChange, onContentC
             </div>
 
             <div className="editor-toolbar-section">
-                {/* FIX: Changed path prop to children for Icon component */}
                 <Icon>{ICONS.LINK}</Icon>
                 <input
                     type="url"

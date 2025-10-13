@@ -1,11 +1,7 @@
-
-
-
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import WizardLayout from './WizardLayout';
-import Icon, { ICONS } from '../Icon';
+import WizardLayout from '../../components/send_wizard/WizardLayout';
+import Icon, { ICONS } from '../../components/Icon';
 
 const Step1SelectType = ({ onNext, onBack, data, updateData }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; }) => {
     const { t } = useTranslation('send-wizard');
@@ -23,7 +19,6 @@ const Step1SelectType = ({ onNext, onBack, data, updateData }: { onNext: () => v
             backButtonText={t('exitWizard')}
         >
             <div className="wizard-step-intro">
-                {/* FIX: Pass icon as child to Icon component */}
                 <Icon>{ICONS.HASH}</Icon>
                 <p>{t('selectCampaignType_desc')}</p>
             </div>

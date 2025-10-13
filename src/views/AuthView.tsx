@@ -66,7 +66,12 @@ const AuthView = () => {
             if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
                 errorMessage = err.errors[0].message;
             }
-            addToast(errorMessage || t('unknownError'), 'error');
+
+            if (errorMessage && errorMessage.toLowerCase().includes('has to be unique') && errorMessage.toLowerCase().includes('email')) {
+                addToast(t('emailAlreadyExists'), 'error');
+            } else {
+                addToast(errorMessage || t('unknownError', { ns: 'common' }), 'error');
+            }
         } finally {
             setLoading(false);
             if (config?.app_recaptcha && (window as any).grecaptcha && recaptchaWidgetId.current !== null) {
@@ -142,123 +147,124 @@ const AuthView = () => {
             </div>
         );
     }
+
+    const logoUrl = config?.app_logo && config?.app_backend ? `${config.app_backend}/assets/${config.app_logo}` : '';
     
     return (
         <div className="auth-container">
-            <div className="auth-box">
-                <h1><span className="logo-font">{t('appName')}</span></h1>
-                <p>{getSubtitle()}</p>
-
-                <form className="auth-form" ref={formRef} onSubmit={handleSubmit}>
-
-                    {mode === 'login' ? (
-                         <>
-                            <div className="input-group">
-                                {/* FIX: Changed to use JSX children for Icon component */}
-                                <span className="input-icon"><Icon>{ICONS.MAIL}</Icon></span>
-                                <input 
-                                    name="email" 
-                                    type="email" 
-                                    placeholder={t('emailAddress')} 
-                                    required
-                                    value={loginEmail}
-                                    onChange={(e) => setLoginEmail(e.target.value)}
-                                />
-                            </div>
-                            <div className="input-group has-btn">
-                                {/* FIX: Changed to use JSX children for Icon component */}
-                                <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
-                                <input 
-                                    name="password" 
-                                    type={showPassword ? "text" : "password"} 
-                                    placeholder={t('password')} 
-                                    required 
-                                    value={loginPassword}
-                                    onChange={(e) => setLoginPassword(e.target.value)}
-                                />
-                                <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-                                    {/* FIX: Changed to use JSX children for Icon component */}
-                                    <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
-                                </button>
-                            </div>
-                             <div style={{ textAlign: 'right', fontSize: '0.9rem', marginTop: '-0.5rem', marginBottom: '1rem' }}>
-                                <button type="button" className="link-button" onClick={() => setMode('forgot')}>
-                                    {t('forgotPassword')}
-                                </button>
-                            </div>
-                        </>
-                    ) : mode === 'register' ? (
-                        <>
-                            <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                <div className="input-group">
-                                    {/* FIX: Changed to use JSX children for Icon component */}
-                                    <span className="input-icon"><Icon>{ICONS.ACCOUNT}</Icon></span>
-                                    <input name="first_name" type="text" placeholder={t('firstName')} required />
-                                </div>
-                                <div className="input-group">
-                                    {/* FIX: Changed to use JSX children for Icon component */}
-                                    <span className="input-icon"><Icon>{ICONS.ACCOUNT}</Icon></span>
-                                    <input name="last_name" type="text" placeholder={t('lastName')} required />
-                                </div>
-                            </div>
-                            <div className="input-group">
-                                {/* FIX: Changed to use JSX children for Icon component */}
-                                <span className="input-icon"><Icon>{ICONS.MAIL}</Icon></span>
-                                <input name="email" type="email" placeholder={t('emailAddress')} required />
-                            </div>
-                            <div className="input-group has-btn">
-                                {/* FIX: Changed to use JSX children for Icon component */}
-                                <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
-                                <input name="password" type={showPassword ? "text" : "password"} placeholder={t('password')} required />
-                                <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-                                    {/* FIX: Changed to use JSX children for Icon component */}
-                                    <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
-                                </button>
-                            </div>
-                            <div className="input-group has-btn">
-                                {/* FIX: Changed to use JSX children for Icon component */}
-                                <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
-                                <input name="confirm_password" type={showConfirmPassword ? "text" : "password"} placeholder={t('confirmPassword')} required />
-                                <button type="button" className="input-icon-btn" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                                    {/* FIX: Changed to use JSX children for Icon component */}
-                                    <Icon>{showConfirmPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
-                                </button>
-                            </div>
-                        </>
-                    ) : ( // mode === 'forgot'
-                        <div className="input-group">
-                            {/* FIX: Changed to use JSX children for Icon component */}
-                            <span className="input-icon"><Icon>{ICONS.MAIL}</Icon></span>
-                            <input name="email" type="email" placeholder={t('emailAddress')} required />
-                        </div>
-                    )}
-
-                    <button type="submit" className="btn btn-primary" disabled={loading}>
-                        {loading ? <Loader /> : (mode === 'forgot' ? t('sendResetLink') : mode === 'login' ? t('signIn') : t('signUp'))}
-                    </button>
-                    <div ref={recaptchaContainerRef} />
-                </form>
-
-                <div className="auth-switch">
-                    {mode === 'login' ? (
-                        <>
-                            <p>{t('noAccount')}</p>
-                            <button type="button" className="auth-switch-button" onClick={() => setMode('register')}>{t('signUpNow')}</button>
-                        </>
-                    ) : mode === 'register' ? (
-                        <>
-                            <p>{t('alreadyHaveAccount')}</p>
-                            <button type="button" className="auth-switch-button" onClick={() => setMode('login')}>{t('signIn')}</button>
-                        </>
-                    ) : (
-                        <button type="button" className="link-button" onClick={() => setMode('login')}>{t('backToSignIn')}</button>
-                    )}
+            <div className="auth-split-layout">
+                <div className="auth-branding-panel">
+                    <div className="auth-branding-content">
+                        {logoUrl && <img src={logoUrl} alt={`${t('appName')} logo`} className="auth-logo" />}
+                        <h1>{t('brandingTitle', { ns: 'auth' })}</h1>
+                        <p>{t('brandingSubtitle', { ns: 'auth', appName: t('appName') })}</p>
+                    </div>
                 </div>
-            </div>
-            <div className="auth-language-switcher">
-                <button onClick={() => changeLanguage('en')} className={i18n.language.startsWith('en') ? 'active' : ''}>EN</button>
-                <span>/</span>
-                <button onClick={() => changeLanguage('fa')} className={i18n.language.startsWith('fa') ? 'active' : ''}>FA</button>
+                <div className="auth-form-panel">
+                    <div className="auth-box">
+                        <h2>{mode === 'login' ? t('signIn') : mode === 'register' ? t('signUp') : t('forgotPasswordTitle')}</h2>
+                        <p>{getSubtitle()}</p>
+
+                        <form className="auth-form" ref={formRef} onSubmit={handleSubmit}>
+
+                            {mode === 'login' ? (
+                                <>
+                                    <div className="input-group">
+                                        <Icon>{ICONS.MAIL}</Icon>
+                                        <input 
+                                            name="email" 
+                                            type="email" 
+                                            placeholder={t('emailAddress')} 
+                                            required
+                                            value={loginEmail}
+                                            onChange={(e) => setLoginEmail(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="input-group has-btn">
+                                        <Icon>{ICONS.LOCK}</Icon>
+                                        <input 
+                                            name="password" 
+                                            type={showPassword ? "text" : "password"} 
+                                            placeholder={t('password')} 
+                                            required 
+                                            value={loginPassword}
+                                            onChange={(e) => setLoginPassword(e.target.value)}
+                                        />
+                                        <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
+                                            <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+                                        </button>
+                                    </div>
+                                    <div style={{ textAlign: 'right', fontSize: '0.9rem', marginTop: '-0.5rem', marginBottom: '1rem' }}>
+                                        <button type="button" className="link-button" onClick={() => setMode('forgot')}>
+                                            {t('forgotPassword')}
+                                        </button>
+                                    </div>
+                                </>
+                            ) : mode === 'register' ? (
+                                <>
+                                    <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div className="input-group">
+                                            <Icon>{ICONS.ACCOUNT}</Icon>
+                                            <input name="first_name" type="text" placeholder={t('firstName')} required />
+                                        </div>
+                                        <div className="input-group">
+                                            <Icon>{ICONS.ACCOUNT}</Icon>
+                                            <input name="last_name" type="text" placeholder={t('lastName')} required />
+                                        </div>
+                                    </div>
+                                    <div className="input-group">
+                                        <Icon>{ICONS.MAIL}</Icon>
+                                        <input name="email" type="email" placeholder={t('emailAddress')} required />
+                                    </div>
+                                    <div className="input-group has-btn">
+                                        <Icon>{ICONS.LOCK}</Icon>
+                                        <input name="password" type={showPassword ? "text" : "password"} placeholder={t('password')} required />
+                                        <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
+                                            <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+                                        </button>
+                                    </div>
+                                    <div className="input-group has-btn">
+                                        <Icon>{ICONS.LOCK}</Icon>
+                                        <input name="confirm_password" type={showConfirmPassword ? "text" : "password"} placeholder={t('confirmPassword')} required />
+                                        <button type="button" className="input-icon-btn" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                                            <Icon>{showConfirmPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+                                        </button>
+                                    </div>
+                                </>
+                            ) : ( // mode === 'forgot'
+                                <div className="input-group">
+                                    <Icon>{ICONS.MAIL}</Icon>
+                                    <input name="email" type="email" placeholder={t('emailAddress')} required />
+                                </div>
+                            )}
+
+                            <button type="submit" className="btn btn-primary" disabled={loading}>
+                                {loading ? <Loader /> : (mode === 'forgot' ? t('sendResetLink') : mode === 'login' ? t('signIn') : t('signUp'))}
+                            </button>
+                            <div ref={recaptchaContainerRef} />
+                        </form>
+
+                        <div className="auth-switch">
+                            {mode === 'login' ? (
+                                <>
+                                    <p>{t('noAccount')}</p>
+                                    <button type="button" className="auth-switch-button" onClick={() => setMode('register')}>{t('signUpNow')}</button>
+                                </>
+                            ) : mode === 'register' ? (
+                                <>
+                                    <p>{t('alreadyHaveAccount')}</p>
+                                    <button type="button" className="auth-switch-button" onClick={() => setMode('login')}>{t('signIn')}</button>
+                                </>
+                            ) : (
+                                <button type="button" className="link-button" onClick={() => setMode('login')}>{t('backToSignIn')}</button>
+                            )}
+                        </div>
+                    </div>
+                    <div className="auth-language-switcher">
+                        <button onClick={() => changeLanguage('en')} className={i18n.language.startsWith('en') ? 'active' : ''}>EN</button>
+                        <button onClick={() => changeLanguage('fa')} className={i18n.language.startsWith('fa') ? 'active' : ''}>FA</button>
+                    </div>
+                </div>
             </div>
         </div>
     );

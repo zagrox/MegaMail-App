@@ -3,6 +3,7 @@
     display: flex;
     height: 100%;
     background-color: var(--background-color);
+    position: relative; /* Needed for absolute positioning of the toggle button */
 }
 .sidebar {
     width: 235px;
@@ -11,7 +12,7 @@
     display: flex;
     flex-direction: column;
     padding: 1rem;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, width 0.3s ease;
     flex-shrink: 0;
     overflow-y: auto;
 }
@@ -20,6 +21,7 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    transition: margin-inline-start 0.3s ease;
 }
 .content {
     padding: 1.5rem 2rem;
@@ -30,7 +32,7 @@
 }
 .content-header h2 {
     font-size: 2.4rem;
-    margin-top: 0.8rem;
+    margin-top: 1rem;
     font-weight: 700;
 }
 
@@ -39,8 +41,11 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 1rem 0.5rem;
+    padding: 0.7rem;
     margin-bottom: 1rem;
+    transition: all 0.2s ease;
+    height: 60px; /* Give header a fixed height */
+    box-sizing: content-box;
 }
 
 .sidebar-logo {
@@ -69,6 +74,8 @@
     text-transform: uppercase;
     margin: 1rem 0 0.5rem 0.75rem;
     letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 .nav-group-header span {
     flex-shrink: 0;
@@ -95,6 +102,7 @@
     text-align: left;
     transition: background-color 0.2s, color 0.2s;
     position: relative;
+    width: 92%;
 }
 .nav-btn:hover {
     background-color: var(--subtle-background);
@@ -164,6 +172,12 @@
     color: var(--warning-color);
 }
 
+/* --- SIDEBAR COLLAPSE TOGGLE --- */
+.sidebar-collapse-toggle {
+    display: none; /* Hide on mobile by default */
+}
+
+
 /* --- MOBILE & RESPONSIVE --- */
 .mobile-header, .mobile-menu-overlay, .mobile-menu-toggle {
     display: none;
@@ -225,7 +239,85 @@
     .content-header {
         display: none;
     }
+    .sidebar-collapse-toggle {
+        display: none !important;
+    }
 }
 .content--no-padding {
     padding: 0;
+}
+
+/* --- DESKTOP COLLAPSED SIDEBAR --- */
+@media (min-width: 769px) {
+    .app-container.sidebar-collapsed .sidebar {
+        width: 80px;
+        padding: 0.4rem 0.5rem;
+    }
+    .app-container.sidebar-collapsed .sidebar-header {
+        justify-content: center;
+        padding: 0.2rem;
+    }
+    .app-container.sidebar-collapsed .sidebar-header .logo-font {
+        display: none;
+    }
+    .app-container.sidebar-collapsed .nav-btn span {
+        display: none;
+    }
+    .app-container.sidebar-collapsed .nav-group-header {
+        visibility: hidden;
+        height: 0;
+        margin: 0;
+    }
+    .app-container.sidebar-collapsed .nav-btn {
+        justify-content: center;
+    }
+    .app-container.sidebar-collapsed .nav-btn .lock-icon {
+        display: none; /* Hide lock on collapsed to avoid clutter */
+    }
+
+    /* New Toggle Button Styles */
+    .sidebar-collapse-toggle {
+        position: absolute;
+        top: 50px; /* Position it below the sidebar header area */
+        left: 235px; /* Width of expanded sidebar */
+        transform: translateX(-50%);
+        z-index: 1001;
+        width: 28px;
+        height: 28px;
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        transition: left 0.3s ease, right 0.3s ease, color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        color: var(--subtle-text-color);
+    }
+    .sidebar-collapse-toggle:hover {
+        background-color: var(--subtle-background);
+        border-color: var(--secondary-color);
+        color: var(--secondary-color);
+    }
+
+    .sidebar-collapse-toggle .icon {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .app-container.sidebar-collapsed .sidebar-collapse-toggle {
+        left: 80px; /* Collapsed width */
+    }
+
+    /* RTL Support for Toggle Button */
+    [dir="rtl"] .sidebar-collapse-toggle {
+        left: auto;
+        right: 235px;
+        transform: translateX(50%);
+    }
+
+    [dir="rtl"].app-container.sidebar-collapsed .sidebar-collapse-toggle {
+        right: 80px;
+    }
 }

@@ -1,8 +1,6 @@
-
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import WizardLayout from './WizardLayout';
+import WizardLayout from '../../components/send_wizard/WizardLayout';
 import MultiSelectSearch from '../../components/MultiSelectSearch';
 import useApiV4 from '../../hooks/useApiV4';
 import { List, Segment } from '../../api/types';
@@ -122,7 +120,7 @@ const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext:
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <div className="wizard-step-intro">
                     {/* FIX: Changed path prop to children for Icon component */}
-                    <Icon children={ICONS.CONTACTS} />
+                    <Icon>{ICONS.CONTACTS}</Icon>
                     <p>{t('selectAudience_desc')}</p>
                 </div>
 

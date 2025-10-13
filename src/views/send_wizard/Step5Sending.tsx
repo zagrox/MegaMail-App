@@ -1,8 +1,6 @@
-
-
 import React, { useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import WizardLayout from './WizardLayout';
+import WizardLayout from '../../components/send_wizard/WizardLayout';
 import Icon, { ICONS } from '../../components/Icon';
 import useApiV4 from '../../hooks/useApiV4';
 import useApi from '../../views/useApi';
@@ -110,8 +108,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
             nextAction={nextAction}
         >
             <div className="wizard-step-intro">
-                {/* FIX: Changed path prop to children for Icon component */}
-                <Icon children={ICONS.VERIFY} />
+                <Icon>{ICONS.VERIFY}</Icon>
                 <p>{t('reviewAndSend_desc')}</p>
             </div>
             <div className="sending-options-list">
@@ -130,8 +127,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         disabled={!hasEnoughCredits}
                     />
                     <div className="sending-option-card-content">
-                        {/* FIX: Explicitly pass children to Icon component */}
-                        <Icon className="sending-option-card-icon" children={ICONS.CALENDAR} />
+                        <Icon className="sending-option-card-icon">{ICONS.CALENDAR}</Icon>
                         <div className="sending-option-card-details">
                             <h4 className="sending-option-card-title">{t('schedule', { ns: 'sendEmail' })}</h4>
                             {data.sendAction === 'schedule' && (
@@ -161,8 +157,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         disabled={!hasEnoughCredits}
                     />
                     <div className="sending-option-card-content">
-                        {/* FIX: Explicitly pass children to Icon component */}
-                        <Icon className="sending-option-card-icon" children={ICONS.SEND_EMAIL} />
+                        <Icon className="sending-option-card-icon">{ICONS.SEND_EMAIL}</Icon>
                         <h4 className="sending-option-card-title">{t('sendNow', { ns: 'sendEmail' })}</h4> 
                     </div>
                 </label>
@@ -180,8 +175,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
                     />
                     <div className="sending-option-card-content">
-                        {/* FIX: Explicitly pass children to Icon component */}
-                        <Icon className="sending-option-card-icon" children={ICONS.SAVE_CHANGES} />
+                        <Icon className="sending-option-card-icon">{ICONS.SAVE_CHANGES}</Icon>
                         <h4 className="sending-option-card-title">{t('saveForLater')}</h4>
                     </div>
                 </label>

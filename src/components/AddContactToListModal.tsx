@@ -41,7 +41,6 @@ const AddContactToListModal: React.FC<AddContactToListModalProps> = ({ isOpen, o
     }, [isOpen]);
 
     return (
-        // FIX: Pass form as a child to the Modal component.
         <Modal
             isOpen={isOpen}
             onClose={onClose}
@@ -67,7 +66,6 @@ const AddContactToListModal: React.FC<AddContactToListModalProps> = ({ isOpen, o
                         {t('cancel')}
                     </button>
                     <button type="submit" className="btn btn-primary" disabled={isSubmitting || !emails.trim()}>
-                        {/* FIX: Changed to use JSX children for Icon component */}
                         {isSubmitting ? <Loader /> : <><Icon>{ICONS.USER_PLUS}</Icon><span>{t('addContact')}</span></>}
                     </button>
                 </div>

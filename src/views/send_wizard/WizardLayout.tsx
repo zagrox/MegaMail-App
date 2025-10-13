@@ -1,11 +1,8 @@
-
-
-
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import Icon, { ICONS } from '../Icon';
-import Loader from '../Loader';
-import Button from '../Button';
+import Icon, { ICONS } from '../../components/Icon';
+import Loader from '../../components/Loader';
+import Button from '../../components/Button';
 import { AppActions } from '../../config/actions';
 
 interface WizardLayoutProps {
@@ -51,12 +48,10 @@ const WizardLayout = ({
                     {isRTL ? (
                         <>
                             <span>{backButtonText || t('back')}</span>
-                            {/* FIX: Changed to use JSX children for Icon component */}
                             <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                         </>
                     ) : (
                         <>
-                            {/* FIX: Changed to use JSX children for Icon component */}
                             <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                             <span>{backButtonText || t('back')}</span>
                         </>
@@ -71,14 +66,12 @@ const WizardLayout = ({
                     >
                         {isRTL ? (
                             <>
-                                {/* FIX: Changed to use JSX children for Icon component */}
                                 <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                                 <span>{t('next')}</span>
                             </>
                         ) : (
                             <>
                                 <span>{t('next')}</span>
-                                {/* FIX: Changed to use JSX children for Icon component */}
                                 <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                             </>
                         )}
@@ -92,7 +85,6 @@ const WizardLayout = ({
                     >
                         {isSubmitting ? <Loader /> : (
                             <>
-                                {/* FIX: Changed to use JSX children for Icon component */}
                                 <Icon>{ICONS.VERIFY}</Icon>
                                 <span>{t('submit', { ns: 'sendEmail' })}</span>
                             </>

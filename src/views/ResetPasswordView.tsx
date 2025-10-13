@@ -66,57 +66,72 @@ const ResetPasswordView = () => {
     }
     
     const appName = config?.app_name || 'MegaMail';
+    const logoUrl = config?.app_logo && config?.app_backend ? `${config.app_backend}/assets/${config.app_logo}` : '';
 
-    // This view now serves two purposes: entering email to request reset, and entering new password with token.
     if (token) {
-        // Mode: User has a token and is setting a new password.
         return (
             <div className="auth-container">
-                <div className="auth-box">
-                    <h1><span className="logo-font">{appName}</span></h1>
-                    <p>{t('resetPasswordSubtitle')}</p>
-                    <form className="auth-form" onSubmit={handleResetSubmit}>
-                        <fieldset disabled={loading} style={{ border: 'none', padding: 0, margin: 0, display: 'contents' }}>
-                            <div className="input-group has-btn">
-                                <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
-                                <input name="password" type={showPassword ? "text" : "password"} placeholder={t('newPassword')} required />
-                                <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-                                    <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
-                                </button>
+                <div className="auth-split-layout">
+                    <div className="auth-branding-panel">
+                        <div className="auth-branding-content">
+                            {logoUrl && <img src={logoUrl} alt={`${appName} logo`} className="auth-logo" />}
+                            <h1>{t('brandingTitle', { ns: 'auth' })}</h1>
+                            <p>{t('brandingSubtitle', { ns: 'auth', appName: appName })}</p>
+                        </div>
+                    </div>
+                    <div className="auth-form-panel">
+                        <div className="auth-box">
+                            <h2>{t('resetPassword')}</h2>
+                            <p>{t('resetPasswordSubtitle')}</p>
+                            <form className="auth-form" onSubmit={handleResetSubmit}>
+                                <fieldset disabled={loading} style={{ border: 'none', padding: 0, margin: 0, display: 'contents' }}>
+                                    <div className="input-group has-btn">
+                                        <Icon>{ICONS.LOCK}</Icon>
+                                        <input name="password" type={showPassword ? "text" : "password"} placeholder={t('newPassword')} required />
+                                        <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
+                                            <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+                                        </button>
+                                    </div>
+                                    <div className="input-group">
+                                        <Icon>{ICONS.LOCK}</Icon>
+                                        <input name="confirm_password" type="password" placeholder={t('confirmPassword')} required />
+                                    </div>
+                                    <button type="submit" className="btn btn-primary" disabled={loading}>
+                                        {loading ? <Loader /> : t('resetPassword')}
+                                    </button>
+                                </fieldset>
+                            </form>
+                            <div className="auth-switch">
+                                <button onClick={goToLogin} className="link-button">{t('backToSignIn')}</button>
                             </div>
-                            <div className="input-group">
-                                <span className="input-icon"><Icon>{ICONS.LOCK}</Icon></span>
-                                <input name="confirm_password" type="password" placeholder={t('confirmPassword')} required />
-                            </div>
-                            <button type="submit" className="btn btn-primary" disabled={loading}>
-                                {loading ? <Loader /> : t('resetPassword')}
-                            </button>
-                        </fieldset>
-                    </form>
-                    <div className="auth-switch">
-                        <button onClick={goToLogin} className="link-button">{t('backToSignIn')}</button>
+                        </div>
                     </div>
                 </div>
             </div>
         );
     }
     
-    // Mode: User does not have a token and needs to request one.
-    // This part is never reached because the App router handles the 'forgot' mode within AuthView.
-    // However, keeping this logic for the /reset-password route which handles the token.
-    // The prompt is slightly ambiguous, if the user lands on /#/reset-password without a token,
-    // they should be redirected or shown an error. The current App.tsx logic doesn't render this view
-    // unless the hash matches. The token useEffect handles the error case. This is sufficient.
     return (
         <div className="auth-container">
-            <div className="auth-box">
-                 <h1><span className="logo-font">{appName}</span></h1>
-                 <p>{t('resetPasswordSubtitle')}</p>
-                 <div className="info-message warning">
-                    <p>{t('invalidResetToken')}</p>
-                 </div>
-                 <div className="auth-switch">
-                    <button onClick={goToLogin} className="link-button">{t('backToSignIn')}</button>
+             <div className="auth-split-layout">
+                <div className="auth-branding-panel">
+                     <div className="auth-branding-content">
+                        {logoUrl && <img src={logoUrl} alt={`${appName} logo`} className="auth-logo" />}
+                        <h1>{t('brandingTitle', { ns: 'auth' })}</h1>
+                        <p>{t('brandingSubtitle', { ns: 'auth', appName: appName })}</p>
+                    </div>
+                </div>
+                <div className="auth-form-panel">
+                    <div className="auth-box">
+                        <h2>{t('resetPassword')}</h2>
+                        <p>{t('resetPasswordSubtitle')}</p>
+                        <div className="info-message warning">
+                            <p>{t('invalidResetToken')}</p>
+                        </div>
+                        <div className="auth-switch">
+                            <button onClick={goToLogin} className="link-button">{t('backToSignIn')}</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
