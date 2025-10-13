@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../components/Icon';
 import Button from '../components/Button';
+import CenteredMessage from '../components/CenteredMessage';
 
 interface CalendarEvent {
     date?: string; // For fixed YYYY-MM-DD
@@ -17,6 +18,7 @@ const CalendarView = () => {
     const { t, i18n } = useTranslation(['common', 'calendar']);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [events, setEvents] = useState<CalendarEvent[]>([]);
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const isJalali = i18n.language === 'fa';
 
     useEffect(() => {
@@ -101,6 +103,36 @@ const CalendarView = () => {
 
     const isRTL = i18n.dir() === 'rtl';
 
+    const monthEvents = useMemo(() => {
+        const currentMonthDays = calendarGrid.filter(d => d.isCurrentMonth);
+        const eventsByDay = new Map<string, { date: Date, events: CalendarEvent[] }>();
+
+        currentMonthDays.forEach(day => {
+            const gregorianDateString = day.date.toISOString().slice(0, 10);
+            const gregorianRecurringString = gregorianDateString.slice(5); // "MM-DD"
+            
+            const [jalaliMonth, jalaliDay] = jalaliDateFormatter.formatToParts(day.date).filter(p => p.type !== 'literal').map(p => p.value);
+            const jalaliDateString = `${jalaliMonth}-${jalaliDay}`;
+
+            const dayEvents = events.filter(event => 
+                (event.date && event.date === gregorianDateString) ||
+                (event.gregorianDate && event.gregorianDate === gregorianRecurringString) ||
+                (event.jalaliDate && event.jalaliDate === jalaliDateString)
+            );
+
+            if (dayEvents.length > 0) {
+                const dayKey = day.date.toISOString().slice(0, 10);
+                if (!eventsByDay.has(dayKey)) {
+                    eventsByDay.set(dayKey, { date: day.date, events: [] });
+                }
+                eventsByDay.get(dayKey)!.events.push(...dayEvents);
+            }
+        });
+
+        return Array.from(eventsByDay.values()).sort((a, b) => a.date.getTime() - b.date.getTime());
+    }, [calendarGrid, events, jalaliDateFormatter]);
+
+
     const NextButton = (
         <Button onClick={handleNextMonth} className="btn-secondary">
              {isRTL ? (
@@ -133,9 +165,6 @@ const CalendarView = () => {
         </Button>
     );
 
-
-
-
     return (
         <div className="calendar-container">
             <div className="calendar-header">
@@ -144,50 +173,86 @@ const CalendarView = () => {
                     <h2>{monthYearFormatter.format(currentDate)}</h2>
                     {isRTL ? NextButton : PrevButton}
                 </div>
-                <Button onClick={handleGoToToday} className="btn-secondary">{t('today', { ns: 'calendar' })}</Button>
+                <div className="header-actions">
+                     <div className="view-switcher">
+                        <button onClick={() => setViewMode('grid')} className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`} aria-label={t('gridView', { ns: 'calendar' })}>
+                            <Icon>{ICONS.DASHBOARD}</Icon>
+                        </button>
+                        <button onClick={() => setViewMode('list')} className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`} aria-label={t('listView', { ns: 'calendar' })}>
+                            <Icon>{ICONS.EMAIL_LISTS}</Icon>
+                        </button>
+                    </div>
+                    <Button onClick={handleGoToToday} className="btn-secondary">{t('today', { ns: 'calendar' })}</Button>
+                </div>
             </div>
+            
+            {viewMode === 'grid' && (
+                <div className="calendar-grid-wrapper">
+                    <div className="calendar-grid">
+                        {daysOfWeek.map(day => (
+                            <div key={day} className="calendar-day-header">{day}</div>
+                        ))}
+                        {calendarGrid.map((item, index) => {
+                            const dayNumber = dayFormatter.format(item.date);
+                            const isToday = item.isCurrentMonth &&
+                                        item.date.getDate() === today.getDate() &&
+                                        item.date.getMonth() === today.getMonth() &&
+                                        item.date.getFullYear() === today.getFullYear();
+                            
+                            const dayClasses = `calendar-day ${!item.isCurrentMonth ? 'is-other-month' : ''} ${isToday ? 'is-today' : ''}`;
 
-            <div className="calendar-grid-wrapper">
-                <div className="calendar-grid">
-                    {daysOfWeek.map(day => (
-                        <div key={day} className="calendar-day-header">{day}</div>
-                    ))}
-                    {calendarGrid.map((item, index) => {
-                        const dayNumber = dayFormatter.format(item.date);
-                        const isToday = item.isCurrentMonth &&
-                                       item.date.getDate() === today.getDate() &&
-                                       item.date.getMonth() === today.getMonth() &&
-                                       item.date.getFullYear() === today.getFullYear();
-                        
-                        const dayClasses = `calendar-day ${!item.isCurrentMonth ? 'is-other-month' : ''} ${isToday ? 'is-today' : ''}`;
+                            const gregorianDateString = item.date.toISOString().slice(0, 10);
+                            const gregorianRecurringString = gregorianDateString.slice(5); // "MM-DD"
+                            
+                            const [jalaliMonth, jalaliDay] = jalaliDateFormatter.formatToParts(item.date).filter(p => p.type !== 'literal').map(p => p.value);
+                            const jalaliDateString = `${jalaliMonth}-${jalaliDay}`;
 
-                        const gregorianDateString = item.date.toISOString().slice(0, 10);
-                        const gregorianRecurringString = gregorianDateString.slice(5); // "MM-DD"
-                        
-                        const [jalaliMonth, jalaliDay] = jalaliDateFormatter.formatToParts(item.date).filter(p => p.type !== 'literal').map(p => p.value);
-                        const jalaliDateString = `${jalaliMonth}-${jalaliDay}`;
+                            const dayEvents = events.filter(event => 
+                                (event.date && event.date === gregorianDateString) ||
+                                (event.gregorianDate && event.gregorianDate === gregorianRecurringString) ||
+                                (event.jalaliDate && event.jalaliDate === jalaliDateString)
+                            );
 
-                        const dayEvents = events.filter(event => 
-                            (event.date && event.date === gregorianDateString) ||
-                            (event.gregorianDate && event.gregorianDate === gregorianRecurringString) ||
-                            (event.jalaliDate && event.jalaliDate === jalaliDateString)
-                        );
-
-                        return (
-                            <div key={index} className={dayClasses}>
-                                <span className="day-number">{dayNumber}</span>
-                                <div className="day-events">
-                                    {dayEvents.map((event, eventIndex) => (
-                                        <div key={eventIndex} className="event-badge">
+                            return (
+                                <div key={index} className={dayClasses}>
+                                    <span className="day-number">{dayNumber}</span>
+                                    <div className="day-events">
+                                        {dayEvents.map((event, eventIndex) => (
+                                            <div key={eventIndex} className="event-badge">
+                                                {isJalali ? event.title_fa : event.title_en}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+            {viewMode === 'list' && (
+                <div className="calendar-list-view">
+                    {monthEvents.length > 0 ? (
+                        monthEvents.map(({ date, events: dayEventsList }) => (
+                            <div key={date.toISOString()} className="list-day-group">
+                                <div className="list-day-header">
+                                    {new Intl.DateTimeFormat(calendarLocale, { weekday: 'long', day: 'numeric' }).format(date)}
+                                </div>
+                                <div className="list-day-events">
+                                    {dayEventsList.map((event, index) => (
+                                        <div key={index} className="event-badge">
                                             {isJalali ? event.title_fa : event.title_en}
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                        );
-                    })}
+                        ))
+                    ) : (
+                        <CenteredMessage style={{minHeight: '400px'}}>
+                            <p>{t('noEventsThisMonth', { ns: 'calendar' })}</p>
+                        </CenteredMessage>
+                    )}
                 </div>
-            </div>
+            )}
         </div>
     );
 };

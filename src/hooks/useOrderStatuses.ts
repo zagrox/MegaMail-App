@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readField } from '@directus/sdk';

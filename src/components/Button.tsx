@@ -47,6 +47,7 @@ const Button: React.FC<ButtonProps> = ({ action, children, className, onClick, .
             aria-disabled={isLocked || props.disabled}
             {...props}
         >
+            {/* FIX: Changed to use JSX children for Icon component */}
             {isLocked && <Icon style={{ marginRight: '0.5rem' }}>{ICONS.LOCK}</Icon>}
             {children}
         </button>

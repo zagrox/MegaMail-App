@@ -1,4 +1,3 @@
-
 import React from 'react';
 import WizardLayout from './WizardLayout';
 import { useTranslation } from 'react-i18next';
@@ -60,13 +59,13 @@ const Step4Settings = ({ onNext, onBack, data, updateData }: { onNext: () => voi
 
     return (
         <WizardLayout
-            // FIX: Removed unused 'step' prop that was causing a TypeScript error.
             title={t('campaignSettings')}
             onNext={onNext}
             onBack={onBack}
             nextDisabled={!data.campaignName}
         >
             <div className="wizard-step-intro">
+                {/* FIX: Pass icon as child to Icon component */}
                 <Icon>{ICONS.SETTINGS}</Icon>
                 <p>{t('campaignSettings_desc')}</p>
             </div>

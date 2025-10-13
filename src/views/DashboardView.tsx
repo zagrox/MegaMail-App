@@ -1,6 +1,3 @@
-
-
-
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -121,8 +118,8 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                         <div className="dashboard-actions">
                             <button className="credits-card-cta" onClick={() => setView('Buy Credits')}>
                                 <div className="credits-card-cta__icon">
-                                    {/* FIX: Explicitly pass children to Icon component */}
-                                    <Icon children={ICONS.BUY_CREDITS} />
+                                    {/* FIX: Changed to use JSX children for Icon component */}
+                                    <Icon>{ICONS.BUY_CREDITS}</Icon>
                                 </div>
                                 <div className="credits-card-cta__text">
                                     
@@ -131,21 +128,21 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                                     </span>
                                 </div>
                                 <div className="credits-card-cta__arrow">
-                                     {/* FIX: Explicitly pass children to Icon component */}
-                                     <Icon children={ICONS.CHEVRON_RIGHT} />
+                                     {/* FIX: Changed to use JSX children for Icon component */}
+                                     <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                                 </div>
                             </button>
                             <Button className="btn-secondary btn-notifications" onClick={handleNotificationsClick} title={t('notifications', { ns: 'common' })}>
-                                {/* FIX: Explicitly pass children to Icon component */}
-                                <Icon children={ICONS.BELL} />
+                                {/* FIX: Changed to use JSX children for Icon component */}
+                                <Icon>{ICONS.BELL}</Icon>
                                 {unreadCount > 0 && <span className="notification-dot"></span>}
                             </Button>
                         </div>
                     </div>
                     <div className="cta-banner">
                         <div className="cta-banner-icon">
-                            {/* FIX: Explicitly pass children to Icon component */}
-                            <Icon children={ICONS.AT_SIGN} />
+                            {/* FIX: Changed to use JSX children for Icon component */}
+                            <Icon>{ICONS.AT_SIGN}</Icon>
                         </div>
                         <div className="cta-banner-text">
                             <h3 className="cta-banner-title">{t('startEmailMarketingTitle')}</h3>
@@ -153,8 +150,8 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                         </div>
                         <div className="cta-banner-action">
                             <Button className="btn-primary" onClick={() => setView('Marketing')}>
-                                {/* FIX: Explicitly pass children to Icon component */}
-                                <Icon children={ICONS.SEND_EMAIL} /> {t('createCampaign', { ns: 'common' })}
+                                {/* FIX: Changed to use JSX children for Icon component */}
+                                <Icon>{ICONS.SEND_EMAIL}</Icon> {t('createCampaign', { ns: 'common' })}
                             </Button>
                         </div>
                     </div>
@@ -163,24 +160,24 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
 
             <div className="dashboard-stats-grid">
                 <div className="card narrow-stat-card">
-                    {/* FIX: Explicitly pass children to Icon component */}
-                    <Icon className="narrow-stat-card-icon" children={ICONS.AWARD} />
+                    {/* FIX: Changed to use JSX children for Icon component */}
+                    <Icon className="narrow-stat-card-icon">{ICONS.AWARD}</Icon>
                     <span className="narrow-stat-card-title">{t('sendingReputation')}</span>
                     <span className="narrow-stat-card-value">
                         {accountLoading ? <LineLoader /> : (accountData?.reputation ? `${accountData.reputation}%` : 'N/A')}
                     </span>
                 </div>
                 <div className="card narrow-stat-card">
-                    {/* FIX: Explicitly pass children to Icon component */}
-                    <Icon className="narrow-stat-card-icon" children={ICONS.MAIL} />
+                    {/* FIX: Changed to use JSX children for Icon component */}
+                    <Icon className="narrow-stat-card-icon">{ICONS.MAIL}</Icon>
                     <span className="narrow-stat-card-title">{t('emailsSent365d')}</span>
                     <span className="narrow-stat-card-value">
                         {statsLoading ? <LineLoader /> : (statsData?.EmailTotal?.toLocaleString(i18n.language) ?? '0')}
                     </span>
                 </div>
                  <div className="card narrow-stat-card">
-                    {/* FIX: Explicitly pass children to Icon component */}
-                    <Icon className="narrow-stat-card-icon" children={ICONS.CONTACTS} />
+                    {/* FIX: Changed to use JSX children for Icon component */}
+                    <Icon className="narrow-stat-card-icon">{ICONS.CONTACTS}</Icon>
                     <span className="narrow-stat-card-title">{t('totalContacts')}</span>
                     <span className="narrow-stat-card-value">
                         {contactsCountLoading ? <LineLoader /> : (contactsCountData?.toLocaleString(i18n.language) ?? '0')}
@@ -239,12 +236,12 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                                         >
                                             {isLocked && (
                                                 <div className="lock-icon-overlay" style={isPromotional ? { color: 'var(--success-color)' } : {}}>
-                                                    {/* FIX: Explicitly pass children to Icon component */}
-                                                    <Icon children={isPromotional ? ICONS.GIFT : ICONS.LOCK} />
+                                                    {/* FIX: Changed to use JSX children for Icon component */}
+                                                    <Icon>{isPromotional ? ICONS.GIFT : ICONS.LOCK}</Icon>
                                                 </div>
                                             )}
-                                            {/* FIX: Explicitly pass children to Icon component */}
-                                            <Icon className="nav-card-icon" children={item.icon} />
+                                            {/* FIX: Changed to use JSX children for Icon component */}
+                                            <Icon className="nav-card-icon">{item.icon}</Icon>
                                             <div className="nav-card-text-content">
                                                 <div className="nav-card-title">{item.name}</div>
                                                 <div className="nav-card-description">{item.desc}</div>

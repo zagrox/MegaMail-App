@@ -30,7 +30,7 @@ const AddSocialNetworkModal: React.FC<AddSocialNetworkModalProps> = ({ isOpen, o
                         onClick={() => onSelect(network)}
                     >
                         {/* FIX: Changed path prop to children for Icon component */}
-                        <Icon style={{ color: SOCIAL_ICONS[network].brandColor, width: '32px', height: '32px' }}>{SOCIAL_ICONS[network].path}</Icon>
+                        <Icon style={{ color: SOCIAL_ICONS[network].brandColor, width: '32px', height: '32px' }} children={SOCIAL_ICONS[network].path} />
                         <span>{t(network, { ns: 'emailBuilder', defaultValue: network })}</span>
                     </button>
                 ))}

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
@@ -62,8 +61,8 @@ const ThemeSwitcher = () => {
                     onClick={() => handleThemeChange(option.value)}
                     aria-label={t('switchToTheme', { theme: option.label })}
                 >
-                    {/* FIX: Changed path prop to children for Icon component */}
-                    <Icon children={option.icon} />
+                    {/* FIX: Changed to use JSX children for Icon component */}
+                    <Icon>{option.icon}</Icon>
                     <span>{option.label}</span>
                 </button>
             ))}

@@ -1,3 +1,5 @@
+
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -26,7 +28,7 @@ const LabeledControl = ({ label, children, fullWidth = false }: { label: string,
 
 const ColorInput = ({ value, onChange, onAdd, onRemove }: { value?: string; onChange: (hex: string) => void; onAdd: () => void; onRemove: () => void; }) => {
     if (!value || value === 'transparent') {
-        {/* FIX: Changed path prop to children for Icon component */}
+        {/* FIX: Changed to use JSX children for Icon component */}
         return <button onClick={onAdd} className="btn-icon color-input-add-btn"><Icon>{ICONS.PLUS}</Icon></button>;
     }
     
@@ -42,7 +44,7 @@ const ColorInput = ({ value, onChange, onAdd, onRemove }: { value?: string; onCh
                 onChange={(e) => onChange(e.target.value)}
                 onFocus={(e) => e.target.select()}
             />
-             {/* FIX: Changed path prop to children for Icon component */}
+             {/* FIX: Changed to use JSX children for Icon component */}
              <button onClick={onRemove} className="btn-icon"><Icon>{ICONS.DELETE}</Icon></button>
         </div>
     );
@@ -77,7 +79,7 @@ const SegmentedControl = ({ options, value, onChange, isIconOnly = false }: { op
                 onClick={() => onChange(opt.value)}
                 title={opt.label}
             >
-                {/* FIX: Changed path prop to children for Icon component */}
+                {/* FIX: Changed to use JSX children for Icon component */}
                 {opt.icon && <Icon>{opt.icon}</Icon>}
                 {!isIconOnly && opt.label && <span>{opt.label}</span>}
             </button>
@@ -108,16 +110,16 @@ function SortableItem({ item, onUrlChange, onRemove }: { item: any, onUrlChange:
     return (
         <div ref={setNodeRef} style={style} className="social-item-row">
             <div className="drag-handle" {...attributes} {...listeners}>
-                {/* FIX: Changed path prop to children for Icon component */}
+                {/* FIX: Changed to use JSX children for Icon component */}
                 <Icon>{ICONS.DRAG_HANDLE}</Icon>
             </div>
-            {/* FIX: Changed path prop to children for Icon component */}
+            {/* FIX: Changed to use JSX children for Icon component */}
             {networkInfo && <Icon style={{ color: networkInfo.brandColor, flexShrink: 0 }}>{networkInfo.path}</Icon>}
             <div className="form-group" style={{flexGrow: 1}}>
                  <label style={{fontSize: '0.8rem', marginBottom: '2px'}}>{t(item.network, {ns: 'emailBuilder', defaultValue: item.network})}</label>
                  <input type="url" value={item.url} onChange={(e) => onUrlChange(item.id, e.target.value)} placeholder={`https://...`} />
             </div>
-            {/* FIX: Changed path prop to children for Icon component */}
+            {/* FIX: Changed to use JSX children for Icon component */}
             <button className="btn-icon btn-icon-danger" onClick={() => onRemove(item.id)}><Icon>{ICONS.DELETE}</Icon></button>
         </div>
     );
@@ -197,52 +199,4 @@ const SocialSettings = ({ block, onStyleChange, onContentChange }: { block: any,
                         onChange={(val) => handleStyleChange('iconStyle', val)}
                         options={[
                             { value: 'default', label: 'Default' },
-                            { value: 'square', label: 'Square' },
-                            { value: 'rounded', label: 'Rounded' },
-                            { value: 'circle', label: 'Circle' },
-                        ]}
-                    />
-                </LabeledControl>
-                 <LabeledControl label={t('iconColor')}>
-                     <SegmentedControl
-                        value={s.iconColor || 'gray'}
-                        onChange={(val) => handleStyleChange('iconColor', val)}
-                        options={[
-                            { value: 'dark', label: 'Dark' },
-                            { value: 'white', label: 'White' },
-                            { value: 'gray', label: 'Gray' },
-                            { value: 'color', label: 'Color' },
-                        ]}
-                    />
-                </LabeledControl>
-                <SliderControl label={t('iconSize')} value={s.iconSize || 30} onChange={val => handleStyleChange('iconSize', val)} min={20} max={60} />
-                <SliderControl label={t('iconSpacing')} value={s.iconSpacing || 15} onChange={val => handleStyleChange('iconSpacing', val)} min={0} max={40} />
-                <LabeledControl label={t('align')}>
-                    <SegmentedControl
-                        value={s.alignment || 'center'}
-                        onChange={(val) => handleStyleChange('alignment', val)}
-                        isIconOnly
-                        options={[
-                            { value: 'left', label: t('alignLeft'), icon: ICONS.ALIGN_LEFT },
-                            { value: 'center', label: t('alignCenter'), icon: ICONS.ALIGN_CENTER },
-                            { value: 'right', label: t('alignRight'), icon: ICONS.ALIGN_RIGHT },
-                        ]}
-                    />
-                </LabeledControl>
-            </Section>
-
-            <Section title={t('colors')}>
-                 <LabeledControl label={t('backgroundColor')}>
-                    <ColorInput 
-                        value={s.backgroundColor} 
-                        onChange={(val) => handleStyleChange('backgroundColor', val)} 
-                        onAdd={() => handleStyleChange('backgroundColor', '#FFFFFF')} 
-                        onRemove={() => handleStyleChange('backgroundColor', 'transparent')} 
-                    />
-                </LabeledControl>
-            </Section>
-        </>
-    );
-};
-
-export default SocialSettings;
+                            { value: 'square

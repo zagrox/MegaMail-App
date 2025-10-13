@@ -208,35 +208,30 @@ const StatsPieChart = ({ stats }: { stats: any }) => {
         const y1 = 50 + 40 * Math.sin(Math.PI * startAngle / 180);
         const x2 = 50 + 40 * Math.cos(Math.PI * endAngle / 180);
         const y2 = 50 + 40 * Math.sin(Math.PI * endAngle / 180);
-
-        const pathData = `M 50,50 L ${x1},${y1} A 40,40 0 ${largeArcFlag},1 ${x2},${y2} Z`;
+        
+        const path = `M 50,50 L ${x1},${y1} A 40,40 0 ${largeArcFlag},1 ${x2},${y2} Z`;
         startAngle = endAngle;
-
-        return { path: pathData, color: d.color, label: d.label, value: d.value, percentage: (d.value / total) * 100 };
+        
+        return { ...d, path };
     });
 
     return (
         <div className="card">
-            <div className="card-header"><h3>{t('interactionBreakdown', { ns: 'campaigns' })}</h3></div>
-            <div style={{ display: 'flex', alignItems: 'center', padding: '1.5rem', gap: '2rem', flexWrap: 'wrap' }}>
-                <svg viewBox="0 0 100 100" width="200" height="200" style={{flexShrink: 0}}>
+             <div className="card-header">
+                <h3>{t('engagementBreakdown', { ns: 'campaigns' })}</h3>
+            </div>
+            <div className="stats-pie-chart-container">
+                <svg viewBox="0 0 100 100" className="stats-pie-chart">
                     {slices.map(slice => (
-                        <path key={slice.label} d={slice.path} fill={slice.color}>
-                            <title>{`${slice.label}: ${slice.value.toLocaleString()}`}</title>
-                        </path>
+                        <path key={slice.label} d={slice.path} fill={slice.color} />
                     ))}
                 </svg>
-                <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {slices.map(slice => (
-                        <div key={slice.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.9rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <span style={{ width: '12px', height: '12px', backgroundColor: slice.color, borderRadius: '3px' }}></span>
-                                <span>{slice.label}</span>
-                            </div>
-                            <div style={{textAlign: 'right'}}>
-                                <span style={{ fontWeight: 600 }}>{slice.value.toLocaleString(i18n.language)}</span>
-                                <span style={{ color: 'var(--subtle-text-color)', marginLeft: '0.5rem' }}>({slice.percentage.toFixed(1)}%)</span>
-                            </div>
+                <div className="chart-legend">
+                    {filteredData.map(d => (
+                        <div key={d.label} className="legend-item">
+                            <span className="color-swatch" style={{ backgroundColor: d.color }}></span>
+                            <span>{d.label}</span>
+                            <span className="legend-value">{d.value.toLocaleString(i18n.language)}</span>
                         </div>
                     ))}
                 </div>
@@ -245,129 +240,99 @@ const StatsPieChart = ({ stats }: { stats: any }) => {
     );
 };
 
-
-const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string; campaign: any | null; onBack: () => void; }) => {
-    const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common', 'mediaManager']);
+const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string, campaign: any | null, onBack: () => void }) => {
+    const { t, i18n } = useTranslation(['campaigns', 'common', 'statistics']);
     const { getStatusStyle } = useStatusStyles();
-    const [activeTab, setActiveTab] = useState('report');
-
-    const campaignName = campaign?.Name;
-    const isDraft = campaign?.Status === 'Draft';
-
+    
+    // Fetch aggregate stats for the entire campaign
     const { data: stats, loading: statsLoading, error: statsError } = useApiV4(
-        !isDraft && campaignName ? `/statistics/campaigns/${encodeURIComponent(campaignName)}` : '',
+        campaign ? `/statistics/campaigns/${encodeURIComponent(campaign.Name)}` : '',
         apiKey
     );
-
+    
+    // Fetch full campaign details (which includes content, options, etc.)
     const { data: campaignDetails, loading: detailsLoading, error: detailsError } = useApiV4(
-        campaignName ? `/campaigns/${encodeURIComponent(campaignName)}` : '',
+        campaign ? `/campaigns/${encodeURIComponent(campaign.Name)}` : '',
         apiKey
     );
     
-    const { data: accountData, loading: balanceLoading } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
+    // Fetch account data, primarily for checking credit balance
+    const { data: accountData, loading: accountLoading, error: accountError } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
 
-    const allLoading = statsLoading || detailsLoading || balanceLoading;
-    const anyError = statsError || detailsError;
-
-    const kpiData = useMemo(() => {
-        if (!stats) return { openRate: '0.00', clickRate: '0.00', recipients: 0, unsubscribed: 0 };
-        const delivered = stats.Delivered || 0;
-        const opened = stats.Opened || 0;
-        const clicked = stats.Clicked || 0;
-        const openRate = delivered > 0 ? (opened / delivered) * 100 : 0;
-        const clickRate = delivered > 0 ? (clicked / delivered) * 100 : 0;
-        return {
-            openRate: openRate.toFixed(2),
-            clickRate: clickRate.toFixed(2),
-            recipients: stats.Recipients || 0,
-            unsubscribed: stats.Unsubscribed || 0,
-        };
-    }, [stats]);
-    
-    const content = campaignDetails?.Content?.[0];
-    const emailBody = content?.Body?.[0]?.Content;
+    const [activeTab, setActiveTab] = useState('overview');
 
     if (!campaign) {
-        return <CenteredMessage>{t('error')}: No campaign selected.</CenteredMessage>;
+        return (
+            <CenteredMessage>
+                <div className="info-message warning">{t('noCampaignSelected')}</div>
+            </CenteredMessage>
+        );
     }
+    
+    const loading = statsLoading || detailsLoading || accountLoading;
+    const error = statsError || detailsError || accountError;
 
     const statusStyle = getStatusStyle(campaign.Status);
 
-    const ReportTabContent = () => (
-        <div className="campaign-report-container">
-            <div className="campaign-detail-kpi-grid" style={{marginTop: '2rem'}}>
-                <AccountDataCard title={t('openRate')} iconPath={ICONS.EYE}>{kpiData.openRate}%</AccountDataCard>
-                <AccountDataCard title={t('clickRate')} iconPath={ICONS.CLICK}>{kpiData.clickRate}%</AccountDataCard>
-                <AccountDataCard title={t('recipients')} iconPath={ICONS.CONTACTS}>{kpiData.recipients.toLocaleString(i18n.language)}</AccountDataCard>
-                <AccountDataCard title={t('unsubscribed')} iconPath={ICONS.LOGOUT}>{kpiData.unsubscribed.toLocaleString(i18n.language)}</AccountDataCard>
+    const OverviewTab = () => (
+        <div className="campaign-overview-tab">
+            <div className="card-grid account-grid">
+                <AccountDataCard title={t('recipients', { ns: 'common' })} iconPath={ICONS.CONTACTS}>{loading ? '...' : stats?.Recipients?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
+                <AccountDataCard title={t('delivered', { ns: 'common' })} iconPath={ICONS.VERIFY}>{loading ? '...' : stats?.Delivered?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
+                <AccountDataCard title={t('opened', { ns: 'common' })} iconPath={ICONS.EYE}>{loading ? '...' : stats?.Opened?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
+                <AccountDataCard title={t('clicked', { ns: 'common' })} iconPath={ICONS.CLICK}>{loading ? '...' : stats?.Clicked?.toLocaleString(i18n.language) ?? '0'}</AccountDataCard>
             </div>
-            <OverallActivityChart stats={stats} loading={statsLoading} error={statsError} />
-             <StatsPieChart stats={stats} />
+             <div className="overall-snapshot-grid">
+                {stats && <StatsPieChart stats={stats} />}
+                <div className="card">
+                     <div className="channel-selector-header">
+                        <h4>{t('activityOverview', { ns: 'statistics' })}</h4>
+                    </div>
+                    <OverallActivityChart stats={stats} loading={loading} error={error} />
+                </div>
+             </div>
+        </div>
+    );
+    
+    const DetailsTab = () => (
+        <div className="campaign-details-tab-grid">
+            {loading ? <Loader /> : (
+                <>
+                    <div className="card"><CampaignSummary campaignDetails={campaignDetails} stats={stats} campaign={campaign} accountData={accountData} /></div>
+                    <DetailedStatsTable stats={stats} />
+                </>
+            )}
         </div>
     );
 
     const tabs = [
-        {
-            id: 'report',
-            label: t('report'),
-            icon: ICONS.STATISTICS,
-            component: (
-                isDraft ? <CenteredMessage>{t('noStatsForCampaign')}</CenteredMessage> : <ReportTabContent />
-            )
-        },
-        {
-            id: 'performance',
-            label: t('performance'),
-            icon: ICONS.TRENDING_UP,
-            component: (
-                isDraft ? <CenteredMessage>{t('noStatsForCampaign')}</CenteredMessage> : (stats && !statsLoading && <DetailedStatsTable stats={stats} />)
-            )
-        },
-        {
-            id: 'content',
-            label: t('content', { ns: 'sendEmail' }),
-            icon: ICONS.FILE_TEXT,
-            component: (
-                 <CampaignSummary campaignDetails={campaignDetails} stats={stats} campaign={campaign} accountData={accountData} />
-            )
-        },
-        {
-            id: 'template',
-            label: t('template', { ns: 'sendEmail' }),
-            icon: ICONS.ARCHIVE,
-            component: (
-                emailBody ? (
-                    <iframe
-                        srcDoc={emailBody}
-                        title={t('preview', { ns: 'mediaManager' })}
-                        className="campaign-detail-content-preview"
-                    />
-                ) : (
-                   detailsLoading ? <Loader /> : <CenteredMessage>{t('couldNotLoadPreview', { ns: 'mediaManager' })}</CenteredMessage>
-                )
-            )
-        }
+        { id: 'overview', label: t('overview', { ns: 'campaigns' }), icon: ICONS.DASHBOARD, component: <OverviewTab /> },
+        { id: 'details', label: t('details', { ns: 'campaigns' }), icon: ICONS.FILE_TEXT, component: <DetailsTab /> },
     ];
 
     return (
         <div>
-            <div className="campaign-detail-header">
-                <button className="btn btn-secondary" onClick={onBack}>
+            <div className="view-header">
+                <button className="btn btn-secondary" onClick={onBack} style={{ whiteSpace: 'nowrap' }}>
                     <Icon>{ICONS.CHEVRON_LEFT}</Icon>
-                    <span>{t('campaigns')}</span>
+                    <span>{t('backToCampaigns')}</span>
                 </button>
-                <h2>{campaign.Name}</h2>
+                 <h2 style={{margin: 0, borderBottom: 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {campaign.Name}
+                </h2>
                 <Badge text={statusStyle.text} type={statusStyle.type} iconPath={statusStyle.iconPath} />
             </div>
 
-            {allLoading && <CenteredMessage><Loader /></CenteredMessage>}
-            {anyError && <ErrorMessage error={anyError} />}
-
-            {!allLoading && !anyError && (
-                <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-            )}
+            {error && <ErrorMessage error={error} />}
+            
+            <Tabs
+                tabs={tabs}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+            />
         </div>
     );
 };
 
+// FIX: Add default export to resolve module not found error.
 export default CampaignDetailView;

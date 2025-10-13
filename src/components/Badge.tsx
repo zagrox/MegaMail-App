@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Icon from './Icon';
 
@@ -26,14 +25,14 @@ const Badge = ({ text, type = 'default', color, iconPath }: BadgeProps) => {
     const style: React.CSSProperties = {};
     
     if (color) {
-        style.backgroundColor = hexToRgba(color, 0.1);
+        style.backgroundColor = hexToRgba(color, 0.15);
         style.color = color;
     }
 
     return (
         <span className={`badge badge-${type}`} style={style}>
-            {/* FIX: Changed path prop to children for Icon component */}
-            {iconPath && <Icon className="icon" style={{ width: '1em', height: '1em', marginRight: '0.4em', verticalAlign: 'text-bottom' }} children={iconPath} />}
+            {/* FIX: Changed to use JSX children for Icon component */}
+            {iconPath && <Icon className="icon" style={{ width: '1em', height: '1em', marginRight: '0.4em', verticalAlign: 'text-bottom' }}>{iconPath}</Icon>}
             {text}
         </span>
     );

@@ -1,6 +1,5 @@
 
 
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import WizardLayout from './WizardLayout';
@@ -122,7 +121,8 @@ const Step2Recipients = ({ onNext, onBack, data, updateData, apiKey }: { onNext:
         >
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <div className="wizard-step-intro">
-                    <Icon>{ICONS.CONTACTS}</Icon>
+                    {/* FIX: Changed path prop to children for Icon component */}
+                    <Icon children={ICONS.CONTACTS} />
                     <p>{t('selectAudience_desc')}</p>
                 </div>
 

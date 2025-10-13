@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import sdk from '../api/directus';
 import { Configuration } from '../api/types';

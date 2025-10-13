@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../components/Icon';
@@ -33,6 +31,7 @@ const ApiKeyView = ({ apiKey: initialApiKey }: { apiKey: string, user: any }) =>
                         onClick={() => setIsKeyVisible(!isKeyVisible)}
                         action={AppActions.REVEAL_API_KEY}
                     >
+                        {/* FIX: Changed path prop to children for Icon component */}
                         <Icon>{isKeyVisible ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
                         <span>{isKeyVisible ? t('hideKey') : t('revealKey')}</span>
                     </Button>
@@ -50,6 +49,7 @@ const ApiKeyView = ({ apiKey: initialApiKey }: { apiKey: string, user: any }) =>
                 </div>
                 <div className="form-actions" style={{ backgroundColor: 'var(--subtle-background)' }}>
                      <a href="https://megamail.readme.io/reference/" target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                        {/* FIX: Changed path prop to children for Icon component */}
                         <Icon>{ICONS.FILE_TEXT}</Icon>
                         <span>{t('apiDocs')}</span>
                     </a>

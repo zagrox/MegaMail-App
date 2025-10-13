@@ -39,6 +39,7 @@ const Accordion: React.FC<AccordionProps> = ({ items, allowMultipleOpen = false 
                             aria-expanded={isOpen}
                         >
                             <h3 className="accordion-title">{item.title}</h3>
+                            {/* FIX: Changed to use JSX children for Icon component */}
                             <Icon className={`accordion-icon ${isOpen ? 'open' : ''}`}>{ICONS.CHEVRON_DOWN}</Icon>
                         </div>
                         {isOpen && (

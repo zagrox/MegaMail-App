@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readItems, updateItem } from '@directus/sdk';
@@ -204,8 +203,8 @@ const NotificationsTab = () => {
                     onClick={handleMarkAllAsRead}
                     disabled={unreadCount === 0}
                 >
-                    {/* FIX: Changed path prop to children for Icon component */}
-                    <Icon children={ICONS.CHECK} />
+                    {/* FIX: Changed to use JSX children for Icon component */}
+                    <Icon>{ICONS.CHECK}</Icon>
                     <span>{t('markAllAsRead')}</span>
                 </button>
             </div>
@@ -229,8 +228,8 @@ const NotificationsTab = () => {
                                 onKeyPress={(e) => (e.key === 'Enter' || e.key === ' ') && handleClickNotification(n)}
                             >
                                 <div className="notification-icon-wrapper">
-                                    {/* FIX: Changed path prop to children for Icon component */}
-                                    <Icon children={getIconPath(n.icon)} />
+                                    {/* FIX: Changed to use JSX children for Icon component */}
+                                    <Icon>{getIconPath(n.icon)}</Icon>
                                 </div>
                                 <div className="notification-content">
                                     <p className="notification-message">{n.message}</p>

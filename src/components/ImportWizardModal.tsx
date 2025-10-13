@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiUploadV4 } from '../api/elasticEmail';
@@ -94,7 +93,14 @@ const ImportWizardModal = ({ isOpen, onClose, apiKey, onSuccess, onError, initia
 
         const reader = new FileReader();
         reader.onload = (e) => {
-            const text = e.target?.result as string;
+            // FIX: Check if the result is a string before proceeding.
+            const result = e.target?.result;
+            if (typeof result !== 'string') {
+                onError("Could not read file content as text.");
+                setIsProcessing(false);
+                return;
+            }
+            const text = result;
             const lines = text.split(/\r\n|\n/).filter(line => line.trim() !== '');
             if (lines.length < 1) {
                 onError("CSV file is empty or invalid.");
@@ -159,7 +165,13 @@ const ImportWizardModal = ({ isOpen, onClose, apiKey, onSuccess, onError, initia
     const isStep2ImportDisabled = !Object.values(mappings).some(f => f === 'Email') || isProcessing;
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={step === 1 ? t('importWizardStep1Title') : t('importWizardStep2Title')} size="large">
+        // FIX: Pass content as children to the Modal component.
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={step === 1 ? t('importWizardStep1Title') : t('importWizardStep2Title')}
+            size="large"
+        >
             {step === 1 && (
                 <form onSubmit={e => { e.preventDefault(); handleParseAndProceed(); }} className="modal-form">
                     <div className="form-group">

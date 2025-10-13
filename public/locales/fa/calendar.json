@@ -2,5 +2,8 @@
 {
     "today": "امروز",
     "nextMonth": "ماه بعد",
-    "prevMonth": "ماه قبل"
+    "prevMonth": "ماه قبل",
+    "noEventsThisMonth": "هیچ رویدادی برای این ماه برنامه‌ریزی نشده است.",
+    "gridView": "نمای شبکه‌ای",
+    "listView": "نمای لیستی"
 }

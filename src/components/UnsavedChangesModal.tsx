@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
@@ -28,30 +27,29 @@ const UnsavedChangesModal: React.FC<UnsavedChangesModalProps> = ({
     };
 
     return (
-        // FIX: Explicitly pass children to Modal component
+        // FIX: Pass content as children to the Modal component.
         <Modal
             isOpen={isOpen}
             onClose={onCancel}
             title={t('unsavedChangesTitle')}
-            children={
-                <div className="modal-form">
-                    <p style={{ marginBottom: '2rem' }}>{t('unsavedChangesMessage')}</p>
-                    <div className="form-actions" style={{ justifyContent: 'space-between' }}>
-                        <Button type="button" className="btn-danger" onClick={onLeave}>
-                            {t('leave')}
+        >
+            <div className="modal-form">
+                <p style={{ marginBottom: '2rem' }}>{t('unsavedChangesMessage')}</p>
+                <div className="form-actions" style={{ justifyContent: 'space-between' }}>
+                    <Button type="button" className="btn-danger" onClick={onLeave}>
+                        {t('leave')}
+                    </Button>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        <Button type="button" className="btn" onClick={onCancel} disabled={isSaving}>
+                            {t('cancel', { ns: 'common' })}
                         </Button>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <Button type="button" className="btn" onClick={onCancel} disabled={isSaving}>
-                                {t('cancel', { ns: 'common' })}
-                            </Button>
-                            <Button type="button" className="btn-primary" onClick={handleSave} disabled={isSaving}>
-                                {isSaving ? <Loader /> : t('saveAndClose')}
-                            </Button>
-                        </div>
+                        <Button type="button" className="btn-primary" onClick={handleSave} disabled={isSaving}>
+                            {isSaving ? <Loader /> : t('saveAndClose')}
+                        </Button>
                     </div>
                 </div>
-            }
-        />
+            </div>
+        </Modal>
     );
 };
 

@@ -22,6 +22,7 @@ const Step1SelectType = ({ onNext, onBack, data, updateData }: { onNext: () => v
             backButtonText={t('exitWizard')}
         >
             <div className="wizard-step-intro">
+                {/* FIX: Pass icon as child to Icon component */}
                 <Icon>{ICONS.HASH}</Icon>
                 <p>{t('selectCampaignType_desc')}</p>
             </div>

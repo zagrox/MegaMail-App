@@ -101,10 +101,12 @@ const OfflinePaymentView = ({ order, setView }: { order: any, setView: (view: st
                         </div>
                         <div className="form-actions" style={{ justifyContent: 'space-between', padding: '1.5rem 0 0', border: 'none' }}>
                             <button type="button" className="btn btn-secondary" onClick={handleBackToOrders} disabled={isSubmitting}>
+                                {/* FIX: Changed path prop to children for Icon component */}
                                 <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                                 <span>{t('backToOrders')}</span>
                             </button>
                             <button type="submit" className="btn btn-primary" disabled={isSubmitting || !details.trim()}>
+                                {/* FIX: Changed path prop to children for Icon component */}
                                 {isSubmitting ? <Loader /> : <Icon>{ICONS.CHECK}</Icon>}
                                 <span>{t('submitDetails')}</span>
                             </button>

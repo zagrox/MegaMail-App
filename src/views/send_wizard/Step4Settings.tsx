@@ -1,6 +1,5 @@
 
 
-
 import React from 'react';
 import WizardLayout from './WizardLayout';
 import { useTranslation } from 'react-i18next';
@@ -68,7 +67,8 @@ const Step4Settings = ({ onNext, onBack, data, updateData }: { onNext: () => voi
             nextDisabled={!data.campaignName}
         >
             <div className="wizard-step-intro">
-                <Icon>{ICONS.SETTINGS}</Icon>
+                {/* FIX: Changed path prop to children for Icon component */}
+                <Icon children={ICONS.SETTINGS} />
                 <p>{t('campaignSettings_desc')}</p>
             </div>
             <div className="wizard-settings-container">

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from '../useApi';
@@ -88,7 +87,7 @@ const FormsTab = ({ apiKey }: { apiKey: string }) => {
                         <code>{subscribeUrl}</code>
                         <Button className="btn-secondary" onClick={handleCopy}>
                             {/* FIX: Explicitly pass children to Icon component */}
-                            <Icon>{copied ? ICONS.CHECK : ICONS.MAIL}</Icon>
+                            <Icon children={copied ? ICONS.CHECK : ICONS.MAIL} />
                             <span>{copied ? t('copied') : t('copyLink')}</span>
                         </Button>
                     </div>

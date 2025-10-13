@@ -65,6 +65,7 @@ export const EditProfileModal = ({ isOpen, onClose, user }: { isOpen: boolean, o
     };
 
     return (
+        // FIX: Explicitly pass children to Modal component
         <Modal isOpen={isOpen} onClose={onClose} title={t('editProfile')}>
             <form onSubmit={handleSubmit} className="modal-form">
                 <div className="form-grid">

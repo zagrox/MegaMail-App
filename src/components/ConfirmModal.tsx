@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
@@ -56,40 +55,39 @@ const ConfirmModal = ({
             isOpen={isOpen}
             onClose={onClose}
             title={title}
-            children={
-                <div className="modal-form">
-                    <div style={{ marginBottom: '1.5rem', lineHeight: '1.6' }}>
-                        {children}
-                    </div>
-                    <div className="form-actions">
-                        <button
-                            type="button"
-                            className="btn"
-                            onClick={onClose}
-                            disabled={isConfirming}
-                        >
-                            {t('cancel')}
-                        </button>
-                        <button
-                            type="button"
-                            className={`btn ${isDestructive ? 'btn-danger' : 'btn-primary'}`}
-                            onClick={handleConfirm}
-                            disabled={isConfirming}
-                        >
-                            {isConfirming ? (
-                                <Loader />
-                            ) : (
-                                <>
-                                    {/* FIX: Changed path prop to children for Icon component */}
-                                    <Icon children={confirmIcon} />
-                                    <span>{confirmText || t('delete')}</span>
-                                </>
-                            )}
-                        </button>
-                    </div>
+        >
+            <div className="modal-form">
+                <div style={{ marginBottom: '1.5rem', lineHeight: '1.6' }}>
+                    {children}
                 </div>
-            }
-        />
+                <div className="form-actions">
+                    <button
+                        type="button"
+                        className="btn"
+                        onClick={onClose}
+                        disabled={isConfirming}
+                    >
+                        {t('cancel')}
+                    </button>
+                    <button
+                        type="button"
+                        className={`btn ${isDestructive ? 'btn-danger' : 'btn-primary'}`}
+                        onClick={handleConfirm}
+                        disabled={isConfirming}
+                    >
+                        {isConfirming ? (
+                            <Loader />
+                        ) : (
+                            <>
+                                {/* FIX: Changed path prop to children for Icon component */}
+                                <Icon>{confirmIcon}</Icon>
+                                <span>{confirmText || t('delete')}</span>
+                            </>
+                        )}
+                    </button>
+                </div>
+            </div>
+        </Modal>
     );
 };
 

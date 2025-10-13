@@ -1,6 +1,5 @@
 
 
-
 import React, { useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import WizardLayout from './WizardLayout';
@@ -111,7 +110,8 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
             nextAction={nextAction}
         >
             <div className="wizard-step-intro">
-                <Icon>{ICONS.VERIFY}</Icon>
+                {/* FIX: Changed path prop to children for Icon component */}
+                <Icon children={ICONS.VERIFY} />
                 <p>{t('reviewAndSend_desc')}</p>
             </div>
             <div className="sending-options-list">

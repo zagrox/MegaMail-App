@@ -37,10 +37,12 @@ const InvoiceView = ({ order, setView }: { order: any, setView: (view: string, d
         <div className="invoice-view-container">
             <div className="invoice-actions">
                 <button className="btn btn-secondary" onClick={handleBack}>
+                    {/* FIX: Changed path prop to children for Icon component */}
                     <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                     <span>{t('backToOrders', { ns: 'buyCredits' })}</span>
                 </button>
                 <button className="btn btn-primary" onClick={handlePrint}>
+                    {/* FIX: Changed path prop to children for Icon component */}
                     <Icon>{ICONS.DOWNLOAD}</Icon>
                     <span>{t('print')}</span>
                 </button>

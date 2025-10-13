@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -451,15 +452,15 @@ const App = () => {
             
                             return (
                                 <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
-                                    {/* FIX: Explicitly pass children to Icon component */}
-                                    <Icon children={navItem.icon} />
+                                    {/* FIX: Changed to use JSX children for Icon component */}
+                                    <Icon>{navItem.icon}</Icon>
                                     <span>{navItem.name}</span>
                                     {isLocked && (
-                                        // FIX: Explicitly pass children to Icon component
+                                        // FIX: Changed to use JSX children for Icon component
                                         <Icon
                                             className="lock-icon"
                                             style={isPromotional ? { color: 'var(--success-color)' } : {}}
-                                            children={isPromotional ? ICONS.GIFT : ICONS.STAR} />
+                                        >{isPromotional ? ICONS.GIFT : ICONS.STAR}</Icon>
                                     )}
                                 </button>
                             );
@@ -470,23 +471,23 @@ const App = () => {
         </nav>
         <div className="sidebar-footer-nav">
              <button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
-                 {/* FIX: Explicitly pass children to Icon component */}
-                 <Icon children={ICONS.HELP_CIRCLE} />
+                 {/* FIX: Changed to use JSX children for Icon component */}
+                 <Icon>{ICONS.HELP_CIRCLE}</Icon>
                  <span>{t('guides')}</span>
              </button>
              <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
-                 {/* FIX: Explicitly pass children to Icon component */}
-                 <Icon children={ICONS.SETTINGS} />
+                 {/* FIX: Changed to use JSX children for Icon component */}
+                 <Icon>{ICONS.SETTINGS}</Icon>
                  <span>{t('settings', { ns: 'account' })}</span>
              </button>
              <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
-                {/* FIX: Explicitly pass children to Icon component */}
-                <Icon children={ICONS.BUY_CREDITS} />
+                {/* FIX: Changed to use JSX children for Icon component */}
+                <Icon>{ICONS.BUY_CREDITS}</Icon>
                 <span>{t('buyCredits')}</span>
              </button>
              <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
-                 {/* FIX: Explicitly pass children to Icon component */}
-                 <Icon children={ICONS.ACCOUNT} />
+                 {/* FIX: Changed to use JSX children for Icon component */}
+                 <Icon>{ICONS.ACCOUNT}</Icon>
                  <span>{t('account')}</span>
              </button>
         </div>
@@ -518,13 +519,13 @@ const App = () => {
             <div className="main-wrapper">
                 <header className="mobile-header">
                      <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)} aria-label={t('openMenu')}>
-                        {/* FIX: Explicitly pass children to Icon component */}
-                        <Icon children={ICONS.MENU} />
+                        {/* FIX: Changed to use JSX children for Icon component */}
+                        <Icon>{ICONS.MENU}</Icon>
                     </button>
                     <h1 className="mobile-header-title">{currentView?.title || appName}</h1>
                     <button className="mobile-menu-toggle" onClick={() => handleSetView('Account')} aria-label={t('account')}>
-                        {/* FIX: Explicitly pass children to Icon component */}
-                        <Icon children={ICONS.ACCOUNT} />
+                        {/* FIX: Changed to use JSX children for Icon component */}
+                        <Icon>{ICONS.ACCOUNT}</Icon>
                     </button>
                 </header>
                 <main className={`content ${view === 'Email Builder' || view === 'Marketing' ? 'content--no-padding' : ''}`}>

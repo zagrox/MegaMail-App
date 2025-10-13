@@ -93,8 +93,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
                 <div className="account-tab-card-body">
                     <p>{t('logoutDescription')}</p>
                     <button className="btn btn-secondary" onClick={handleLogout} style={{maxWidth: '250px'}}>
-                        <Icon>{ICONS.LOGOUT}</Icon>
-                        <span>{t('logout')}</span>
+                        <Icon>{ICONS.LOGOUT}</Icon> {t('logout')}
                     </button>
                 </div>
             </div>

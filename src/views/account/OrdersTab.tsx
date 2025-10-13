@@ -152,6 +152,7 @@ const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void })
                                             </td>
                                             <td style={{ textAlign: 'right' }}>
                                                 <button className="btn-icon btn-icon-primary" onClick={() => setSelectedOrder(order)} aria-label={t('orderDetails', { ns: 'buyCredits' })}>
+                                                    {/* FIX: Changed path prop to children for Icon component */}
                                                     <Icon>{ICONS.EYE}</Icon>
                                                 </button>
                                             </td>

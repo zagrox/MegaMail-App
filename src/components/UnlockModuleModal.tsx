@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -52,62 +51,61 @@ const UnlockModuleModal: React.FC<UnlockModuleModalProps> = ({ module, onClose, 
             isOpen={!!module}
             onClose={onClose}
             title={`${t('unlock')} ${module.modulename}`}
-            children={
-                <div style={{ textAlign: 'center', padding: '1rem' }}>
-                    <h2 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>{module.modulename}</h2>
-                    <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 2rem' }}>
-                        {module.moduledetails}
-                    </p>
+        >
+            <div style={{ textAlign: 'center', padding: '1rem' }}>
+                <h2 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>{module.modulename}</h2>
+                <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 2rem' }}>
+                    {module.moduledetails}
+                </p>
 
-                    <div style={{
-                        backgroundColor: 'var(--subtle-background)',
-                        borderRadius: '8px',
-                        padding: '1.5rem',
-                        marginBottom: '2rem',
-                        border: '1px solid var(--border-color)'
-                    }}>
-                        <div style={{ marginBottom: '1rem' }}>
-                            <div style={{ fontSize: '0.9rem', color: 'var(--subtle-text-color)' }}>{t('unlockModalPriceLabel')}</div>
-                            <div style={{ fontSize: '2rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                               {isPromo && (
-                                    <span style={{ textDecoration: 'line-through', color: 'var(--subtle-text-color)', fontSize: '1.5rem', fontWeight: 'normal' }}>
-                                        {module.modulediscount?.toLocaleString(i18n.language)}
-                                    </span>
-                                )}
-                                <span>
-                                    {module.moduleprice.toLocaleString(i18n.language)} {t('credits', { ns: 'dashboard' })}
+                <div style={{
+                    backgroundColor: 'var(--subtle-background)',
+                    borderRadius: '8px',
+                    padding: '1.5rem',
+                    marginBottom: '2rem',
+                    border: '1px solid var(--border-color)'
+                }}>
+                    <div style={{ marginBottom: '1rem' }}>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--subtle-text-color)' }}>{t('unlockModalPriceLabel')}</div>
+                        <div style={{ fontSize: '2rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                           {isPromo && (
+                                <span style={{ textDecoration: 'line-through', color: 'var(--subtle-text-color)', fontSize: '1.5rem', fontWeight: 'normal' }}>
+                                    {module.modulediscount?.toLocaleString(i18n.language)}
                                 </span>
-                            </div>
-                        </div>
-                        <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '1rem 0' }} />
-                        <div>
-                            <div style={{ fontSize: '0.9rem', color: 'var(--subtle-text-color)' }}>{t('yourBalanceLabel')}</div>
-                            <div style={{ fontSize: '1.5rem', fontWeight: 500 }}>
-                                {balanceLoading ? <Loader /> : `${userBalance.toLocaleString(i18n.language)} ${t('credits', { ns: 'dashboard' })}`}
-                            </div>
+                            )}
+                            <span>
+                                {module.moduleprice.toLocaleString(i18n.language)} {t('credits', { ns: 'dashboard' })}
+                            </span>
                         </div>
                     </div>
-
-                    <div className="form-actions" style={{ justifyContent: 'center', gap: '1rem', paddingTop: 0 }}>
-                        <button className="btn" onClick={onClose} disabled={isPurchasing}>{t('cancel')}</button>
-                        {hasEnoughCredits ? (
-                            <button className="btn btn-primary" onClick={handlePurchase} disabled={isPurchasing || balanceLoading}>
-                                {isPurchasing ? <Loader /> : t('unlockForCredits', { amount: module.moduleprice.toLocaleString(i18n.language) })}
-                            </button>
-                        ) : (
-                            <button className="btn btn-primary" onClick={handleGoToBuyCredits} disabled={balanceLoading}>
-                                {t('buyCredits')}
-                            </button>
-                        )}
+                    <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '1rem 0' }} />
+                    <div>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--subtle-text-color)' }}>{t('yourBalanceLabel')}</div>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 500 }}>
+                            {balanceLoading ? <Loader /> : `${userBalance.toLocaleString(i18n.language)} ${t('credits', { ns: 'dashboard' })}`}
+                        </div>
                     </div>
-                     {!balanceLoading && !hasEnoughCredits &&
-                        <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--danger-color)'}}>
-                            {t('notEnoughCredits', { amount: (module.moduleprice - userBalance).toLocaleString(i18n.language)})}
-                        </p>
-                    }
                 </div>
-            }
-        />
+
+                <div className="form-actions" style={{ justifyContent: 'center', gap: '1rem', paddingTop: 0 }}>
+                    <button className="btn" onClick={onClose} disabled={isPurchasing}>{t('cancel')}</button>
+                    {hasEnoughCredits ? (
+                        <button className="btn btn-primary" onClick={handlePurchase} disabled={isPurchasing || balanceLoading}>
+                            {isPurchasing ? <Loader /> : t('unlockForCredits', { amount: module.moduleprice.toLocaleString(i18n.language) })}
+                        </button>
+                    ) : (
+                        <button className="btn btn-primary" onClick={handleGoToBuyCredits} disabled={balanceLoading}>
+                            {t('buyCredits')}
+                        </button>
+                    )}
+                </div>
+                 {!balanceLoading && !hasEnoughCredits &&
+                    <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--danger-color)'}}>
+                        {t('notEnoughCredits', { amount: (module.moduleprice - userBalance).toLocaleString(i18n.language)})}
+                    </p>
+                }
+            </div>
+        </Modal>
     );
 };
 

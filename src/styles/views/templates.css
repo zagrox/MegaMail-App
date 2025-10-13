@@ -36,6 +36,10 @@
     background-color: #fff; /* Ensure iframe has a background */
 }
 
+[dir="rtl"] .template-card-preview-wrapper iframe {
+    transform-origin: top right;
+}
+
 .template-card-content {
     padding: 1rem;
     flex-grow: 1;
