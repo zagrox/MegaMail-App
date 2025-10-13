@@ -102,7 +102,7 @@
     text-align: left;
     transition: background-color 0.2s, color 0.2s;
     position: relative;
-    width: 92%;
+    width: 100%;
 }
 .nav-btn:hover {
     background-color: var(--subtle-background);
@@ -182,7 +182,7 @@
 .mobile-header, .mobile-menu-overlay, .mobile-menu-toggle {
     display: none;
 }
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .sidebar {
         position: fixed;
         inset-inline-start: 0;
@@ -248,7 +248,7 @@
 }
 
 /* --- DESKTOP COLLAPSED SIDEBAR --- */
-@media (min-width: 769px) {
+@media (min-width: 768px) {
     .app-container.sidebar-collapsed .sidebar {
         width: 80px;
         padding: 0.4rem 0.5rem;
@@ -311,13 +311,13 @@
     }
 
     /* RTL Support for Toggle Button */
-    html[dir="rtl"] .sidebar-collapse-toggle {
+    [dir="rtl"] .sidebar-collapse-toggle {
         left: auto;
         right: 235px;
         transform: translateX(50%);
     }
 
-    html[dir="rtl"] .app-container.sidebar-collapsed .sidebar-collapse-toggle {
+    [dir="rtl"] .app-container.sidebar-collapsed .sidebar-collapse-toggle {
         right: 80px;
     }
 }
