@@ -1,18 +1,17 @@
 /* --- TABS --- */
 .tabs-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 .tabs-nav {
     display: flex;
     border-bottom: 1px solid var(--border-color);
     overflow-x: auto;
-    scrollbar-width: none; /* Firefox */
+    -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
 }
-.tabs-nav::-webkit-scrollbar {
-    display: none; /* Safari and Chrome */
-}
+/* Let browser handle scrollbar visibility for mobile-first experience */
+
 .tab-btn {
     padding: 0.75rem 1.25rem;
     cursor: pointer;

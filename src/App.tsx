@@ -93,7 +93,7 @@ const App = () => {
         if (user?.display && user.display !== theme) {
             setTheme(user.display);
         }
-    }, [user?.display, theme, setTheme]);
+    }, [user?.display, setTheme]);
 
     useEffect(() => {
         const handleForbidden = () => {
@@ -462,9 +462,15 @@ const App = () => {
                             const isLocked = !hasAccess && (authLoading || !allModules || isPurchasableModule);
                             const isPromotional = isLocked && moduleData?.modulepro === true;
                             
-                            const button = (
+                            return (
                                 <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
-                                    <Icon>{navItem.icon}</Icon>
+                                    {isSidebarCollapsed ? (
+                                        <Tooltip text={navItem.name}>
+                                            <Icon>{navItem.icon}</Icon>
+                                        </Tooltip>
+                                    ) : (
+                                        <Icon>{navItem.icon}</Icon>
+                                    )}
                                     <span>{navItem.name}</span>
                                     {isLocked && (
                                         <Icon
@@ -474,30 +480,28 @@ const App = () => {
                                     )}
                                 </button>
                             );
-
-                            return isSidebarCollapsed ? <Tooltip key={navItem.view} text={navItem.name}>{button}</Tooltip> : button;
                         })}
                     </div>
                 </React.Fragment>
             ))}
         </nav>
         <div className="sidebar-footer-nav">
-             <Tooltip text={t('guides')}><button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
-                 <Icon>{ICONS.HELP_CIRCLE}</Icon>
-                 <span>{t('guides')}</span>
-             </button></Tooltip>
-             <Tooltip text={t('settings', { ns: 'account' })}><button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
-                 <Icon>{ICONS.SETTINGS}</Icon>
+             <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
+                 {isSidebarCollapsed ? (<Tooltip text={t('settings', { ns: 'account' })}><Icon>{ICONS.SETTINGS}</Icon></Tooltip>) : (<Icon>{ICONS.SETTINGS}</Icon>)}
                  <span>{t('settings', { ns: 'account' })}</span>
-             </button></Tooltip>
-             <Tooltip text={t('buyCredits')}><button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
-                <Icon>{ICONS.BUY_CREDITS}</Icon>
-                <span>{t('buyCredits')}</span>
-             </button></Tooltip>
-             <Tooltip text={t('account')}><button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
-                 <Icon>{ICONS.ACCOUNT}</Icon>
+             </button>
+             <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
+                 {isSidebarCollapsed ? (<Tooltip text={t('account')}><Icon>{ICONS.ACCOUNT}</Icon></Tooltip>) : (<Icon>{ICONS.ACCOUNT}</Icon>)}
                  <span>{t('account')}</span>
-             </button></Tooltip>
+             </button>
+             <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
+                {isSidebarCollapsed ? (<Tooltip text={t('buyCredits')}><Icon>{ICONS.BUY_CREDITS}</Icon></Tooltip>) : (<Icon>{ICONS.BUY_CREDITS}</Icon>)}
+                <span>{t('buyCredits')}</span>
+             </button>
+             <button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
+                 {isSidebarCollapsed ? (<Tooltip text={t('guides')}><Icon>{ICONS.HELP_CIRCLE}</Icon></Tooltip>) : (<Icon>{ICONS.HELP_CIRCLE}</Icon>)}
+                 <span>{t('guides')}</span>
+             </button>
         </div>
       </>
     );
