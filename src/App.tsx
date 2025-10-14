@@ -41,6 +41,7 @@ import UnsavedChangesModal from './components/UnsavedChangesModal';
 import GuidesView from './views/GuidesView';
 import { useTheme } from './contexts/ThemeContext';
 import Tooltip from './components/Tooltip';
+import DomainVerificationView from './views/DomainVerificationView';
 
 
 const App = () => {
@@ -61,6 +62,7 @@ const App = () => {
     const [orderToResume, setOrderToResume] = useState<any | null>(null);
     const [orderForOfflinePayment, setOrderForOfflinePayment] = useState<any | null>(null);
     const [orderForInvoice, setOrderForInvoice] = useState<any | null>(null);
+    const [domainToVerify, setDomainToVerify] = useState<string | null>(null);
     const appContainerRef = useRef<HTMLDivElement>(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
         const storedValue = localStorage.getItem('sidebarCollapsed');
@@ -319,7 +321,7 @@ const App = () => {
         setView('Dashboard');
     };
 
-    const handleSetView = (newView: string, data?: { template?: Template; galleryTemplate?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any, campaign?: any, orderToResume?: any, order?: any }, options?: { ignoreDirty?: boolean }) => {
+    const handleSetView = (newView: string, data?: { template?: Template; galleryTemplate?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any, campaign?: any, orderToResume?: any, order?: any, domain?: string }, options?: { ignoreDirty?: boolean }) => {
         // This guard prevents accidental navigation away from unsaved work in the builder.
         if (!options?.ignoreDirty && view === 'Email Builder' && isBuilderDirty && newView !== 'Email Builder') {
             setLeaveConfirmationState({ isOpen: true, targetView: newView, targetData: data });
@@ -379,6 +381,12 @@ const App = () => {
             setOrderForInvoice(null);
         }
 
+        if (newView === 'DomainVerification' && data?.domain) {
+            setDomainToVerify(data.domain);
+        } else {
+            setDomainToVerify(null);
+        }
+
         setView(newView);
         setIsMobileMenuOpen(false);
     }
@@ -436,7 +444,9 @@ const App = () => {
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
         'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('marketingCampaign'), icon: ICONS.TARGET },
         'Calendar': { component: <CalendarView />, title: t('calendar'), icon: ICONS.CALENDAR },
-        'Settings': { component: <SettingsView apiKey={apiKey} user={user} />, title: t('settings', { ns: 'account' }), icon: ICONS.SETTINGS },
+        // FIX: Pass `handleSetView` to SettingsView so it can be passed to child components.
+        'Settings': { component: <SettingsView apiKey={apiKey} user={user} setView={handleSetView} />, title: t('settings', { ns: 'account' }), icon: ICONS.SETTINGS },
+        'DomainVerification': { component: <DomainVerificationView domainName={domainToVerify || ''} apiKey={apiKey} onBack={() => { sessionStorage.setItem('settings-tab', 'domains'); handleSetView('Settings'); }} />, title: t('domainVerification', { ns: 'domains' }), icon: ICONS.DOMAINS },
         'Guides': { component: <GuidesView />, title: t('guides'), icon: ICONS.HELP_CIRCLE },
     };
 
@@ -544,7 +554,7 @@ const App = () => {
     );
     
     const currentView = views[view];
-    const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail' && view !== 'Marketing' && view !== 'CampaignDetail' && view !== 'OfflinePayment' && view !== 'Invoice';
+    const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail' && view !== 'Marketing' && view !== 'CampaignDetail' && view !== 'OfflinePayment' && view !== 'Invoice' && view !== 'DomainVerification';
 
     return (
         <div ref={appContainerRef} className={`app-container ${isMobileMenuOpen ? 'mobile-menu-open' : ''} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>

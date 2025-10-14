@@ -1,5 +1,9 @@
 {
     "addDomain": "Add Domain",
+    "newDomainButton": "New Domain",
+    "howToAddDomainLink": "How to add a domain?",
+    "sendingDomains": "Sending Domains",
+    "sendingDomainsDesc": "Add and verify a sending domain to improve your email deliverability and sender reputation. A verified domain tells email providers that MegaMail has permission to send emails on your behalf.",
     "domainAddedSuccess": "Domain {{domain}} added successfully. Follow the instructions to verify it.",
     "domainAddedError": "Failed to add domain: {{error}}",
     "confirmDeleteDomain": "Are you sure you want to delete the domain {{domainName}}?",
@@ -23,5 +27,13 @@
     "notSet": "Not Set",
     "fromEmail": "From Email",
     "defaultSenderTitle": "Default Sender",
-    "defaultSenderDescription": "Default sender is an email address used in your emails as a 'From' address. We strongly recommend setting a default sender to help increase your deliverability performance."
+    "defaultSenderDescription": "Default sender is an email address used in your emails as a 'From' address. We strongly recommend setting a default sender to help increase your deliverability performance.",
+    "backToDomains": "Back to Domains",
+    "verifyDomainTitle": "Verify Domain: {{domainName}}",
+    "verifyAll": "Verify All",
+    "domainVerification": "Domain Verification",
+    "recordInstructionSPF": "Add this TXT record to your domain's DNS settings to specify that MegaMail is a permitted sender.",
+    "recordInstructionDKIM": "Add this TXT record to enable DKIM authentication, which helps prevent email spoofing.",
+    "recordInstructionTracking": "Add this CNAME record to enable click and open tracking with your own domain.",
+    "recordInstructionDMARC": "Add this TXT record to set up DMARC, which tells receiving servers what to do with unauthenticated emails."
 }

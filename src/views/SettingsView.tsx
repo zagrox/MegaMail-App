@@ -9,7 +9,8 @@ import ShareTab from './account/ShareTab';
 import { useAuth } from '../contexts/AuthContext';
 import FormsTab from './settings/FormsTab';
 
-const SettingsView = ({ apiKey, user }: { apiKey: string, user: any }) => {
+// FIX: Added `setView` to props to pass it down to child components like DomainsView.
+const SettingsView = ({ apiKey, user, setView }: { apiKey: string, user: any, setView: (view: string, data?: any) => void }) => {
     const { t } = useTranslation(['common', 'account', 'domains', 'smtp']);
     const { hasModuleAccess, allModules } = useAuth();
     const [activeTab, setActiveTab] = useState('domains');
@@ -20,7 +21,7 @@ const SettingsView = ({ apiKey, user }: { apiKey: string, user: any }) => {
                 id: 'domains', 
                 label: t('domains'), 
                 icon: ICONS.DOMAINS, 
-                component: <DomainsView apiKey={apiKey} /> 
+                component: <DomainsView apiKey={apiKey} setView={setView} /> 
             },
             { 
                 id: 'smtp', 
@@ -52,7 +53,8 @@ const SettingsView = ({ apiKey, user }: { apiKey: string, user: any }) => {
             });
         }
         return baseTabs;
-    }, [t, apiKey, user, hasModuleAccess, allModules]);
+    // FIX: Added `setView` to the dependency array.
+    }, [t, apiKey, user, hasModuleAccess, allModules, setView]);
 
     useEffect(() => {
         const initialTab = sessionStorage.getItem('settings-tab');

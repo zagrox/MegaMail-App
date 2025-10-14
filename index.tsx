@@ -45,6 +45,7 @@ import './src/styles/views/campaigns.css';
 import './src/styles/views/contacts.css';
 import './src/styles/views/dashboard.css';
 import './src/styles/views/domains.css';
+import './src/styles/views/domain-verification.css';
 import './src/styles/views/email-builder.css';
 import './src/styles/views/email-lists.css';
 import './src/styles/views/embed.css';

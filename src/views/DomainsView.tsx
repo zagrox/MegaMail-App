@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
 import { apiFetchV4 } from '../api/elasticEmail';
@@ -13,197 +13,49 @@ import { useStatusStyles } from '../hooks/useStatusStyles';
 import Modal from '../components/Modal';
 import Button from '../components/Button';
 import EmptyState from '../components/EmptyState';
+import SetDefaultSenderModal from './domains/SetDefaultSenderModal';
 
-const DNS_RECORDS_CONFIG = {
-    SPF: {
-        type: 'TXT',
-        name: (domain: string) => domain,
-        expectedValue: 'v=spf1 a mx include:mailzila.com ~all',
-        check: (data: string) => data.includes('v=spf1') && data.includes('include:mailzila.com'),
-        host: '@ or your domain',
-    },
-    DKIM: {
-        type: 'TXT',
-        name: (domain: string) => `api._domainkey.${domain}`,
-        expectedValue: 'k=rsa;t=s;p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCbmGbQMzYeMvxwtNQoXN0waGYaciuKx8mtMh5czguT4EZlJXuCt6V+l56mmt3t68FEX5JJ0q4ijG71BGoFRkl87uJi7LrQt1ZZmZCvrEII0YO4mp8sDLXC8g1aUAoi8TJgxq2MJqCaMyj5kAm3Fdy2tzftPCV/lbdiJqmBnWKjtwIDAQAB',
-        check: (data: string) => data.includes('k=rsa;') && data.includes('p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCbmGbQMzYeMvxwtNQoXN0waGYaciuKx8mtMh5czguT4EZlJXuCt6V+l56mmt3t68FEX5JJ0q4ijG71BGoFRkl87uJi7LrQt1ZZmZCvrEII0YO4mp8sDLXC8g1aUAoi8TJgxq2MJqCaMyj5kAm3Fdy2tzftPCV/lbdiJqmBnWKjtwIDAQAB'),
-        host: 'api._domainkey',
-    },
-    Tracking: {
-        type: 'CNAME',
-        name: (domain: string) => `tracking.${domain}`,
-        expectedValue: 'app.mailzila.com',
-        check: (data: string) => data.includes('app.mailzila.com'),
-        host: 'tracking',
-    },
-    DMARC: {
-        type: 'TXT',
-        name: (domain: string) => `_dmarc.${domain}`,
-        expectedValue: 'v=DMARC1;p=none;pct=10;aspf=r;adkim=r;',
-        check: (data: string) => data.includes('v=DMARC1'),
-        host: '_dmarc',
-    },
-};
+const GuideStep = ({ step, title, desc }: { step: number, title: string, desc: string }) => (
+    <div className="step-item">
+        <div className="step-number">{step}</div>
+        <div className="step-content">
+            <h4>{title}</h4>
+            <p dangerouslySetInnerHTML={{ __html: desc }} />
+        </div>
+    </div>
+);
 
-type VerificationStatus = 'idle' | 'checking' | 'verified' | 'failed';
-
-const SetDefaultSenderModal = ({ isOpen, onClose, domain, apiKey, onSuccess }: { isOpen: boolean; onClose: () => void; domain: any; apiKey: string; onSuccess: () => void; }) => {
-    const { t } = useTranslation(['domains', 'common', 'auth']);
-    const [localPart, setLocalPart] = useState('');
-    const [isSaving, setIsSaving] = useState(false);
-    const { addToast } = useToast();
-
-    useEffect(() => {
-        const defaultSender = domain?.DefaultSender || domain?.defaultsender;
-        if (defaultSender) {
-            setLocalPart(defaultSender.split('@')[0]);
-        } else {
-            setLocalPart('mailer'); // Default value
-        }
-    }, [domain]);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSaving(true);
-        const fullEmail = `${localPart}@${domain.Domain}`;
-        try {
-            await apiFetchV4(`/domains/${encodeURIComponent(fullEmail)}/default`, apiKey, {
-                method: 'PATCH',
-            });
-            addToast('Default sender updated successfully!', 'success');
-            onSuccess();
-        } catch (err: any) {
-            addToast(`Failed to update: ${err.message}`, 'error');
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
+const HowToModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
+    const { t } = useTranslation('guides');
+    const title = t('guideDomainTitle');
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={t('defaultSenderTitle')}>
-            <form onSubmit={handleSubmit} className="modal-form">
-                <p>{t('defaultSenderDescription')}</p>
-                <div className="form-group">
-                    <label htmlFor="email-local-part">{t('emailAddress')}</label>
-                    <div className="from-email-composer">
-                        <input
-                            id="email-local-part"
-                            type="text"
-                            value={localPart}
-                            onChange={e => setLocalPart(e.target.value.trim())}
-                            required
-                        />
-                        <span className="from-email-at">@{domain.Domain}</span>
-                    </div>
-                </div>
-                <div className="form-actions" style={{ marginTop: '1.5rem' }}>
-                    <button type="button" className="btn" onClick={onClose} disabled={isSaving}>{t('cancel')}</button>
-                    <button type="submit" className="btn btn-primary" disabled={isSaving || !localPart}>
-                        {isSaving ? <Loader /> : t('saveChanges')}
-                    </button>
-                </div>
-            </form>
+        <Modal isOpen={isOpen} onClose={onClose} title={title}>
+            <div className="step-by-step-list">
+                <GuideStep step={1} title={t('guideDomainStep1Title')} desc={t('guideDomainStep1Desc')} />
+                <GuideStep step={2} title={t('guideDomainStep2Title')} desc={t('guideDomainStep2Desc')} />
+                <GuideStep step={3} title={t('guideDomainStep3Title')} desc={t('guideDomainStep3Desc')} />
+                <GuideStep step={4} title={t('guideDomainStep4Title')} desc={t('guideDomainStep4Desc')} />
+            </div>
         </Modal>
     );
 };
 
-
-const VerificationStatusIndicator = ({ status }: { status: VerificationStatus }) => {
-    const { t } = useTranslation('domains');
-    const { getStatusStyle } = useStatusStyles();
-
-    switch (status) {
-        case 'checking':
-            const checkingStyle = getStatusStyle('Checking');
-            return <span className="verification-status"><Badge text={t('checking')} type={checkingStyle.type} iconPath={checkingStyle.iconPath} /></span>;
-        case 'verified':
-            const verifiedStyle = getStatusStyle('Verified');
-            return <span className="verification-status"><Badge text={t('verified')} type={verifiedStyle.type} iconPath={verifiedStyle.iconPath} /></span>;
-        case 'failed':
-             const failedStyle = getStatusStyle('Failed');
-            return <span className="verification-status"><Badge text={t('notVerified')} type={failedStyle.type} iconPath={failedStyle.iconPath} /></span>;
-        default:
-            return null;
-    }
-};
-
-const DomainVerificationChecker = ({ domainName }: { domainName: string }) => {
-    const { t } = useTranslation('domains');
-    const [statuses, setStatuses] = useState<Record<string, { status: VerificationStatus }>>(
-      Object.keys(DNS_RECORDS_CONFIG).reduce((acc, key) => ({ ...acc, [key]: { status: 'idle' } }), {})
-    );
-    const [isChecking, setIsChecking] = useState(false);
-
-    const checkAllDns = async () => {
-        setIsChecking(true);
-        setStatuses(prev => Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: { status: 'checking' } }), {}));
-
-        for (const [key, config] of Object.entries(DNS_RECORDS_CONFIG)) {
-            try {
-                const response = await fetch(`https://dns.google/resolve?name=${config.name(domainName)}&type=${config.type}`);
-                if (!response.ok) {
-                    throw new Error(`DNS lookup failed with status ${response.status}`);
-                }
-                const result = await response.json();
-                
-                let isVerified = false;
-                if (result.Status === 0 && result.Answer) {
-                    const foundRecord = result.Answer.find((ans: any) => config.check(ans.data.replace(/"/g, '')));
-                    if (foundRecord) {
-                        isVerified = true;
-                    }
-                }
-                setStatuses(prev => ({ ...prev, [key]: { status: isVerified ? 'verified' : 'failed' } }));
-
-            } catch (error) {
-                console.error(`Error checking ${key}:`, error);
-                setStatuses(prev => ({ ...prev, [key]: { status: 'failed' } }));
-            }
-        }
-        setIsChecking(false);
-    };
-
-    return (
-        <div className="domain-verification-checker">
-            <button className="btn check-all-btn" onClick={checkAllDns} disabled={isChecking}>
-                {isChecking ? <Loader /> : <Icon>{ICONS.VERIFY}</Icon>}
-                {isChecking ? t('checkingDns') : t('checkDnsStatus')}
-            </button>
-            <div className="dns-records-list">
-                {Object.entries(DNS_RECORDS_CONFIG).map(([key, config]) => (
-                    <div className="dns-record-item" key={key}>
-                        <div className="dns-record-item-header">
-                            <h4>{t('recordType', { type: key })}</h4>
-                            <VerificationStatusIndicator status={statuses[key]?.status} />
-                        </div>
-                        <div className="dns-record-details">
-                            <div className="detail"><strong>{t('host')}:</strong> <code>{config.host}</code></div>
-                            <div className="detail"><strong>{t('type')}:</strong> <code>{config.type}</code></div>
-                            <div className="detail"><strong>{t('value')}:</strong> <code>{config.expectedValue}</code></div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-};
-
-const DomainsView = ({ apiKey }: { apiKey: string }) => {
+const DomainsView = ({ apiKey, setView }: { apiKey: string, setView: (view: string, data?: any) => void }) => {
     const { t, i18n } = useTranslation(['domains', 'common']);
     const { addToast } = useToast();
     const [refetchIndex, setRefetchIndex] = useState(0);
     const [newDomain, setNewDomain] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [expandedDomain, setExpandedDomain] = useState<string | null>(null);
     const [domainToDelete, setDomainToDelete] = useState<string | null>(null);
     const [domainToEdit, setDomainToEdit] = useState<any | null>(null);
+    const [isAddingDomain, setIsAddingDomain] = useState(false);
+    const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
     const newDomainInputRef = useRef<HTMLInputElement>(null);
 
     const { getStatusStyle } = useStatusStyles();
 
     const { data, loading, error } = useApiV4('/domains', apiKey, {}, refetchIndex);
     const refetch = () => {
-        setExpandedDomain(null);
         setRefetchIndex(i => i + 1);
     }
 
@@ -223,6 +75,7 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
             await apiFetchV4('/domains', apiKey, { method: 'POST', body: { Domain: newDomain } });
             addToast(t('domainAddedSuccess', { domain: newDomain }), 'success');
             setNewDomain('');
+            setIsAddingDomain(false);
             refetch();
         } catch (err: any) {
             addToast(t('domainAddedError', { error: err.message }), 'error');
@@ -249,8 +102,8 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
     const showNoDomainsMessage = !loading && !error && domainsList.length === 0;
 
     return (
-        <div>
-             <ConfirmModal
+        <div className="domains-view-container">
+            <ConfirmModal
                 isOpen={!!domainToDelete}
                 onClose={() => setDomainToDelete(null)}
                 onConfirm={confirmDeleteDomain}
@@ -270,34 +123,17 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                     }}
                 />
             )}
-             <div className="view-header">
-                <form className="add-domain-form" onSubmit={handleAddDomain}>
-                    <input
-                        ref={newDomainInputRef}
-                        type="text"
-                        placeholder="example.com"
-                        value={newDomain}
-                        onChange={handleNewDomainChange}
-                        disabled={isSubmitting}
-                    />
-                    <Button type="submit" className="btn-primary" disabled={!newDomain || isSubmitting} action="add_domain">
-                        {isSubmitting ? <Loader /> : <><Icon>{ICONS.PLUS}</Icon> {t('addDomain')}</>}
-                    </Button>
-                </form>
+            <HowToModal isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />
+
+            <div className="domains-description-header">
+                <h2>{t('sendingDomains', {ns: 'domains'})}</h2>
+                <p>{t('sendingDomainsDesc', {ns: 'domains'})}</p>
             </div>
+
             {loading && <CenteredMessage><Loader /></CenteredMessage>}
             {error && !isNotFoundError && <ErrorMessage error={error} />}
-            {showNoDomainsMessage && 
-                <EmptyState
-                    icon={ICONS.DOMAINS}
-                    title={t('noDomainsFound')}
-                    message={t('noDomainsFoundDesc')}
-                    ctaText={t('addDomain')}
-                    onCtaClick={() => newDomainInputRef.current?.focus()}
-                />
-            }
             
-            {domainsList.length > 0 && 
+            {!loading && !error && domainsList.length > 0 && 
             <div className="table-container">
                 <table className="simple-table">
                     <thead>
@@ -322,7 +158,6 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                              const isMxVerified = String(domain.MX || domain.mx).toLowerCase() === 'true';
                              const trackingStatus = domain.TrackingStatus || domain.trackingstatus;
                              const isTrackingVerified = String(trackingStatus).toLowerCase() === 'validated';
-                             const isExpanded = expandedDomain === domainName;
                              
                              return (
                                 <React.Fragment key={domainName}>
@@ -344,37 +179,54 @@ const DomainsView = ({ apiKey }: { apiKey: string }) => {
                                     </td>
                                     <td>
                                         <div className="action-buttons" style={{ justifyContent: 'flex-end' }}>
-                                            <button 
-                                                className="btn btn-secondary" 
-                                                onClick={() => setExpandedDomain(isExpanded ? null : domainName)}
-                                                style={{ padding: '0.5rem 1rem' }}
+                                            <Button 
+                                                className="btn-secondary" 
+                                                onClick={() => setView('DomainVerification', { domain: domainName })}
                                             >
-                                                <Icon style={{ transform: isExpanded ? 'rotate(180deg)' : 'none' }}>{isExpanded ? ICONS.CHEVRON_DOWN : ICONS.VERIFY}</Icon>
-                                                <span>{isExpanded ? t('cancel') : t('verify')}</span>
-                                            </button>
-                                            <button 
-                                                className="btn-icon btn-icon-danger" 
+                                                <Icon>{ICONS.VERIFY}</Icon>
+                                                <span>{t('verify')}</span>
+                                            </Button>
+                                            <Button 
+                                                className="btn-icon-danger" 
                                                 onClick={() => setDomainToDelete(domainName)} 
                                                 aria-label={t('deleteDomain', { domainName })}
                                             >
                                                 <Icon>{ICONS.DELETE}</Icon>
-                                            </button>
+                                            </Button>
                                         </div>
                                     </td>
                                 </tr>
-                                {isExpanded && (
-                                    <tr>
-                                        <td colSpan={4} style={{ padding: 0 }}>
-                                            <DomainVerificationChecker domainName={domainName} />
-                                        </td>
-                                    </tr>
-                                )}
                                 </React.Fragment>
                              )
                         })}
                     </tbody>
                 </table>
             </div>}
+            
+            <div className="add-domain-section">
+                {isAddingDomain ? (
+                    <form className="add-domain-form" onSubmit={handleAddDomain}>
+                        <input
+                            ref={newDomainInputRef}
+                            type="text"
+                            placeholder="example.com"
+                            value={newDomain}
+                            onChange={handleNewDomainChange}
+                            disabled={isSubmitting}
+                            autoFocus
+                        />
+                        <Button type="submit" className="btn-primary" disabled={!newDomain || isSubmitting} action="add_domain">
+                            {isSubmitting ? <Loader /> : <>{t('addDomain')}</>}
+                        </Button>
+                    </form>
+                ) : (
+                    <Button className="btn-primary" onClick={() => setIsAddingDomain(true)} action="add_domain" style={{ padding: '0.75rem 2rem' }}>
+                        <Icon>{ICONS.PLUS}</Icon> {t('newDomainButton', {ns: 'domains'})}
+                    </Button>
+                )}
+                <button className="link-button" onClick={() => setIsHelpModalOpen(true)}>{t('howToAddDomainLink', {ns: 'domains'})}</button>
+            </div>
+
         </div>
     );
 };
