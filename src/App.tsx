@@ -93,7 +93,7 @@ const App = () => {
         if (user?.display && user.display !== theme) {
             setTheme(user.display);
         }
-    }, [user?.display, setTheme]);
+    }, [user?.display, setTheme, theme]);
 
     useEffect(() => {
         const handleForbidden = () => {
@@ -239,30 +239,67 @@ const App = () => {
         let touchStartY: number | null = null;
 
         const handleTouchStart = (e: TouchEvent) => {
-            if (e.touches.length === 1) {
+            // Only respond to single-touch gestures
+            if (e.touches.length !== 1) return;
+
+            const touchX = e.touches[0].clientX;
+            const screenWidth = window.innerWidth;
+            const edgeThreshold = 40; // Only start swipe detection within 40px of the edge
+
+            const isNearLeftEdge = touchX < edgeThreshold;
+            const isNearRightEdge = screenWidth - touchX < edgeThreshold;
+
+            // Only initiate swipe if it starts from the correct edge for the current language direction
+            if ((!isRTL && isNearLeftEdge) || (isRTL && isNearRightEdge)) {
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
+            } else {
+                // If swipe starts anywhere else, ignore it for sidebar opening
+                touchStartX = null;
+                touchStartY = null;
             }
         };
 
         const handleTouchMove = (e: TouchEvent) => {
             if (isMobileMenuOpen || touchStartX === null || touchStartY === null) return;
-            const currentX = e.touches[0].clientX;
-            const deltaX = currentX - touchStartX;
-            if (Math.abs(deltaX) < 50) return; // Swipe threshold
             
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            
+            const deltaX = currentX - touchStartX;
+            const deltaY = currentY - touchStartY;
+            
+            // If vertical movement is more significant than horizontal, assume it's a scroll and cancel the swipe.
+            if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                touchStartX = null;
+                touchStartY = null;
+                return;
+            }
+
+            const swipeThreshold = 50;
+            if (Math.abs(deltaX) < swipeThreshold) return; // Wait for a minimum swipe distance
+            
+            // Open sidebar if swiping in the correct direction (right for LTR, left for RTL)
             if ((!isRTL && deltaX > 0) || (isRTL && deltaX < 0)) {
+                // Prevent the browser's default behavior (like scrolling) to ensure a smooth menu opening
+                e.preventDefault();
                 setIsMobileMenuOpen(true);
+                
+                // Reset touch coordinates after opening to prevent re-triggering
+                touchStartX = null;
+                touchStartY = null;
             }
         };
-        container.addEventListener('touchstart', handleTouchStart);
-        container.addEventListener('touchmove', handleTouchMove);
+
+        // passive:true is a performance optimization, but we need passive:false on touchmove to call preventDefault().
+        container.addEventListener('touchstart', handleTouchStart, { passive: true });
+        container.addEventListener('touchmove', handleTouchMove, { passive: false });
 
         return () => {
             container.removeEventListener('touchstart', handleTouchStart);
             container.removeEventListener('touchmove', handleTouchMove);
         };
-    }, [isMobileMenuOpen, i18n, isEmbedMode, setIsMobileMenuOpen, isRTL]);
+    }, [isMobileMenuOpen, isEmbedMode, setIsMobileMenuOpen, isRTL]);
 
     if (configLoading) {
         return <CenteredMessage style={{height: '100vh'}}><Loader /></CenteredMessage>;
