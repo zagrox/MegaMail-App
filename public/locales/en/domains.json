@@ -24,7 +24,7 @@
     "notVerified": "Not Verified",
     "deleteDomain": "Delete domain {{domainName}}",
     "verify": "Verify",
-    "notSet": "Not Set",
+    "notSet": "Set Email",
     "fromEmail": "From Email",
     "defaultSenderTitle": "Default Sender",
     "defaultSenderDescription": "Default sender is an email address used in your emails as a 'From' address. We strongly recommend setting a default sender to help increase your deliverability performance.",
