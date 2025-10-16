@@ -11,7 +11,7 @@ import { formatDateForDisplay } from '../utils/helpers';
 import OverallActivityChart from '../components/OverallActivityChart';
 import ProgressBar from '../components/ProgressBar';
 
-const SummaryItem = ({ label, value }: { label: string, value: React.ReactNode }) => {
+const SummaryItem = React.memo(({ label, value }: { label: string, value: React.ReactNode }) => {
     if (!value && value !== 0) return null;
     return (
         <>
@@ -19,7 +19,7 @@ const SummaryItem = ({ label, value }: { label: string, value: React.ReactNode }
             <dd>{value}</dd>
         </>
     );
-};
+});
 
 const CampaignDetailView = ({ apiKey, campaign, onBack }: { apiKey: string, campaign: any | null, onBack: () => void }) => {
     const { t, i18n } = useTranslation(['campaigns', 'common']);

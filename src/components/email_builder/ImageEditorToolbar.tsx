@@ -41,8 +41,8 @@ const PaddingControl = ({ style, onStyleChange }: { style: any, onStyleChange: a
                     onClick={() => setIsLinked(!isLinked)}
                     title={t('paddingLinked')}
                 >
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                    <Icon children={ICONS.LINK} />
+                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                    <Icon>{ICONS.LINK}</Icon>
                 </button>
 
                 <NumberInput className="padding-input right" title="Right" value={getPixelValue(style.paddingRight)} onChange={e => onStyleChange('paddingRight', `${e.target.value}px`)} />
@@ -105,9 +105,12 @@ const ImageEditorToolbar = ({ block, canvasWrapperRef, onStyleChange, onContentC
     return (
         <div ref={toolbarRef} className="editor-toolbar image-editor-toolbar" style={toolbarState} onMouseDown={e => e.preventDefault()}>
             <div className="editor-toolbar-section">
-                <button onClick={() => handleStyleChange('textAlign', 'left')} className={currentStyle.textAlign === 'left' ? 'active' : ''} title={t('alignLeft')}><Icon children={ICONS.ALIGN_LEFT} /></button>
-                <button onClick={() => handleStyleChange('textAlign', 'center')} className={currentStyle.textAlign === 'center' ? 'active' : ''} title={t('alignCenter')}><Icon children={ICONS.ALIGN_CENTER} /></button>
-                <button onClick={() => handleStyleChange('textAlign', 'right')} className={currentStyle.textAlign === 'right' ? 'active' : ''} title={t('alignRight')}><Icon children={ICONS.ALIGN_RIGHT} /></button>
+                {/* FIX: Corrected Icon component usage to pass children instead of using a prop. */}
+                <button onClick={() => handleStyleChange('textAlign', 'left')} className={currentStyle.textAlign === 'left' ? 'active' : ''} title={t('alignLeft')}><Icon>{ICONS.ALIGN_LEFT}</Icon></button>
+                {/* FIX: Corrected Icon component usage to pass children instead of using a prop. */}
+                <button onClick={() => handleStyleChange('textAlign', 'center')} className={currentStyle.textAlign === 'center' ? 'active' : ''} title={t('alignCenter')}><Icon>{ICONS.ALIGN_CENTER}</Icon></button>
+                {/* FIX: Corrected Icon component usage to pass children instead of using a prop. */}
+                <button onClick={() => handleStyleChange('textAlign', 'right')} className={currentStyle.textAlign === 'right' ? 'active' : ''} title={t('alignRight')}><Icon>{ICONS.ALIGN_RIGHT}</Icon></button>
             </div>
             
              <div className="editor-toolbar-section">
@@ -151,8 +154,8 @@ const ImageEditorToolbar = ({ block, canvasWrapperRef, onStyleChange, onContentC
             </div>
 
             <div className="editor-toolbar-section">
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                <Icon children={ICONS.LINK} />
+                {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                <Icon>{ICONS.LINK}</Icon>
                 <input
                     type="url"
                     className="editor-toolbar-link-input"

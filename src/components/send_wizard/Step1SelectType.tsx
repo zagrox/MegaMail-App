@@ -20,8 +20,7 @@ const Step1SelectType = ({ onNext, onBack, data, updateData }: { onNext: () => v
         >
             <div className="wizard-step-intro">
                 {/* FIX: Pass icon as child to Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                <Icon children={ICONS.HASH} />
+                <Icon>{ICONS.HASH}</Icon>
                 <p>{t('selectCampaignType_desc')}</p>
             </div>
             <div className="selection-grid">

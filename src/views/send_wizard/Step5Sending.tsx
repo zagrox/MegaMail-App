@@ -109,7 +109,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
         >
             <div className="wizard-step-intro">
 {/* FIX: Changed to use explicit children prop for Icon component */}
-                <Icon children={ICONS.VERIFY} />
+                <Icon>{ICONS.VERIFY}</Icon>
                 <p>{t('reviewAndSend_desc')}</p>
             </div>
             <div className="sending-options-list">
@@ -129,7 +129,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                     />
                     <div className="sending-option-card-content">
 {/* FIX: Changed to use explicit children prop for Icon component */}
-                        <Icon className="sending-option-card-icon" children={ICONS.CALENDAR} />
+                        <Icon className="sending-option-card-icon">{ICONS.CALENDAR}</Icon>
                         <div className="sending-option-card-details">
                             <h4 className="sending-option-card-title">{t('schedule', { ns: 'sendEmail' })}</h4>
                             {data.sendAction === 'schedule' && (
@@ -161,7 +161,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                     <div className="sending-option-card-content">
                         {/* FIX: Explicitly pass children to Icon component */}
 {/* FIX: Changed to use explicit children prop for Icon component */}
-                        <Icon className="sending-option-card-icon" children={ICONS.SEND_EMAIL} />
+                        <Icon className="sending-option-card-icon">{ICONS.SEND_EMAIL}</Icon>
                         <h4 className="sending-option-card-title">{t('sendNow', { ns: 'sendEmail' })}</h4> 
                     </div>
                 </label>
@@ -181,7 +181,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                     <div className="sending-option-card-content">
                         {/* FIX: Explicitly pass children to Icon component */}
 {/* FIX: Changed to use explicit children prop for Icon component */}
-                        <Icon className="sending-option-card-icon" children={ICONS.SAVE_CHANGES} />
+                        <Icon className="sending-option-card-icon">{ICONS.SAVE_CHANGES}</Icon>
                         <h4 className="sending-option-card-title">{t('saveForLater')}</h4>
                     </div>
                 </label>

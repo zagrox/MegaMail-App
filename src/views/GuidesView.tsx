@@ -65,7 +65,7 @@ const GuidesView = () => {
                             className={`guides-nav-item ${activeIndex === index ? 'active' : ''}`}
                             onClick={() => setActiveIndex(index)}
                         >
-                            {/* FIX: Changed to use JSX children for Icon component */}
+                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <Icon>{guide.icon}</Icon>
                             <span>{t(`guide${guide.key}Title`)}</span>
                         </button>
@@ -73,7 +73,7 @@ const GuidesView = () => {
                 </nav>
                 <article className="guides-content card">
                     <header className="guides-content-header">
-                        {/* FIX: Changed to use JSX children for Icon component */}
+                        {/* FIX: Updated Icon component to accept children instead of a prop. */}
                         <Icon>{activeGuide.icon}</Icon>
                         <h3>{t(`guide${activeGuide.key}Title`)}</h3>
                     </header>
@@ -89,7 +89,7 @@ const GuidesView = () => {
                     {helpCards.map(card => (
                         <button key={card.key} className="card help-card" onClick={card.onClick} disabled={card.isSoon}>
                             {card.isSoon && <div className="soon-badge-overlay">{t('soon', { ns: 'onboarding' })}</div>}
-                            {/* FIX: Changed to use JSX children for Icon component */}
+                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <Icon>{card.icon}</Icon>
                             <h4>{card.title}</h4>
                             <p>{card.desc}</p>

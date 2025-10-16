@@ -93,6 +93,9 @@ export type Configuration = {
     app_recaptcha?: boolean;
     app_recaptcha_key?: string;
     user_registration_role?: string;
+    app_bank_name?: string;
+    app_card_number?: string;
+    app_account_name?: string;
 };
 export type CustomField = {
     Name: string;

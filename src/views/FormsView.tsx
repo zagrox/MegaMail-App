@@ -86,7 +86,7 @@ const FormsView = ({ apiKey }: { apiKey: string }) => {
                     <div className="form-url-display">
                         <code>{subscribeUrl}</code>
                         <Button className="btn-secondary" onClick={handleCopy}>
-                            {/* FIX: Changed path prop to children for Icon component */}
+                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <Icon>{copied ? ICONS.CHECK : ICONS.COPY}</Icon>
                             <span>{copied ? t('copied') : t('copyLink')}</span>
                         </Button>

@@ -152,6 +152,16 @@ const App = () => {
         }
     }, [user, config, authLoading, i18n]);
 
+    useEffect(() => {
+        const hash = window.location.hash.substring(1);
+        if (hash === 'account-orders') {
+            sessionStorage.setItem('account-tab', 'orders');
+            setView('Account');
+            // Clean the hash from the URL to prevent re-triggering on refresh
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+    }, []); // Empty dependency array ensures it runs only once on mount
+
     const urlParams = new URLSearchParams(window.location.search);
     const isEmbedMode = urlParams.get('embed') === 'true';
     
@@ -512,19 +522,16 @@ const App = () => {
                             return (
                                 <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
                                     {isSidebarCollapsed ? (
-// FIX: Changed to use explicit children prop for Icon component
-                                        <Tooltip text={navItem.name} children={<Icon children={navItem.icon} />} />
+                                        <Tooltip text={navItem.name}><Icon>{navItem.icon}</Icon></Tooltip>
                                     ) : (
-// FIX: Changed to use explicit children prop for Icon component
-                                        <Icon children={navItem.icon} />
+                                        <Icon>{navItem.icon}</Icon>
                                     )}
                                     <span>{navItem.name}</span>
                                     {isLocked && (
-// FIX: Changed to use explicit children prop for Icon component
                                         <Icon
                                             className="lock-icon"
                                             style={isPromotional ? { color: 'var(--success-color)' } : {}}
-                                            children={isPromotional ? ICONS.GIFT : ICONS.STAR} />
+                                            >{isPromotional ? ICONS.GIFT : ICONS.STAR}</Icon>
                                     )}
                                 </button>
                             );
@@ -535,23 +542,19 @@ const App = () => {
         </nav>
         <div className="sidebar-footer-nav">
              <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                 {isSidebarCollapsed ? (<Tooltip text={t('settings', { ns: 'account' })}><Icon children={ICONS.SETTINGS} /></Tooltip>) : (<Icon children={ICONS.SETTINGS} />)}
+                 {isSidebarCollapsed ? (<Tooltip text={t('settings', { ns: 'account' })}><Icon>{ICONS.SETTINGS}</Icon></Tooltip>) : (<Icon>{ICONS.SETTINGS}</Icon>)}
                  <span>{t('settings', { ns: 'account' })}</span>
              </button>
              <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                 {isSidebarCollapsed ? (<Tooltip text={t('account')}><Icon children={ICONS.ACCOUNT} /></Tooltip>) : (<Icon children={ICONS.ACCOUNT} />)}
+                 {isSidebarCollapsed ? (<Tooltip text={t('account')}><Icon>{ICONS.ACCOUNT}</Icon></Tooltip>) : (<Icon>{ICONS.ACCOUNT}</Icon>)}
                  <span>{t('account')}</span>
              </button>
              <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                {isSidebarCollapsed ? (<Tooltip text={t('buyCredits')}><Icon children={ICONS.BUY_CREDITS} /></Tooltip>) : (<Icon children={ICONS.BUY_CREDITS} />)}
+                {isSidebarCollapsed ? (<Tooltip text={t('buyCredits')}><Icon>{ICONS.BUY_CREDITS}</Icon></Tooltip>) : (<Icon>{ICONS.BUY_CREDITS}</Icon>)}
                 <span>{t('buyCredits')}</span>
              </button>
              <button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                 {isSidebarCollapsed ? (<Tooltip text={t('guides')}><Icon children={ICONS.HELP_CIRCLE} /></Tooltip>) : (<Icon children={ICONS.HELP_CIRCLE} />)}
+                 {isSidebarCollapsed ? (<Tooltip text={t('guides')}><Icon>{ICONS.HELP_CIRCLE}</Icon></Tooltip>) : (<Icon>{ICONS.HELP_CIRCLE}</Icon>)}
                  <span>{t('guides')}</span>
              </button>
         </div>
@@ -581,19 +584,16 @@ const App = () => {
                 <SidebarContent />
             </aside>
             <button onClick={toggleSidebarCollapse} className="sidebar-collapse-toggle" aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-               <Icon children={isRTL ? (isSidebarCollapsed ? ICONS.CHEVRON_LEFT : ICONS.CHEVRON_RIGHT) : (isSidebarCollapsed ? ICONS.CHEVRON_RIGHT : ICONS.CHEVRON_LEFT)} />
+               <Icon>{isRTL ? (isSidebarCollapsed ? ICONS.CHEVRON_LEFT : ICONS.CHEVRON_RIGHT) : (isSidebarCollapsed ? ICONS.CHEVRON_RIGHT : ICONS.CHEVRON_LEFT)}</Icon>
             </button>
             <div className="main-wrapper">
                 <header className="mobile-header">
                      <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)} aria-label={t('openMenu')}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                        <Icon children={ICONS.MENU} />
+                        <Icon>{ICONS.MENU}</Icon>
                     </button>
                     <h1 className="mobile-header-title">{currentView?.title || appName}</h1>
                     <button className="mobile-menu-toggle" onClick={() => handleSetView('Account')} aria-label={t('account')}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                        <Icon children={ICONS.ACCOUNT} />
+                        <Icon>{ICONS.ACCOUNT}</Icon>
                     </button>
                 </header>
                 <main className={`content ${view === 'Email Builder' || view === 'Marketing' ? 'content--no-padding' : ''}`}>

@@ -1,4 +1,3 @@
-
 {
     "yourCurrentBalance": "موجودی فعلی شما",
     "choosePackage": "یک بسته برای شارژ انتخاب کنید",
@@ -37,7 +36,7 @@
     "submitBankInfo": "ارسال اطلاعات بانکی",
     "offlinePaymentFormTitle": "ارسال جزئیات انتقال بانکی",
     "offlinePaymentFormInstructions": "لطفاً جزئیات انتقال بانکی خود را در زیر وارد کنید. تیم ما پرداخت شما را ظرف ۲۴ ساعت بررسی و تأیید خواهد کرد.",
-    "transferDetails": "جزئیات انتقال",
+    "transferDetails": "جزئیات تراکنش شما",
     "transferDetailsPlaceholder": "شناسه تراکنش، تاریخ، مبلغ و سایر اطلاعات مربوطه را اینجا وارد کنید...",
     "submitDetails": "ارسال جزئیات",
     "detailsSubmittedSuccess": "جزئیات انتقال بانکی شما با موفقیت ارسال شد.",
@@ -50,5 +49,13 @@
     "costInCredits": "هزینه (اعتبار)",
     "emailSendCost": "ارسال هر ایمیل",
     "oneCredit": "۱",
-    "free": "رایگان"
+    "free": "رایگان",
+    "ourBankDetails": "اطلاعات حساب بانکی ما",
+    "ourBankDetailsInstruction": "لطفاً مبلغ کل را به حساب زیر واریز نمایید. پس از واریز، جزئیات تراکنش خود را در فرم وارد کنید.",
+    "bankNameLabel": "نام بانک",
+    "cardNumberLabel": "شماره کارت",
+    "accountNameLabel": "نام صاحب حساب",
+    "bankNameValue": "بانک پاسارگاد",
+    "cardNumberValue": "۵۰۲۲-۲۹۱۰-۸۹۳۲-۴۴۷۷",
+    "accountNameValue": "آقای حمید چمانچی"
 }

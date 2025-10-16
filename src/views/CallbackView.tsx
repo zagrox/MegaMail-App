@@ -116,7 +116,7 @@ const CallbackView = () => {
     }, [user]);
 
     const handleReturn = () => {
-        window.location.href = '/';
+        window.location.href = '/#account-orders';
     };
 
     if (loading) {
@@ -135,7 +135,6 @@ const CallbackView = () => {
             <div className="card" style={{ maxWidth: '500px', width: '100%', margin: '0 auto', padding: '2rem', textAlign: 'center' }}>
                 {error ? (
                     <>
-                        {/* FIX: Changed path prop to children for Icon component */}
                         <Icon style={{ width: 48, height: 48, color: 'var(--danger-color)', margin: '0 auto 1rem' }}>{ICONS.X_CIRCLE}</Icon>
                         <h2 style={{ color: 'var(--danger-color)' }}>{t('paymentFailed')}</h2>
                         <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{error}</p>
@@ -150,12 +149,11 @@ const CallbackView = () => {
                             </div>
                         )}
                         <div className="form-actions" style={{ justifyContent: 'center' }}>
-                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToDashboard', { ns: 'dashboard' })}</button>
+                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToOrders', { ns: 'orders' })}</button>
                         </div>
                     </>
                 ) : (
                     <>
-                        {/* FIX: Changed path prop to children for Icon component */}
                         <Icon style={{ width: 48, height: 48, color: 'var(--success-color)', margin: '0 auto 1rem' }}>{ICONS.CHECK}</Icon>
                         <h2 style={{ color: 'var(--success-color)' }}>{t('paymentSuccess')}</h2>
                         <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{message}</p>
@@ -166,13 +164,13 @@ const CallbackView = () => {
                                         <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
                                         <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.note}</strong></td></tr>
                                         {processedOrder.creditsAdded && <tr><td>{t('credits', { ns: 'dashboard' })}</td><td style={{textAlign: 'right'}}><strong>+{processedOrder.creditsAdded.toLocaleString(i18n.language)}</strong></td></tr>}
-                                        <tr><td>{t('total', { ns: 'common' })}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.total.toLocaleString(i18n.language)} {t('priceIRT')}</strong></td></tr>
+                                        <tr><td>{t('total', { ns: 'common' })}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.total.toLocaleString(i18n.language)} {t('buyCredits:priceIRT')}</strong></td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         )}
                         <div className="form-actions" style={{ justifyContent: 'center' }}>
-                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToDashboard', { ns: 'dashboard' })}</button>
+                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToOrders', { ns: 'orders' })}</button>
                         </div>
                     </>
                 )}

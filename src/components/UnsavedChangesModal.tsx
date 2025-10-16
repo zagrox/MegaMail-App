@@ -27,7 +27,7 @@ const UnsavedChangesModal: React.FC<UnsavedChangesModalProps> = ({
     };
 
     return (
-        // FIX: Pass content as children to the Modal component.
+        // FIX: Passed content as children to the Modal component to satisfy TypeScript checks.
         <Modal
             isOpen={isOpen}
             onClose={onCancel}

@@ -1,7 +1,7 @@
 import React from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import Icon from './Icon';
+import { useSortable } from '@d-kit/sortable';
+import { CSS } from '@d-kit/utilities';
+import Icon from '../Icon';
 
 export const SortableNavCard = ({ id, item, setView }: { id: string; item: { name: string; icon: React.ReactNode; desc: string; view: string; }; setView: (view: string) => void; }) => {
     const {

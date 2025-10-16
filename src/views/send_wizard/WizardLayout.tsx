@@ -50,13 +50,13 @@ const WizardLayout = ({
                             <span>{backButtonText || t('back')}</span>
                             {/* FIX: Explicitly pass children to Icon component */}
 {/* FIX: Changed to use explicit children prop for Icon component */}
-                            <Icon children={ICONS.CHEVRON_RIGHT} />
+                            <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                         </>
                     ) : (
                         <>
                             {/* FIX: Explicitly pass children to Icon component */}
 {/* FIX: Changed to use explicit children prop for Icon component */}
-                            <Icon children={ICONS.CHEVRON_LEFT} />
+                            <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                             <span>{backButtonText || t('back')}</span>
                         </>
                     )}
@@ -72,7 +72,7 @@ const WizardLayout = ({
                             <>
                                 {/* FIX: Explicitly pass children to Icon component */}
 {/* FIX: Changed to use explicit children prop for Icon component */}
-                                <Icon children={ICONS.CHEVRON_LEFT} />
+                                <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                                 <span>{t('next')}</span>
                             </>
                         ) : (
@@ -80,7 +80,7 @@ const WizardLayout = ({
                                 <span>{t('next')}</span>
                                 {/* FIX: Explicitly pass children to Icon component */}
 {/* FIX: Changed to use explicit children prop for Icon component */}
-                                <Icon children={ICONS.CHEVRON_RIGHT} />
+                                <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                             </>
                         )}
                     </Button>
@@ -95,7 +95,7 @@ const WizardLayout = ({
                             <>
                                 {/* FIX: Explicitly pass children to Icon component */}
 {/* FIX: Changed to use explicit children prop for Icon component */}
-                                <Icon children={ICONS.VERIFY} />
+                                <Icon>{ICONS.VERIFY}</Icon>
                                 <span>{t('submit', { ns: 'sendEmail' })}</span>
                             </>
                         )}

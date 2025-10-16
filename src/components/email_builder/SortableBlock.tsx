@@ -72,26 +72,22 @@ export const SortableBlock = (props: SortableBlockProps) => {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="canvas-item-actions-bar-left">
-                           {/* FIX: Changed path prop to children for Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                           <Icon children={ICONS.DRAG_HANDLE} />
+                           {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                           <Icon>{ICONS.DRAG_HANDLE}</Icon>
                            <span>{getBlockTypeTranslationKey(item.type)}</span>
                         </div>
                         <div className="canvas-item-actions-bar-right">
-                            {/* FIX: Changed path prop to children for Icon component */}
+                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onEdit(id); }} aria-label={t('editBlock')}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                <Icon children={ICONS.PENCIL} />
+                                <Icon>{ICONS.PENCIL}</Icon>
                             </button>
-                            {/* FIX: Changed path prop to children for Icon component */}
+                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onDuplicate(id); }} aria-label={t('duplicateBlock')}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                <Icon children={ICONS.DUPLICATE} />
+                                <Icon>{ICONS.DUPLICATE}</Icon>
                             </button>
-                            {/* FIX: Changed path prop to children for Icon component */}
+                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <button className="btn-icon btn-icon-danger" onClick={(e) => { e.stopPropagation(); onRemove(id); }} aria-label={t('deleteBlock')}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                <Icon children={ICONS.DELETE} />
+                                <Icon>{ICONS.DELETE}</Icon>
                             </button>
                         </div>
                     </div>
@@ -102,9 +98,8 @@ export const SortableBlock = (props: SortableBlockProps) => {
                             onClick={(e) => { e.stopPropagation(); setIsAddPopoverOpen(p => !p); }}
                             aria-label={t('addBlock')}
                         >
-                            {/* FIX: Changed path prop to children for Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                            <Icon children={ICONS.PLUS} />
+                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                            <Icon>{ICONS.PLUS}</Icon>
                         </button>
                         {isAddPopoverOpen && (
                             <AddBlockPopover onSelectBlockType={handleInsert} onClose={() => setIsAddPopoverOpen(false)} />

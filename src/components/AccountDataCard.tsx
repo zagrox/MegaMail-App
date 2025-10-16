@@ -4,9 +4,8 @@ import Icon from './Icon';
 const AccountDataCard = React.memo(({ iconPath, title, children }: { iconPath: React.ReactNode; title: string; children?: ReactNode }) => (
     <div className="card account-card">
         <div className="card-icon-wrapper">
-            {/* FIX: Changed to use JSX children for Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
-            <Icon children={iconPath} />
+            {/* FIX: Updated Icon component to accept children instead of a prop. */}
+            <Icon>{iconPath}</Icon>
         </div>
         <div className="card-details">
             <div className="card-title">{title}</div>

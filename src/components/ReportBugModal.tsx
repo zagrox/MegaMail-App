@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
@@ -42,57 +43,30 @@ const ReportBugModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
                 throw new Error(errorMessage);
             }
 
-            addToast(t('bugReportSuccess'), 'success');
+            addToast(t('bugReportSubmitted', { ns: 'guides' }), 'success');
             onClose();
-            setTitle('');
-            setDetails('');
         } catch (err: any) {
-            addToast(t('bugReportError', { error: err.message }), 'error');
+            addToast(t('bugReportError', { ns: 'guides', error: err.message }), 'error');
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        // FIX: Pass content as children to the Modal component.
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            title={t('bugReportModalTitle')}
-        >
+        <Modal isOpen={isOpen} onClose={onClose} title={t('reportABug')}>
             <form onSubmit={handleSubmit} className="modal-form">
-                <div className="info-message" style={{ textAlign: 'inherit', alignItems: 'flex-start', width: '100%', margin: 0 }}>
-                    <p style={{ margin: 0 }}>{t('bugReportFormIntro1')}</p>
-                    <p style={{ margin: 0 }}>{t('bugReportFormIntro2')}</p>
-                </div>
-                <p>{t('bugReportFormDesc')}</p>
                 <div className="form-group">
                     <label htmlFor="bug-title">{t('bugTitle')}</label>
-                    <input
-                        id="bug-title"
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder={t('bugTitlePlaceholder')}
-                        required
-                        disabled={isSubmitting}
-                    />
+                    <input id="bug-title" type="text" value={title} onChange={e => setTitle(e.target.value)} required />
                 </div>
                 <div className="form-group">
                     <label htmlFor="bug-details">{t('bugDetails')}</label>
-                    <textarea
-                        id="bug-details"
-                        value={details}
-                        onChange={(e) => setDetails(e.target.value)}
-                        required
-                        disabled={isSubmitting}
-                        rows={5}
-                    />
+                    <textarea id="bug-details" value={details} onChange={e => setDetails(e.target.value)} rows={5} required />
                 </div>
-                <div className="form-actions">
-                    <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>{t('cancel', { ns: 'common' })}</button>
-                    <button type="submit" className="btn btn-primary" disabled={isSubmitting || !title || !details}>
-                        {isSubmitting ? <Loader /> : t('submitBugReport')}
+                <div className="form-actions" style={{ justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+                    <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>{t('cancel')}</button>
+                    <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                        {isSubmitting ? <Loader /> : t('submitReport')}
                     </button>
                 </div>
             </form>

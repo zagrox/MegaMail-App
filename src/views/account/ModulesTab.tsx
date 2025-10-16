@@ -14,7 +14,7 @@ interface ModulesTabProps {
     setView: (view: string) => void;
 }
 
-const ModuleCard = ({ module, isUnlocked, onUnlock, onInstantUnlock, isUnlocking }: { module: Module, isUnlocked: boolean, onUnlock: () => void, onInstantUnlock: () => void, isUnlocking: boolean }) => {
+const ModuleCard = React.memo(({ module, isUnlocked, onUnlock, onInstantUnlock, isUnlocking }: { module: Module, isUnlocked: boolean, onUnlock: () => void, onInstantUnlock: () => void, isUnlocking: boolean }) => {
     const { t, i18n } = useTranslation(['orders', 'common']);
 
     const handleUnlockClick = () => {
@@ -71,7 +71,7 @@ const ModuleCard = ({ module, isUnlocked, onUnlock, onInstantUnlock, isUnlocking
             </div>
         </div>
     );
-};
+});
 
 const ModulesTab: React.FC<ModulesTabProps> = ({ setView }) => {
     const { t } = useTranslation(['orders', 'common']);

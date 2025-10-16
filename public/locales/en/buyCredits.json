@@ -1,4 +1,3 @@
-
 {
     "yourCurrentBalance": "Your Current Balance",
     "choosePackage": "Choose a Package to Top Up",
@@ -37,7 +36,7 @@
     "submitBankInfo": "Submit Bank Info",
     "offlinePaymentFormTitle": "Submit Bank Transfer Details",
     "offlinePaymentFormInstructions": "Please enter the details of your bank transfer below. Our team will review and confirm your payment within 24 hours.",
-    "transferDetails": "Transfer Details",
+    "transferDetails": "Your Transaction Details",
     "transferDetailsPlaceholder": "Enter transaction ID, date, amount, and any other relevant information here...",
     "submitDetails": "Submit Details",
     "detailsSubmittedSuccess": "Your bank transfer details have been submitted successfully.",
@@ -50,5 +49,13 @@
     "costInCredits": "Cost in Credits",
     "emailSendCost": "Each Email Send",
     "oneCredit": "1 Credit",
-    "free": "FREE"
+    "free": "FREE",
+    "ourBankDetails": "Our Bank Details",
+    "ourBankDetailsInstruction": "Please transfer the total amount to the account below. After transferring, enter your transaction details in the form.",
+    "bankNameLabel": "Bank Name",
+    "cardNumberLabel": "Card Number",
+    "accountNameLabel": "Account Name",
+    "bankNameValue": "Pasargad Bank",
+    "cardNumberValue": "5022 2910 8932 4477",
+    "accountNameValue": "Hamid Chamanchi"
 }

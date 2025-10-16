@@ -17,13 +17,24 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder, onGoToOffl
     const showPayButton = ['pending', 'failed'].includes(order.order_status);
     const showInvoiceButton = order.order_status === 'completed';
     const lastTransaction = order.transactions?.length > 0 ? order.transactions[order.transactions.length - 1] : null;
-    const paymentUrl = lastTransaction ? `https://gateway.zibal.ir/start/${lastTransaction.trackid}` : '#';
+
+    const handleRetryPayment = () => {
+        // If an order has failed but has a previous transaction attempt, redirect to the gateway to try again.
+        if (order.order_status === 'failed' && lastTransaction?.trackid) {
+            window.location.href = `https://gateway.zibal.ir/start/${lastTransaction.trackid}`;
+            return;
+        }
+
+        // For pending orders, or failed orders without a transaction, go through the normal flow to generate a new one.
+        if (onContinueOrder) {
+            onContinueOrder(order);
+        }
+    };
 
     const orderStatus = order.order_status;
     const statusInfo = !statusesLoading ? statusesMap[orderStatus] : null;
 
     return (
-        // FIX: Pass content as children to the Modal component.
         <Modal isOpen={isOpen} onClose={onClose} title={`${t('orderDetails')}`}>
             <>
                 <div className="table-container-simple" style={{ marginBottom: '1.5rem' }}>
@@ -56,15 +67,13 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder, onGoToOffl
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         {order.order_status === 'processing' && onGoToOfflineForm && (
                             <button className="btn btn-primary" onClick={() => onGoToOfflineForm(order)}>
-                                {/* FIX: Changed to use JSX children for Icon component */}
                                 <Icon>{ICONS.PENCIL}</Icon>
                                 <span>{t('submitBankInfo', { ns: 'buyCredits' })}</span>
                             </button>
                         )}
 
-                        {showPayButton && onContinueOrder && (
-                            <button className="btn btn-primary" onClick={() => onContinueOrder(order)}>
-                                {/* FIX: Changed to use JSX children for Icon component */}
+                        {showPayButton && (
+                            <button className="btn btn-primary" onClick={handleRetryPayment}>
                                 <Icon>{ICONS.LOCK_OPEN}</Icon>
                                 <span>{t('continueOrder')}</span>
                             </button>
@@ -72,7 +81,6 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder, onGoToOffl
                         
                         {showInvoiceButton && onViewInvoice && (
                             <button className="btn btn-primary" onClick={() => onViewInvoice(order)}>
-                                {/* FIX: Changed to use JSX children for Icon component */}
                                 <Icon>{ICONS.FILE_TEXT}</Icon>
                                 <span>{t('viewInvoice')}</span>
                             </button>

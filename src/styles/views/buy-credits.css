@@ -162,3 +162,38 @@ html[data-theme='dark'] .credit-slider {
     font-size: 1rem;
     padding: 0.8rem 1.5rem;
 }
+
+/* Offline Payment Bank Details */
+.bank-details-section {
+    margin-bottom: 2rem;
+}
+.bank-details-section h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.bank-details-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem 1.5rem;
+    align-items: center;
+}
+.bank-details-list dt {
+    font-weight: 500;
+    color: var(--subtle-text-color);
+}
+.bank-details-list dd {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--subtle-background);
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-family: monospace;
+    font-size: 1rem;
+}
+.bank-details-list .btn-icon {
+    flex-shrink: 0;
+}

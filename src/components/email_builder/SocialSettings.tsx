@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -199,4 +197,52 @@ const SocialSettings = ({ block, onStyleChange, onContentChange }: { block: any,
                         onChange={(val) => handleStyleChange('iconStyle', val)}
                         options={[
                             { value: 'default', label: 'Default' },
-                            { value: 'square
+                            { value: 'square', label: 'Square' },
+                            { value: 'rounded', label: 'Rounded' },
+                            { value: 'circle', label: 'Circle' },
+                        ]}
+                    />
+                </LabeledControl>
+                 <LabeledControl label={t('iconColor')}>
+                     <SegmentedControl
+                        value={s.iconColor || 'gray'}
+                        onChange={(val) => handleStyleChange('iconColor', val)}
+                        options={[
+                            { value: 'dark', label: 'Dark' },
+                            { value: 'white', label: 'White' },
+                            { value: 'gray', label: 'Gray' },
+                            { value: 'color', label: 'Color' },
+                        ]}
+                    />
+                </LabeledControl>
+                <SliderControl label={t('iconSize')} value={s.iconSize || 30} onChange={val => handleStyleChange('iconSize', val)} min={20} max={60} />
+                <SliderControl label={t('iconSpacing')} value={s.iconSpacing || 15} onChange={val => handleStyleChange('iconSpacing', val)} min={0} max={40} />
+                <LabeledControl label={t('align')}>
+                    <SegmentedControl
+                        value={s.alignment || 'center'}
+                        onChange={(val) => handleStyleChange('alignment', val)}
+                        isIconOnly
+                        options={[
+                            { value: 'left', label: t('alignLeft'), icon: ICONS.ALIGN_LEFT },
+                            { value: 'center', label: t('alignCenter'), icon: ICONS.ALIGN_CENTER },
+                            { value: 'right', label: t('alignRight'), icon: ICONS.ALIGN_RIGHT },
+                        ]}
+                    />
+                </LabeledControl>
+            </Section>
+
+            <Section title={t('colors')}>
+                 <LabeledControl label={t('backgroundColor')}>
+                    <ColorInput 
+                        value={s.backgroundColor} 
+                        onChange={(val) => handleStyleChange('backgroundColor', val)} 
+                        onAdd={() => handleStyleChange('backgroundColor', '#FFFFFF')} 
+                        onRemove={() => handleStyleChange('backgroundColor', 'transparent')} 
+                    />
+                </LabeledControl>
+            </Section>
+        </>
+    );
+};
+
+export default SocialSettings;

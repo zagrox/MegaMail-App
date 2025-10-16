@@ -193,8 +193,8 @@ const ToolbarItem = ({ component, onAddComponent }: { component: typeof TOOLBAR_
                 }
             }}
         >
-{/* FIX: Changed to use explicit children prop for Icon component */}
-            <Icon children={component.icon} />
+            {/* FIX: Updated Icon component to accept children instead of a prop. */}
+            <Icon>{component.icon}</Icon>
             <span>{t(component.type.toLowerCase())}</span>
         </div>
     );

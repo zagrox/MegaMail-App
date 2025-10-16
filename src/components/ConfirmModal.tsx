@@ -50,7 +50,7 @@ const ConfirmModal = ({
     }, [isOpen]);
 
     return (
-        // FIX: Explicitly pass children to Modal component
+        // FIX: Passed content as children to the Modal component to satisfy TypeScript checks.
         <Modal
             isOpen={isOpen}
             onClose={onClose}
@@ -79,7 +79,7 @@ const ConfirmModal = ({
                             <Loader />
                         ) : (
                             <>
-                                {/* FIX: Changed path prop to children for Icon component */}
+                                {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                 <Icon>{confirmIcon}</Icon>
                                 <span>{confirmText || t('delete')}</span>
                             </>

@@ -1,3 +1,4 @@
+
 {
     "orders": "سفارش‌ها",
     "totalAmount": "مبلغ کل",
@@ -36,5 +37,7 @@
     "unitPrice": "قیمت واحد",
     "subtotal": "جمع جزء",
     "tax": "مالیات (۰٪)",
-    "thankYouForYourBusiness": "از خرید شما متشکریم!"
+    "thankYouForYourBusiness": "از خرید شما متشکریم!",
+    "returnToOrders": "بازگشت به سفارشات من",
+    "newOrder": "سفارش جدید"
 }

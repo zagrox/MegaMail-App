@@ -93,7 +93,7 @@ const ImportWizardModal = ({ isOpen, onClose, apiKey, onSuccess, onError, initia
 
         const reader = new FileReader();
         reader.onload = (e) => {
-            // FIX: Check if the result is a string before proceeding.
+            // FIX: Added a type guard to ensure the file reader result is a string before processing.
             const result = e.target?.result;
             if (typeof result !== 'string') {
                 onError("Could not read file content as text.");
@@ -165,7 +165,7 @@ const ImportWizardModal = ({ isOpen, onClose, apiKey, onSuccess, onError, initia
     const isStep2ImportDisabled = !Object.values(mappings).some(f => f === 'Email') || isProcessing;
 
     return (
-        // FIX: Pass content as children to the Modal component.
+        // FIX: Passed content as children to the Modal component to satisfy TypeScript checks.
         <Modal
             isOpen={isOpen}
             onClose={onClose}

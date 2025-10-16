@@ -273,6 +273,10 @@
         margin: 0;
     }
     .app-container.sidebar-collapsed .nav-btn {
+        width: 44px;
+        height: 44px;
+        padding: 0; /* Remove padding to let flexbox center the icon */
+        margin: 0.1rem auto; /* Add some vertical spacing and center horizontally */
         justify-content: center;
     }
     .app-container.sidebar-collapsed .nav-btn .lock-icon {

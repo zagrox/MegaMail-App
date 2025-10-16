@@ -23,7 +23,7 @@ const RenameModal = ({ isOpen, onClose, entityName, entityType, onSubmit }: { is
     };
 
     return (
-        // FIX: Pass form as a child to the Modal component to satisfy TypeScript checks.
+        // FIX: Passed form content as children to the Modal component to satisfy TypeScript checks.
         <Modal
             isOpen={isOpen}
             onClose={onClose}

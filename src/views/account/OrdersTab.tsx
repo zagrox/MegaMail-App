@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readItems } from '@directus/sdk';
@@ -11,6 +12,7 @@ import OrderDetailsModal from './OrderDetailsModal';
 import { formatDateRelative } from '../../utils/helpers';
 import Badge from '../../components/Badge';
 import { useOrderStatuses } from '../../hooks/useOrderStatuses';
+import Button from '../../components/Button';
 
 const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void }) => {
     const { t, i18n } = useTranslation(['orders', 'common', 'buyCredits', 'dashboard']);
@@ -113,8 +115,12 @@ const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void })
                     onViewInvoice={handleViewInvoice}
                 />
             )}
-            <div className="account-tab-card-header">
+            <div className="account-tab-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3>{t('orders')}</h3>
+                <Button className="btn-primary" onClick={() => setView('Buy Credits')}>
+                    <Icon>{ICONS.PLUS}</Icon>
+                    <span>{t('newOrder')}</span>
+                </Button>
             </div>
             <div className="account-tab-card-body" style={{ padding: 0 }}>
                 {orders.length === 0 ? (
@@ -152,7 +158,6 @@ const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void })
                                             </td>
                                             <td style={{ textAlign: 'right' }}>
                                                 <button className="btn-icon btn-icon-primary" onClick={() => setSelectedOrder(order)} aria-label={t('orderDetails', { ns: 'buyCredits' })}>
-                                                    {/* FIX: Changed path prop to children for Icon component */}
                                                     <Icon>{ICONS.EYE}</Icon>
                                                 </button>
                                             </td>

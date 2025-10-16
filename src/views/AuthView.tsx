@@ -163,8 +163,8 @@ const AuthView = () => {
                             {mode === 'login' ? (
                                 <>
                                     <div className="input-group">
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                        <Icon children={ICONS.MAIL} />
+                                        {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                                        <Icon>{ICONS.MAIL}</Icon>
                                         <input 
                                             name="email" 
                                             type="email" 
@@ -176,8 +176,8 @@ const AuthView = () => {
                                         />
                                     </div>
                                     <div className="input-group has-btn">
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                        <Icon children={ICONS.LOCK} />
+                                        {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                                        <Icon>{ICONS.LOCK}</Icon>
                                         <input 
                                             name="password" 
                                             type={showPassword ? "text" : "password"} 
@@ -188,8 +188,8 @@ const AuthView = () => {
                                             autoComplete="current-password"
                                         />
                                         <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                            <Icon children={showPassword ? ICONS.EYE_OFF : ICONS.EYE} />
+                                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                                            <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
                                         </button>
                                     </div>
                                     <div style={{ textAlign: 'right', fontSize: '0.9rem', marginTop: '-0.5rem', marginBottom: '1rem' }}>
@@ -202,44 +202,44 @@ const AuthView = () => {
                                 <>
                                     <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                         <div className="input-group">
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                            <Icon children={ICONS.ACCOUNT} />
+                                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                                            <Icon>{ICONS.ACCOUNT}</Icon>
                                             <input name="first_name" type="text" placeholder={t('firstName')} required autoComplete="given-name" />
                                         </div>
                                         <div className="input-group">
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                            <Icon children={ICONS.ACCOUNT} />
+                                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                                            <Icon>{ICONS.ACCOUNT}</Icon>
                                             <input name="last_name" type="text" placeholder={t('lastName')} required autoComplete="family-name" />
                                         </div>
                                     </div>
                                     <div className="input-group">
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                        <Icon children={ICONS.MAIL} />
+                                        {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                                        <Icon>{ICONS.MAIL}</Icon>
                                         <input name="email" type="email" placeholder={t('emailAddress')} required autoComplete="username" />
                                     </div>
                                     <div className="input-group has-btn">
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                        <Icon children={ICONS.LOCK} />
+                                        {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                                        <Icon>{ICONS.LOCK}</Icon>
                                         <input name="password" type={showPassword ? "text" : "password"} placeholder={t('password')} required autoComplete="new-password" />
                                         <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                            <Icon children={showPassword ? ICONS.EYE_OFF : ICONS.EYE} />
+                                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                                            <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
                                         </button>
                                     </div>
                                     <div className="input-group has-btn">
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                        <Icon children={ICONS.LOCK} />
+                                        {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                                        <Icon>{ICONS.LOCK}</Icon>
                                         <input name="confirm_password" type={showConfirmPassword ? "text" : "password"} placeholder={t('confirmPassword')} required autoComplete="new-password" />
                                         <button type="button" className="input-icon-btn" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                            <Icon children={showConfirmPassword ? ICONS.EYE_OFF : ICONS.EYE} />
+                                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                                            <Icon>{showConfirmPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
                                         </button>
                                     </div>
                                 </>
                             ) : ( // mode === 'forgot'
                                 <div className="input-group">
-{/* FIX: Changed to use explicit children prop for Icon component */}
-                                    <Icon children={ICONS.MAIL} />
+                                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
+                                    <Icon>{ICONS.MAIL}</Icon>
                                     <input name="email" type="email" placeholder={t('emailAddress')} required autoComplete="email" />
                                 </div>
                             )}
