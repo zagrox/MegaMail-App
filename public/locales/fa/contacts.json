@@ -1,3 +1,4 @@
+
 {
     "selectPage": "انتخاب صفحه",
     "countSelected": "{{count}} انتخاب شده",
@@ -94,5 +95,12 @@
     "mappingNotRecognized": "شناخته نشد",
     "mappingSkipColumn": "از این ستون بگذر",
     "mappingSelectField": "یک فیلد انتخاب کنید",
-    "import": "وارد کردن"
+    "import": "وارد کردن",
+    "addContactsToListTitle": "افزودن مخاطبین به «{{listName}}»",
+    "emailAddressesLabel": "آدرس‌های ایمیل",
+    "emailsPlaceholder": "user1@example.com, user2@example.com...",
+    "emailsHelpText": "یک یا چند ایمیل را وارد کنید، که با کاما، فاصله یا خط جدید از هم جدا شده باشند.",
+    "contactsAddedSuccess_one": "{{count}} مخاطب با موفقیت به «{{listName}}» اضافه شد!",
+    "contactsAddedSuccess_other": "{{count}} مخاطب با موفقیت به «{{listName}}» اضافه شدند!",
+    "contactsAddedError": "افزودن مخاطبین ناموفق بود: {{error}}"
 }

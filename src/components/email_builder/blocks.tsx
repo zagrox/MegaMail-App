@@ -395,9 +395,7 @@ const SocialBlock = ({ item }: { item: any }) => {
                                         width: `${iconSize}px`,
                                         height: `${iconSize}px`
                                     }}
-                                >
-                                    {socialInfo.path}
-                                </Icon>
+                                    children={socialInfo.path} />
                             </div>
                         </a>
                     );

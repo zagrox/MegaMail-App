@@ -1,3 +1,4 @@
+
 {
     "selectPage": "Select Page",
     "countSelected": "{{count}} selected",
@@ -94,5 +95,12 @@
     "mappingNotRecognized": "Not Recognized",
     "mappingSkipColumn": "Skip this column",
     "mappingSelectField": "Select a field",
-    "import": "Import"
+    "import": "Import",
+    "addContactsToListTitle": "Add Contacts to \"{{listName}}\"",
+    "emailAddressesLabel": "Email Addresses",
+    "emailsPlaceholder": "user1@example.com, user2@example.com...",
+    "emailsHelpText": "Enter one or more emails, separated by commas, spaces, or new lines.",
+    "contactsAddedSuccess_one": "{{count}} contact added to \"{{listName}}\" successfully!",
+    "contactsAddedSuccess_other": "{{count}} contacts added to \"{{listName}}\" successfully!",
+    "contactsAddedError": "Failed to add contacts: {{error}}"
 }

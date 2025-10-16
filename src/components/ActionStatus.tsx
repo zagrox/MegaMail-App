@@ -6,7 +6,7 @@ interface ActionStatusProps {
     onDismiss: () => void;
 }
 
-const ActionStatus: React.FC<ActionStatusProps> = ({ status, onDismiss }) => {
+const ActionStatus = ({ status, onDismiss }: ActionStatusProps) => {
     useEffect(() => {
         if (status) {
             const timer = setTimeout(() => {
@@ -30,12 +30,10 @@ const ActionStatus: React.FC<ActionStatusProps> = ({ status, onDismiss }) => {
 
     return (
         <div className={`action-status info-message ${currentConfig.className}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            {/* FIX: Changed to use JSX children for Icon component */}
-            <Icon>{currentConfig.icon}</Icon>
+            <Icon children={currentConfig.icon} />
             <p style={{ margin: '0 0.75rem', flexGrow: 1 }}>{status.message}</p>
             <button onClick={onDismiss} className="btn-icon" style={{alignSelf: 'center'}}>
-                {/* FIX: Changed to use JSX children for Icon component */}
-                <Icon>{ICONS.DELETE}</Icon>
+                <Icon children={ICONS.DELETE} />
             </button>
         </div>
     );

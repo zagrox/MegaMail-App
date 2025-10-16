@@ -1029,20 +1029,23 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
                 <header className="email-builder-header">
                     <div className="email-builder-header-left">
                         <button className="btn-icon" onClick={() => setView('Gallery')} title={t('gallery', { ns: 'common' })}>
-                            <Icon>{ICONS.BOX}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                            <Icon children={ICONS.BOX} />
                         </button>
                         <button className="btn-icon" onClick={() => setIsTestSendVisible(prev => !prev)} title={t('sendTestEmail')}>
-                            <Icon>{ICONS.SEND_EMAIL}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                            <Icon children={ICONS.SEND_EMAIL} />
                         </button>
-                        <button className="btn-icon" onClick={handleOpenGlobalSettings} title={t('global')}><Icon>{ICONS.SETTINGS}</Icon></button>
-                        <button className={`btn-icon ${isMobileView ? 'active' : ''}`} onClick={toggleMobileView} title={t('mobileView')}><Icon>{ICONS.MOBILE}</Icon></button>
-                        <button className="btn-icon" onClick={() => prepareAndShowHtml('preview')} title={t('previewEmail')}><Icon>{ICONS.EYE}</Icon></button>
-                        <button className="btn-icon" onClick={() => prepareAndShowHtml('code')} title={t('viewCode')}><Icon>{ICONS.CODE}</Icon></button>
-                        <button className="btn-icon" onClick={handleExportHtml} title={t('exportHtml')}><Icon>{ICONS.DOWNLOAD}</Icon></button>
+                        <button className="btn-icon" onClick={handleOpenGlobalSettings} title={t('global')}><Icon children={ICONS.SETTINGS} /></button>
+                        <button className={`btn-icon ${isMobileView ? 'active' : ''}`} onClick={toggleMobileView} title={t('mobileView')}><Icon children={ICONS.MOBILE} /></button>
+                        <button className="btn-icon" onClick={() => prepareAndShowHtml('preview')} title={t('previewEmail')}><Icon children={ICONS.EYE} /></button>
+                        <button className="btn-icon" onClick={() => prepareAndShowHtml('code')} title={t('viewCode')}><Icon children={ICONS.CODE} /></button>
+                        <button className="btn-icon" onClick={handleExportHtml} title={t('exportHtml')}><Icon children={ICONS.DOWNLOAD} /></button>
                     </div>
                     <div className="email-builder-header-right">
                         <div className="input-with-icon">
-                            <Icon>{ICONS.ARCHIVE}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                            <Icon children={ICONS.ARCHIVE} />
                             <input
                                 type="text"
                                 placeholder={t('templateName')}
@@ -1053,7 +1056,7 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
                             />
                         </div>
                         <Button className="btn-primary" onClick={handleSaveTemplate} disabled={isSaving} title={t('saveChanges')} action={AppActions.SAVE_TEMPLATE}>
-                            {isSaving ? <Loader /> : <><Icon>{ICONS.SAVE_CHANGES}</Icon><span>{t('saveTemplate')}</span></>}
+                            {isSaving ? <Loader /> : <><Icon children={ICONS.SAVE_CHANGES} /><span>{t('saveTemplate')}</span></>}
                         </Button>
                     </div>
                 </header>
@@ -1061,7 +1064,8 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
                 <div className={`email-builder-test-panel ${isTestSendVisible ? 'visible' : ''}`}>
                     <div className="form-group">
                         <div className="input-with-icon">
-                            <Icon>{ICONS.MAIL}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                            <Icon children={ICONS.MAIL} />
                             <input
                                 type="text"
                                 placeholder={t('subject', { ns: 'sendEmail' })}
@@ -1074,7 +1078,8 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
                     <div className="email-builder-test-panel-row">
                         <div className="form-group">
                             <div className="input-with-icon">
-                                <Icon>{ICONS.ACCOUNT}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                <Icon children={ICONS.ACCOUNT} />
                                 <input
                                     type="text"
                                     placeholder={t('fromName', { ns: 'sendEmail' })}
@@ -1085,7 +1090,8 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
                             </div>
                         </div>
                         <button className="btn btn-secondary">
-                            <Icon>{ICONS.SEND_EMAIL}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                            <Icon children={ICONS.SEND_EMAIL} />
                             <span>{t('sendEmail')}</span>
                         </button>
                     </div>
@@ -1139,22 +1145,23 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
                 onSelect={handleImageSelect}
             />
             
-            <Modal isOpen={isPreviewModalOpen} onClose={() => setIsPreviewModalOpen(false)} title={t('previewEmail')} size="fullscreen" bodyClassName="modal-body--no-padding">
+            <Modal isOpen={isPreviewModalOpen} onClose={() => setIsPreviewModalOpen(false)} title={t('previewEmail')} size="fullscreen" bodyClassName="modal-body--no-padding" children={
                 <iframe srcDoc={generatedHtml} className="preview-iframe" title={t('previewEmail')} />
-            </Modal>
+            } />
             
-            <Modal isOpen={isCodeModalOpen} onClose={() => setIsCodeModalOpen(false)} title={t('htmlCode')} size="large">
+            <Modal isOpen={isCodeModalOpen} onClose={() => setIsCodeModalOpen(false)} title={t('htmlCode')} size="large" children={
                 <pre className="code-view-pre">
                     <code>{generatedHtml}</code>
                 </pre>
-            </Modal>
+            } />
 
             <DragOverlay>
                 {activeItem ? (
                     <div className="drag-overlay-item">
                         {activeItem.isToolbarItem ? (
                             <div className="toolbar-item" style={{cursor: 'grabbing'}}>
-                                <Icon>{activeItem.icon}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                <Icon children={activeItem.icon} />
                                 <span>{t(activeItem.type.toLowerCase())}</span>
                             </div>
                         ) : (

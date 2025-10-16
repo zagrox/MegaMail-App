@@ -12,7 +12,7 @@ interface AddContactToListModalProps {
 }
 
 const AddContactToListModal: React.FC<AddContactToListModalProps> = ({ isOpen, onClose, onSubmit, listName }) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['contacts', 'common']);
     const [emails, setEmails] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -44,26 +44,26 @@ const AddContactToListModal: React.FC<AddContactToListModalProps> = ({ isOpen, o
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title={`${t('addContact')} to "${listName}"`}
+            title={t('addContactsToListTitle', { listName })}
         >
             <form onSubmit={handleSubmit} className="modal-form">
                 <div className="form-group">
-                    <label htmlFor="emails-input">Email Addresses</label>
+                    <label htmlFor="emails-input">{t('emailAddressesLabel')}</label>
                     <textarea
                         id="emails-input"
                         value={emails}
                         onChange={e => setEmails(e.target.value)}
                         rows={5}
-                        placeholder="user1@example.com, user2@example.com..."
+                        placeholder={t('emailsPlaceholder')}
                         disabled={isSubmitting}
                     />
                     <p style={{ fontSize: '0.8rem', color: 'var(--subtle-text-color)', marginTop: '0.5rem' }}>
-                        Enter one or more emails, separated by commas, spaces, or new lines.
+                        {t('emailsHelpText')}
                     </p>
                 </div>
                 <div className="form-actions" style={{ marginTop: '1.5rem' }}>
                     <button type="button" className="btn" onClick={onClose} disabled={isSubmitting}>
-                        {t('cancel')}
+                        {t('cancel', { ns: 'common' })}
                     </button>
                     <button type="submit" className="btn btn-primary" disabled={isSubmitting || !emails.trim()}>
                         {isSubmitting ? <Loader /> : <><Icon>{ICONS.USER_PLUS}</Icon><span>{t('addContact')}</span></>}

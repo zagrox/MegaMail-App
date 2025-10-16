@@ -1,9 +1,5 @@
-
-
-
-
 import React, { useState, useMemo } from 'react';
-import WizardLayout from './WizardLayout';
+import WizardLayout from '../../components/send_wizard/WizardLayout';
 import Icon, { ICONS } from '../../components/Icon';
 import Modal from '../../components/Modal';
 import Loader from '../../components/Loader';
@@ -128,11 +124,12 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
 
     return (
         <>
-            <Modal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} title={t('templates')}>
+            <Modal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} title={t('templates')} children={
                 <div className="template-selector-modal">
                     <div className="search-bar" style={{marginBottom: '1rem'}}>
                         {/* FIX: Pass icon as child to Icon component */}
-                        <Icon>{ICONS.SEARCH}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                        <Icon children={ICONS.SEARCH} />
                         <input
                             type="search"
                             placeholder={t('searchTemplatesPlaceholder', { ns: 'templates' })}
@@ -168,11 +165,11 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
                         )}
                     </div>
                 </div>
-            </Modal>
+            } />
             
-            <Modal isOpen={isPreviewModalOpen} onClose={() => setIsPreviewModalOpen(false)} title={templateToPreview?.Name || ''} size="fullscreen" bodyClassName="modal-body--no-padding">
+            <Modal isOpen={isPreviewModalOpen} onClose={() => setIsPreviewModalOpen(false)} title={templateToPreview?.Name || ''} size="fullscreen" bodyClassName="modal-body--no-padding" children={
                 <iframe srcDoc={templateToPreview?.Body?.[0]?.Content || ''} className="preview-iframe" title={t('previewTemplate', { ns: 'templates' })} />
-            </Modal>
+            } />
             
             <WizardLayout
                 title={t('designContent')}
@@ -182,7 +179,8 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
             >
                 <div className="wizard-step-intro">
                     {/* FIX: Pass icon as child to Icon component */}
-                    <Icon>{ICONS.MAIL}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                    <Icon children={ICONS.MAIL} />
                     <p>{t('designContent_desc')}</p>
                 </div>
                 <div className="content-form-grid">
@@ -192,7 +190,8 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
                     </div>
                     <button className="btn btn-secondary" onClick={handlePreview} disabled={!data.template || isLoadingTemplate}>
                         {/* FIX: Pass icon as child to Icon component */}
-                        <Icon>{ICONS.EYE}</Icon> {t('previewTemplate', { ns: 'templates' })}
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                        <Icon children={ICONS.EYE} /> {t('previewTemplate', { ns: 'templates' })}
                     </button>
 
                     <label>{t('fromName', { ns: 'sendEmail' })}</label>

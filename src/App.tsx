@@ -512,18 +512,19 @@ const App = () => {
                             return (
                                 <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
                                     {isSidebarCollapsed ? (
-                                        <Tooltip text={navItem.name}>
-                                            <Icon>{navItem.icon}</Icon>
-                                        </Tooltip>
+// FIX: Changed to use explicit children prop for Icon component
+                                        <Tooltip text={navItem.name} children={<Icon children={navItem.icon} />} />
                                     ) : (
-                                        <Icon>{navItem.icon}</Icon>
+// FIX: Changed to use explicit children prop for Icon component
+                                        <Icon children={navItem.icon} />
                                     )}
                                     <span>{navItem.name}</span>
                                     {isLocked && (
+// FIX: Changed to use explicit children prop for Icon component
                                         <Icon
                                             className="lock-icon"
                                             style={isPromotional ? { color: 'var(--success-color)' } : {}}
-                                        >{isPromotional ? ICONS.GIFT : ICONS.STAR}</Icon>
+                                            children={isPromotional ? ICONS.GIFT : ICONS.STAR} />
                                     )}
                                 </button>
                             );
@@ -534,19 +535,23 @@ const App = () => {
         </nav>
         <div className="sidebar-footer-nav">
              <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
-                 {isSidebarCollapsed ? (<Tooltip text={t('settings', { ns: 'account' })}><Icon>{ICONS.SETTINGS}</Icon></Tooltip>) : (<Icon>{ICONS.SETTINGS}</Icon>)}
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                 {isSidebarCollapsed ? (<Tooltip text={t('settings', { ns: 'account' })}><Icon children={ICONS.SETTINGS} /></Tooltip>) : (<Icon children={ICONS.SETTINGS} />)}
                  <span>{t('settings', { ns: 'account' })}</span>
              </button>
              <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
-                 {isSidebarCollapsed ? (<Tooltip text={t('account')}><Icon>{ICONS.ACCOUNT}</Icon></Tooltip>) : (<Icon>{ICONS.ACCOUNT}</Icon>)}
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                 {isSidebarCollapsed ? (<Tooltip text={t('account')}><Icon children={ICONS.ACCOUNT} /></Tooltip>) : (<Icon children={ICONS.ACCOUNT} />)}
                  <span>{t('account')}</span>
              </button>
              <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
-                {isSidebarCollapsed ? (<Tooltip text={t('buyCredits')}><Icon>{ICONS.BUY_CREDITS}</Icon></Tooltip>) : (<Icon>{ICONS.BUY_CREDITS}</Icon>)}
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                {isSidebarCollapsed ? (<Tooltip text={t('buyCredits')}><Icon children={ICONS.BUY_CREDITS} /></Tooltip>) : (<Icon children={ICONS.BUY_CREDITS} />)}
                 <span>{t('buyCredits')}</span>
              </button>
              <button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
-                 {isSidebarCollapsed ? (<Tooltip text={t('guides')}><Icon>{ICONS.HELP_CIRCLE}</Icon></Tooltip>) : (<Icon>{ICONS.HELP_CIRCLE}</Icon>)}
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                 {isSidebarCollapsed ? (<Tooltip text={t('guides')}><Icon children={ICONS.HELP_CIRCLE} /></Tooltip>) : (<Icon children={ICONS.HELP_CIRCLE} />)}
                  <span>{t('guides')}</span>
              </button>
         </div>
@@ -576,16 +581,19 @@ const App = () => {
                 <SidebarContent />
             </aside>
             <button onClick={toggleSidebarCollapse} className="sidebar-collapse-toggle" aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
-               <Icon>{isRTL ? (isSidebarCollapsed ? ICONS.CHEVRON_LEFT : ICONS.CHEVRON_RIGHT) : (isSidebarCollapsed ? ICONS.CHEVRON_RIGHT : ICONS.CHEVRON_LEFT)}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+               <Icon children={isRTL ? (isSidebarCollapsed ? ICONS.CHEVRON_LEFT : ICONS.CHEVRON_RIGHT) : (isSidebarCollapsed ? ICONS.CHEVRON_RIGHT : ICONS.CHEVRON_LEFT)} />
             </button>
             <div className="main-wrapper">
                 <header className="mobile-header">
                      <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)} aria-label={t('openMenu')}>
-                        <Icon>{ICONS.MENU}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                        <Icon children={ICONS.MENU} />
                     </button>
                     <h1 className="mobile-header-title">{currentView?.title || appName}</h1>
                     <button className="mobile-menu-toggle" onClick={() => handleSetView('Account')} aria-label={t('account')}>
-                        <Icon>{ICONS.ACCOUNT}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                        <Icon children={ICONS.ACCOUNT} />
                     </button>
                 </header>
                 <main className={`content ${view === 'Email Builder' || view === 'Marketing' ? 'content--no-padding' : ''}`}>

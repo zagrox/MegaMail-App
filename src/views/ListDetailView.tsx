@@ -50,11 +50,11 @@ const ListDetailView = ({ apiKey, list, onBack, setView }: {
                 method: 'POST',
                 body: { Emails: emails }
             });
-            addToast(`${emails.length} contact(s) added to ${listName} successfully!`, 'success');
+            addToast(t('contactsAddedSuccess', { count: emails.length, listName }), 'success');
             setIsAddContactModalOpen(false);
             refetch();
         } catch (err: any) {
-            addToast(`Failed to add contacts: ${err.message}`, 'error');
+            addToast(t('contactsAddedError', { error: err.message }), 'error');
         }
     };
     

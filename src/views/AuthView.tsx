@@ -163,7 +163,8 @@ const AuthView = () => {
                             {mode === 'login' ? (
                                 <>
                                     <div className="input-group">
-                                        <Icon>{ICONS.MAIL}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                        <Icon children={ICONS.MAIL} />
                                         <input 
                                             name="email" 
                                             type="email" 
@@ -175,7 +176,8 @@ const AuthView = () => {
                                         />
                                     </div>
                                     <div className="input-group has-btn">
-                                        <Icon>{ICONS.LOCK}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                        <Icon children={ICONS.LOCK} />
                                         <input 
                                             name="password" 
                                             type={showPassword ? "text" : "password"} 
@@ -186,7 +188,8 @@ const AuthView = () => {
                                             autoComplete="current-password"
                                         />
                                         <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-                                            <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                            <Icon children={showPassword ? ICONS.EYE_OFF : ICONS.EYE} />
                                         </button>
                                     </div>
                                     <div style={{ textAlign: 'right', fontSize: '0.9rem', marginTop: '-0.5rem', marginBottom: '1rem' }}>
@@ -199,36 +202,44 @@ const AuthView = () => {
                                 <>
                                     <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                         <div className="input-group">
-                                            <Icon>{ICONS.ACCOUNT}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                            <Icon children={ICONS.ACCOUNT} />
                                             <input name="first_name" type="text" placeholder={t('firstName')} required autoComplete="given-name" />
                                         </div>
                                         <div className="input-group">
-                                            <Icon>{ICONS.ACCOUNT}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                            <Icon children={ICONS.ACCOUNT} />
                                             <input name="last_name" type="text" placeholder={t('lastName')} required autoComplete="family-name" />
                                         </div>
                                     </div>
                                     <div className="input-group">
-                                        <Icon>{ICONS.MAIL}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                        <Icon children={ICONS.MAIL} />
                                         <input name="email" type="email" placeholder={t('emailAddress')} required autoComplete="username" />
                                     </div>
                                     <div className="input-group has-btn">
-                                        <Icon>{ICONS.LOCK}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                        <Icon children={ICONS.LOCK} />
                                         <input name="password" type={showPassword ? "text" : "password"} placeholder={t('password')} required autoComplete="new-password" />
                                         <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>
-                                            <Icon>{showPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                            <Icon children={showPassword ? ICONS.EYE_OFF : ICONS.EYE} />
                                         </button>
                                     </div>
                                     <div className="input-group has-btn">
-                                        <Icon>{ICONS.LOCK}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                        <Icon children={ICONS.LOCK} />
                                         <input name="confirm_password" type={showConfirmPassword ? "text" : "password"} placeholder={t('confirmPassword')} required autoComplete="new-password" />
                                         <button type="button" className="input-icon-btn" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                                            <Icon>{showConfirmPassword ? ICONS.EYE_OFF : ICONS.EYE}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                            <Icon children={showConfirmPassword ? ICONS.EYE_OFF : ICONS.EYE} />
                                         </button>
                                     </div>
                                 </>
                             ) : ( // mode === 'forgot'
                                 <div className="input-group">
-                                    <Icon>{ICONS.MAIL}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                    <Icon children={ICONS.MAIL} />
                                     <input name="email" type="email" placeholder={t('emailAddress')} required autoComplete="email" />
                                 </div>
                             )}

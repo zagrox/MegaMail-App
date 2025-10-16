@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -75,21 +73,25 @@ export const SortableBlock = (props: SortableBlockProps) => {
                     >
                         <div className="canvas-item-actions-bar-left">
                            {/* FIX: Changed path prop to children for Icon component */}
-                           <Icon>{ICONS.DRAG_HANDLE}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                           <Icon children={ICONS.DRAG_HANDLE} />
                            <span>{getBlockTypeTranslationKey(item.type)}</span>
                         </div>
                         <div className="canvas-item-actions-bar-right">
                             {/* FIX: Changed path prop to children for Icon component */}
                             <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onEdit(id); }} aria-label={t('editBlock')}>
-                                <Icon>{ICONS.PENCIL}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                <Icon children={ICONS.PENCIL} />
                             </button>
                             {/* FIX: Changed path prop to children for Icon component */}
                             <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onDuplicate(id); }} aria-label={t('duplicateBlock')}>
-                                <Icon>{ICONS.DUPLICATE}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                <Icon children={ICONS.DUPLICATE} />
                             </button>
                             {/* FIX: Changed path prop to children for Icon component */}
                             <button className="btn-icon btn-icon-danger" onClick={(e) => { e.stopPropagation(); onRemove(id); }} aria-label={t('deleteBlock')}>
-                                <Icon>{ICONS.DELETE}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                                <Icon children={ICONS.DELETE} />
                             </button>
                         </div>
                     </div>
@@ -101,7 +103,8 @@ export const SortableBlock = (props: SortableBlockProps) => {
                             aria-label={t('addBlock')}
                         >
                             {/* FIX: Changed path prop to children for Icon component */}
-                            <Icon>{ICONS.PLUS}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                            <Icon children={ICONS.PLUS} />
                         </button>
                         {isAddPopoverOpen && (
                             <AddBlockPopover onSelectBlockType={handleInsert} onClose={() => setIsAddPopoverOpen(false)} />

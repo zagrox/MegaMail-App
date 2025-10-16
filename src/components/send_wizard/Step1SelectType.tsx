@@ -1,7 +1,3 @@
-
-
-
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import WizardLayout from './WizardLayout';
@@ -24,7 +20,8 @@ const Step1SelectType = ({ onNext, onBack, data, updateData }: { onNext: () => v
         >
             <div className="wizard-step-intro">
                 {/* FIX: Pass icon as child to Icon component */}
-                <Icon>{ICONS.HASH}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                <Icon children={ICONS.HASH} />
                 <p>{t('selectCampaignType_desc')}</p>
             </div>
             <div className="selection-grid">

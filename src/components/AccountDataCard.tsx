@@ -5,7 +5,8 @@ const AccountDataCard = React.memo(({ iconPath, title, children }: { iconPath: R
     <div className="card account-card">
         <div className="card-icon-wrapper">
             {/* FIX: Changed to use JSX children for Icon component */}
-            <Icon>{iconPath}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+            <Icon children={iconPath} />
         </div>
         <div className="card-details">
             <div className="card-title">{title}</div>

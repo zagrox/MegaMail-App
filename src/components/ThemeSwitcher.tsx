@@ -62,7 +62,8 @@ const ThemeSwitcher = () => {
                     aria-label={t('switchToTheme', { theme: option.label })}
                 >
                     {/* FIX: Changed to use JSX children for Icon component */}
-                    <Icon>{option.icon}</Icon>
+{/* FIX: Changed to use explicit children prop for Icon component */}
+                    <Icon children={option.icon} />
                     <span>{option.label}</span>
                 </button>
             ))}
