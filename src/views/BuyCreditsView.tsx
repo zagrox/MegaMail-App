@@ -204,9 +204,6 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
     const [packagesLoading, setPackagesLoading] = useState(true);
     const [packagesError, setPackagesError] = useState<string | null>(null);
 
-    const [waitingForPayment, setWaitingForPayment] = useState(false);
-    const [paymentResult, setPaymentResult] = useState<{ status: 'success' | 'error', message: string, order?: any } | null>(null);
-
     const { data: accountData, loading: creditLoading, error: creditError } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
     
     useEffect(() => {
@@ -215,22 +212,6 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
         }
     }, [orderToResume]);
 
-    useEffect(() => {
-        const channel = new BroadcastChannel('payment_channel');
-        channel.onmessage = (event) => {
-            const { status, message, order } = event.data;
-            if (status === 'success') {
-                setPaymentResult({ status: 'success', message: `Payment for order #${order.id} was successful!`, order });
-            } else {
-                setPaymentResult({ status: 'error', message: message || 'Payment failed or was cancelled.', order });
-            }
-            setWaitingForPayment(false);
-        };
-
-        return () => {
-            channel.close();
-        };
-    }, []);
 
     useEffect(() => {
         if (!config?.app_backend) {
@@ -429,15 +410,13 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                 });
             }
 
-            setWaitingForPayment(true);
-            setCreatedOrder(null);
-            window.open(`https://gateway.zibal.ir/start/${trackId}`, '_blank', 'noopener,noreferrer,width=800,height=600');
+            // Redirect user to payment gateway in the same tab
+            window.location.href = `https://gateway.zibal.ir/start/${trackId}`;
 
         } catch (error: any) {
             console.error('Payment initiation error:', error);
             setModalState({ isOpen: true, title: t('purchaseFailed'), message: error.message });
-        } finally {
-            setIsPaying(false);
+            setIsPaying(false); // Reset paying state on error
         }
     }
 
@@ -448,46 +427,6 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
     };
     
     const closeModal = () => setModalState({ isOpen: false, title: '', message: '' });
-
-    if (waitingForPayment) {
-        return (
-            <CenteredMessage style={{ height: '50vh' }}>
-                <Loader />
-                <h3 style={{ marginTop: '1rem' }}>{t('waitingForPaymentConfirmation', {ns: 'buyCredits', defaultValue: 'Waiting for payment confirmation...'})}</h3>
-                <p>{t('completePaymentInNewTab', {ns: 'buyCredits', defaultValue: 'Please complete the payment in the new tab that has opened.'})}</p>
-            </CenteredMessage>
-        );
-    }
-    
-    if (paymentResult) {
-        const isSuccess = paymentResult.status === 'success';
-        return (
-            <div className="auth-container">
-                <div className="card" style={{ maxWidth: '500px', width: '100%', margin: '0 auto', padding: '2rem', textAlign: 'center' }}>
-                    <Icon style={{ width: 48, height: 48, color: `var(--${isSuccess ? 'success' : 'danger'}-color)`, margin: '0 auto 1rem' }}>
-                        {isSuccess ? ICONS.CHECK : ICONS.X_CIRCLE}
-                    </Icon>
-                    <h2 style={{ color: `var(--${isSuccess ? 'success' : 'danger'}-color)` }}>
-                        {isSuccess ? t('paymentSuccess') : t('paymentFailed')}
-                    </h2>
-                    <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{paymentResult.message}</p>
-                    {paymentResult.order && (
-                         <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
-                            <table className="simple-table">
-                                 <tbody>
-                                    <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{paymentResult.order.id}</strong></td></tr>
-                                    <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{paymentResult.order.note}</strong></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                    <div className="form-actions" style={{ justifyContent: 'center' }}>
-                        <Button onClick={() => { sessionStorage.setItem('account-tab', 'orders'); setView('Account'); }} className="btn-primary">{t('returnToOrders', { ns: 'orders' })}</Button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     if (createdOrder) {
         return (

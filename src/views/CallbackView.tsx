@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
+import Button from '../components/Button';
 
 type ProcessedOrder = {
     id: string;
@@ -16,24 +17,20 @@ type ProcessedOrder = {
 };
 
 const CallbackView = () => {
-    const { t } = useTranslation(['buyCredits', 'common']);
+    const { t } = useTranslation(['buyCredits', 'common', 'orders']);
     const { user, loading: authLoading } = useAuth();
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
     const [message, setMessage] = useState('Verifying your payment, please wait...');
+    const [processedOrder, setProcessedOrder] = useState<ProcessedOrder | null>(null);
 
     useEffect(() => {
-        const channel = new BroadcastChannel('payment_channel');
-
         if (authLoading) {
-            return; // Wait for auth to initialize
+            return; // Wait for auth to initialize before doing anything.
         }
 
         if (!user) {
             setStatus('error');
-            const errorMessage = 'Authentication session not found. Please log in and check your orders.';
-            setMessage(errorMessage);
-            channel.postMessage({ status: 'error', message: errorMessage });
-            setTimeout(() => window.close(), 3000);
+            setMessage('Authentication session not found. Please log in and check your orders.');
             return;
         }
 
@@ -65,6 +62,10 @@ const CallbackView = () => {
                 
                 const transaction = transactions[0];
                 const order = transaction.transaction_order;
+
+                if (!order) {
+                    throw new Error(`Order for transaction ${transaction.id} could not be loaded.`);
+                }
                 
                 await sdk.request(updateItem('transactions', transaction.id, { payment_status: statusParam }));
 
@@ -88,30 +89,30 @@ const CallbackView = () => {
                         const successMessage = `Payment successful! ${packsize.toLocaleString()} credits have been added to your account.`;
                         setMessage(successMessage);
                         setStatus('success');
-                        channel.postMessage({ status: 'success', order: { ...orderData, creditsAdded: packsize }, message: successMessage });
+                        setProcessedOrder({ ...orderData, creditsAdded: packsize });
                     } else {
                         throw new Error("User API key not found. Could not add credits.");
                     }
                 } else {
                     await sdk.request(updateItem('orders', order.id, { order_status: 'failed' }));
-                    throw new Error('Payment was not successful or was cancelled.');
+                    setProcessedOrder(orderData);
+                    throw new Error('Payment was not successful or was cancelled by the user.');
                 }
 
             } catch (err: any) {
                 setMessage(err.message || 'An unknown error occurred during payment verification.');
                 setStatus('error');
-                channel.postMessage({ status: 'error', message: err.message });
-            } finally {
-                setTimeout(() => window.close(), 2000); // Attempt to close the tab after showing the message
             }
         };
 
         handleCallback();
 
-        return () => {
-            channel.close();
-        };
     }, [user, authLoading, t]);
+
+    const handleReturnToOrders = () => {
+        // Use a full page navigation to ensure the app state is fresh.
+        window.location.href = '/#account-orders';
+    };
 
     if (status === 'loading') {
         return (
@@ -124,22 +125,32 @@ const CallbackView = () => {
         );
     }
 
+    const isSuccess = status === 'success';
+
     return (
         <CenteredMessage style={{ height: '100vh' }}>
-            {status === 'success' ? (
-                 <Icon style={{ width: 48, height: 48, color: 'var(--success-color)', margin: '0 auto 1rem' }}>{ICONS.CHECK}</Icon>
-            ) : (
-                 <Icon style={{ width: 48, height: 48, color: 'var(--danger-color)', margin: '0 auto 1rem' }}>{ICONS.X_CIRCLE}</Icon>
-            )}
-            <h2 style={{ color: status === 'success' ? 'var(--success-color)' : 'var(--danger-color)' }}>
-                {status === 'success' ? t('paymentSuccess') : t('paymentFailed')}
-            </h2>
-            <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>
-                {message}
-            </p>
-            <p style={{ marginTop: '1rem', color: 'var(--subtle-text-color)', fontSize: '0.9rem' }}>
-                {t('youCanCloseThisTab', { ns: 'buyCredits', defaultValue: 'You can now close this tab. Your original window has been updated.' })}
-            </p>
+            <div className="card" style={{ maxWidth: '500px', width: '100%', padding: '2rem', textAlign: 'center' }}>
+                <Icon style={{ width: 48, height: 48, color: `var(--${isSuccess ? 'success' : 'danger'}-color)`, margin: '0 auto 1rem' }}>
+                    {isSuccess ? ICONS.CHECK : ICONS.X_CIRCLE}
+                </Icon>
+                <h2 style={{ color: `var(--${isSuccess ? 'success' : 'danger'}-color)` }}>
+                    {isSuccess ? t('paymentSuccess') : t('paymentFailed')}
+                </h2>
+                <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{message}</p>
+                {processedOrder && (
+                     <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
+                        <table className="simple-table">
+                             <tbody>
+                                <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
+                                <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.note}</strong></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                <div className="form-actions" style={{ justifyContent: 'center' }}>
+                    <Button onClick={handleReturnToOrders} className="btn-primary">{t('returnToOrders', { ns: 'orders' })}</Button>
+                </div>
+            </div>
         </CenteredMessage>
     );
 };

@@ -57,8 +57,5 @@
     "accountNameLabel": "نام صاحب حساب",
     "bankNameValue": "بانک پاسارگاد",
     "cardNumberValue": "۵۰۲۲-۲۹۱۰-۸۹۳۲-۴۴۷۷",
-    "accountNameValue": "آقای حمید چمانچی",
-    "waitingForPaymentConfirmation": "در انتظار تأیید پرداخت...",
-    "completePaymentInNewTab": "لطفاً پرداخت را در تب جدیدی که باز شده است تکمیل کنید.",
-    "youCanCloseThisTab": "اکنون می‌توانید این تب را ببندید. پنجره اصلی شما به‌روزرسانی شده است."
+    "accountNameValue": "آقای حمید چمانچی"
 }

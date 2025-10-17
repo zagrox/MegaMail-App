@@ -57,8 +57,5 @@
     "accountNameLabel": "Account Name",
     "bankNameValue": "Pasargad Bank",
     "cardNumberValue": "5022 2910 8932 4477",
-    "accountNameValue": "Hamid Chamanchi",
-    "waitingForPaymentConfirmation": "Waiting for payment confirmation...",
-    "completePaymentInNewTab": "Please complete the payment in the new tab that has opened.",
-    "youCanCloseThisTab": "You can now close this tab. Your original window has been updated."
+    "accountNameValue": "Hamid Chamanchi"
 }
