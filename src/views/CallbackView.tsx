@@ -1,116 +1,97 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { readItems, updateItem } from '@directus/sdk';
+import { readItems } from '@directus/sdk';
 import sdk from '../api/directus';
-import { apiFetch } from '../api/elasticEmail';
 import { useAuth } from '../contexts/AuthContext';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
 import Button from '../components/Button';
 
-type ProcessedOrder = {
-    id: string;
-    note: string;
-    creditsAdded?: number;
-    total: number;
-};
-
 const CallbackView = () => {
     const { t } = useTranslation(['buyCredits', 'common', 'orders']);
     const { user, loading: authLoading } = useAuth();
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-    const [message, setMessage] = useState('Verifying your payment, please wait...');
-    const [processedOrder, setProcessedOrder] = useState<ProcessedOrder | null>(null);
+    const [message, setMessage] = useState(t('verifyingPayment', { ns: 'buyCredits' }));
+    const [finalOrder, setFinalOrder] = useState<any | null>(null);
 
     useEffect(() => {
         if (authLoading) {
-            return; // Wait for auth to initialize before doing anything.
+            return; // Wait for auth session to initialize
         }
 
         if (!user) {
             setStatus('error');
-            setMessage('Authentication session not found. Please log in and check your orders.');
+            setMessage(t('sessionExpired', { ns: 'buyCredits' }));
             return;
         }
 
-        const handleCallback = async () => {
+        const params = new URLSearchParams(window.location.hash.split('?')[1] || window.location.search);
+        const orderId = params.get('orderId');
+
+        if (!orderId) {
+            setStatus('error');
+            setMessage(t('orderIdMissing', { ns: 'buyCredits' }));
+            return;
+        }
+
+        const poll = async () => {
             try {
-                const hash = window.location.hash.substring(1);
-                const hashQueryString = hash.split('?')[1] || '';
-                const searchQueryString = window.location.search.substring(1) || '';
-                const params = new URLSearchParams(hashQueryString || searchQueryString);
-                
-                const trackId = params.get('trackId');
-                const statusParam = params.get('status');
-                const success = params.get('success');
-                const orderIdParam = params.get('orderId');
-
-                if (!trackId || !statusParam || !success || !orderIdParam) {
-                    throw new Error('Missing callback parameters.');
-                }
-
-                const transactions = await sdk.request(readItems('transactions', {
-                    filter: { trackid: { _eq: trackId } },
-                    fields: ['*', 'transaction_order.*'],
+                const response = await sdk.request(readItems('orders', {
+                    filter: { id: { _eq: orderId }, user_created: { _eq: user.id } },
+                    fields: ['id', 'order_status', 'order_note', 'order_total'],
                     limit: 1
                 }));
 
-                if (!transactions || transactions.length === 0) {
-                    throw new Error(`Transaction with Track ID ${trackId} not found.`);
+                const order = response?.[0];
+
+                if (order && order.order_status !== 'pending' && order.order_status !== 'processing') {
+                    return order; // End polling
                 }
-                
-                const transaction = transactions[0];
-                const order = transaction.transaction_order;
-
-                if (!order) {
-                    throw new Error(`Order for transaction ${transaction.id} could not be loaded.`);
-                }
-                
-                await sdk.request(updateItem('transactions', transaction.id, { payment_status: statusParam }));
-
-                const isSuccess = success === '1' && (statusParam === '1' || statusParam === '2');
-                const orderData = { id: order.id, note: order.order_note, total: order.order_total };
-
-                if (isSuccess) {
-                    await sdk.request(updateItem('orders', order.id, { order_status: 'completed' }));
-                    
-                    const packages = await sdk.request(readItems('packages', { filter: { packname: { _eq: order.order_note } } }));
-                    if (!packages || packages.length === 0) throw new Error(`Package details for "${order.order_note}" not found.`);
-                    
-                    const packsize = packages[0].packsize;
-
-                    if (user.elastickey) {
-                        await apiFetch('/account/addsubaccountcredits', user.elastickey, {
-                            method: 'POST',
-                            params: { credits: packsize, notes: `Order #${order.id} via ZibalPay. Track ID: ${trackId}` }
-                        });
-                        
-                        const successMessage = `Payment successful! ${packsize.toLocaleString()} credits have been added to your account.`;
-                        setMessage(successMessage);
-                        setStatus('success');
-                        setProcessedOrder({ ...orderData, creditsAdded: packsize });
-                    } else {
-                        throw new Error("User API key not found. Could not add credits.");
-                    }
-                } else {
-                    await sdk.request(updateItem('orders', order.id, { order_status: 'failed' }));
-                    setProcessedOrder(orderData);
-                    throw new Error('Payment was not successful or was cancelled by the user.');
-                }
-
+                return null; // Continue polling
             } catch (err: any) {
-                setMessage(err.message || 'An unknown error occurred during payment verification.');
-                setStatus('error');
+                // Stop polling on a hard error like "Access Denied"
+                throw new Error(t('orderStatusError', { ns: 'buyCredits', error: err.message }));
             }
         };
 
-        handleCallback();
+        const intervalId = setInterval(async () => {
+            const orderResult = await poll().catch(err => {
+                clearInterval(intervalId);
+                setStatus('error');
+                setMessage(err.message);
+            });
 
-    }, [user, authLoading, t]);
+            if (orderResult) {
+                clearInterval(intervalId);
+                setFinalOrder(orderResult);
+                if (orderResult.order_status === 'completed') {
+                    setStatus('success');
+                    setMessage(t('paymentSuccessMessage', { ns: 'buyCredits' }));
+                } else {
+                    setStatus('error');
+                    setMessage(t('paymentFailedMessageFull', { ns: 'buyCredits' }));
+                }
+            }
+        }, 3000); // Poll every 3 seconds
+
+        // Set a timeout to prevent infinite polling
+        const timeoutId = setTimeout(() => {
+            clearInterval(intervalId);
+            if (status === 'loading') {
+                setStatus('error');
+                setMessage(t('paymentTimeout', { ns: 'buyCredits' }));
+            }
+        }, 60000); // 1 minute timeout
+
+        return () => {
+            clearInterval(intervalId);
+            clearTimeout(timeoutId);
+        };
+
+    }, [authLoading, user, t]);
 
     const handleReturnToOrders = () => {
-        // Use a full page navigation to ensure the app state is fresh.
         window.location.href = '/#account-orders';
     };
 
@@ -137,12 +118,12 @@ const CallbackView = () => {
                     {isSuccess ? t('paymentSuccess') : t('paymentFailed')}
                 </h2>
                 <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{message}</p>
-                {processedOrder && (
+                {finalOrder && (
                      <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
                         <table className="simple-table">
                              <tbody>
-                                <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
-                                <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.note}</strong></td></tr>
+                                <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{finalOrder.id}</strong></td></tr>
+                                <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{finalOrder.order_note}</strong></td></tr>
                             </tbody>
                         </table>
                     </div>
