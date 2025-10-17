@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { readItems } from '@directus/sdk';
+import { updateItem, readItems } from '@directus/sdk';
 import sdk from '../api/directus';
 import { useAuth } from '../contexts/AuthContext';
+import { useConfiguration } from '../contexts/ConfigurationContext';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
@@ -11,85 +12,116 @@ import Button from '../components/Button';
 const CallbackView = () => {
     const { t } = useTranslation(['buyCredits', 'common', 'orders']);
     const { user, loading: authLoading } = useAuth();
+    const { config, loading: configLoading } = useConfiguration();
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-    const [message, setMessage] = useState(t('verifyingPayment', { ns: 'buyCredits' }));
+    const [message, setMessage] = useState(t('verifyingPayment'));
     const [finalOrder, setFinalOrder] = useState<any | null>(null);
 
     useEffect(() => {
-        if (authLoading) {
-            return; // Wait for auth session to initialize
-        }
+        const verifyPayment = async () => {
+            if (authLoading || configLoading) {
+                return; // Wait for auth session and config to initialize
+            }
 
-        if (!user) {
-            setStatus('error');
-            setMessage(t('sessionExpired', { ns: 'buyCredits' }));
-            return;
-        }
+            if (!user || !config) {
+                setStatus('error');
+                setMessage(t('sessionExpired'));
+                return;
+            }
 
-        const params = new URLSearchParams(window.location.hash.split('?')[1] || window.location.search);
-        const orderId = params.get('orderId');
-
-        if (!orderId) {
-            setStatus('error');
-            setMessage(t('orderIdMissing', { ns: 'buyCredits' }));
-            return;
-        }
-
-        const poll = async () => {
+            const params = new URLSearchParams(window.location.search || window.location.hash.split('?')[1]);
+            const orderId = params.get('orderId');
+            const trackId = params.get('trackId');
+            const zibalStatus = params.get('status');
+            const success = params.get('success');
+            
+            if (!orderId || !trackId || !zibalStatus || !success) {
+                setStatus('error');
+                setMessage(t('invalidCallbackParams'));
+                return;
+            }
+            
+            // Attempt to fetch order details for display, regardless of outcome
             try {
-                const response = await sdk.request(readItems('orders', {
-                    filter: { id: { _eq: orderId }, user_created: { _eq: user.id } },
+                const orderResponse = await sdk.request(readItems('orders', {
+                    filter: { id: { _eq: orderId } },
                     fields: ['id', 'order_status', 'order_note', 'order_total'],
                     limit: 1
                 }));
-
-                const order = response?.[0];
-
-                if (order && order.order_status !== 'pending' && order.order_status !== 'processing') {
-                    return order; // End polling
+                if (orderResponse?.[0]) {
+                    setFinalOrder(orderResponse[0]);
                 }
-                return null; // Continue polling
-            } catch (err: any) {
-                // Stop polling on a hard error like "Access Denied"
-                throw new Error(t('orderStatusError', { ns: 'buyCredits', error: err.message }));
+            } catch (e) {
+                console.warn("Could not fetch final order details for display.");
             }
-        };
 
-        const intervalId = setInterval(async () => {
-            const orderResult = await poll().catch(err => {
-                clearInterval(intervalId);
+            // Handle cases where user cancelled on bank page or payment failed initially
+            if (success !== '1' || zibalStatus !== '2') {
+                 try {
+                    await sdk.request(updateItem('orders', orderId, { order_status: 'failed' }));
+                } catch (updateError) {
+                    console.warn(`Could not update order ${orderId} to failed status`, updateError);
+                }
                 setStatus('error');
-                setMessage(err.message);
-            });
+                setMessage(t('paymentFailedMessageFull'));
+                return;
+            }
 
-            if (orderResult) {
-                clearInterval(intervalId);
-                setFinalOrder(orderResult);
-                if (orderResult.order_status === 'completed') {
+            // At this point, zibalStatus is '2', meaning potential success. We MUST verify.
+            try {
+                const zibalVerificationResponse = await fetch("https://gateway.zibal.ir/v1/verify", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        merchant: config.app_zibal || "62f36ca618f934159dd26c19",
+                        trackId: Number(trackId),
+                    }),
+                });
+                if (!zibalVerificationResponse.ok) {
+                    throw new Error('Could not connect to payment verification service.');
+                }
+                const zibalData = await zibalVerificationResponse.json();
+
+                // Update transaction record in Directus with verification result
+                const transactions = await sdk.request(readItems('transactions', {
+                    filter: { trackid: { _eq: trackId } },
+                    limit: 1
+                }));
+                const transactionId = transactions?.[0]?.id;
+
+                if (transactionId) {
+                    await sdk.request(updateItem('transactions', transactionId, {
+                        transaction_status: String(zibalData.status),
+                        transaction_message: zibalData.message,
+                        transaction_ref: zibalData.refNumber,
+                        transaction_card: zibalData.cardNumber,
+                    }));
+                }
+                
+                // Check Zibal result and update our order status
+                if (zibalData.result === 100) { // Zibal success code
+                    const updatedOrder = await sdk.request(updateItem('orders', orderId, { order_status: 'completed' }));
+                    setFinalOrder(updatedOrder);
                     setStatus('success');
-                    setMessage(t('paymentSuccessMessage', { ns: 'buyCredits' }));
+                    setMessage(t('paymentSuccessMessage'));
                 } else {
-                    setStatus('error');
-                    setMessage(t('paymentFailedMessageFull', { ns: 'buyCredits' }));
+                    await sdk.request(updateItem('orders', orderId, { order_status: 'failed' }));
+                    throw new Error(zibalData.message || 'Payment verification failed.');
                 }
-            }
-        }, 3000); // Poll every 3 seconds
 
-        // Set a timeout to prevent infinite polling
-        const timeoutId = setTimeout(() => {
-            clearInterval(intervalId);
-            if (status === 'loading') {
+            } catch (err: any) {
                 setStatus('error');
-                setMessage(t('paymentTimeout', { ns: 'buyCredits' }));
+                setMessage(err.message || t('paymentFailedMessageFull'));
+                // Try to mark as failed in DB as a last resort
+                try {
+                     await sdk.request(updateItem('orders', orderId, { order_status: 'failed' }));
+                } catch {}
             }
-        }, 60000); // 1 minute timeout
-
-        return () => {
-            clearInterval(intervalId);
-            clearTimeout(timeoutId);
         };
 
-    }, [authLoading, user, t]);
+        verifyPayment();
+
+    }, [authLoading, configLoading, user, config, t]);
 
     const handleReturnToOrders = () => {
         window.location.href = '/#account-orders';
