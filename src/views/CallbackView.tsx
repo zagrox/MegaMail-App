@@ -1,195 +1,181 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { readItem } from '@directus/sdk';
+import { readItems, updateItem } from '@directus/sdk';
 import sdk from '../api/directus';
+import { apiFetch } from '../api/elasticEmail';
 import { useAuth } from '../contexts/AuthContext';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
-import Button from '../components/Button';
-import { useConfiguration } from '../contexts/ConfigurationContext';
+
+type ProcessedOrder = {
+    id: string;
+    note: string;
+    creditsAdded?: number;
+    total: number;
+};
 
 const CallbackView = () => {
-    const { t } = useTranslation(['buyCredits', 'common', 'orders']);
-    const { user, loading: authLoading } = useAuth();
-    const { config, loading: configLoading } = useConfiguration();
-    const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'timeout'>('verifying');
-    const [finalOrder, setFinalOrder] = useState<any | null>(null);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-    const pollInterval = useRef<number | null>(null);
-    const timeout = useRef<number | null>(null);
-    const hasTriggeredVerification = useRef(false);
-
-    const stopTimers = () => {
-        if (pollInterval.current) clearInterval(pollInterval.current);
-        if (timeout.current) clearTimeout(timeout.current);
-        pollInterval.current = null;
-        timeout.current = null;
-    };
+    const { t, i18n } = useTranslation(['buyCredits', 'dashboard', 'orders', 'common']);
+    const { user } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [message, setMessage] = useState('');
+    const [processedOrder, setProcessedOrder] = useState<ProcessedOrder | null>(null);
 
     useEffect(() => {
-        return () => stopTimers();
-    }, []);
-
-    useEffect(() => {
-        // 1. Wait until user and config are fully loaded.
-        if (authLoading || configLoading || !user || !config) {
-            return;
-        }
-
-        // 2. Ensure this logic runs only once.
-        if (hasTriggeredVerification.current) {
-            return;
-        }
-        hasTriggeredVerification.current = true;
-
-        const runVerificationAndPoll = async () => {
-            const params = new URLSearchParams(window.location.search || window.location.hash.split('?')[1]);
-            const orderId = params.get('orderId');
-            const trackId = params.get('trackId');
-
-            if (!orderId || !trackId) {
-                setStatus('error');
-                setErrorMessage(t('invalidCallbackParams'));
-                return;
-            }
-
+        const handleCallback = async () => {
+            setLoading(true);
             try {
-                // 3. Trigger the backend verification flow as the authenticated user.
-                const token = await sdk.getToken();
-                const flowUrl = `${config.app_backend}/flows/trigger/e0df8d51-4d1a-4638-994c-28340d21e0fc`;
-                const triggerResponse = await fetch(flowUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ trackId, orderId })
-                });
+                // Be robust: check both hash and search for parameters, as gateways can handle redirects differently.
+                const hash = window.location.hash.substring(1);
+                const hashQueryString = hash.split('?')[1] || '';
+                const searchQueryString = window.location.search.substring(1) || '';
+                const params = new URLSearchParams(hashQueryString || searchQueryString);
+                
+                const trackId = params.get('trackId');
+                const status = params.get('status');
+                const success = params.get('success');
+                const orderIdParam = params.get('orderId');
 
-                if (!triggerResponse.ok) {
-                    throw new Error('Failed to initiate payment verification flow.');
+                if (!trackId || !status || !success || !orderIdParam) {
+                    throw new Error('Missing callback parameters.');
+                }
+
+                // Find the transaction by trackId
+                const transactions = await sdk.request(readItems('transactions', {
+                    filter: { trackid: { _eq: trackId } },
+                    fields: ['*', 'transaction_order.*'],
+                    limit: 1
+                }));
+
+                if (!transactions || transactions.length === 0) {
+                    throw new Error(`Transaction with Track ID ${trackId} not found.`);
                 }
                 
-                // 4. Start polling for the result.
-                const pollOrderStatus = async () => {
-                    try {
-                        const order = await sdk.request(readItem('orders', orderId, { fields: ['order_status', 'id', 'order_note', 'order_total'] }));
-                        setFinalOrder(order);
-                        
-                        if (order.order_status === 'completed') {
-                            setStatus('success');
-                            stopTimers();
-                        } else if (order.order_status !== 'pending' && order.order_status !== 'processing') {
-                            setStatus('error');
-                            setErrorMessage(t('paymentFailedMessageFull'));
-                            stopTimers();
-                        }
-                    } catch (pollErr: any) {
-                        setStatus('error');
-                        setErrorMessage(t('orderStatusError', { error: pollErr.message }));
-                        stopTimers();
-                    }
-                };
+                const transaction = transactions[0];
+                const order = transaction.transaction_order;
                 
-                pollOrderStatus();
-                pollInterval.current = window.setInterval(pollOrderStatus, 3000);
+                // Update the transaction status
+                await sdk.request(updateItem('transactions', transaction.id, { payment_status: status }));
 
-                timeout.current = window.setTimeout(() => {
-                    // Check status inside timeout to avoid race conditions
-                    setStatus(currentStatus => {
-                        if (currentStatus === 'verifying') {
-                            stopTimers();
-                            return 'timeout';
-                        }
-                        return currentStatus;
+                const isSuccess = success === '1' && (status === '1' || status === '2');
+
+                if (isSuccess) {
+                    // Update order status
+                    await sdk.request(updateItem('orders', order.id, { order_status: 'completed' }));
+                    
+                    // Find package to get credit amount
+                    const packages = await sdk.request(readItems('packages', {
+                        filter: { packname: { _eq: order.order_note } }
+                    }));
+                    
+                    if (!packages || packages.length === 0) {
+                        throw new Error(`Package details for "${order.order_note}" not found.`);
+                    }
+                    const packsize = packages[0].packsize;
+
+                    // Add credits to user's account via Elastic Email API
+                    if (user && user.elastickey) {
+                        await apiFetch('/account/addsubaccountcredits', user.elastickey, {
+                            method: 'POST',
+                            params: {
+                                credits: packsize,
+                                notes: `Order #${order.id} via ZibalPay. Track ID: ${trackId}`
+                            }
+                        });
+                        setMessage(`Payment successful! ${packsize.toLocaleString()} credits have been added to your account.`);
+                        setProcessedOrder({
+                            id: order.id,
+                            note: order.order_note,
+                            creditsAdded: packsize,
+                            total: order.order_total,
+                        });
+                    } else {
+                        throw new Error("User authentication not found. Could not add credits.");
+                    }
+                } else {
+                    // Payment failed or was canceled
+                    await sdk.request(updateItem('orders', order.id, { order_status: 'failed' }));
+                     setProcessedOrder({
+                        id: order.id,
+                        note: order.order_note,
+                        total: order.order_total,
                     });
-                }, 45000);
+                    throw new Error('Payment was not successful.');
+                }
 
-            } catch (triggerErr: any) {
-                setStatus('error');
-                setErrorMessage(triggerErr.message);
-                stopTimers();
+            } catch (err: any) {
+                setError(err.message || 'An unknown error occurred during payment verification.');
+            } finally {
+                setLoading(false);
             }
         };
 
-        runVerificationAndPoll();
+        handleCallback();
+    }, [user]);
 
-    }, [authLoading, configLoading, user, config, t]);
-
-
-    const handleReturnToOrders = () => {
+    const handleReturn = () => {
         window.location.href = '/#account-orders';
     };
 
-    const renderContent = () => {
-        switch (status) {
-            case 'success':
-                return {
-                    icon: ICONS.CHECK,
-                    colorClass: 'success',
-                    title: t('paymentSuccess'),
-                    message: t('paymentSuccessMessage'),
-                };
-            case 'error':
-                 return {
-                    icon: ICONS.X_CIRCLE,
-                    colorClass: 'danger',
-                    title: t('paymentFailed'),
-                    message: errorMessage || t('orderStatusError', { error: 'Verification failed.' }),
-                };
-            case 'timeout':
-                 return {
-                    icon: ICONS.COMPLAINT,
-                    colorClass: 'warning',
-                    title: t('paymentFailed'),
-                    message: t('paymentTimeout'),
-                };
-            case 'verifying':
-            default:
-                return null;
-        }
-    };
-
-    const content = renderContent();
-
-    if (!content) {
+    if (loading) {
         return (
             <CenteredMessage style={{ height: '100vh' }}>
                 <Loader />
                 <p style={{ marginTop: '1rem', color: 'var(--subtle-text-color)' }}>
-                    {t('verifyingPayment')}
+                    Verifying your payment, please wait...
                 </p>
             </CenteredMessage>
         );
     }
 
     return (
-         <CenteredMessage style={{ height: '100vh' }}>
-            <div className="card" style={{ maxWidth: '500px', width: '100%', padding: '2rem', textAlign: 'center' }}>
-                <Icon style={{ width: 48, height: 48, color: `var(--${content.colorClass}-color)`, margin: '0 auto 1rem' }}>
-                    {content.icon}
-                </Icon>
-                <h2 style={{ color: `var(--${content.colorClass}-color)` }}>
-                    {content.title}
-                </h2>
-                <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{content.message}</p>
-                {finalOrder && (
-                     <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
-                        <table className="simple-table">
-                             <tbody>
-                                <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{finalOrder.id}</strong></td></tr>
-                                <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{finalOrder.order_note}</strong></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+        <div className="auth-container">
+            <div className="card" style={{ maxWidth: '500px', width: '100%', margin: '0 auto', padding: '2rem', textAlign: 'center' }}>
+                {error ? (
+                    <>
+                        <Icon style={{ width: 48, height: 48, color: 'var(--danger-color)', margin: '0 auto 1rem' }}>{ICONS.X_CIRCLE}</Icon>
+                        <h2 style={{ color: 'var(--danger-color)' }}>{t('paymentFailed')}</h2>
+                        <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{error}</p>
+                        {processedOrder && (
+                             <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
+                                <table className="simple-table">
+                                     <tbody>
+                                        <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
+                                        <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.note}</strong></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                        <div className="form-actions" style={{ justifyContent: 'center' }}>
+                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToOrders', { ns: 'orders' })}</button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <Icon style={{ width: 48, height: 48, color: 'var(--success-color)', margin: '0 auto 1rem' }}>{ICONS.CHECK}</Icon>
+                        <h2 style={{ color: 'var(--success-color)' }}>{t('paymentSuccess')}</h2>
+                        <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{message}</p>
+                        {processedOrder && (
+                            <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
+                                <table className="simple-table">
+                                    <tbody>
+                                        <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
+                                        <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.note}</strong></td></tr>
+                                        {processedOrder.creditsAdded && <tr><td>{t('credits', { ns: 'dashboard' })}</td><td style={{textAlign: 'right'}}><strong>+{processedOrder.creditsAdded.toLocaleString(i18n.language)}</strong></td></tr>}
+                                        <tr><td>{t('total', { ns: 'common' })}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.total.toLocaleString(i18n.language)} {t('buyCredits:priceIRT')}</strong></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                        <div className="form-actions" style={{ justifyContent: 'center' }}>
+                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToOrders', { ns: 'orders' })}</button>
+                        </div>
+                    </>
                 )}
-                <div className="form-actions" style={{ justifyContent: 'center' }}>
-                    <Button onClick={handleReturnToOrders} className="btn-primary">{t('returnToOrders', { ns: 'orders' })}</Button>
-                </div>
             </div>
-        </CenteredMessage>
+        </div>
     );
 };
 

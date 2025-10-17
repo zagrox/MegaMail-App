@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from './useApi';
@@ -12,7 +14,6 @@ import Loader from '../components/Loader';
 import { useToast } from '../contexts/ToastContext';
 import { readItems } from '@directus/sdk';
 import { Module } from '../api/types';
-import Button from '../components/Button';
 
 const PricingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
     const { t, i18n } = useTranslation(['buyCredits', 'common']);
@@ -46,6 +47,7 @@ const PricingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
     }, [isOpen]);
 
     return (
+        // FIX: Passed content as children to the Modal component to satisfy TypeScript checks.
         <Modal
             isOpen={isOpen}
             onClose={onClose}
@@ -167,6 +169,7 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
     return (
         <div className="card balance-display-card">
             <div className="balance-info">
+                {/* FIX: Updated Icon component to accept children instead of a prop. */}
                 <Icon className="balance-icon">{ICONS.BUY_CREDITS}</Icon>
                 <div>
                     <span className="balance-title">{t('yourCurrentBalance')}</span>
@@ -177,10 +180,12 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
             </div>
             <div className="balance-actions">
                 <button className="btn btn-secondary" onClick={onPricingClick}>
+                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
                     <Icon>{ICONS.PRICE_TAG}</Icon>
                     <span>{t('pricingAndFees')}</span>
                 </button>
                 <button className="btn btn-secondary" onClick={onHistoryClick}>
+                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
                     <Icon>{ICONS.CALENDAR}</Icon>
                     <span>{t('viewHistory')}</span>
                 </button>
@@ -211,7 +216,6 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
             setCreatedOrder(orderToResume);
         }
     }, [orderToResume]);
-
 
     useEffect(() => {
         if (!config?.app_backend) {
@@ -334,10 +338,14 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
         if (!createdOrder) return;
         setIsPaying(true);
         try {
+            // This function now simply navigates to the offline payment page,
+            // keeping the order status as 'pending'. The status will be updated
+            // to 'processing' only after the user submits their bank details.
             const orderForNextStep = { ...createdOrder };
             setCreatedOrder(null);
             setView('OfflinePayment', { order: orderForNextStep });
         } catch (error: any) {
+            // This is unlikely to be hit now, but good for safety.
             addToast(t('purchaseFailedMessage', { error: error.message }), 'error');
         } finally {
             setIsPaying(false);
@@ -354,9 +362,10 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
         setModalState({ isOpen: false, title: '', message: '' });
 
         try {
+            // Step 1: Request trackId from Zibal
             const zibalPayload = {
                 merchant: config?.app_zibal || "62f36ca618f934159dd26c19",
-                amount: createdOrder.order_total * 10,
+                amount: createdOrder.order_total * 10, // Convert Toman to Rial for Zibal
                 callbackUrl: `${config?.app_url || window.location.origin}/#/callback`,
                 description: createdOrder.order_note,
                 orderId: createdOrder.id,
@@ -371,21 +380,26 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
             const zibalData = await zibalResponse.json();
             const trackId = zibalData.trackId;
 
+            // Step 2: Create transaction record in Directus
             const token = await sdk.getToken();
-            if (!token) throw new Error("Authentication token not found.");
+            if (!token) {
+                throw new Error("Authentication token not found. Please log in again.");
+            }
             
             const transactionPayload = {
                 trackid: String(trackId),
                 transaction_order: createdOrder.id,
                 transaction_result: String(zibalData.result),
                 transaction_message: zibalData.message,
-                status: 'published',
-                user_created: user.id
+                status: 'published'
             };
 
             const directusResponse = await fetch(`${config.app_backend}/items/transactions`, {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(transactionPayload),
             });
 
@@ -393,37 +407,70 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                  const errorText = await directusResponse.text();
                  try {
                     const errorData = JSON.parse(errorText);
-                    throw new Error(errorData?.errors?.[0]?.message || 'Failed to create transaction record.');
-                 } catch (e) { throw new Error(`Failed to create transaction record. Server responded with: ${errorText}`); }
+                    const errorMessage = errorData?.errors?.[0]?.message || 'Failed to create transaction record.';
+                    throw new Error(errorMessage);
+                 } catch (e) {
+                    throw new Error(`Failed to create transaction record. Server responded with: ${errorText}`);
+                 }
             }
             
-            if (zibalData.result !== 100) throw new Error(`ZibalPay Error (${zibalData.result}): ${zibalData.message}`);
+            // Check for Zibal success AFTER logging the transaction attempt
+            if (zibalData.result !== 100) {
+                throw new Error(`ZibalPay Error (${zibalData.result}): ${zibalData.message}`);
+            }
 
             const newTransaction = await directusResponse.json();
             const newTransactionId = newTransaction?.data?.id;
 
             if (newTransactionId) {
-                await fetch(`${config.app_backend}/items/orders/${createdOrder.id}`, {
+                const orderUpdatePayload = {
+                    transactions: [newTransactionId],
+                };
+
+                const orderUpdateResponse = await fetch(`${config.app_backend}/items/orders/${createdOrder.id}`, {
                     method: 'PATCH',
-                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ transactions: [newTransactionId] }),
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(orderUpdatePayload),
                 });
+
+                if (!orderUpdateResponse.ok) {
+                    const errorText = await orderUpdateResponse.text();
+                    let detailedError = 'Failed to link transaction back to order.';
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        detailedError = errorJson?.errors?.[0]?.message || errorText;
+                    } catch (e) {
+                        detailedError = errorText;
+                    }
+                    throw new Error(`Order Update Failed: ${detailedError}`);
+                }
             }
 
-            // Redirect user to payment gateway in the same tab
+            // Step 3: Redirect user to payment gateway
             window.location.href = `https://gateway.zibal.ir/start/${trackId}`;
 
         } catch (error: any) {
             console.error('Payment initiation error:', error);
-            setModalState({ isOpen: true, title: t('purchaseFailed'), message: error.message });
-            setIsPaying(false); // Reset paying state on error
+            setModalState({
+                isOpen: true,
+                title: t('purchaseFailed'),
+                message: error.message,
+            });
+            setIsPaying(false);
         }
     }
 
     const handleConfirmAndPay = async () => {
         if (!createdOrder) return;
-        if (paymentMethod === 'bank_transfer') await handleBankTransferPayment();
-        else await handleOnlinePayment();
+        
+        if (paymentMethod === 'bank_transfer') {
+            await handleBankTransferPayment();
+        } else {
+            await handleOnlinePayment();
+        }
     };
     
     const closeModal = () => setModalState({ isOpen: false, title: '', message: '' });
@@ -433,6 +480,7 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
             <div className="order-confirmation-view">
                 <div className="card" style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
                     <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                        {/* FIX: Updated Icon component to accept children instead of a prop. */}
                         <Icon style={{ width: 48, height: 48, color: 'var(--success-color)' }}>{ICONS.CHECK}</Icon>
                         <h2 style={{ marginTop: '1rem' }}>{t('orderSuccessMessage')}</h2>
                         <p>{t('orderSuccessSubtitle')}</p>
@@ -457,9 +505,9 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                         </select>
                     </div>
                     
-                    <div className="form-actions" style={{justifyContent: 'space-between', padding: 0}}>
-                        <button className="btn" onClick={() => setCreatedOrder(null)}>{t('buyDifferentPackage')}</button>
+                    <div className="form-actions" style={{justifyContent: 'flex-end', padding: 0}}>
                         <button className="btn btn-primary" onClick={handleConfirmAndPay} disabled={isPaying}>
+                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             {isPaying ? <Loader /> : <Icon>{paymentMethod === 'credit_card' ? ICONS.LOCK_OPEN : ICONS.CHECK}</Icon>}
                             <span>{t('confirmAndPay')}</span>
                         </button>
@@ -472,7 +520,14 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
     return (
         <div className="buy-credits-view">
             <PricingModal isOpen={isPricingModalOpen} onClose={() => setIsPricingModalOpen(false)} />
-             <Modal isOpen={modalState.isOpen} onClose={closeModal} title={modalState.title} children={<p style={{ whiteSpace: "pre-wrap" }}>{modalState.message}</p>} />
+             {/* FIX: Passed content as children to the Modal component to satisfy TypeScript checks. */}
+             <Modal
+                isOpen={modalState.isOpen}
+                onClose={closeModal}
+                title={modalState.title}
+            >
+                <p style={{ whiteSpace: "pre-wrap" }}>{modalState.message}</p>
+            </Modal>
 
             <BalanceDisplayCard
                 creditLoading={creditLoading}

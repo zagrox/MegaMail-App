@@ -57,13 +57,5 @@
     "accountNameLabel": "Account Name",
     "bankNameValue": "Pasargad Bank",
     "cardNumberValue": "5022 2910 8932 4477",
-    "accountNameValue": "Hamid Chamanchi",
-    "verifyingPayment": "...Finalizing your payment, please wait",
-    "sessionExpired": "Your session has expired. Please log in to see your order status.",
-    "orderIdMissing": "Order ID not found in callback URL.",
-    "orderStatusError": "An error occurred while fetching your order status: {{error}}",
-    "paymentSuccessMessage": "Your payment was successful and your account balance has been updated.",
-    "paymentFailedMessageFull": "Your payment failed or was cancelled. Please try again or check your orders for more details.",
-    "paymentTimeout": "We could not confirm your payment status. Please check your orders page or contact support if you have been charged.",
-    "invalidCallbackParams": "Invalid payment callback parameters. Could not find order details."
+    "accountNameValue": "Hamid Chamanchi"
 }
