@@ -11,7 +11,7 @@ interface AccordionProps {
     allowMultipleOpen?: boolean;
 }
 
-const Accordion: React.FC<AccordionProps> = ({ items, allowMultipleOpen = false }) => {
+const Accordion = ({ items, allowMultipleOpen = false }: AccordionProps) => {
     const [openIndexes, setOpenIndexes] = useState<number[]>([]);
 
     const toggleItem = (index: number) => {
@@ -39,7 +39,6 @@ const Accordion: React.FC<AccordionProps> = ({ items, allowMultipleOpen = false 
                             aria-expanded={isOpen}
                         >
                             <h3 className="accordion-title">{item.title}</h3>
-                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <Icon className={`accordion-icon ${isOpen ? 'open' : ''}`}>{ICONS.CHEVRON_DOWN}</Icon>
                         </div>
                         {isOpen && (

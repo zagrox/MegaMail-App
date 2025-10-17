@@ -47,7 +47,7 @@ interface VerificationRecordCardProps {
     onVerify: (key: string) => void;
 }
 
-const VerificationRecordCard: React.FC<VerificationRecordCardProps> = ({ recordKey, domainName, status, onVerify }) => {
+const VerificationRecordCard = ({ recordKey, domainName, status, onVerify }: VerificationRecordCardProps) => {
     const { t } = useTranslation(['domains', 'common']);
     const { addToast } = useToast();
     const { getStatusStyle } = useStatusStyles();

@@ -12,7 +12,7 @@ interface EmptyStateProps {
     onSecondaryCtaClick?: () => void;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({
+const EmptyState = ({
     icon,
     title,
     message,
@@ -20,7 +20,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
     onCtaClick,
     secondaryCtaText,
     onSecondaryCtaClick
-}) => {
+}: EmptyStateProps) => {
     return (
         <div className="empty-state-container">
             <div className="empty-state-icon-wrapper">

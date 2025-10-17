@@ -9,7 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     className?: string;
 }
 
-const Button: React.FC<ButtonProps> = ({ action, children, className, onClick, ...props }) => {
+const Button = ({ action, children, className, onClick, ...props }: ButtonProps) => {
     const { canPerformAction, allModules, setModuleToUnlock } = useAuth();
     const isLocked = action ? !canPerformAction(action) : false;
 
@@ -47,7 +47,6 @@ const Button: React.FC<ButtonProps> = ({ action, children, className, onClick, .
             aria-disabled={isLocked || props.disabled}
             {...props}
         >
-            {/* FIX: Changed to use JSX children for Icon component */}
             {isLocked && <Icon style={{ marginRight: '0.5rem' }}>{ICONS.LOCK}</Icon>}
             {children}
         </button>

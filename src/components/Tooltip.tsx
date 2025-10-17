@@ -6,7 +6,7 @@ interface TooltipProps {
     children: React.ReactNode;
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
+const Tooltip = ({ text, children }: TooltipProps) => {
     const [isVisible, setIsVisible] = useState(false);
     const [position, setPosition] = useState({ top: 0, left: 0 });
     const wrapperRef = useRef<HTMLDivElement>(null);

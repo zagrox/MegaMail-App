@@ -1,8 +1,3 @@
-
-
-
-
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from '../../Modal';
@@ -15,7 +10,7 @@ interface AddSocialNetworkModalProps {
     existingNetworks: string[];
 }
 
-const AddSocialNetworkModal: React.FC<AddSocialNetworkModalProps> = ({ isOpen, onClose, onSelect, existingNetworks }) => {
+const AddSocialNetworkModal = ({ isOpen, onClose, onSelect, existingNetworks }: AddSocialNetworkModalProps) => {
     const { t } = useTranslation('emailBuilder');
 
     const availableNetworks = Object.keys(SOCIAL_ICONS).filter(
@@ -23,7 +18,6 @@ const AddSocialNetworkModal: React.FC<AddSocialNetworkModalProps> = ({ isOpen, o
     );
 
     return (
-        // FIX: Pass content as children to the Modal component.
         <Modal
             isOpen={isOpen}
             onClose={onClose}
@@ -37,7 +31,6 @@ const AddSocialNetworkModal: React.FC<AddSocialNetworkModalProps> = ({ isOpen, o
                         style={{ width: '100%', height: '100px', cursor: 'pointer' }}
                         onClick={() => onSelect(network)}
                     >
-                        {/* FIX: Changed to use JSX children for Icon component */}
                         <Icon style={{ color: SOCIAL_ICONS[network].brandColor, width: '32px', height: '32px' }}>{SOCIAL_ICONS[network].path}</Icon>
                         <span>{t(network, { ns: 'emailBuilder', defaultValue: network })}</span>
                     </button>

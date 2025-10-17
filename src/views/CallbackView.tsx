@@ -17,13 +17,25 @@ type ProcessedOrder = {
 
 const CallbackView = () => {
     const { t, i18n } = useTranslation(['buyCredits', 'dashboard', 'orders', 'common']);
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState('');
     const [processedOrder, setProcessedOrder] = useState<ProcessedOrder | null>(null);
 
     useEffect(() => {
+        // Guard against running before authentication is initialized.
+        if (authLoading) {
+            return;
+        }
+
+        // The user must be logged in to have a valid payment callback.
+        if (!user) {
+            setError('Authentication session not found. Please log in and check your orders.');
+            setLoading(false);
+            return;
+        }
+
         const handleCallback = async () => {
             setLoading(true);
             try {
@@ -113,13 +125,13 @@ const CallbackView = () => {
         };
 
         handleCallback();
-    }, [user]);
+    }, [user, authLoading, t, i18n.language]);
 
     const handleReturn = () => {
         window.location.href = '/#account-orders';
     };
 
-    if (loading) {
+    if (authLoading || loading) {
         return (
             <CenteredMessage style={{ height: '100vh' }}>
                 <Loader />

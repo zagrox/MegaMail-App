@@ -16,13 +16,13 @@ interface MultiSelectSearchProps {
     loading: boolean;
 }
 
-const MultiSelectSearch: React.FC<MultiSelectSearchProps> = ({
+const MultiSelectSearch = ({
     items,
     selectedItems,
     onSelectionChange,
     placeholder,
     loading
-}) => {
+}: MultiSelectSearchProps) => {
     const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -57,7 +57,6 @@ const MultiSelectSearch: React.FC<MultiSelectSearchProps> = ({
     return (
         <div className="multi-select-container" ref={containerRef}>
             <div className="multi-select-input-wrapper">
-                {/* FIX: Changed path prop to children for Icon component */}
                 <Icon className="multi-select-icon">{ICONS.HASH}</Icon>
                 <input
                     type="search"

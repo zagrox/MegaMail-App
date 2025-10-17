@@ -9,7 +9,7 @@ interface BulkActionsBarProps {
     onAddToList: () => void;
 }
 
-const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ count, onDeselectAll, onDelete, onAddToList }) => {
+const BulkActionsBar = ({ count, onDeselectAll, onDelete, onAddToList }: BulkActionsBarProps) => {
     const { t } = useTranslation(['contacts', 'common']);
     
     return (
@@ -20,12 +20,10 @@ const BulkActionsBar: React.FC<BulkActionsBarProps> = ({ count, onDeselectAll, o
             </div>
             <div className="bulk-actions-bar-actions">
                 <button className="btn btn-secondary" onClick={onAddToList}>
-                    {/* FIX: Changed to use JSX children for Icon component */}
                     <Icon>{ICONS.PLUS}</Icon>
                     <span>{t('addToListOptional')}</span>
                 </button>
                 <button className="btn btn-danger" onClick={onDelete}>
-                    {/* FIX: Changed to use JSX children for Icon component */}
                     <Icon>{ICONS.DELETE}</Icon>
                     <span>{t('delete')}</span>
                 </button>

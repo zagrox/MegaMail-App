@@ -14,7 +14,7 @@ import Modal from '../components/Modal';
 import Button from '../components/Button';
 import ConfirmModal from '../components/ConfirmModal';
 
-const DetailItem: React.FC<{ label: string, value: React.ReactNode }> = ({ label, value }) => (
+const DetailItem = ({ label, value }: { label: string, value: React.ReactNode }) => (
     (value || value === 0) ? (
         <>
             <dt>{label}</dt>
@@ -161,7 +161,6 @@ const ContactDetailView = ({ apiKey, contactEmail, onBack }: {
 
     const statusStyle = contact ? getStatusStyle(contact.Status) : getStatusStyle('unknown');
     
-    // Handle potential inconsistencies in API response casing (e.g., FirstName vs firstname)
     const fName = contact?.FirstName || (contact as any)?.firstname;
     const lName = contact?.LastName || (contact as any)?.lastname;
     const fullName = [fName, lName].filter(Boolean).join(' ');

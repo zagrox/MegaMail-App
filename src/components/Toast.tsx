@@ -14,7 +14,7 @@ const toastConfig = {
     warning: { icon: ICONS.COMPLAINT, title: 'Warning' },
 };
 
-const Toast: React.FC<ToastProps> = ({ message, type, onDismiss }) => {
+const Toast = ({ message, type, onDismiss }: ToastProps) => {
     const timerRef = useRef<number | null>(null);
 
     useEffect(() => {

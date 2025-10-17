@@ -11,12 +11,12 @@ interface UnsavedChangesModalProps {
     onSaveAndLeave: () => Promise<void>;
 }
 
-const UnsavedChangesModal: React.FC<UnsavedChangesModalProps> = ({
+const UnsavedChangesModal = ({
     isOpen,
     onCancel,
     onLeave,
     onSaveAndLeave,
-}) => {
+}: UnsavedChangesModalProps) => {
     const { t } = useTranslation('emailBuilder');
     const [isSaving, setIsSaving] = useState(false);
 
@@ -27,7 +27,6 @@ const UnsavedChangesModal: React.FC<UnsavedChangesModalProps> = ({
     };
 
     return (
-        // FIX: Passed content as children to the Modal component to satisfy TypeScript checks.
         <Modal
             isOpen={isOpen}
             onClose={onCancel}

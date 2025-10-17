@@ -16,7 +16,7 @@ interface AddToListModalProps {
     apiKey: string;
 }
 
-const AddToListModal: React.FC<AddToListModalProps> = ({ isOpen, onClose, onConfirm, apiKey }) => {
+const AddToListModal = ({ isOpen, onClose, onConfirm, apiKey }: AddToListModalProps) => {
     const { t } = useTranslation(['contacts', 'sendEmail', 'emailLists', 'common']);
     const { data: lists, loading: listsLoading } = useApiV4('/lists', apiKey, {}, isOpen ? 1 : 0);
     const [selectedList, setSelectedList] = useState('');
@@ -46,7 +46,6 @@ const AddToListModal: React.FC<AddToListModalProps> = ({ isOpen, onClose, onConf
     const noListsFound = !listsLoading && (!lists || lists.length === 0);
 
     return (
-        // FIX: Pass form as a child to the Modal component.
         <Modal
             isOpen={isOpen}
             onClose={onClose}
@@ -81,7 +80,6 @@ const AddToListModal: React.FC<AddToListModalProps> = ({ isOpen, onClose, onConf
                                 // Close the current modal when the unlock flow is triggered
                                 onClick={() => onClose()}
                             >
-                                {/* FIX: Changed to use JSX children for Icon component */}
                                 <Icon>{ICONS.PLUS}</Icon>
                                 <span>{t('createList', { ns: 'emailLists' })}</span>
                             </Button>

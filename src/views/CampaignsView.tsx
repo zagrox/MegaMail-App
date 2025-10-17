@@ -20,7 +20,6 @@ const CampaignPreviewModal = ({ campaign, onClose }: { campaign: any | null, onC
     const htmlContent = campaign?.Content?.[0]?.Body?.[0]?.Content || '';
 
     return (
-        // FIX: Explicitly pass children to Modal component to satisfy TypeScript checks.
         <Modal
             isOpen={!!campaign}
             onClose={onClose}
@@ -52,7 +51,7 @@ interface CampaignCardProps {
     isLoadingPreview: boolean;
 }
 
-const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onPause, stats, loadingStats, processingCampaign, onPreviewTemplate, isLoadingPreview }) => {
+const CampaignCard = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onPause, stats, loadingStats, processingCampaign, onPreviewTemplate, isLoadingPreview }: CampaignCardProps) => {
     const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common', 'mediaManager', 'templates']);
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(campaign.Status);
@@ -96,7 +95,6 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, onSelect, onEdit,
                     <p className="campaign-card-subject">{content?.Subject || t('noSubject')}</p>
                     {templateName && (
                         <button className="campaign-card-template" onClick={onPreviewTemplate} disabled={isLoadingPreview || !!processingCampaign}>
-                            {/* FIX: Explicitly pass children to Icon component */}
                             <Icon>{isLoadingPreview ? <Loader /> : ICONS.ARCHIVE}</Icon>
                             <span>{templateName}</span>
                         </button>
@@ -133,36 +131,30 @@ const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, onSelect, onEdit,
                 {isDraft ? (
                     <>
                         <Button className="btn-secondary" onClick={onEdit} disabled={loadingStats || !!processingCampaign}>
-                            {/* FIX: Explicitly pass children to Icon component */}
                             <Icon>{ICONS.PENCIL}</Icon>
                             <span>{t('quickEdit')}</span>
                         </Button>
                         <Button className="btn-secondary" onClick={onEditInWizard} disabled={loadingStats || !!processingCampaign}>
-                            {/* FIX: Explicitly pass children to Icon component */}
                             <Icon>{ICONS.TARGET}</Icon>
                             <span>{t('wizard')}</span>
                         </Button>
                          <Button className="btn-danger" onClick={onDelete} disabled={loadingStats || !!processingCampaign}>
-                            {/* FIX: Explicitly pass children to Icon component */}
                             <Icon>{processingCampaign === campaign.Name ? <Loader /> : ICONS.DELETE}</Icon>
                         </Button>
                     </>
                 ) : isSending ? (
                      <>
                         <Button className="btn-secondary" onClick={onPause} disabled={loadingStats || !!processingCampaign}>
-                            {/* FIX: Explicitly pass children to Icon component */}
                             <Icon>{processingCampaign === campaign.Name ? <Loader /> : ICONS.PAUSE}</Icon>
                             <span>{t('pause', { ns: 'campaigns' })}</span>
                         </Button>
                         <Button className="btn-secondary" onClick={onSelect} disabled={loadingStats || !!processingCampaign}>
-                            {/* FIX: Explicitly pass children to Icon component */}
                             <Icon>{ICONS.STATISTICS}</Icon>
                             <span>{t('viewReport', { ns: 'campaigns' })}</span>
                         </Button>
                     </>
                 ) : (
                     <Button className="btn-secondary" onClick={onSelect} disabled={loadingStats || !!processingCampaign}>
-                        {/* FIX: Explicitly pass children to Icon component */}
                         <Icon>{ICONS.STATISTICS}</Icon>
                         <span>{t('viewReport', { ns: 'campaigns' })}</span>
                     </Button>
@@ -186,7 +178,7 @@ interface CampaignRowProps {
     isLoadingPreview: boolean;
 }
 
-const CampaignRow: React.FC<CampaignRowProps> = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onPause, stats, loadingStats, processingCampaign, onPreviewTemplate, isLoadingPreview }) => {
+const CampaignRow = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onPause, stats, loadingStats, processingCampaign, onPreviewTemplate, isLoadingPreview }: CampaignRowProps) => {
     const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common', 'mediaManager', 'templates']);
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(campaign.Status);
@@ -209,7 +201,6 @@ const CampaignRow: React.FC<CampaignRowProps> = ({ campaign, onSelect, onEdit, o
                 <div className="campaign-row-subject">{content?.Subject || t('noSubject')}</div>
                 {templateName && (
                     <button className="campaign-row-template" onClick={onPreviewTemplate} disabled={isLoadingPreview || !!processingCampaign}>
-                        {/* FIX: Explicitly pass children to Icon component */}
                         <Icon>{isLoadingPreview ? <Loader /> : ICONS.ARCHIVE}</Icon>
                         <span>{templateName}</span>
                     </button>
@@ -241,25 +232,21 @@ const CampaignRow: React.FC<CampaignRowProps> = ({ campaign, onSelect, onEdit, o
                                 <span>{t('wizard')}</span>
                             </button>
                             <button className="btn-icon btn-icon-danger" onClick={onDelete} aria-label={t('delete')} disabled={!!processingCampaign}>
-                                {/* FIX: Explicitly pass children to Icon component */}
                                 <Icon>{processingCampaign === campaign.Name ? <div style={{width: '20px', height: '20px'}}><Loader/></div> : ICONS.DELETE}</Icon>
                             </button>
                         </>
                     ) : isSending ? (
                         <>
                             <button onClick={onPause} className="btn btn-secondary" disabled={loadingStats || !!processingCampaign} style={{padding: '0.5rem 1rem'}}>
-                                {/* FIX: Explicitly pass children to Icon component */}
                                 <Icon>{processingCampaign === campaign.Name ? <Loader /> : ICONS.PAUSE}</Icon>
                                 <span>{t('pause')}</span>
                             </button>
                             <button className="btn-icon" onClick={onSelect} aria-label={t('viewCampaignStats')}>
-                                {/* FIX: Explicitly pass children to Icon component */}
                                 <Icon>{ICONS.EYE}</Icon>
                             </button>
                         </>
                     ) : (
                         <button className="btn-icon" onClick={onSelect} aria-label={t('viewCampaignStats')}>
-                            {/* FIX: Explicitly pass children to Icon component */}
                             <Icon>{ICONS.EYE}</Icon>
                         </button>
                     )}
@@ -294,11 +281,7 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
 
     const refetch = () => setRefetchIndex(i => i + 1);
 
-    // FIX: Add a useEffect to reset the processing state after a data refetch is complete.
-    // This prevents race conditions when performing actions (like delete) in quick succession.
     useEffect(() => {
-        // If a campaign operation was in progress and the main data has finished loading,
-        // we can reset the processing state to unlock the UI for the next action.
         if (processingCampaign && !loading) {
             setProcessingCampaign(null);
         }
@@ -307,25 +290,20 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     const handlePreviewTemplate = async (campaignName: string) => {
         setLoadingPreview(campaignName);
         try {
-            // Step 1: Fetch the full campaign
             const fullCampaign = await apiFetchV4(`/campaigns/${encodeURIComponent(campaignName)}`, apiKey);
     
-            // Step 2: Check for existing body content
             if (fullCampaign?.Content?.[0]?.Body?.[0]?.Content) {
                 setCampaignToPreview(fullCampaign);
-                return; // Done
+                return; 
             }
     
-            // Step 3: If no body, check for a template name
             const templateName = fullCampaign?.Content?.[0]?.TemplateName;
             if (templateName) {
-                // Step 4: Fetch the template
                 const templateData = await apiFetchV4(`/templates/${encodeURIComponent(templateName)}`, apiKey);
                 
-                // Step 5 & 6: Check if template has content and create a preview object
                 if (templateData?.Body?.[0]?.Content) {
                     const previewCampaignObject = {
-                        ...fullCampaign, // Use campaign name for the modal title
+                        ...fullCampaign, 
                         Content: [{
                             ...fullCampaign.Content[0],
                             Body: [{
@@ -337,11 +315,9 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                     };
                     setCampaignToPreview(previewCampaignObject);
                 } else {
-                    // Template exists but has no content
                     addToast(t('noPreviewAvailable'), 'info');
                 }
             } else {
-                // No body and no template name
                 addToast(t('noPreviewAvailable'), 'info');
             }
         } catch (e: any) {
@@ -448,7 +424,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             refetch();
         } catch (e: any) {
             addToast(t('campaignPausedError', { error: e.message }), 'error');
-            // FIX: Unlock the UI on failure.
             setProcessingCampaign(null);
         }
     };
@@ -462,10 +437,8 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             refetch();
         } catch (e: any) {
             addToast(t('campaignDeletedError', { error: e.message }), 'error');
-            // FIX: Unlock the UI on failure.
             setProcessingCampaign(null);
         } finally {
-            // FIX: Always close the modal, but let the useEffect handle resetting the processing state on success.
             setCampaignToDelete(null);
         }
     };
@@ -473,7 +446,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
     return (
         <div>
             <CampaignPreviewModal campaign={campaignToPreview} onClose={() => setCampaignToPreview(null)} />
-             {/* FIX: Explicitly pass children to ConfirmModal component to satisfy TypeScript checks. */}
              <ConfirmModal
                 isOpen={!!campaignToDelete}
                 onClose={() => setCampaignToDelete(null)}
@@ -485,7 +457,6 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
             </ConfirmModal>
             <div className="view-header">
                 <div className="search-bar" style={{ flexGrow: 1 }}>
-                    {/* FIX: Explicitly pass children to Icon component */}
                     <Icon>{ICONS.SEARCH}</Icon>
                     <input
                         type="search"
@@ -498,17 +469,14 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                 </div>
                 <div className="header-actions">
                     <div className="view-switcher">
-                        {/* FIX: Explicitly pass children to Icon component */}
                         <button onClick={() => setViewMode('grid')} className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`} aria-label="Grid view">
                             <Icon>{ICONS.DASHBOARD}</Icon>
                         </button>
-                        {/* FIX: Explicitly pass children to Icon component */}
                         <button onClick={() => setViewMode('list')} className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`} aria-label="List view">
                             <Icon>{ICONS.EMAIL_LISTS}</Icon>
                         </button>
                     </div>
                     <Button className="btn-primary" onClick={() => setView('Send Email')} action="create_campaign">
-                        {/* FIX: Explicitly pass children to Icon component */}
                         <Icon>{ICONS.PLUS}</Icon> {t('createCampaign')}
                     </Button>
                 </div>
@@ -595,14 +563,12 @@ const CampaignsView = ({ apiKey, setView }: { apiKey: string, setView: (view: st
                     {(paginatedCampaigns.length > 0 || offset > 0) && (
                         <div className="pagination-controls">
                             <button onClick={() => setOffset(o => Math.max(0, o - CAMPAIGNS_PER_PAGE))} disabled={offset === 0 || loading}>
-                                {/* FIX: Changed path prop to children for Icon component */}
                                 <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                                 <span>{t('previous', { ns: 'common' })}</span>
                             </button>
                             <span className="pagination-page-info">{t('page', { ns: 'common', page: offset / CAMPAIGNS_PER_PAGE + 1 })}</span>
                             <button onClick={() => setOffset(o => o + CAMPAIGNS_PER_PAGE)} disabled={!paginatedCampaigns || paginatedCampaigns.length < CAMPAIGNS_PER_PAGE || loading}>
                                 <span>{t('next', { ns: 'common' })}</span>
-                                {/* FIX: Changed path prop to children for Icon component */}
                                 <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                             </button>
                         </div>

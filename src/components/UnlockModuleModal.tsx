@@ -14,7 +14,7 @@ interface UnlockModuleModalProps {
     setView: (view: string) => void;
 }
 
-const UnlockModuleModal: React.FC<UnlockModuleModalProps> = ({ module, onClose, setView }) => {
+const UnlockModuleModal = ({ module, onClose, setView }: UnlockModuleModalProps) => {
     const { t, i18n } = useTranslation(['orders', 'common']);
     const { user, purchaseModule } = useAuth();
     const { addToast } = useToast();
@@ -46,7 +46,6 @@ const UnlockModuleModal: React.FC<UnlockModuleModalProps> = ({ module, onClose, 
     };
 
     return (
-        // FIX: Explicitly pass children to Modal component
         <Modal
             isOpen={!!module}
             onClose={onClose}
