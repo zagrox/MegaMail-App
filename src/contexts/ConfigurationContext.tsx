@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, PropsWithChildren } from 'react';
 import sdk from '../api/directus';
 import { Configuration } from '../api/types';
 
@@ -10,7 +10,7 @@ interface ConfigurationContextType {
 
 const ConfigurationContext = createContext<ConfigurationContextType | undefined>(undefined);
 
-export const ConfigurationProvider = ({ children }: { children: ReactNode }) => {
+export const ConfigurationProvider = ({ children }: PropsWithChildren) => {
     const [config, setConfig] = useState<Configuration | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

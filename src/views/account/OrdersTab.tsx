@@ -84,6 +84,11 @@ const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void })
         setSelectedOrder(null); // Close the modal first
         setView('Buy Credits', { orderToResume: order });
     };
+    
+    const handleCreateNewOrder = () => {
+        setSelectedOrder(null);
+        setView('Buy Credits');
+    };
 
     const handleGoToOfflineForm = (order: any) => {
         setSelectedOrder(null);
@@ -113,6 +118,7 @@ const OrdersTab = ({ setView }: { setView: (view: string, data?: any) => void })
                     onContinueOrder={handleContinueOrder}
                     onGoToOfflineForm={handleGoToOfflineForm}
                     onViewInvoice={handleViewInvoice}
+                    onCreateNewOrder={handleCreateNewOrder}
                 />
             )}
             <div className="account-tab-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

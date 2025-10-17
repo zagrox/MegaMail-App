@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from '../../components/Modal';
@@ -7,27 +8,36 @@ import Icon, { ICONS } from '../../components/Icon';
 import { useOrderStatuses } from '../../hooks/useOrderStatuses';
 import { useStatusStyles } from '../../hooks/useStatusStyles';
 
-const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder, onGoToOfflineForm, onViewInvoice }: { isOpen: boolean, onClose: () => void, order: any, onContinueOrder?: (order: any) => void, onGoToOfflineForm?: (order: any) => void, onViewInvoice?: (order: any) => void }) => {
+interface OrderDetailsModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    order: any;
+    onContinueOrder?: (order: any) => void;
+    onGoToOfflineForm?: (order: any) => void;
+    onViewInvoice?: (order: any) => void;
+    onCreateNewOrder?: () => void;
+}
+
+const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder, onGoToOfflineForm, onViewInvoice, onCreateNewOrder }: OrderDetailsModalProps) => {
     const { t, i18n } = useTranslation(['orders', 'buyCredits', 'common']);
     const { statusesMap, loading: statusesLoading } = useOrderStatuses();
     const { getStatusStyle } = useStatusStyles();
     
     const valueCellStyle: React.CSSProperties = { textAlign: i18n.dir() === 'rtl' ? 'left' : 'right' };
 
-    const showPayButton = ['pending', 'failed'].includes(order.order_status);
+    const showContinueButton = order.order_status === 'pending';
+    const showNewOrderButton = order.order_status === 'failed';
     const showInvoiceButton = order.order_status === 'completed';
-    const lastTransaction = order.transactions?.length > 0 ? order.transactions[order.transactions.length - 1] : null;
 
-    const handleRetryPayment = () => {
-        // If an order has failed but has a previous transaction attempt, redirect to the gateway to try again.
-        if (order.order_status === 'failed' && lastTransaction?.trackid) {
-            window.location.href = `https://gateway.zibal.ir/start/${lastTransaction.trackid}`;
-            return;
-        }
-
-        // For pending orders, or failed orders without a transaction, go through the normal flow to generate a new one.
+    const handleContinuePayment = () => {
         if (onContinueOrder) {
             onContinueOrder(order);
+        }
+    };
+
+    const handleCreateNewOrderClick = () => {
+        if (onCreateNewOrder) {
+            onCreateNewOrder();
         }
     };
 
@@ -72,10 +82,17 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onContinueOrder, onGoToOffl
                             </button>
                         )}
 
-                        {showPayButton && (
-                            <button className="btn btn-primary" onClick={handleRetryPayment}>
+                        {showContinueButton && onContinueOrder && (
+                            <button className="btn btn-primary" onClick={handleContinuePayment}>
                                 <Icon>{ICONS.LOCK_OPEN}</Icon>
                                 <span>{t('continueOrder')}</span>
+                            </button>
+                        )}
+
+                        {showNewOrderButton && onCreateNewOrder && (
+                            <button className="btn btn-primary" onClick={handleCreateNewOrderClick}>
+                                <Icon>{ICONS.PLUS}</Icon>
+                                <span>{t('newOrder', { ns: 'orders' })}</span>
                             </button>
                         )}
                         

@@ -1,3 +1,9 @@
+
+
+
+
+
+
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../../components/Icon';
@@ -49,13 +55,11 @@ const WizardLayout = ({
                         <>
                             <span>{backButtonText || t('back')}</span>
                             {/* FIX: Explicitly pass children to Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
                             <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                         </>
                     ) : (
                         <>
                             {/* FIX: Explicitly pass children to Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
                             <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                             <span>{backButtonText || t('back')}</span>
                         </>
@@ -71,7 +75,6 @@ const WizardLayout = ({
                         {isRTL ? (
                             <>
                                 {/* FIX: Explicitly pass children to Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
                                 <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                                 <span>{t('next')}</span>
                             </>
@@ -79,7 +82,6 @@ const WizardLayout = ({
                             <>
                                 <span>{t('next')}</span>
                                 {/* FIX: Explicitly pass children to Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
                                 <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                             </>
                         )}
@@ -94,7 +96,6 @@ const WizardLayout = ({
                         {isSubmitting ? <Loader /> : (
                             <>
                                 {/* FIX: Explicitly pass children to Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
                                 <Icon>{ICONS.VERIFY}</Icon>
                                 <span>{t('submit', { ns: 'sendEmail' })}</span>
                             </>

@@ -1,6 +1,15 @@
-import React, { useEffect, ReactNode } from 'react';
+import React, { useEffect, ReactNode, PropsWithChildren } from 'react';
 
-const Modal = ({ isOpen, onClose, title, children, size, bodyClassName, zIndex }: { isOpen: boolean; onClose: () => void; title: string; children: ReactNode; size?: 'default' | 'large' | 'fullscreen', bodyClassName?: string, zIndex?: number }) => {
+type ModalProps = PropsWithChildren<{
+    isOpen: boolean;
+    onClose: () => void;
+    title: string;
+    size?: 'default' | 'large' | 'fullscreen';
+    bodyClassName?: string;
+    zIndex?: number;
+}>;
+
+const Modal = ({ isOpen, onClose, title, children, size, bodyClassName, zIndex }: ModalProps) => {
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
             if (event.key === 'Escape') onClose();

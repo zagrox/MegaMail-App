@@ -1,6 +1,6 @@
 
 
-import React, { useState, useEffect, useCallback, ReactNode, createContext, useContext } from 'react';
+import React, { useState, useEffect, useCallback, ReactNode, createContext, useContext, PropsWithChildren } from 'react';
 // FIX: Removed `updateUser as sdkUpdateUser` as it was causing argument mismatch errors and is replaced by a raw request.
 // FIX: Added AuthenticationData type for use with raw login request.
 import { readMe, updateMe, createItem, readItems, updateItem, type AuthenticationData } from '@directus/sdk';
@@ -62,7 +62,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({ children }: PropsWithChildren) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [allModules, setAllModules] = useState<Module[] | null>(null);

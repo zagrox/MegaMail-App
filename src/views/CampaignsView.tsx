@@ -38,7 +38,21 @@ const CampaignPreviewModal = ({ campaign, onClose }: { campaign: any | null, onC
     );
 };
 
-const CampaignCard = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onPause, stats, loadingStats, processingCampaign, onPreviewTemplate, isLoadingPreview }: { campaign: any; onSelect: () => void; onEdit: () => void; onEditInWizard: () => void; onDelete: () => void; onPause: () => void; stats: { Delivered: number, Opened: number, Clicked: number } | null; loadingStats: boolean; processingCampaign: string | null; onPreviewTemplate: () => void; isLoadingPreview: boolean; }) => {
+interface CampaignCardProps {
+    campaign: any;
+    onSelect: () => void;
+    onEdit: () => void;
+    onEditInWizard: () => void;
+    onDelete: () => void;
+    onPause: () => void;
+    stats: { Delivered: number, Opened: number, Clicked: number } | null;
+    loadingStats: boolean;
+    processingCampaign: string | null;
+    onPreviewTemplate: () => void;
+    isLoadingPreview: boolean;
+}
+
+const CampaignCard: React.FC<CampaignCardProps> = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onPause, stats, loadingStats, processingCampaign, onPreviewTemplate, isLoadingPreview }) => {
     const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common', 'mediaManager', 'templates']);
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(campaign.Status);
@@ -158,7 +172,21 @@ const CampaignCard = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, on
     );
 };
 
-const CampaignRow = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onPause, stats, loadingStats, processingCampaign, onPreviewTemplate, isLoadingPreview }: { campaign: any; onSelect: () => void; onEdit: () => void; onEditInWizard: () => void; onDelete: () => void; onPause: () => void; stats: { Delivered: number, Opened: number } | null; loadingStats: boolean; processingCampaign: string | null; onPreviewTemplate: () => void; isLoadingPreview: boolean; }) => {
+interface CampaignRowProps {
+    campaign: any;
+    onSelect: () => void;
+    onEdit: () => void;
+    onEditInWizard: () => void;
+    onDelete: () => void;
+    onPause: () => void;
+    stats: { Delivered: number, Opened: number } | null;
+    loadingStats: boolean;
+    processingCampaign: string | null;
+    onPreviewTemplate: () => void;
+    isLoadingPreview: boolean;
+}
+
+const CampaignRow: React.FC<CampaignRowProps> = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onPause, stats, loadingStats, processingCampaign, onPreviewTemplate, isLoadingPreview }) => {
     const { t, i18n } = useTranslation(['campaigns', 'sendEmail', 'common', 'mediaManager', 'templates']);
     const { getStatusStyle } = useStatusStyles();
     const statusStyle = getStatusStyle(campaign.Status);

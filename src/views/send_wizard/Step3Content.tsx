@@ -1,3 +1,9 @@
+
+
+
+
+
+
 import React, { useState, useMemo } from 'react';
 import WizardLayout from '../../components/send_wizard/WizardLayout';
 import Icon, { ICONS } from '../../components/Icon';
@@ -128,7 +134,6 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
                 <div className="template-selector-modal">
                     <div className="search-bar" style={{marginBottom: '1rem'}}>
                         {/* FIX: Pass icon as child to Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
                         <Icon>{ICONS.SEARCH}</Icon>
                         <input
                             type="search"
@@ -179,7 +184,6 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
             >
                 <div className="wizard-step-intro">
                     {/* FIX: Pass icon as child to Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
                     <Icon>{ICONS.MAIL}</Icon>
                     <p>{t('designContent_desc')}</p>
                 </div>
@@ -190,7 +194,6 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
                     </div>
                     <button className="btn btn-secondary" onClick={handlePreview} disabled={!data.template || isLoadingTemplate}>
                         {/* FIX: Pass icon as child to Icon component */}
-{/* FIX: Changed to use explicit children prop for Icon component */}
                         <Icon>{ICONS.EYE}</Icon> {t('previewTemplate', { ns: 'templates' })}
                     </button>
 

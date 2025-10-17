@@ -14,7 +14,7 @@ import Modal from '../components/Modal';
 import Button from '../components/Button';
 import ConfirmModal from '../components/ConfirmModal';
 
-const DetailItem = ({ label, value }: { label: string, value: React.ReactNode }) => (
+const DetailItem: React.FC<{ label: string, value: React.ReactNode }> = ({ label, value }) => (
     (value || value === 0) ? (
         <>
             <dt>{label}</dt>

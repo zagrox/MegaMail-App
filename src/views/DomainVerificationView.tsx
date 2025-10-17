@@ -40,7 +40,14 @@ const DNS_RECORDS_CONFIG = {
 
 type VerificationStatus = 'idle' | 'checking' | 'verified' | 'failed';
 
-const VerificationRecordCard = ({ recordKey, domainName, status, onVerify }: { recordKey: string, domainName: string, status: VerificationStatus, onVerify: (key: string) => void }) => {
+interface VerificationRecordCardProps {
+    recordKey: string;
+    domainName: string;
+    status: VerificationStatus;
+    onVerify: (key: string) => void;
+}
+
+const VerificationRecordCard: React.FC<VerificationRecordCardProps> = ({ recordKey, domainName, status, onVerify }) => {
     const { t } = useTranslation(['domains', 'common']);
     const { addToast } = useToast();
     const { getStatusStyle } = useStatusStyles();

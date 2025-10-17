@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, PropsWithChildren, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
 import Loader from './Loader';
 import Icon, { ICONS } from './Icon';
 
-interface ConfirmModalProps {
+type ConfirmModalProps = PropsWithChildren<{
     isOpen: boolean;
     onClose: () => void;
     onConfirm: () => Promise<void> | void;
     title: string;
-    children: React.ReactNode;
     confirmText?: string;
     confirmIcon?: React.ReactNode;
     isDestructive?: boolean;
-}
+}>;
 
 const ConfirmModal = ({
     isOpen,
@@ -50,7 +49,6 @@ const ConfirmModal = ({
     }, [isOpen]);
 
     return (
-        // FIX: Passed content as children to the Modal component to satisfy TypeScript checks.
         <Modal
             isOpen={isOpen}
             onClose={onClose}
@@ -79,7 +77,6 @@ const ConfirmModal = ({
                             <Loader />
                         ) : (
                             <>
-                                {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                 <Icon>{confirmIcon}</Icon>
                                 <span>{confirmText || t('delete')}</span>
                             </>

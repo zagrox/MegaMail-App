@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode, createContext, useContext, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, ReactNode, createContext, useContext, useCallback, useMemo, PropsWithChildren } from 'react';
 
 type Theme = 'light' | 'dark' | 'auto';
 interface ThemeContextType {
@@ -9,7 +9,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider = ({ children }: { children: ReactNode }) => {
+export const ThemeProvider = ({ children }: PropsWithChildren) => {
     const [theme, _setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'auto');
     const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>('light');
 

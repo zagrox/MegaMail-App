@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, PropsWithChildren } from 'react';
 import { useConfiguration } from './ConfigurationContext';
 
 export interface Labels {
@@ -15,7 +15,7 @@ const LabelsContext = createContext<LabelsContextType | undefined>(undefined);
 
 let cachedLabels: Labels | null = null;
 
-export const LabelsProvider = ({ children }: { children: ReactNode }) => {
+export const LabelsProvider = ({ children }: PropsWithChildren) => {
     const { config } = useConfiguration();
     const [labels, setLabels] = useState<Labels | null>(cachedLabels);
     const [loading, setLoading] = useState(!cachedLabels);
