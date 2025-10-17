@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from './useApi';
@@ -47,7 +45,6 @@ const PricingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => voi
     }, [isOpen]);
 
     return (
-        // FIX: Passed content as children to the Modal component to satisfy TypeScript checks.
         <Modal
             isOpen={isOpen}
             onClose={onClose}
@@ -169,7 +166,6 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
     return (
         <div className="card balance-display-card">
             <div className="balance-info">
-                {/* FIX: Updated Icon component to accept children instead of a prop. */}
                 <Icon className="balance-icon">{ICONS.BUY_CREDITS}</Icon>
                 <div>
                     <span className="balance-title">{t('yourCurrentBalance')}</span>
@@ -180,12 +176,10 @@ const BalanceDisplayCard = ({ creditLoading, creditError, accountData, onHistory
             </div>
             <div className="balance-actions">
                 <button className="btn btn-secondary" onClick={onPricingClick}>
-                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
                     <Icon>{ICONS.PRICE_TAG}</Icon>
                     <span>{t('pricingAndFees')}</span>
                 </button>
                 <button className="btn btn-secondary" onClick={onHistoryClick}>
-                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
                     <Icon>{ICONS.CALENDAR}</Icon>
                     <span>{t('viewHistory')}</span>
                 </button>
@@ -391,7 +385,8 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                 transaction_order: createdOrder.id,
                 transaction_result: String(zibalData.result),
                 transaction_message: zibalData.message,
-                status: 'published'
+                status: 'published',
+                user_created: user.id // <-- FIX: Associate transaction with user
             };
 
             const directusResponse = await fetch(`${config.app_backend}/items/transactions`, {
@@ -480,7 +475,6 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
             <div className="order-confirmation-view">
                 <div className="card" style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
                     <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                        {/* FIX: Updated Icon component to accept children instead of a prop. */}
                         <Icon style={{ width: 48, height: 48, color: 'var(--success-color)' }}>{ICONS.CHECK}</Icon>
                         <h2 style={{ marginTop: '1rem' }}>{t('orderSuccessMessage')}</h2>
                         <p>{t('orderSuccessSubtitle')}</p>
@@ -507,7 +501,6 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                     
                     <div className="form-actions" style={{justifyContent: 'flex-end', padding: 0}}>
                         <button className="btn btn-primary" onClick={handleConfirmAndPay} disabled={isPaying}>
-                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             {isPaying ? <Loader /> : <Icon>{paymentMethod === 'credit_card' ? ICONS.LOCK_OPEN : ICONS.CHECK}</Icon>}
                             <span>{t('confirmAndPay')}</span>
                         </button>
@@ -520,7 +513,6 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
     return (
         <div className="buy-credits-view">
             <PricingModal isOpen={isPricingModalOpen} onClose={() => setIsPricingModalOpen(false)} />
-             {/* FIX: Passed content as children to the Modal component to satisfy TypeScript checks. */}
              <Modal
                 isOpen={modalState.isOpen}
                 onClose={closeModal}
