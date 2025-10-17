@@ -66,7 +66,6 @@ const App = () => {
     const appContainerRef = useRef<HTMLDivElement>(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
         const storedValue = localStorage.getItem('sidebarCollapsed');
-        // Default to collapsed (true) on first visit
         return storedValue === null ? true : storedValue === 'true';
     });
 
@@ -89,9 +88,6 @@ const App = () => {
     };
 
     useEffect(() => {
-        // Sync the application theme with the user's saved preference upon login or profile load.
-        // This ensures that if a user has a theme preference ('light', 'dark', or 'auto')
-        // saved in their profile, it is applied as soon as they are authenticated.
         if (user?.display && user.display !== theme) {
             setTheme(user.display);
         }
@@ -101,17 +97,23 @@ const App = () => {
         const handleForbidden = () => {
             addToast(t('permissionDeniedError'), 'error');
         };
+        const handleTokenExpired = () => {
+            addToast(t('sessionExpired'), 'error');
+            logout(); // Force logout
+        };
 
         emitter.addEventListener('apiForbidden', handleForbidden);
+        emitter.addEventListener('auth:tokenExpired', handleTokenExpired);
         
         return () => {
             emitter.removeEventListener('apiForbidden', handleForbidden);
+            emitter.removeEventListener('auth:tokenExpired', handleTokenExpired);
         };
-    }, [addToast, t]);
+    }, [addToast, t, logout]);
 
     useEffect(() => {
         if (authLoading || !config) {
-            return; // Wait until essential data is loaded.
+            return;
         }
     
         const mapLangToCode = (lang: string | undefined): string | undefined => {
@@ -119,7 +121,7 @@ const App = () => {
             const lowerLang = lang.toLowerCase();
             if (lowerLang.startsWith('fa') || lowerLang.startsWith('persian')) return 'fa';
             if (lowerLang.startsWith('en') || lowerLang.startsWith('english')) return 'en';
-            return undefined; // Return undefined for unknown languages
+            return undefined;
         };
     
         const i18nextLngCode = mapLangToCode(localStorage.getItem('i18nextLng') || undefined);
@@ -128,25 +130,18 @@ const App = () => {
     
         let targetLangCode: string | undefined;
     
-        // Determine if the user is in the onboarding flow (logged in but no elastic key yet).
         const isOnboarding = user && !user.elastickey;
     
-        // This logic establishes the definitive hierarchy for the app's language.
-        // An explicit choice from the language switcher ALWAYS wins.
         if (i18nextLngCode) {
             targetLangCode = i18nextLngCode;
         } 
-        // A fully onboarded user's saved preference is next. This is ignored during onboarding.
         else if (userLangCode && !isOnboarding) {
             targetLangCode = userLangCode;
         }
-        // For anyone else (onboarding users, new visitors, or users without a saved pref), 
-        // the app's configured default language is the source of truth.
         else {
             targetLangCode = configLangCode;
         }
     
-        // Apply the determined language if it's different from the current one.
         if (targetLangCode && targetLangCode !== i18n.language) {
             i18n.changeLanguage(targetLangCode);
         }
@@ -157,10 +152,9 @@ const App = () => {
         if (hash === 'account-orders') {
             sessionStorage.setItem('account-tab', 'orders');
             setView('Account');
-            // Clean the hash from the URL to prevent re-triggering on refresh
             window.history.replaceState(null, '', window.location.pathname + window.location.search);
         }
-    }, []); // Empty dependency array ensures it runs only once on mount
+    }, []);
 
     const urlParams = new URLSearchParams(window.location.search);
     const isEmbedMode = urlParams.get('embed') === 'true';
@@ -183,10 +177,8 @@ const App = () => {
     useEffect(() => {
         if (!config) return;
     
-        // Update Page Title
         document.title = appName;
     
-        // Update Favicon and Apple Touch Icon
         const favicon = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
         const appleTouchIcon = document.querySelector("link[rel='apple-touch-icon']") as HTMLLinkElement;
         if (config.app_logo && config.app_backend && favicon) {
@@ -197,14 +189,12 @@ const App = () => {
             }
         }
 
-        // Send backend URL to Service Worker
         if (config.app_backend) {
             if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
                 navigator.serviceWorker.controller.postMessage({ type: 'SET_BACKEND_URL', url: config.app_backend });
             }
         }
     
-        // Update Theme Color Meta Tag & CSS Variables
         const themeColorMeta = document.querySelector('meta[name="theme-color"]');
         if (config.app_secondary_color) {
             if (themeColorMeta) {
@@ -216,7 +206,6 @@ const App = () => {
             document.documentElement.style.setProperty('--secondary-color-dark', config.app_secondary_color_dark);
         }
     
-        // Update PWA Manifest
         const manifestLink = document.querySelector('link[rel="manifest"]');
         if (manifestLink && config.app_backend) {
             const manifest = {
@@ -251,22 +240,19 @@ const App = () => {
         let touchStartY: number | null = null;
 
         const handleTouchStart = (e: TouchEvent) => {
-            // Only respond to single-touch gestures
             if (e.touches.length !== 1) return;
 
             const touchX = e.touches[0].clientX;
             const screenWidth = window.innerWidth;
-            const edgeThreshold = 40; // Only start swipe detection within 40px of the edge
+            const edgeThreshold = 40;
 
             const isNearLeftEdge = touchX < edgeThreshold;
             const isNearRightEdge = screenWidth - touchX < edgeThreshold;
 
-            // Only initiate swipe if it starts from the correct edge for the current language direction
             if ((!isRTL && isNearLeftEdge) || (isRTL && isNearRightEdge)) {
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
             } else {
-                // If swipe starts anywhere else, ignore it for sidebar opening
                 touchStartX = null;
                 touchStartY = null;
             }
@@ -281,7 +267,6 @@ const App = () => {
             const deltaX = currentX - touchStartX;
             const deltaY = currentY - touchStartY;
             
-            // If vertical movement is more significant than horizontal, assume it's a scroll and cancel the swipe.
             if (Math.abs(deltaY) > Math.abs(deltaX)) {
                 touchStartX = null;
                 touchStartY = null;
@@ -289,21 +274,17 @@ const App = () => {
             }
 
             const swipeThreshold = 50;
-            if (Math.abs(deltaX) < swipeThreshold) return; // Wait for a minimum swipe distance
+            if (Math.abs(deltaX) < swipeThreshold) return;
             
-            // Open sidebar if swiping in the correct direction (right for LTR, left for RTL)
             if ((!isRTL && deltaX > 0) || (isRTL && deltaX < 0)) {
-                // Prevent the browser's default behavior (like scrolling) to ensure a smooth menu opening
                 e.preventDefault();
                 setIsMobileMenuOpen(true);
                 
-                // Reset touch coordinates after opening to prevent re-triggering
                 touchStartX = null;
                 touchStartY = null;
             }
         };
 
-        // passive:true is a performance optimization, but we need passive:false on touchmove to call preventDefault().
         container.addEventListener('touchstart', handleTouchStart, { passive: true });
         container.addEventListener('touchmove', handleTouchMove, { passive: false });
 
@@ -332,7 +313,6 @@ const App = () => {
     };
 
     const handleSetView = (newView: string, data?: { template?: Template; galleryTemplate?: Template; list?: List; contactEmail?: string; origin?: { view: string, data: any }, campaignToLoad?: any, campaign?: any, orderToResume?: any, order?: any, domain?: string }, options?: { ignoreDirty?: boolean }) => {
-        // This guard prevents accidental navigation away from unsaved work in the builder.
         if (!options?.ignoreDirty && view === 'Email Builder' && isBuilderDirty && newView !== 'Email Builder') {
             setLeaveConfirmationState({ isOpen: true, targetView: newView, targetData: data });
             return;
@@ -375,7 +355,6 @@ const App = () => {
         if (newView === 'Buy Credits' && data?.orderToResume) {
             setOrderToResume(data.orderToResume);
         } else {
-            // Clear it for any other navigation action to avoid resuming a stale order.
             setOrderToResume(null);
         }
 
@@ -405,8 +384,6 @@ const App = () => {
         setIsBuilderDirty(false);
         const { targetView, targetData } = leaveConfirmationState;
         setLeaveConfirmationState({ isOpen: false, targetView: '', targetData: null });
-        // Use a timeout to ensure state updates are processed before navigation,
-        // and ignore the dirty check since the user explicitly chose to leave.
         setTimeout(() => {
             handleSetView(targetView, targetData, { ignoreDirty: true });
         }, 0);
@@ -423,8 +400,6 @@ const App = () => {
                 setIsBuilderDirty(false); 
                 const { targetView, targetData } = leaveConfirmationState;
                 setLeaveConfirmationState({ isOpen: false, targetView: '', targetData: null });
-                // Use a timeout to ensure state updates are processed before navigation,
-                // and ignore the dirty check as the save was successful.
                 setTimeout(() => {
                     handleSetView(targetView, targetData, { ignoreDirty: true });
                 }, 0);
@@ -454,7 +429,6 @@ const App = () => {
         'Send Email': { component: <SendEmailView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('sendEmail'), icon: ICONS.SEND_EMAIL },
         'Marketing': { component: <MarketingView apiKey={apiKey} setView={handleSetView} campaignToLoad={campaignToLoad} />, title: t('marketingCampaign'), icon: ICONS.TARGET },
         'Calendar': { component: <CalendarView />, title: t('calendar'), icon: ICONS.CALENDAR },
-        // FIX: Pass `handleSetView` to SettingsView so it can be passed to child components.
         'Settings': { component: <SettingsView apiKey={apiKey} user={user} setView={handleSetView} />, title: t('settings', { ns: 'account' }), icon: ICONS.SETTINGS },
         'DomainVerification': { component: <DomainVerificationView domainName={domainToVerify || ''} apiKey={apiKey} onBack={() => { sessionStorage.setItem('settings-tab', 'domains'); handleSetView('Settings'); }} />, title: t('domainVerification', { ns: 'domains' }), icon: ICONS.DOMAINS },
         'Guides': { component: <GuidesView />, title: t('guides'), icon: ICONS.HELP_CIRCLE },

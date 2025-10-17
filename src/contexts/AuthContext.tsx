@@ -1,11 +1,6 @@
-
-
 import React, { useState, useEffect, useCallback, ReactNode, createContext, useContext, PropsWithChildren } from 'react';
-// FIX: Removed `updateUser as sdkUpdateUser` as it was causing argument mismatch errors and is replaced by a raw request.
-// FIX: Added AuthenticationData type for use with raw login request.
 import { readMe, updateMe, createItem, readItems, updateItem, type AuthenticationData } from '@directus/sdk';
-// FIX: Import storage to manually handle authentication tokens.
-import sdk, { storage } from '../api/directus';
+import sdk, { storage, authenticatedRequest } from '../api/directus';
 import { apiFetch } from '../api/elasticEmail';
 import type { Module } from '../api/types';
 import { AppActions } from '../config/actions';
@@ -73,41 +68,54 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         try {
             // If allModules is already populated, modulesPromise resolves instantly.
             // Otherwise, it starts the network request in the background.
+            // FIX: Explicitly type the expected return value of authenticatedRequest.
             const modulesPromise = allModules
                 ? Promise.resolve(allModules)
-                : sdk.request(readItems('modules', { 
-                    fields: ['id', 'modulename', 'moduleprice', 'moduledetails', 'status', 'modulepro', 'modulediscount', 'modulecore', 'locked_actions'], 
+                // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks when a full schema is not available, resolving a 'string is not assignable to never' error.
+                : authenticatedRequest<Module[]>(readItems('modules', { 
+                    // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
+                    fields: ['id', 'modulename', 'moduleprice', 'moduledetails', 'status', 'modulepro', 'modulediscount', 'modulecore', 'locked_actions'] as any, 
                     limit: -1,
                     filter: { status: { _eq: 'published' } } 
                 }));
 
             // 1. Get Directus user data
-            const me = await sdk.request(readMe({
+            // FIX: Type `me` as `any` and cast fields to `any` to bypass strict SDK type checks for 'role.*' and custom fields.
+            // FIX: Explicitly type the generic for `authenticatedRequest` to avoid type inference issues.
+            const me: any = await authenticatedRequest<any>(readMe({
+                // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
                 fields: [
                     'id', 'first_name', 'last_name', 'email', 'avatar', 'language',
                     'status', 'role.*', 'last_access', 'email_notifications',
                     'theme_dark', 'theme_light', 'text_direction'
-                ]
+                ] as any
             }));
 
             // 2. Get the associated user profile from the 'profiles' collection
-            const profiles = await sdk.request(readItems('profiles', {
+            // FIX: Explicitly type the expected return value of authenticatedRequest.
+            // FIX: Explicitly type the generic for `authenticatedRequest` and cast `fields` to `any` to avoid type errors.
+            const profiles: any[] = await authenticatedRequest<any[]>(readItems('profiles', {
                 filter: { user_created: { _eq: me.id } },
-                fields: ['id', 'company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display', 'language'],
+                // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
+                fields: ['id', 'company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display', 'language'] as any,
                 limit: 1
             }));
             
-            let profileData = profiles?.[0];
+            let profileData: any = profiles?.[0];
 
             if (!profileData) {
-                profileData = await sdk.request(createItem('profiles', { status: 'published', user_created: me.id }));
+                // FIX: Explicitly type the expected return value of authenticatedRequest.
+                // FIX: Cast the item data to `any` to satisfy `createItem` when no schema is present.
+                profileData = await authenticatedRequest<any>(createItem('profiles', { status: 'published', user_created: me.id } as any));
             }
 
             // 3. Initiate fetching purchased modules based on the profile ID.
             const purchasedModulesPromise = profileData.id
-                ? sdk.request(readItems('profiles_modules', {
+                // FIX: Explicitly type the expected return value of authenticatedRequest.
+                ? authenticatedRequest<{ module_id: string }[]>(readItems('profiles_modules', {
                     filter: { profile_id: { _eq: profileData.id } },
-                    fields: ['module_id'],
+                    // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
+                    fields: ['module_id'] as any,
                     limit: -1
                 }))
                 : Promise.resolve([]);
@@ -124,12 +132,14 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             }
             
             // 6. Process the purchased modules
+            // FIX: purchasedModulesResponse is now correctly typed as { module_id: string }[]
             const purchasedModuleIds = new Set(purchasedModulesResponse.map((pm: any) => String(pm.module_id)));
             const purchasedModules = (fetchedModules as Module[])
                 .filter((module: any) => purchasedModuleIds.has(String(module.id)))
                 .map((module: any) => module.modulename);
 
             // 7. Combine data and set the user state
+            // FIX: `me` and `profileData` are now `any`, so spreading and property access are allowed.
             const mergedUser: User = {
                 ...me,
                 ...profileData,
@@ -204,10 +214,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     const login = async (credentials: any, recaptchaToken?: string) => {
         setLoading(true);
         try {
-            // FIX: The original sdk.login call caused a parameter count error (line 199).
-            // Replaced with a raw request to the login endpoint to reliably include the reCAPTCHA token,
-            // which is consistent with other auth methods in this file.
-            const authData = await sdk.request<AuthenticationData>(() => ({
+            // Using a raw request to include reCAPTCHA, which is now wrapped.
+            const authData = await authenticatedRequest<AuthenticationData>(() => ({
                 method: 'POST',
                 path: '/auth/login',
                 body: JSON.stringify({
@@ -218,8 +226,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                 headers: { 'Content-Type': 'application/json' },
             }));
 
-            // Manually set the authentication data in storage, which the SDK's
-            // internal request interceptor will then use for subsequent requests.
+            // Manually set the authentication data in storage.
             await storage.set(authData);
 
             localStorage.removeItem('elastic_email_api_key');
@@ -251,6 +258,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             requestPayload['g-recaptcha-response'] = recaptchaToken;
         }
 
+        // This is a public request, so it doesn't need the authenticated wrapper.
         return await sdk.request<any>(() => ({
             method: 'POST',
             path: '/users',
@@ -260,7 +268,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     };
 
     const createInitialProfile = async (userId: string) => {
-        // This request will use the public role's permissions, as the user is not logged in yet.
+        // This request will use the public role's permissions.
         await sdk.request(createItem('profiles', {
             status: 'published',
             user_created: userId,
@@ -286,7 +294,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         try {
             const meFields: { [key: string]: any } = {};
             const profileFields: { [key: string]: any } = {};
-            // FIX: Moved 'language' from directus_users fields to profiles fields to save it in the correct collection.
             const allowedMeFields = ['first_name', 'last_name', 'theme_dark', 'theme_light', 'text_direction'];
             const allowedProfileFields = ['company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display', 'language'];
 
@@ -296,34 +303,32 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             }
 
             if (Object.keys(meFields).length > 0) {
-                await sdk.request(updateMe(meFields));
+                // FIX: Explicitly type the generic for `authenticatedRequest` to avoid type inference issues.
+                await authenticatedRequest<any>(updateMe(meFields));
             }
 
             if (Object.keys(profileFields).length > 0 && user.profileId) {
-                await sdk.request(updateItem('profiles', user.profileId, profileFields));
+                // FIX: Explicitly type the generic for `authenticatedRequest` to avoid type inference issues.
+                await authenticatedRequest<any>(updateItem('profiles', user.profileId, profileFields));
             }
             
-            // Re-fetch to get the canonical state from the server AFTER a successful update.
             await getMe();
 
         } catch (error) {
             console.error("Failed to update user:", error);
-            // No optimistic state to revert, just re-throw the error
             throw error;
         }
     };
 
     const updateUserEmail = async (newEmail: string) => {
         if (!user || user.isApiKeyUser) throw new Error("User not authenticated.");
-        await sdk.request(updateMe({ email: newEmail.toLowerCase() }));
+        await authenticatedRequest(updateMe({ email: newEmail.toLowerCase() }));
         await getMe();
     };
 
     const changePassword = async (passwords: { old: string; new: string }) => {
         if (!user) throw new Error("User not authenticated");
-        // FIX: Replaced deprecated SDK call (`sdk.users.me.update`) and removed @ts-ignore
-        // with a raw request to the correct password change endpoint.
-        await sdk.request(() => ({
+        await authenticatedRequest(() => ({
             method: 'PATCH',
             path: '/users/me/password',
             body: JSON.stringify({
@@ -341,7 +346,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             reset_url: reset_url,
         };
     
-        // Use a raw request to include the reCAPTCHA token in the body, which the SDK doesn't directly support here.
+        // This is a public request.
         await sdk.request(() => ({
             method: 'POST',
             path: '/auth/password/request',
@@ -351,7 +356,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     };
 
     const resetPassword = async (token: string, password: string) => {
-        // FIX: The `sdk.passwordReset` method does not exist. Replaced with a raw request to the password reset endpoint.
+        // This is a public request.
         await sdk.request(() => ({
             method: 'POST',
             path: '/auth/password/reset',
@@ -368,63 +373,59 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         const webhookUrl = `${DIRECTUS_CRM_URL}/flows/trigger/736aa130-adf4-4ab0-a117-7e7647b403ea`;
 
         try {
-            // Step 1: Trigger the webhook. The flow handles all backend logic.
             const response = await fetch(webhookUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${await sdk.getToken()}`
                 },
-                body: JSON.stringify({ email, password }) // Pass email and password to the flow
+                body: JSON.stringify({ email, password })
             });
 
             if (!response.ok) {
                 try {
                     const errorBody = await response.json();
-                    // Let the calling function handle specific error messages like "account exists"
                     throw new Error(errorBody.message || `Webhook trigger failed with status ${response.status}`);
                 } catch {
                     throw new Error(`Webhook trigger failed with status ${response.status}`);
                 }
             }
 
-            // The webhook is async. We need to poll to see if the user's profile was updated with an API key.
             const pollForApiKey = async (timeout = 15000, interval = 2000): Promise<boolean> => {
                 const endTime = Date.now() + timeout;
                 while (Date.now() < endTime) {
                     try {
-                        const profiles = await sdk.request(readItems('profiles', {
+                        // FIX: Explicitly type the expected return value of authenticatedRequest.
+                        // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
+                        const profiles = await authenticatedRequest<any[]>(readItems('profiles', {
                             filter: { user_created: { _eq: user.id } },
-                            fields: ['elastickey'],
+                            // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
+                            fields: ['elastickey'] as any,
                             limit: 1
                         }));
                         if (profiles && profiles.length > 0 && profiles[0].elastickey) {
-                            return true; // Success! Key is present.
+                            return true;
                         }
                     } catch (pollError) {
                         console.warn("Polling for API key encountered an error, retrying...", pollError);
                     }
                     await new Promise(res => setTimeout(res, interval));
                 }
-                return false; // Timeout
+                return false;
             };
 
             const isKeyProvisioned = await pollForApiKey();
 
             if (isKeyProvisioned) {
-                // Success: refresh user data to get the new API key.
                 await getMe();
-                // Not returning anything as the caller doesn't use it and getMe() updates state.
                 return;
             } else {
-                // Failure: timeout
-                await getMe(); // Refresh state just in case
+                await getMe();
                 throw new Error("Account creation timed out. Please check your account page shortly or contact support.");
             }
 
         } catch (error: any) {
             console.error("Subaccount creation failed:", error);
-            // Re-throw the error so the UI can handle it (e.g., show the 'account exists' prompt)
             throw error;
         }
     };
@@ -432,8 +433,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     const hasModuleAccess = (moduleName: string, allModules: Module[] | null): boolean => {
         if (!allModules) return false;
         const moduleData = allModules.find(m => m.modulename === moduleName);
-        if (!moduleData) return true; // If module isn't in DB, it's a core feature
-        if (moduleData.modulecore) return true; // Core modules are always accessible
+        if (!moduleData) return true;
+        if (moduleData.modulecore) return true;
         return user?.purchasedModules.includes(moduleName) ?? false;
     };
     
@@ -466,7 +467,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             const webhookUrl = `${DIRECTUS_CRM_URL}/flows/trigger/974adeab-789f-428d-9433-b056e1c6da9b`;
     
             try {
-                // Step 1: Trigger the webhook. The flow handles all backend logic.
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
                     headers: {
@@ -479,7 +479,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                 if (!response.ok) {
                     try {
                         const errorBody = await response.json();
-                        // Customize error for insufficient balance based on your flow's potential response
                         if (errorBody.message?.toLowerCase().includes('balance')) {
                             throw new Error("Insufficient credits.");
                         }
@@ -489,38 +488,38 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                     }
                 }
     
-                // Step 2: Poll for the result of the flow: the 'profiles_modules' item creation.
                 const pollForModuleUnlock = async (timeout = 15000, interval = 2000): Promise<boolean> => {
                     const endTime = Date.now() + timeout;
                     while (Date.now() < endTime) {
                         try {
-                            const result = await sdk.request(readItems('profiles_modules', {
+                            // FIX: Explicitly type the expected return value of authenticatedRequest.
+                            // FIX: Cast `filter` object to `any` to avoid type errors when a schema is not present.
+                            const result = await authenticatedRequest<any[]>(readItems('profiles_modules', {
+                                // FIX: Cast `filter` object to `any` to avoid type errors when a schema is not present.
                                 filter: {
                                     profile_id: { _eq: user.profileId },
                                     module_id: { _eq: moduleId }
-                                },
+                                } as any,
                                 limit: 1
                             }));
                             if (result && result.length > 0) {
-                                return true; // Success!
+                                return true;
                             }
                         } catch (pollError) {
                             console.warn("Polling for module unlock encountered an error, retrying...", pollError);
                         }
                         await new Promise(res => setTimeout(res, interval));
                     }
-                    return false; // Timeout
+                    return false;
                 };
     
                 const isUnlocked = await pollForModuleUnlock();
     
                 if (isUnlocked) {
-                    // Success: refresh user data. The server-side flow is responsible for notifications.
                     await getMe();
                     resolve();
                 } else {
-                    // Failure: timeout
-                    await getMe(); // Refresh state just in case
+                    await getMe();
                     reject(new Error("Unlocking the module timed out. The transaction may still be processing. Please check your modules page again shortly or contact support."));
                 }
     

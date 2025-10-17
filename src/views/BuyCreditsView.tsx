@@ -391,7 +391,8 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                 transaction_order: createdOrder.id,
                 transaction_result: String(zibalData.result),
                 transaction_message: zibalData.message,
-                status: 'published'
+                status: 'published',
+                payment_status: 'در انتظار پرداخت'
             };
 
             const directusResponse = await fetch(`${config.app_backend}/items/transactions`, {
