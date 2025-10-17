@@ -1,155 +1,180 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { updateItem, readItems } from '@directus/sdk';
+import { readItem } from '@directus/sdk';
 import sdk from '../api/directus';
 import { useAuth } from '../contexts/AuthContext';
-import { useConfiguration } from '../contexts/ConfigurationContext';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
 import Button from '../components/Button';
+import { useConfiguration } from '../contexts/ConfigurationContext';
 
 const CallbackView = () => {
     const { t } = useTranslation(['buyCredits', 'common', 'orders']);
     const { user, loading: authLoading } = useAuth();
     const { config, loading: configLoading } = useConfiguration();
-    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-    const [message, setMessage] = useState(t('verifyingPayment'));
+    const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'timeout'>('verifying');
     const [finalOrder, setFinalOrder] = useState<any | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    const pollInterval = useRef<number | null>(null);
+    const timeout = useRef<number | null>(null);
+    const hasTriggeredVerification = useRef(false);
+
+    const stopTimers = () => {
+        if (pollInterval.current) clearInterval(pollInterval.current);
+        if (timeout.current) clearTimeout(timeout.current);
+        pollInterval.current = null;
+        timeout.current = null;
+    };
 
     useEffect(() => {
-        const verifyPayment = async () => {
-            if (authLoading || configLoading) {
-                return; // Wait for auth session and config to initialize
-            }
+        return () => stopTimers();
+    }, []);
 
-            if (!user || !config) {
-                setStatus('error');
-                setMessage(t('sessionExpired'));
-                return;
-            }
+    useEffect(() => {
+        // 1. Wait until user and config are fully loaded.
+        if (authLoading || configLoading || !user || !config) {
+            return;
+        }
 
+        // 2. Ensure this logic runs only once.
+        if (hasTriggeredVerification.current) {
+            return;
+        }
+        hasTriggeredVerification.current = true;
+
+        const runVerificationAndPoll = async () => {
             const params = new URLSearchParams(window.location.search || window.location.hash.split('?')[1]);
             const orderId = params.get('orderId');
             const trackId = params.get('trackId');
-            const zibalStatus = params.get('status');
-            const success = params.get('success');
-            
-            if (!orderId || !trackId || !zibalStatus || !success) {
-                setStatus('error');
-                setMessage(t('invalidCallbackParams'));
-                return;
-            }
-            
-            // Attempt to fetch order details for display, regardless of outcome
-            try {
-                const orderResponse = await sdk.request(readItems('orders', {
-                    filter: { id: { _eq: orderId } },
-                    fields: ['id', 'order_status', 'order_note', 'order_total'],
-                    limit: 1
-                }));
-                if (orderResponse?.[0]) {
-                    setFinalOrder(orderResponse[0]);
-                }
-            } catch (e) {
-                console.warn("Could not fetch final order details for display.");
-            }
 
-            // Handle cases where user cancelled on bank page or payment failed initially
-            if (success !== '1' || zibalStatus !== '2') {
-                 try {
-                    await sdk.request(updateItem('orders', orderId, { order_status: 'failed' }));
-                } catch (updateError) {
-                    console.warn(`Could not update order ${orderId} to failed status`, updateError);
-                }
+            if (!orderId || !trackId) {
                 setStatus('error');
-                setMessage(t('paymentFailedMessageFull'));
+                setErrorMessage(t('invalidCallbackParams'));
                 return;
             }
 
-            // At this point, zibalStatus is '2', meaning potential success. We MUST verify.
             try {
-                const zibalVerificationResponse = await fetch("https://gateway.zibal.ir/v1/verify", {
+                // 3. Trigger the backend verification flow as the authenticated user.
+                const token = await sdk.getToken();
+                const flowUrl = `${config.app_backend}/flows/trigger/e0df8d51-4d1a-4638-994c-28340d21e0fc`;
+                const triggerResponse = await fetch(flowUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        merchant: config.app_zibal || "62f36ca618f934159dd26c19",
-                        trackId: Number(trackId),
-                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ trackId, orderId })
                 });
-                if (!zibalVerificationResponse.ok) {
-                    throw new Error('Could not connect to payment verification service.');
-                }
-                const zibalData = await zibalVerificationResponse.json();
 
-                // Update transaction record in Directus with verification result
-                const transactions = await sdk.request(readItems('transactions', {
-                    filter: { trackid: { _eq: trackId } },
-                    limit: 1
-                }));
-                const transactionId = transactions?.[0]?.id;
-
-                if (transactionId) {
-                    await sdk.request(updateItem('transactions', transactionId, {
-                        transaction_status: String(zibalData.status),
-                        transaction_message: zibalData.message,
-                        transaction_ref: zibalData.refNumber,
-                        transaction_card: zibalData.cardNumber,
-                    }));
+                if (!triggerResponse.ok) {
+                    throw new Error('Failed to initiate payment verification flow.');
                 }
                 
-                // Check Zibal result and update our order status
-                if (zibalData.result === 100) { // Zibal success code
-                    const updatedOrder = await sdk.request(updateItem('orders', orderId, { order_status: 'completed' }));
-                    setFinalOrder(updatedOrder);
-                    setStatus('success');
-                    setMessage(t('paymentSuccessMessage'));
-                } else {
-                    await sdk.request(updateItem('orders', orderId, { order_status: 'failed' }));
-                    throw new Error(zibalData.message || 'Payment verification failed.');
-                }
+                // 4. Start polling for the result.
+                const pollOrderStatus = async () => {
+                    try {
+                        const order = await sdk.request(readItem('orders', orderId, { fields: ['order_status', 'id', 'order_note', 'order_total'] }));
+                        setFinalOrder(order);
+                        
+                        if (order.order_status === 'completed') {
+                            setStatus('success');
+                            stopTimers();
+                        } else if (order.order_status !== 'pending' && order.order_status !== 'processing') {
+                            setStatus('error');
+                            setErrorMessage(t('paymentFailedMessageFull'));
+                            stopTimers();
+                        }
+                    } catch (pollErr: any) {
+                        setStatus('error');
+                        setErrorMessage(t('orderStatusError', { error: pollErr.message }));
+                        stopTimers();
+                    }
+                };
+                
+                pollOrderStatus();
+                pollInterval.current = window.setInterval(pollOrderStatus, 3000);
 
-            } catch (err: any) {
+                timeout.current = window.setTimeout(() => {
+                    // Check status inside timeout to avoid race conditions
+                    setStatus(currentStatus => {
+                        if (currentStatus === 'verifying') {
+                            stopTimers();
+                            return 'timeout';
+                        }
+                        return currentStatus;
+                    });
+                }, 45000);
+
+            } catch (triggerErr: any) {
                 setStatus('error');
-                setMessage(err.message || t('paymentFailedMessageFull'));
-                // Try to mark as failed in DB as a last resort
-                try {
-                     await sdk.request(updateItem('orders', orderId, { order_status: 'failed' }));
-                } catch {}
+                setErrorMessage(triggerErr.message);
+                stopTimers();
             }
         };
 
-        verifyPayment();
+        runVerificationAndPoll();
 
     }, [authLoading, configLoading, user, config, t]);
+
 
     const handleReturnToOrders = () => {
         window.location.href = '/#account-orders';
     };
 
-    if (status === 'loading') {
+    const renderContent = () => {
+        switch (status) {
+            case 'success':
+                return {
+                    icon: ICONS.CHECK,
+                    colorClass: 'success',
+                    title: t('paymentSuccess'),
+                    message: t('paymentSuccessMessage'),
+                };
+            case 'error':
+                 return {
+                    icon: ICONS.X_CIRCLE,
+                    colorClass: 'danger',
+                    title: t('paymentFailed'),
+                    message: errorMessage || t('orderStatusError', { error: 'Verification failed.' }),
+                };
+            case 'timeout':
+                 return {
+                    icon: ICONS.COMPLAINT,
+                    colorClass: 'warning',
+                    title: t('paymentFailed'),
+                    message: t('paymentTimeout'),
+                };
+            case 'verifying':
+            default:
+                return null;
+        }
+    };
+
+    const content = renderContent();
+
+    if (!content) {
         return (
             <CenteredMessage style={{ height: '100vh' }}>
                 <Loader />
                 <p style={{ marginTop: '1rem', color: 'var(--subtle-text-color)' }}>
-                    {message}
+                    {t('verifyingPayment')}
                 </p>
             </CenteredMessage>
         );
     }
 
-    const isSuccess = status === 'success';
-
     return (
-        <CenteredMessage style={{ height: '100vh' }}>
+         <CenteredMessage style={{ height: '100vh' }}>
             <div className="card" style={{ maxWidth: '500px', width: '100%', padding: '2rem', textAlign: 'center' }}>
-                <Icon style={{ width: 48, height: 48, color: `var(--${isSuccess ? 'success' : 'danger'}-color)`, margin: '0 auto 1rem' }}>
-                    {isSuccess ? ICONS.CHECK : ICONS.X_CIRCLE}
+                <Icon style={{ width: 48, height: 48, color: `var(--${content.colorClass}-color)`, margin: '0 auto 1rem' }}>
+                    {content.icon}
                 </Icon>
-                <h2 style={{ color: `var(--${isSuccess ? 'success' : 'danger'}-color)` }}>
-                    {isSuccess ? t('paymentSuccess') : t('paymentFailed')}
+                <h2 style={{ color: `var(--${content.colorClass}-color)` }}>
+                    {content.title}
                 </h2>
-                <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{message}</p>
+                <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{content.message}</p>
                 {finalOrder && (
                      <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
                         <table className="simple-table">
