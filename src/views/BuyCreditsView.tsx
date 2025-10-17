@@ -12,6 +12,7 @@ import Loader from '../components/Loader';
 import { useToast } from '../contexts/ToastContext';
 import { readItems } from '@directus/sdk';
 import { Module } from '../api/types';
+import Button from '../components/Button';
 
 const PricingModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
     const { t, i18n } = useTranslation(['buyCredits', 'common']);
@@ -203,6 +204,9 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
     const [packagesLoading, setPackagesLoading] = useState(true);
     const [packagesError, setPackagesError] = useState<string | null>(null);
 
+    const [waitingForPayment, setWaitingForPayment] = useState(false);
+    const [paymentResult, setPaymentResult] = useState<{ status: 'success' | 'error', message: string, order?: any } | null>(null);
+
     const { data: accountData, loading: creditLoading, error: creditError } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
     
     useEffect(() => {
@@ -210,6 +214,23 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
             setCreatedOrder(orderToResume);
         }
     }, [orderToResume]);
+
+    useEffect(() => {
+        const channel = new BroadcastChannel('payment_channel');
+        channel.onmessage = (event) => {
+            const { status, message, order } = event.data;
+            if (status === 'success') {
+                setPaymentResult({ status: 'success', message: `Payment for order #${order.id} was successful!`, order });
+            } else {
+                setPaymentResult({ status: 'error', message: message || 'Payment failed or was cancelled.', order });
+            }
+            setWaitingForPayment(false);
+        };
+
+        return () => {
+            channel.close();
+        };
+    }, []);
 
     useEffect(() => {
         if (!config?.app_backend) {
@@ -332,14 +353,10 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
         if (!createdOrder) return;
         setIsPaying(true);
         try {
-            // This function now simply navigates to the offline payment page,
-            // keeping the order status as 'pending'. The status will be updated
-            // to 'processing' only after the user submits their bank details.
             const orderForNextStep = { ...createdOrder };
             setCreatedOrder(null);
             setView('OfflinePayment', { order: orderForNextStep });
         } catch (error: any) {
-            // This is unlikely to be hit now, but good for safety.
             addToast(t('purchaseFailedMessage', { error: error.message }), 'error');
         } finally {
             setIsPaying(false);
@@ -356,10 +373,9 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
         setModalState({ isOpen: false, title: '', message: '' });
 
         try {
-            // Step 1: Request trackId from Zibal
             const zibalPayload = {
                 merchant: config?.app_zibal || "62f36ca618f934159dd26c19",
-                amount: createdOrder.order_total * 10, // Convert Toman to Rial for Zibal
+                amount: createdOrder.order_total * 10,
                 callbackUrl: `${config?.app_url || window.location.origin}/#/callback`,
                 description: createdOrder.order_note,
                 orderId: createdOrder.id,
@@ -374,11 +390,8 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
             const zibalData = await zibalResponse.json();
             const trackId = zibalData.trackId;
 
-            // Step 2: Create transaction record in Directus
             const token = await sdk.getToken();
-            if (!token) {
-                throw new Error("Authentication token not found. Please log in again.");
-            }
+            if (!token) throw new Error("Authentication token not found.");
             
             const transactionPayload = {
                 trackid: String(trackId),
@@ -386,15 +399,12 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                 transaction_result: String(zibalData.result),
                 transaction_message: zibalData.message,
                 status: 'published',
-                user_created: user.id // <-- FIX: Associate transaction with user
+                user_created: user.id
             };
 
             const directusResponse = await fetch(`${config.app_backend}/items/transactions`, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify(transactionPayload),
             });
 
@@ -402,73 +412,82 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                  const errorText = await directusResponse.text();
                  try {
                     const errorData = JSON.parse(errorText);
-                    const errorMessage = errorData?.errors?.[0]?.message || 'Failed to create transaction record.';
-                    throw new Error(errorMessage);
-                 } catch (e) {
-                    throw new Error(`Failed to create transaction record. Server responded with: ${errorText}`);
-                 }
+                    throw new Error(errorData?.errors?.[0]?.message || 'Failed to create transaction record.');
+                 } catch (e) { throw new Error(`Failed to create transaction record. Server responded with: ${errorText}`); }
             }
             
-            // Check for Zibal success AFTER logging the transaction attempt
-            if (zibalData.result !== 100) {
-                throw new Error(`ZibalPay Error (${zibalData.result}): ${zibalData.message}`);
-            }
+            if (zibalData.result !== 100) throw new Error(`ZibalPay Error (${zibalData.result}): ${zibalData.message}`);
 
             const newTransaction = await directusResponse.json();
             const newTransactionId = newTransaction?.data?.id;
 
             if (newTransactionId) {
-                const orderUpdatePayload = {
-                    transactions: [newTransactionId],
-                };
-
-                const orderUpdateResponse = await fetch(`${config.app_backend}/items/orders/${createdOrder.id}`, {
+                await fetch(`${config.app_backend}/items/orders/${createdOrder.id}`, {
                     method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(orderUpdatePayload),
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ transactions: [newTransactionId] }),
                 });
-
-                if (!orderUpdateResponse.ok) {
-                    const errorText = await orderUpdateResponse.text();
-                    let detailedError = 'Failed to link transaction back to order.';
-                    try {
-                        const errorJson = JSON.parse(errorText);
-                        detailedError = errorJson?.errors?.[0]?.message || errorText;
-                    } catch (e) {
-                        detailedError = errorText;
-                    }
-                    throw new Error(`Order Update Failed: ${detailedError}`);
-                }
             }
 
-            // Step 3: Redirect user to payment gateway
-            window.location.href = `https://gateway.zibal.ir/start/${trackId}`;
+            setWaitingForPayment(true);
+            setCreatedOrder(null);
+            window.open(`https://gateway.zibal.ir/start/${trackId}`, '_blank', 'noopener,noreferrer,width=800,height=600');
 
         } catch (error: any) {
             console.error('Payment initiation error:', error);
-            setModalState({
-                isOpen: true,
-                title: t('purchaseFailed'),
-                message: error.message,
-            });
+            setModalState({ isOpen: true, title: t('purchaseFailed'), message: error.message });
+        } finally {
             setIsPaying(false);
         }
     }
 
     const handleConfirmAndPay = async () => {
         if (!createdOrder) return;
-        
-        if (paymentMethod === 'bank_transfer') {
-            await handleBankTransferPayment();
-        } else {
-            await handleOnlinePayment();
-        }
+        if (paymentMethod === 'bank_transfer') await handleBankTransferPayment();
+        else await handleOnlinePayment();
     };
     
     const closeModal = () => setModalState({ isOpen: false, title: '', message: '' });
+
+    if (waitingForPayment) {
+        return (
+            <CenteredMessage style={{ height: '50vh' }}>
+                <Loader />
+                <h3 style={{ marginTop: '1rem' }}>{t('waitingForPaymentConfirmation', {ns: 'buyCredits', defaultValue: 'Waiting for payment confirmation...'})}</h3>
+                <p>{t('completePaymentInNewTab', {ns: 'buyCredits', defaultValue: 'Please complete the payment in the new tab that has opened.'})}</p>
+            </CenteredMessage>
+        );
+    }
+    
+    if (paymentResult) {
+        const isSuccess = paymentResult.status === 'success';
+        return (
+            <div className="auth-container">
+                <div className="card" style={{ maxWidth: '500px', width: '100%', margin: '0 auto', padding: '2rem', textAlign: 'center' }}>
+                    <Icon style={{ width: 48, height: 48, color: `var(--${isSuccess ? 'success' : 'danger'}-color)`, margin: '0 auto 1rem' }}>
+                        {isSuccess ? ICONS.CHECK : ICONS.X_CIRCLE}
+                    </Icon>
+                    <h2 style={{ color: `var(--${isSuccess ? 'success' : 'danger'}-color)` }}>
+                        {isSuccess ? t('paymentSuccess') : t('paymentFailed')}
+                    </h2>
+                    <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{paymentResult.message}</p>
+                    {paymentResult.order && (
+                         <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
+                            <table className="simple-table">
+                                 <tbody>
+                                    <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{paymentResult.order.id}</strong></td></tr>
+                                    <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{paymentResult.order.note}</strong></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                    <div className="form-actions" style={{ justifyContent: 'center' }}>
+                        <Button onClick={() => { sessionStorage.setItem('account-tab', 'orders'); setView('Account'); }} className="btn-primary">{t('returnToOrders', { ns: 'orders' })}</Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (createdOrder) {
         return (
@@ -499,7 +518,8 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                         </select>
                     </div>
                     
-                    <div className="form-actions" style={{justifyContent: 'flex-end', padding: 0}}>
+                    <div className="form-actions" style={{justifyContent: 'space-between', padding: 0}}>
+                        <button className="btn" onClick={() => setCreatedOrder(null)}>{t('buyDifferentPackage')}</button>
                         <button className="btn btn-primary" onClick={handleConfirmAndPay} disabled={isPaying}>
                             {isPaying ? <Loader /> : <Icon>{paymentMethod === 'credit_card' ? ICONS.LOCK_OPEN : ICONS.CHECK}</Icon>}
                             <span>{t('confirmAndPay')}</span>
@@ -513,13 +533,7 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
     return (
         <div className="buy-credits-view">
             <PricingModal isOpen={isPricingModalOpen} onClose={() => setIsPricingModalOpen(false)} />
-             <Modal
-                isOpen={modalState.isOpen}
-                onClose={closeModal}
-                title={modalState.title}
-            >
-                <p style={{ whiteSpace: "pre-wrap" }}>{modalState.message}</p>
-            </Modal>
+             <Modal isOpen={modalState.isOpen} onClose={closeModal} title={modalState.title} children={<p style={{ whiteSpace: "pre-wrap" }}>{modalState.message}</p>} />
 
             <BalanceDisplayCard
                 creditLoading={creditLoading}
