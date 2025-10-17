@@ -295,7 +295,7 @@ const BuyCreditsView = ({ apiKey, user, setView, orderToResume }: { apiKey: stri
                 user_created: user.id,
                 order_total: pkg.packprice,
                 project_name: "MegaMail",
-                order_note: pkg.packname,
+                order_note: String(pkg.packsize),
                 order_status: "pending",
             };
 

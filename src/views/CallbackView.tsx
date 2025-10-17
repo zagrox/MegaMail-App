@@ -59,7 +59,7 @@ const CallbackView = () => {
                 // Update the transaction status
                 await sdk.request(updateItem('transactions', transaction.id, { payment_status: status }));
 
-                const isSuccess = success === '1' && (status === '1' || status === '2');
+                const isSuccess = success === '1' && status === '2';
 
                 if (isSuccess) {
                     // Update order status
