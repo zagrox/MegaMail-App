@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from './Icon';
 
 interface ToastProps {
@@ -7,14 +8,8 @@ interface ToastProps {
     onDismiss: () => void;
 }
 
-const toastConfig = {
-    success: { icon: ICONS.CHECK, title: 'Success' },
-    error: { icon: ICONS.X_CIRCLE, title: 'Error' },
-    info: { icon: ICONS.COMPLAINT, title: 'Info' },
-    warning: { icon: ICONS.COMPLAINT, title: 'Warning' },
-};
-
 const Toast = ({ message, type, onDismiss }: ToastProps) => {
+    const { t } = useTranslation('common');
     const timerRef = useRef<number | null>(null);
 
     useEffect(() => {
@@ -28,6 +23,13 @@ const Toast = ({ message, type, onDismiss }: ToastProps) => {
             }
         };
     }, [onDismiss]);
+
+    const toastConfig = {
+        success: { icon: ICONS.CHECK, title: t('toastSuccess', 'Success') },
+        error: { icon: ICONS.X_CIRCLE, title: t('toastError', 'Error') },
+        info: { icon: ICONS.COMPLAINT, title: t('toastInfo', 'Info') },
+        warning: { icon: ICONS.COMPLAINT, title: t('toastWarning', 'Warning') },
+    };
     
     const config = toastConfig[type];
 

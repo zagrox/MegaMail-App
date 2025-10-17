@@ -96,5 +96,9 @@
     "publicIdUnavailable": "Your Public Account ID is not available, so the subscription form URL cannot be generated.",
     "addContactsToList": "Add new subscribers to this list:",
     "back": "Back",
-    "guides": "Guides"
+    "guides": "Guides",
+    "toastSuccess": "Success",
+    "toastError": "Error",
+    "toastInfo": "Info",
+    "toastWarning": "Warning"
 }
