@@ -73,7 +73,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                 ? Promise.resolve(allModules)
                 // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks when a full schema is not available, resolving a 'string is not assignable to never' error.
                 : authenticatedRequest<Module[]>(readItems('modules', { 
-                    // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
                     fields: ['id', 'modulename', 'moduleprice', 'moduledetails', 'status', 'modulepro', 'modulediscount', 'modulecore', 'locked_actions'] as any, 
                     limit: -1,
                     filter: { status: { _eq: 'published' } } 
@@ -83,7 +82,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             // FIX: Type `me` as `any` and cast fields to `any` to bypass strict SDK type checks for 'role.*' and custom fields.
             // FIX: Explicitly type the generic for `authenticatedRequest` to avoid type inference issues.
             const me: any = await authenticatedRequest<any>(readMe({
-                // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
                 fields: [
                     'id', 'first_name', 'last_name', 'email', 'avatar', 'language',
                     'status', 'role.*', 'last_access', 'email_notifications',
@@ -96,7 +94,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             // FIX: Explicitly type the generic for `authenticatedRequest` and cast `fields` to `any` to avoid type errors.
             const profiles: any[] = await authenticatedRequest<any[]>(readItems('profiles', {
                 filter: { user_created: { _eq: me.id } },
-                // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
                 fields: ['id', 'company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display', 'language'] as any,
                 limit: 1
             }));
@@ -114,8 +111,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                 // FIX: Explicitly type the expected return value of authenticatedRequest.
                 ? authenticatedRequest<{ module_id: string }[]>(readItems('profiles_modules', {
                     filter: { profile_id: { _eq: profileData.id } },
-                    // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
-                    fields: ['module_id'] as any,
+                    fields: ['module_id'],
                     limit: -1
                 }))
                 : Promise.resolve([]);
@@ -399,7 +395,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                         // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
                         const profiles = await authenticatedRequest<any[]>(readItems('profiles', {
                             filter: { user_created: { _eq: user.id } },
-                            // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
                             fields: ['elastickey'] as any,
                             limit: 1
                         }));
@@ -495,7 +490,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                             // FIX: Explicitly type the expected return value of authenticatedRequest.
                             // FIX: Cast `filter` object to `any` to avoid type errors when a schema is not present.
                             const result = await authenticatedRequest<any[]>(readItems('profiles_modules', {
-                                // FIX: Cast `filter` object to `any` to avoid type errors when a schema is not present.
                                 filter: {
                                     profile_id: { _eq: user.profileId },
                                     module_id: { _eq: moduleId }

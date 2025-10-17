@@ -1,120 +1,125 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readItems, updateItem } from '@directus/sdk';
-import { authenticatedRequest } from '../api/directus';
+import sdk from '../api/directus';
+import { apiFetch } from '../api/elasticEmail';
 import { useAuth } from '../contexts/AuthContext';
-import { useConfiguration } from '../contexts/ConfigurationContext';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
 
+type ProcessedOrder = {
+    id: string;
+    note: string;
+    creditsAdded?: number;
+    total: number;
+};
+
 const CallbackView = () => {
-    const { t, i18n } = useTranslation(['buyCredits', 'common', 'orders']);
+    const { t, i18n } = useTranslation(['buyCredits', 'dashboard', 'orders', 'common']);
     const { user } = useAuth();
-    const { config } = useConfiguration();
-    const [status, setStatus] = useState('loading'); // 'loading', 'success', 'error'
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState('');
-    const [processedOrder, setProcessedOrder] = useState<any | null>(null);
+    const [processedOrder, setProcessedOrder] = useState<ProcessedOrder | null>(null);
 
     useEffect(() => {
-        if (!user || !config) {
-            return;
-        }
-
-        const verifyAndPoll = async () => {
+        const handleCallback = async () => {
+            setLoading(true);
             try {
-                const params = new URLSearchParams(window.location.hash.split('?')[1] || window.location.search);
+                // Be robust: check both hash and search for parameters, as gateways can handle redirects differently.
+                const hash = window.location.hash.substring(1);
+                const hashQueryString = hash.split('?')[1] || '';
+                const searchQueryString = window.location.search.substring(1) || '';
+                const params = new URLSearchParams(hashQueryString || searchQueryString);
+                
                 const trackId = params.get('trackId');
-                const orderId = params.get('orderId');
-                const zibalSuccess = params.get('success');
+                const status = params.get('status');
+                const success = params.get('success');
+                const orderIdParam = params.get('orderId');
 
-                if (!trackId || !orderId) {
-                    setStatus('error');
-                    setMessage('Invalid payment callback URL. Required parameters are missing.');
-                    return;
+                if (!trackId || !status || !success || !orderIdParam) {
+                    throw new Error('Missing callback parameters.');
                 }
 
-                if (zibalSuccess === '0') {
-                    // Payment failed or was canceled at the gateway. No need to poll.
-                    try {
-                        // FIX: Cast payload to `any` to satisfy Directus SDK type requirements when no schema is present.
-                        await authenticatedRequest(updateItem('orders', orderId, { order_status: 'failed' } as any));
-                        
-                        // Find the transaction and update it.
-                        const transactionResponse = await authenticatedRequest(readItems('transactions', {
-                            // FIX: Cast filter object to `any` to satisfy Directus SDK type requirements when no schema is present.
-                            filter: { trackid: { _eq: trackId } } as any,
-                            limit: 1
-                        }));
+                // Find the transaction by trackId
+                const transactions = await sdk.request(readItems('transactions', {
+                    filter: { trackid: { _eq: trackId } },
+                    fields: ['*', 'transaction_order.*'],
+                    limit: 1
+                }));
 
-                        const transaction = transactionResponse?.[0];
-                        if (transaction) {
-                            await authenticatedRequest(updateItem('transactions', transaction.id, {
-                                // FIX: Cast payload to `any` to satisfy Directus SDK type requirements when no schema is present.
-                                payment_status: 'لغو شده توسط کاربر' // Canceled by user
-                            } as any));
-                        }
-
-                        setStatus('error');
-                        setMessage('The payment was canceled or failed at the payment gateway.');
-                    } catch (updateError: any) {
-                        setStatus('error');
-                        setMessage(`Payment failed, but there was an issue updating the order status: ${updateError.message}`);
-                    }
-                    return; // Stop execution
-                }
-
-                // If success is '1', proceed with server-side verification and polling.
-                await authenticatedRequest(updateItem('orders', orderId, {
-                    // FIX: Cast payload to `any` to satisfy Directus SDK type requirements when no schema is present.
-                    payment_gateway_track_id: trackId,
-                    order_status: 'processing'
-                } as any));
-
-                // Poll for the final result from the backend.
-                for (let i = 0; i < 15; i++) { // Poll for up to 45 seconds
-                    const orderResponse = await authenticatedRequest(readItems('orders', {
-                        // FIX: Cast filter object and fields array to `any` to satisfy Directus SDK type requirements when no schema is present.
-                        filter: { id: { _eq: orderId } } as any,
-                        fields: ['id', 'order_status', 'order_note', 'order_total'] as any
-                    }));
-
-                    const updatedOrder = orderResponse?.[0];
-                    if (updatedOrder) {
-                        setProcessedOrder(updatedOrder);
-                        if (updatedOrder.order_status === 'completed') {
-                            setStatus('success');
-                            setMessage('Payment successful! Your order has been processed and credits added to your account.');
-                            return;
-                        }
-                        if (updatedOrder.order_status === 'failed') {
-                            setStatus('error');
-                            setMessage('The payment failed, was cancelled, or could not be verified.');
-                            return;
-                        }
-                    }
-                    await new Promise(resolve => setTimeout(resolve, 3000));
+                if (!transactions || transactions.length === 0) {
+                    throw new Error(`Transaction with Track ID ${trackId} not found.`);
                 }
                 
-                setStatus('error');
-                setProcessedOrder({ id: orderId });
-                setMessage('Verification is taking longer than expected. Please check your Orders page in a few minutes or contact support.');
+                const transaction = transactions[0];
+                const order = transaction.transaction_order;
+                
+                // Update the transaction status
+                await sdk.request(updateItem('transactions', transaction.id, { payment_status: status }));
+
+                const isSuccess = success === '1' && (status === '1' || status === '2');
+
+                if (isSuccess) {
+                    // Update order status
+                    await sdk.request(updateItem('orders', order.id, { order_status: 'completed' }));
+                    
+                    // Find package to get credit amount
+                    const packages = await sdk.request(readItems('packages', {
+                        filter: { packname: { _eq: order.order_note } }
+                    }));
+                    
+                    if (!packages || packages.length === 0) {
+                        throw new Error(`Package details for "${order.order_note}" not found.`);
+                    }
+                    const packsize = packages[0].packsize;
+
+                    // Add credits to user's account via Elastic Email API
+                    if (user && user.elastickey) {
+                        await apiFetch('/account/addsubaccountcredits', user.elastickey, {
+                            method: 'POST',
+                            params: {
+                                credits: packsize,
+                                notes: `Order #${order.id} via ZibalPay. Track ID: ${trackId}`
+                            }
+                        });
+                        setMessage(`Payment successful! ${packsize.toLocaleString()} credits have been added to your account.`);
+                        setProcessedOrder({
+                            id: order.id,
+                            note: order.order_note,
+                            creditsAdded: packsize,
+                            total: order.order_total,
+                        });
+                    } else {
+                        throw new Error("User authentication not found. Could not add credits.");
+                    }
+                } else {
+                    // Payment failed or was canceled
+                    await sdk.request(updateItem('orders', order.id, { order_status: 'failed' }));
+                     setProcessedOrder({
+                        id: order.id,
+                        note: order.order_note,
+                        total: order.order_total,
+                    });
+                    throw new Error('Payment was not successful.');
+                }
 
             } catch (err: any) {
-                setStatus('error');
-                setMessage(err.message || 'An unknown error occurred while initiating verification.');
+                setError(err.message || 'An unknown error occurred during payment verification.');
+            } finally {
+                setLoading(false);
             }
         };
 
-        verifyAndPoll();
-
-    }, [user, config, t]);
+        handleCallback();
+    }, [user]);
 
     const handleReturn = () => {
         window.location.href = '/#account-orders';
     };
 
-    if (status === 'loading') {
+    if (loading) {
         return (
             <CenteredMessage style={{ height: '100vh' }}>
                 <Loader />
@@ -128,34 +133,47 @@ const CallbackView = () => {
     return (
         <div className="auth-container">
             <div className="card" style={{ maxWidth: '500px', width: '100%', margin: '0 auto', padding: '2rem', textAlign: 'center' }}>
-                {status === 'success' ? (
-                     <>
-                        <Icon style={{ width: 48, height: 48, color: 'var(--success-color)', margin: '0 auto 1rem' }}>{ICONS.CHECK}</Icon>
-                        <h2 style={{ color: 'var(--success-color)' }}>{t('paymentSuccess')}</h2>
-                        <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{message}</p>
-                    </>
-                ) : (
+                {error ? (
                     <>
                         <Icon style={{ width: 48, height: 48, color: 'var(--danger-color)', margin: '0 auto 1rem' }}>{ICONS.X_CIRCLE}</Icon>
                         <h2 style={{ color: 'var(--danger-color)' }}>{t('paymentFailed')}</h2>
+                        <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{error}</p>
+                        {processedOrder && (
+                             <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
+                                <table className="simple-table">
+                                     <tbody>
+                                        <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
+                                        <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.note}</strong></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                        <div className="form-actions" style={{ justifyContent: 'center' }}>
+                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToOrders', { ns: 'orders' })}</button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <Icon style={{ width: 48, height: 48, color: 'var(--success-color)', margin: '0 auto 1rem' }}>{ICONS.CHECK}</Icon>
+                        <h2 style={{ color: 'var(--success-color)' }}>{t('paymentSuccess')}</h2>
                         <p style={{ color: 'var(--subtle-text-color)', maxWidth: '400px', margin: '0 auto 1.5rem' }}>{message}</p>
+                        {processedOrder && (
+                            <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
+                                <table className="simple-table">
+                                    <tbody>
+                                        <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
+                                        <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.note}</strong></td></tr>
+                                        {processedOrder.creditsAdded && <tr><td>{t('credits', { ns: 'dashboard' })}</td><td style={{textAlign: 'right'}}><strong>+{processedOrder.creditsAdded.toLocaleString(i18n.language)}</strong></td></tr>}
+                                        <tr><td>{t('total', { ns: 'common' })}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.total.toLocaleString(i18n.language)} {t('buyCredits:priceIRT')}</strong></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                        <div className="form-actions" style={{ justifyContent: 'center' }}>
+                            <button onClick={handleReturn} className="btn btn-primary">{t('returnToOrders', { ns: 'orders' })}</button>
+                        </div>
                     </>
                 )}
-                {processedOrder && (
-                     <div className="table-container-simple" style={{ marginBottom: '2rem', textAlign: 'left' }}>
-                        <table className="simple-table">
-                             <tbody>
-                                <tr><td>{t('orderId', { ns: 'orders' })}</td><td style={{textAlign: 'right'}}><strong>#{processedOrder.id}</strong></td></tr>
-                                {processedOrder.order_note && (
-                                     <tr><td>{t('package')}</td><td style={{textAlign: 'right'}}><strong>{processedOrder.order_note}</strong></td></tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-                <div className="form-actions" style={{ justifyContent: 'center' }}>
-                    <button onClick={handleReturn} className="btn btn-primary">{t('returnToOrders', { ns: 'orders' })}</button>
-                </div>
             </div>
         </div>
     );
