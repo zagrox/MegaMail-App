@@ -1,3 +1,4 @@
+
 {
     "yourCurrentBalance": "موجودی فعلی شما",
     "choosePackage": "یک بسته برای شارژ انتخاب کنید",
@@ -31,6 +32,7 @@
     "buyDifferentPackage": "انتخاب یک بسته دیگر",
     "confirmAndPay": "تأیید و پرداخت",
     "paymentSuccess": "پرداخت موفق",
+    "paymentSuccessMessage": "پرداخت موفق بود! سفارش شما برای {{count}} اعتبار در حال پردازش است و به زودی به حساب شما اضافه خواهد شد.",
     "orderPlacedForProcessing": "سفارش شما ثبت شد و در حال پردازش است. لطفاً اطلاعات واریز بانکی خود را ارسال کنید.",
     "offlinePaymentTitle": "جزئیات پرداخت آفلاین",
     "submitBankInfo": "ارسال اطلاعات بانکی",

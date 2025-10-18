@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readItems, updateItem } from '@directus/sdk';
 import sdk from '../api/directus';
-import { apiFetch } from '../api/elasticEmail';
-import { useAuth } from '../contexts/AuthContext';
 import CenteredMessage from '../components/CenteredMessage';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
@@ -17,7 +15,6 @@ type ProcessedOrder = {
 
 const CallbackView = () => {
     const { t, i18n } = useTranslation(['buyCredits', 'dashboard', 'orders', 'common']);
-    const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState('');
@@ -62,41 +59,31 @@ const CallbackView = () => {
                 const isSuccess = success === '1' && status === '2';
 
                 if (isSuccess) {
-                    // Update order status
-                    await sdk.request(updateItem('orders', order.id, { order_status: 'completed' }));
+                    // Update order status to 'completed'. This will trigger the backend flow.
+                    // Check status to prevent re-triggering if the page is reloaded.
+                    if (order.order_status !== 'completed') {
+                        await sdk.request(updateItem('orders', order.id, { order_status: 'completed' }));
+                    }
                     
-                    // Find package to get credit amount
+                    // Find package details just for display purposes.
                     const packages = await sdk.request(readItems('packages', {
                         filter: { packname: { _eq: order.order_note } }
                     }));
                     
-                    if (!packages || packages.length === 0) {
-                        throw new Error(`Package details for "${order.order_note}" not found.`);
-                    }
-                    const packsize = packages[0].packsize;
+                    const packsize = (packages && packages.length > 0) ? packages[0].packsize : 0;
 
-                    // Add credits to user's account via Elastic Email API
-                    if (user && user.elastickey) {
-                        await apiFetch('/account/addsubaccountcredits', user.elastickey, {
-                            method: 'POST',
-                            params: {
-                                credits: packsize,
-                                notes: `Order #${order.id} via ZibalPay. Track ID: ${trackId}`
-                            }
-                        });
-                        setMessage(`Payment successful! ${packsize.toLocaleString()} credits have been added to your account.`);
-                        setProcessedOrder({
-                            id: order.id,
-                            note: order.order_note,
-                            creditsAdded: packsize,
-                            total: order.order_total,
-                        });
-                    } else {
-                        throw new Error("User authentication not found. Could not add credits.");
-                    }
+                    setMessage(t('paymentSuccessMessage', { count: packsize.toLocaleString(i18n.language) }));
+                    setProcessedOrder({
+                        id: order.id,
+                        note: order.order_note,
+                        creditsAdded: packsize > 0 ? packsize : undefined,
+                        total: order.order_total,
+                    });
                 } else {
-                    // Payment failed or was canceled
-                    await sdk.request(updateItem('orders', order.id, { order_status: 'failed' }));
+                    // Payment failed or was canceled. Update status if not already failed.
+                    if (order.order_status !== 'failed') {
+                        await sdk.request(updateItem('orders', order.id, { order_status: 'failed' }));
+                    }
                      setProcessedOrder({
                         id: order.id,
                         note: order.order_note,
@@ -113,7 +100,8 @@ const CallbackView = () => {
         };
 
         handleCallback();
-    }, [user]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleReturn = () => {
         window.location.href = '/#account-orders';

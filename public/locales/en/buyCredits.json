@@ -1,3 +1,4 @@
+
 {
     "yourCurrentBalance": "Your Current Balance",
     "choosePackage": "Choose a Package to Top Up",
@@ -31,6 +32,7 @@
     "buyDifferentPackage": "Choose a Different Package",
     "confirmAndPay": "Confirm and Pay",
     "paymentSuccess": "Payment Successful",
+    "paymentSuccessMessage": "Payment successful! Your order for {{count}} credits is being processed and will be added to your account shortly.",
     "orderPlacedForProcessing": "Your order has been placed and is now processing. Please submit your bank transfer details.",
     "offlinePaymentTitle": "Offline Payment Details",
     "submitBankInfo": "Submit Bank Info",
