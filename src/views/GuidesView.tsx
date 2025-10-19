@@ -83,8 +83,31 @@ const GuidesView = () => {
                 </article>
             </div>
             
+            <div className="card contact-info-card">
+                <div className="contact-info-item">
+                    <Icon>{ICONS.MOBILE}</Icon>
+                    <div className="contact-info-text">
+                        <span>{t('contactPhoneLabel')}</span>
+                        <strong>{t('contactPhoneNumber')}</strong>
+                    </div>
+                </div>
+                <div className="contact-info-item">
+                    <Icon>{ICONS.CALENDAR}</Icon>
+                    <div className="contact-info-text">
+                        <span>{t('workingHoursLabel')}</span>
+                        <strong>{t('workingHoursValue')}</strong>
+                    </div>
+                </div>
+                <div className="contact-info-item">
+                    <Icon>{ICONS.CALENDAR}</Icon>
+                    <div className="contact-info-text">
+                        <span>{t('workingDaysLabel')}</span>
+                        <strong>{t('workingDaysValue')}</strong>
+                    </div>
+                </div>
+            </div>
+
             <div className="help-section">
-                <h2 className="help-section-header">{t('needMoreHelp')}</h2>
                 <div className="help-cards-grid">
                     {helpCards.map(card => (
                         <button key={card.key} className="card help-card" onClick={card.onClick} disabled={card.isSoon}>
@@ -97,6 +120,8 @@ const GuidesView = () => {
                     ))}
                 </div>
             </div>
+
+            
 
         </div>
     );

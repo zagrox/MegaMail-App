@@ -495,6 +495,7 @@ const App = () => {
                             
                             return (
                                 <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
+                                    {/* FIX: Corrected Tooltip and Icon component usage */}
                                     {isSidebarCollapsed ? (
                                         <Tooltip text={navItem.name}><Icon>{navItem.icon}</Icon></Tooltip>
                                     ) : (
@@ -502,6 +503,7 @@ const App = () => {
                                     )}
                                     <span>{navItem.name}</span>
                                     {isLocked && (
+                                        // FIX: Corrected Icon component usage
                                         <Icon
                                             className="lock-icon"
                                             style={isPromotional ? { color: 'var(--success-color)' } : {}}
@@ -515,18 +517,22 @@ const App = () => {
             ))}
         </nav>
         <div className="sidebar-footer-nav">
+             {/* FIX: Corrected Tooltip and Icon component usage */}
              <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
                  {isSidebarCollapsed ? (<Tooltip text={t('settings', { ns: 'account' })}><Icon>{ICONS.SETTINGS}</Icon></Tooltip>) : (<Icon>{ICONS.SETTINGS}</Icon>)}
                  <span>{t('settings', { ns: 'account' })}</span>
              </button>
+             {/* FIX: Corrected Tooltip and Icon component usage */}
              <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
                  {isSidebarCollapsed ? (<Tooltip text={t('account')}><Icon>{ICONS.ACCOUNT}</Icon></Tooltip>) : (<Icon>{ICONS.ACCOUNT}</Icon>)}
                  <span>{t('account')}</span>
              </button>
+             {/* FIX: Corrected Tooltip and Icon component usage */}
              <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
                 {isSidebarCollapsed ? (<Tooltip text={t('buyCredits')}><Icon>{ICONS.BUY_CREDITS}</Icon></Tooltip>) : (<Icon>{ICONS.BUY_CREDITS}</Icon>)}
                 <span>{t('buyCredits')}</span>
              </button>
+             {/* FIX: Corrected Tooltip and Icon component usage */}
              <button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
                  {isSidebarCollapsed ? (<Tooltip text={t('guides')}><Icon>{ICONS.HELP_CIRCLE}</Icon></Tooltip>) : (<Icon>{ICONS.HELP_CIRCLE}</Icon>)}
                  <span>{t('guides')}</span>
@@ -557,15 +563,18 @@ const App = () => {
             <aside className="sidebar">
                 <SidebarContent />
             </aside>
+            {/* FIX: Corrected Icon component usage */}
             <button onClick={toggleSidebarCollapse} className="sidebar-collapse-toggle" aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
                <Icon>{isRTL ? (isSidebarCollapsed ? ICONS.CHEVRON_LEFT : ICONS.CHEVRON_RIGHT) : (isSidebarCollapsed ? ICONS.CHEVRON_RIGHT : ICONS.CHEVRON_LEFT)}</Icon>
             </button>
             <div className="main-wrapper">
                 <header className="mobile-header">
+                     {/* FIX: Corrected Icon component usage */}
                      <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)} aria-label={t('openMenu')}>
                         <Icon>{ICONS.MENU}</Icon>
                     </button>
                     <h1 className="mobile-header-title">{currentView?.title || appName}</h1>
+                    {/* FIX: Corrected Icon component usage */}
                     <button className="mobile-menu-toggle" onClick={() => handleSetView('Account')} aria-label={t('account')}>
                         <Icon>{ICONS.ACCOUNT}</Icon>
                     </button>

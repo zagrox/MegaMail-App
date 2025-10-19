@@ -101,5 +101,11 @@
     "bugDetails": "Bug Details",
     "submitBugReport": "Submit Bug Report",
     "bugReportSuccess": "Bug report submitted successfully. Our team will investigate the issue.",
-    "bugReportError": "Failed to submit bug report: {{error}}"
+    "bugReportError": "Failed to submit bug report: {{error}}",
+    "contactPhoneLabel": "Phone",
+    "contactPhoneNumber": "+98(21)2289 1615",
+    "workingHoursLabel": "Working Hours",
+    "workingHoursValue": "8am - 5pm",
+    "workingDaysLabel": "Working Days",
+    "workingDaysValue": "Saturday to Thursday"
 }

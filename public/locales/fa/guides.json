@@ -108,5 +108,11 @@
     "bugDetails": "جزئیات اشکال",
     "submitBugReport": "ارسال گزارش اشکال",
     "bugReportSuccess": "گزارش اشکال با موفقیت ارسال شد. تیم ما موضوع را بررسی خواهد کرد.",
-    "bugReportError": "ارسال گزارش اشکال ناموفق بود: {{error}}"
+    "bugReportError": "ارسال گزارش اشکال ناموفق بود: {{error}}",
+    "contactPhoneLabel": "تلفن",
+    "contactPhoneNumber": "۰۲۱-۲۲۸۹۱۶۱۵",
+    "workingHoursLabel": "ساعات کاری",
+    "workingHoursValue": "۸ صبح تا ۵ عصر",
+    "workingDaysLabel": "روزهای کاری",
+    "workingDaysValue": "شنبه تا پنجشنبه"
 }
