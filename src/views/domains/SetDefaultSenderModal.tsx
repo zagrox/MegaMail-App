@@ -16,7 +16,7 @@ const SetDefaultSenderModal = ({ isOpen, onClose, domain, apiKey, onSuccess }: {
         if (defaultSender) {
             setLocalPart(defaultSender.split('@')[0]);
         } else {
-            setLocalPart('mailer'); // Default value
+            setLocalPart(''); // Default value
         }
     }, [domain]);
 

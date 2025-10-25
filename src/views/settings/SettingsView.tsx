@@ -1,14 +1,14 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import Tabs from '../components/Tabs';
-import { ICONS } from '../components/Icon';
-import DomainsView from './domains/DomainVerificationTab';
+import Tabs from '../../components/Tabs';
+import { ICONS } from '../../components/Icon';
+import DomainsView from './DomainsView';
 import SmtpView from './SmtpView';
 import ApiKeyView from './ApiKeyView';
-import ShareTab from './account/ShareTab';
-import { useAuth } from '../contexts/AuthContext';
-import FormsTab from './settings/FormsTab';
+import ShareTab from '../account/ShareTab';
+import { useAuth } from '../../contexts/AuthContext';
+import FormsTab from './FormsTab';
 
 // FIX: Added `setView` to props to pass it down to child components like DomainsView.
 const SettingsView = ({ apiKey, user, setView }: { apiKey: string, user: any, setView: (view: string, data?: any) => void }) => {

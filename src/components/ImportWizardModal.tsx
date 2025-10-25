@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiUploadV4 } from '../api/elasticEmail';
@@ -155,7 +156,7 @@ const ImportWizardModal = ({ isOpen, onClose, apiKey, onSuccess, onError, initia
             await apiUploadV4('/contacts/import', apiKey, formData);
             onSuccess();
         } catch (err: any) {
-            onError(err.message);
+            onError(err.message || "An unknown error occurred during import.");
         } finally {
             setIsProcessing(false);
         }
@@ -165,7 +166,6 @@ const ImportWizardModal = ({ isOpen, onClose, apiKey, onSuccess, onError, initia
     const isStep2ImportDisabled = !Object.values(mappings).some(f => f === 'Email') || isProcessing;
 
     return (
-        // FIX: Passed content as children to the Modal component to satisfy TypeScript checks.
         <Modal
             isOpen={isOpen}
             onClose={onClose}

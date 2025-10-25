@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from '../Modal';
@@ -10,7 +11,7 @@ interface AddSocialNetworkModalProps {
     existingNetworks: string[];
 }
 
-const AddSocialNetworkModal: React.FC<AddSocialNetworkModalProps> = ({ isOpen, onClose, onSelect, existingNetworks }) => {
+const AddSocialNetworkModal = ({ isOpen, onClose, onSelect, existingNetworks }: AddSocialNetworkModalProps) => {
     const { t } = useTranslation('emailBuilder');
 
     const availableNetworks = Object.keys(SOCIAL_ICONS).filter(
@@ -18,7 +19,6 @@ const AddSocialNetworkModal: React.FC<AddSocialNetworkModalProps> = ({ isOpen, o
     );
 
     return (
-        // FIX: Pass content as children to the Modal component.
         <Modal
             isOpen={isOpen}
             onClose={onClose}

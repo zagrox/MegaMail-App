@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useCallback } from 'react';
 import { apiFetch } from '../api/elasticEmail';
 
 const useApi = (endpoint: string, apiKey: string, params: Record<string, any> = {}, refetchIndex = 0) => {
@@ -8,29 +9,30 @@ const useApi = (endpoint: string, apiKey: string, params: Record<string, any> = 
   
   const paramsString = JSON.stringify(params);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     if (!apiKey || !endpoint) {
         setLoading(false);
+        setData(null);
         return;
     };
 
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const result = await apiFetch(endpoint, apiKey, { params: JSON.parse(paramsString) });
-        setData(result);
-      } catch (err: any) {
-        setError({message: err.message, endpoint, status: err.status});
-      } finally {
-        setLoading(false);
-      }
-    };
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await apiFetch(endpoint, apiKey, { params: JSON.parse(paramsString) });
+      setData(result);
+    } catch (err: any) {
+      setError({message: err.message, endpoint, status: err.status});
+    } finally {
+      setLoading(false);
+    }
+  }, [endpoint, apiKey, paramsString]);
 
+  useEffect(() => {
     fetchData();
-  }, [endpoint, apiKey, paramsString, refetchIndex]);
+  }, [fetchData, refetchIndex]);
 
-  return { data, loading, error };
+  return { data, loading, error, refetch: fetchData };
 };
 
 export default useApi;

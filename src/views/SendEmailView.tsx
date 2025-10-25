@@ -12,6 +12,12 @@ import MultiSelectSearch from '../components/MultiSelectSearch';
 import Button from '../components/Button';
 import EmptyState from '../components/EmptyState';
 
+const cleanDomain = (domainStr: string) => {
+    if (!domainStr) return '';
+    const match = domainStr.match(/^([a-zA-Z0-9.-]+)/);
+    return match ? match[0] : domainStr;
+};
+
 const emptyContent = { From: '', FromName: '', ReplyTo: '', Subject: '', TemplateName: '', Preheader: '', Body: null, Utm: null };
 const initialCampaignState = {
     Name: '',
@@ -21,25 +27,24 @@ const initialCampaignState = {
         TrackOpens: true, 
         TrackClicks: true, 
         DeliveryOptimization: 'None',
-        EnableSendTimeOptimization: false
+        EnableSendTimeOptimization: false,
+        ScheduleFor: null,
+        TriggerFrequency: 0,
+        TriggerCount: 0,
     }
 };
 
-// Decode a Base64 string to UTF-8 using modern browser APIs
 const decodeState = (base64: string): string => {
-    // 1. Decode the Base64 string to a binary string.
     const binary_string = window.atob(base64);
-    // 2. Create a Uint8Array from the binary string.
     const bytes = new Uint8Array(binary_string.length);
     for (let i = 0; i < binary_string.length; i++) {
         bytes[i] = binary_string.charCodeAt(i);
     }
-    // 3. Decode the UTF-8 bytes back to a string.
     return new TextDecoder().decode(bytes);
 }
 
 const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, setView: (view: string, data?: any) => void; campaignToLoad?: any }) => {
-    const { t, i18n } = useTranslation(['sendEmail', 'templates', 'common', 'send-wizard']);
+    const { t, i18n } = useTranslation(['sendEmail', 'templates', 'common', 'send-wizard', 'domains']);
     const { addToast } = useToast();
     
     const [isSending, setIsSending] = useState(false);
@@ -52,6 +57,12 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     const [isCountLoading, setIsCountLoading] = useState(false);
     const [campaign, setCampaign] = useState(JSON.parse(JSON.stringify(initialCampaignState)));
     const [segmentCounts, setSegmentCounts] = useState<Record<string, number | null>>({});
+    const [enableReplyTo, setEnableReplyTo] = useState(false);
+
+    // New state for replyTo composer
+    const [replyToName, setReplyToName] = useState('');
+    const [replyToPrefix, setReplyToPrefix] = useState('');
+    const [replyToDomain, setReplyToDomain] = useState('');
     
     const { data: lists, loading: listsLoading } = useApiV4('/lists', apiKey, { limit: 1000 });
     const { data: segments, loading: segmentsLoading } = useApiV4('/segments', apiKey, {});
@@ -65,6 +76,8 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             templateTypes: 'RawHTML',
         }
     );
+
+    const [fromEmailPrefix, setFromEmailPrefix] = useState('mailer');
     
     const listItems = useMemo(() => (Array.isArray(lists) ? lists : []).map((l: List) => ({ id: l.ListName, name: l.ListName })), [lists]);
     
@@ -95,49 +108,63 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         });
     }, [segments, segmentCounts]);
 
-
     const verifiedDomainsWithDefault = useMemo(() => {
         if (!Array.isArray(domains)) return [];
         return domains
             .filter(d => String(d.Spf).toLowerCase() === 'true' && String(d.Dkim).toLowerCase() === 'true')
             .map(d => ({
-                domain: d.Domain,
-                defaultSender: d.DefaultSender || `mailer@${d.Domain}`
+                domain: cleanDomain(d.Domain),
+                defaultSender: d.DefaultSender
             }));
     }, [domains]);
 
     const [selectedDomain, setSelectedDomain] = useState('');
 
-    const handleValueChange = (section: 'Campaign' | 'Content' | 'Options', key: string, value: any, contentIndex: number = activeContent) => {
+    const handleValueChange = useCallback((section: 'Campaign' | 'Content' | 'Options', key: string, value: any, contentIndex: number = 0) => {
         setCampaign(prev => {
             if (section === 'Campaign') {
                 return { ...prev, [key]: value };
             }
             if (section === 'Content') {
-                return {
-                    ...prev,
-                    Content: prev.Content.map((item, idx) => 
-                        idx === contentIndex ? { ...item, [key]: value } : item
-                    )
-                };
+                const newContent = [...prev.Content];
+                newContent[contentIndex] = { ...newContent[contentIndex], [key]: value };
+                return { ...prev, Content: newContent };
             }
             if (section === 'Options') {
-                return {
-                    ...prev,
-                    Options: { ...prev.Options, [key]: value }
-                };
+                return { ...prev, Options: { ...prev.Options, [key]: value } };
             }
             return prev;
         });
-    };
+    }, []);
+
+    useEffect(() => {
+        const newFromEmail = selectedDomain ? `${fromEmailPrefix}@${selectedDomain}` : '';
+        if (campaign.Content[activeContent].From !== newFromEmail) {
+            handleValueChange('Content', 'From', newFromEmail, activeContent);
+        }
+    }, [fromEmailPrefix, selectedDomain, activeContent, handleValueChange, campaign.Content]);
 
     const handleDomainChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const domainName = e.target.value;
         setSelectedDomain(domainName);
         const domainInfo = verifiedDomainsWithDefault.find(d => d.domain === domainName);
-        if (domainInfo) {
-            handleValueChange('Content', 'From', domainInfo.defaultSender);
+        
+        let prefix = 'mailer';
+        let fromName = campaign.Content[0].FromName;
+
+        if (domainInfo?.defaultSender) {
+            const defaultSender = domainInfo.defaultSender;
+            const defaultMatch = defaultSender.match(/(.*)<(.*)>/);
+            if (defaultMatch) {
+                if (!fromName) { 
+                    handleValueChange('Content', 'FromName', defaultMatch[1].trim().replace(/"/g, ''));
+                }
+                prefix = defaultMatch[2].trim().split('@')[0];
+            } else {
+                prefix = defaultSender.trim().split('@')[0];
+            }
         }
+        setFromEmailPrefix(prefix);
     };
         
     const filteredTemplates = useMemo(() => {
@@ -151,43 +178,112 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         setRecipientCount(null);
         setIsEditing(false);
         setSelectedDomain('');
+        setFromEmailPrefix('mailer');
+        setEnableReplyTo(false);
+        setReplyToName('');
+        setReplyToPrefix('');
+        setReplyToDomain('');
     }, []);
 
     useEffect(() => {
+        if (domainsLoading) {
+            return; 
+        }
+
         if (campaignToLoad) {
             setIsEditing(true);
             const loadedContent = campaignToLoad.Content?.[0] || {};
             
             const fromString = loadedContent.From || '';
-            let fromName = loadedContent.FromName;
+            let fromName = loadedContent.FromName || '';
             let fromEmail = fromString;
 
-            const angleBracketMatch = fromString.match(/(.*)<(.*)>/);
-            if (angleBracketMatch && angleBracketMatch.length === 3) {
-                fromName = fromName || angleBracketMatch[1].trim().replace(/"/g, '');
-                fromEmail = angleBracketMatch[2].trim();
-            } else {
-                const lastSpaceIndex = fromString.lastIndexOf(' ');
-                if (lastSpaceIndex !== -1 && fromString.substring(lastSpaceIndex + 1).includes('@')) {
-                    fromName = fromName || fromString.substring(0, lastSpaceIndex).trim();
-                    fromEmail = fromString.substring(lastSpaceIndex + 1).trim();
+            if (!fromName) {
+                const angleBracketMatch = fromString.match(/(.*)<(.*)>/);
+                if (angleBracketMatch && angleBracketMatch.length === 3) {
+                    fromName = angleBracketMatch[1].trim().replace(/"/g, '');
+                    fromEmail = angleBracketMatch[2].trim();
                 }
             }
             
-            const domainPart = fromEmail.split('@')[1];
-            if (domainPart) {
+            const isEmailValid = fromEmail && fromEmail.includes('@') && !fromEmail.endsWith('@');
+            const [prefix, domainPart] = isEmailValid ? fromEmail.split('@') : ['', ''];
+            const isDomainVerified = verifiedDomainsWithDefault.some(d => d.domain === domainPart);
+
+            if (isEmailValid && isDomainVerified) {
                 setSelectedDomain(domainPart);
+                setFromEmailPrefix(prefix);
+            } else {
+                if (verifiedDomainsWithDefault.length > 0) {
+                    const firstDomain = verifiedDomainsWithDefault[0];
+                    setSelectedDomain(firstDomain.domain);
+                    const defaultSender = firstDomain.defaultSender;
+                    const defaultMatch = defaultSender?.match(/(.*)<(.*)>/);
+                    if (defaultMatch) {
+                        if (!fromName) fromName = defaultMatch[1].trim().replace(/"/g, '');
+                        setFromEmailPrefix(defaultMatch[2].trim().split('@')[0] || 'mailer');
+                    } else if (defaultSender) {
+                        setFromEmailPrefix(defaultSender.trim().split('@')[0] || 'mailer');
+                    } else {
+                        setFromEmailPrefix('mailer');
+                    }
+                } else {
+                    setSelectedDomain('');
+                    setFromEmailPrefix('');
+                }
+            }
+            
+            if (loadedContent.ReplyTo) {
+                setEnableReplyTo(true);
+                const replyToString = loadedContent.ReplyTo;
+                let rName = '';
+                let rEmail = '';
+
+                const replyToMatch = replyToString.match(/(.*)<(.*)>/);
+                if (replyToMatch) {
+                    rName = replyToMatch[1].trim().replace(/"/g, '');
+                    rEmail = replyToMatch[2].trim();
+                } else {
+                    rEmail = replyToString.trim();
+                }
+
+                const [rPrefix, rDomain] = rEmail.includes('@') ? rEmail.split('@') : ['', ''];
+                setReplyToName(rName);
+                setReplyToPrefix(rPrefix);
+                if (verifiedDomainsWithDefault.some(d => d.domain === rDomain)) {
+                    setReplyToDomain(rDomain);
+                }
+            } else {
+                setEnableReplyTo(false);
+                setReplyToName('');
+                setReplyToPrefix('');
+                setReplyToDomain('');
             }
 
             const loadedOptions = campaignToLoad.Options || {};
             const loadedRecipients = campaignToLoad.Recipients || {};
 
+            let recipientTarget: 'all' | 'list' | 'segment' | null = null;
+            if (loadedRecipients.ListNames?.length > 0) {
+                recipientTarget = 'list';
+            } else if (loadedRecipients.SegmentNames?.includes('All Contacts')) {
+                recipientTarget = 'all';
+            } else if (loadedRecipients.SegmentNames?.length > 0) {
+                recipientTarget = 'segment';
+            } else if (campaignToLoad.Status?.toLowerCase() === 'draft' && Object.keys(loadedRecipients).length === 0) {
+                recipientTarget = 'all';
+            }
+
+            const mergedOptions = {
+                ...initialCampaignState.Options,
+                ...loadedOptions
+            };
+
             setCampaign({
                 Name: campaignToLoad.Name || '',
                 Content: [{
-                    From: fromEmail || '',
-                    FromName: fromName || '',
-                    ReplyTo: loadedContent.ReplyTo || '',
+                    ...emptyContent,
+                    FromName: fromName,
                     Subject: loadedContent.Subject || '',
                     TemplateName: loadedContent.TemplateName || '',
                     Preheader: loadedContent.Preheader || '',
@@ -198,50 +294,39 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                     ListNames: loadedRecipients.ListNames || [],
                     SegmentNames: loadedRecipients.SegmentNames || [],
                 },
-                Options: {
-                    TrackOpens: loadedOptions.TrackOpens !== false,
-                    TrackClicks: loadedOptions.TrackClicks !== false,
-                    DeliveryOptimization: loadedOptions.DeliveryOptimization || 'None',
-                    EnableSendTimeOptimization: loadedOptions.EnableSendTimeOptimization || false,
-                }
+                Options: mergedOptions
             });
+            setRecipientTarget(recipientTarget);
 
-            if (loadedRecipients.ListNames?.length > 0) {
-                setRecipientTarget('list');
-            } else if (loadedRecipients.SegmentNames?.length > 0 && loadedRecipients.SegmentNames.includes('All Contacts')) {
-                setRecipientTarget('all');
-            } else if (loadedRecipients.SegmentNames?.length > 0) {
-                setRecipientTarget('segment');
-            } else if (Object.keys(loadedRecipients).length === 0) {
-                setRecipientTarget('all');
-            } else {
-                setRecipientTarget(null);
-            }
         } else {
-            setIsEditing(false);
             resetForm();
+            if (verifiedDomainsWithDefault.length > 0) {
+                const firstDomain = verifiedDomainsWithDefault[0];
+                setSelectedDomain(firstDomain.domain);
+                setReplyToDomain(firstDomain.domain);
+                const defaultSender = firstDomain.defaultSender;
+                let fromName = '';
+                let prefix = 'mailer';
+                if (defaultSender) {
+                    const defaultMatch = defaultSender.match(/(.*)<(.*)>/);
+                    if (defaultMatch) {
+                        fromName = defaultMatch[1].trim().replace(/"/g, '');
+                        prefix = defaultMatch[2].trim().split('@')[0] || 'mailer';
+                    } else {
+                        prefix = defaultSender.trim().split('@')[0] || 'mailer';
+                    }
+                }
+                setFromEmailPrefix(prefix);
+                handleValueChange('Content', 'FromName', fromName);
+            }
         }
-    }, [campaignToLoad, resetForm]);
-
-    // Effect to set initial domain
-    useEffect(() => {
-        if (!campaignToLoad && verifiedDomainsWithDefault.length > 0 && !selectedDomain) {
-            const initialDomain = verifiedDomainsWithDefault[0];
-            setSelectedDomain(initialDomain.domain);
-            handleValueChange('Content', 'From', initialDomain.defaultSender);
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [verifiedDomainsWithDefault, campaignToLoad, selectedDomain]);
+    }, [campaignToLoad, domainsLoading, resetForm, verifiedDomainsWithDefault, handleValueChange]);
 
     useEffect(() => {
         const calculateCount = async () => {
             if (!apiKey) return;
 
-            // --- ASYNCHRONOUS PATH for 'all' and 'list' ---
             if (recipientTarget === 'all' || (recipientTarget === 'list' && campaign.Recipients.ListNames.length > 0)) {
-                // The key fix is NOT setting a loading state that removes the existing count.
-                // By just fetching and then setting the new count, the number will update seamlessly
-                // without a disruptive "flash" or loading indicator replacing it.
                 try {
                     let countResult: number | null = null;
                     if (recipientTarget === 'all') {
@@ -264,8 +349,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                 return;
             }
 
-            // --- SYNCHRONOUS PATH for 'segment', empty selection, or null target ---
-            setIsCountLoading(false); // Ensure loader is always off for sync operations.
+            setIsCountLoading(false); 
             if (recipientTarget === 'segment' && campaign.Recipients.SegmentNames.length > 0) {
                 const total = campaign.Recipients.SegmentNames.reduce((sum, segmentName) => {
                     const count = segmentCounts[segmentName];
@@ -273,7 +357,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                 }, 0);
                 setRecipientCount(total);
             } else {
-                setRecipientCount(0); // Default to 0 if no recipients are selected
+                setRecipientCount(0); 
             }
         };
 
@@ -311,56 +395,61 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         }
 
         setIsSending(true);
-    
-        const payload = JSON.parse(JSON.stringify(campaign));
-    
-        payload.Content = payload.Content.map((c: any) => {
-            const fromEmail = c.From;
-            const fromName = c.FromName;
-            const combinedFrom = fromName ? `${fromName} ${fromEmail}` : fromEmail;
-            
-            const newContent = { ...c, From: combinedFrom };
-            delete newContent.FromName;
-            return newContent;
-        });
-    
-        if (action === 'send') {
-            payload.Status = 'Active';
-        } else { // 'draft'
-            payload.Status = 'Draft';
-        }
-    
-        payload.Content = payload.Content.map((c: any) => ({...c, Body: null, TemplateName: c.TemplateName || null}));
-            
-        let finalRecipients: { ListNames?: string[]; SegmentNames?: string[] } = {};
 
+        const content = campaign.Content[0];
+        const fromEmail = content.From || '';
+        const fromName = content.FromName?.trim() || '';
+        const combinedFrom = fromName ? `${fromName} <${fromEmail}>` : fromEmail;
+
+        let combinedReplyTo = '';
+        if (enableReplyTo && replyToPrefix && replyToDomain) {
+            const rEmail = `${replyToPrefix}@${replyToDomain}`;
+            combinedReplyTo = replyToName.trim() ? `${replyToName.trim()} <${rEmail}>` : rEmail;
+        } else if (combinedFrom) {
+            // Default ReplyTo to From address if not otherwise specified and From is set
+            combinedReplyTo = combinedFrom;
+        }
+
+        const contentPayload = {
+            From: combinedFrom,
+            ReplyTo: combinedReplyTo,
+            Subject: content.Subject || undefined,
+            TemplateName: content.TemplateName || undefined,
+            Preheader: content.Preheader || undefined,
+        };
+
+        const finalRecipients: { ListNames: string[]; SegmentNames: string[] } = { ListNames: [], SegmentNames: [] };
         switch (recipientTarget) {
             case 'list':
-                finalRecipients = { ListNames: campaign.Recipients.ListNames || [] };
+                finalRecipients.ListNames = campaign.Recipients.ListNames || [];
                 break;
             case 'segment':
-                finalRecipients = { SegmentNames: campaign.Recipients.SegmentNames || [] };
+                finalRecipients.SegmentNames = campaign.Recipients.SegmentNames || [];
                 break;
             case 'all':
-                if (!isEditing) {
-                    finalRecipients = { SegmentNames: ['All Contacts'] };
-                } else {
-                    finalRecipients = {};
+                finalRecipients.SegmentNames = ['All Contacts'];
+                break;
+            default:
+                if (action === 'draft') {
+                    finalRecipients.ListNames = campaign.Recipients.ListNames || [];
+                    finalRecipients.SegmentNames = campaign.Recipients.SegmentNames || [];
                 }
                 break;
-            default: // recipientTarget is null
-                finalRecipients = { ListNames: [], SegmentNames: [] };
-                break;
         }
-    
-        payload.Recipients = finalRecipients;
-    
+
+        const payload = {
+            Name: campaign.Name || undefined,
+            Status: action === 'send' && isRecipientSelected ? 'Active' : 'Draft',
+            Content: [contentPayload],
+            Recipients: finalRecipients,
+            Options: campaign.Options
+        };
+
         try {
-            if (isEditing && campaignToLoad) {
-                await apiFetchV4(`/campaigns/${encodeURIComponent(campaignToLoad.Name)}`, apiKey, { method: 'PUT', body: payload });
-            } else {
-                await apiFetchV4('/campaigns', apiKey, { method: 'POST', body: payload });
-            }
+            const method = isEditing ? 'PUT' : 'POST';
+            const endpoint = isEditing ? `/campaigns/${encodeURIComponent(campaignToLoad.Name)}` : '/campaigns';
+
+            await apiFetchV4(endpoint, apiKey, { method, body: JSON.parse(JSON.stringify(payload)) });
             
             addToast(payload.Status === 'Draft' ? t('draftSavedSuccess') : t('emailSentSuccess'), 'success');
             setView('Campaigns');
@@ -418,16 +507,83 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     };
 
     const handleGoToDomains = () => {
-        sessionStorage.setItem('account-tab', 'domains');
-        setView('Account');
+        sessionStorage.setItem('settings-tab', 'domains');
+        setView('Settings');
     };
 
     const handleGoToBuilder = () => {
         setIsTemplateModalOpen(false);
         setView('Email Builder');
     };
+
+    const payloadForDisplay = useMemo(() => {
+        const { FromName, From, Subject, TemplateName, Preheader } = campaign.Content[0];
+        const fromEmail = From || '';
+        const fromName = FromName?.trim() || '';
+        const combinedFrom = fromName ? `${fromName} <${fromEmail}>` : fromEmail;
+
+        let combinedReplyTo = '';
+        if (enableReplyTo && replyToPrefix && replyToDomain) {
+            const rEmail = `${replyToPrefix}@${replyToDomain}`;
+            combinedReplyTo = replyToName.trim() ? `${replyToName.trim()} <${rEmail}>` : rEmail;
+        } else if (combinedFrom) {
+            // Default ReplyTo to From address if not otherwise specified and From is set
+            combinedReplyTo = combinedFrom;
+        }
+    
+        let finalRecipients: { ListNames: string[]; SegmentNames: string[] } = { ListNames: [], SegmentNames: [] };
+    
+        switch (recipientTarget) {
+            case 'list':
+                finalRecipients.ListNames = campaign.Recipients.ListNames || [];
+                break;
+            case 'segment':
+                finalRecipients.SegmentNames = campaign.Recipients.SegmentNames || [];
+                break;
+            case 'all':
+                finalRecipients.SegmentNames = ['All Contacts'];
+                break;
+            default:
+                 if (campaign.Recipients.ListNames.length > 0) finalRecipients.ListNames = campaign.Recipients.ListNames;
+                 if (campaign.Recipients.SegmentNames.length > 0) finalRecipients.SegmentNames = campaign.Recipients.SegmentNames;
+                break;
+        }
+    
+        const contentForDisplay: { [key: string]: any } = {};
+        if (combinedFrom) contentForDisplay.From = combinedFrom;
+        contentForDisplay.ReplyTo = combinedReplyTo;
+        if (Subject) contentForDisplay.Subject = Subject;
+        if (TemplateName) contentForDisplay.TemplateName = TemplateName;
+        if (Preheader) contentForDisplay.Preheader = Preheader;
+    
+        const status = (recipientTarget === 'all' || finalRecipients.ListNames.length > 0 || finalRecipients.SegmentNames.length > 0) ? "Active" : "Draft";
+    
+        const payload: { [key: string]: any } = {
+          Status: status,
+        };
+        if (campaign.Name) payload.Name = campaign.Name;
+        if (Object.keys(contentForDisplay).length > 0) payload.Content = [contentForDisplay];
+        if (finalRecipients.ListNames.length > 0 || finalRecipients.SegmentNames.length > 0) {
+            payload.Recipients = finalRecipients;
+        }
+        payload.Options = campaign.Options;
+    
+        return JSON.stringify(payload, null, 2);
+    }, [campaign, recipientTarget, enableReplyTo, replyToName, replyToPrefix, replyToDomain]);
     
     const currentContent = campaign.Content[activeContent] || {};
+
+    const handleEnableReplyToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const isEnabled = e.target.checked;
+        setEnableReplyTo(isEnabled);
+        if (!isEnabled) {
+            setReplyToName('');
+            setReplyToPrefix('');
+            if (verifiedDomainsWithDefault.length > 0) {
+                setReplyToDomain(verifiedDomainsWithDefault[0].domain);
+            }
+        }
+    };
         
     if (domainsLoading) return <CenteredMessage><Loader /></CenteredMessage>;
     
@@ -562,47 +718,101 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                         {currentContent.TemplateName && (
                             <>
                                  <div className="form-grid">
-                                    <div className="form-group"><label>{t('fromName')}</label><input type="text" value={currentContent.FromName} onChange={e => handleValueChange('Content', 'FromName', e.target.value)} /></div>
+                                    <div className="form-group">
+                                        <label>{t('fromName')}</label>
+                                        <input type="text" value={currentContent.FromName} onChange={e => handleValueChange('Content', 'FromName', e.target.value)} />
+                                    </div>
                                     <div className="form-group">
                                         <label>{t('fromEmail')}</label>
                                         {verifiedDomainsWithDefault.length > 0 ? (
-                                            <>
-                                            <select value={selectedDomain} onChange={handleDomainChange}>
-                                                {verifiedDomainsWithDefault.map(d => <option key={d.domain} value={d.domain}>{d.domain}</option>)}
-                                            </select>
-                                            <p style={{fontSize: '0.9rem', color: 'var(--subtle-text-color)', marginTop: '0.5rem'}}>
-                                                {t('sending')}: <strong>{currentContent.From}</strong>
-                                            </p>
-                                            </>
+                                            <div className="from-email-composer">
+                                                <input
+                                                    type="text"
+                                                    value={fromEmailPrefix}
+                                                    onChange={e => setFromEmailPrefix(e.target.value.trim())}
+                                                />
+                                                <span className="from-email-at">@</span>
+                                                <select value={selectedDomain} onChange={handleDomainChange}>
+                                                    {verifiedDomainsWithDefault.map(d => (
+                                                        <option key={d.domain} value={d.domain}>{d.domain}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
                                         ) : (
-                                            <div className="info-message warning" style={{width: '100%', margin: 0}}>
-                                                <p style={{margin: 0}}>
-                                                    {t('noVerifiedDomainsToSendError')}{' '}
-                                                    <button type="button" className="link-button" onClick={handleGoToDomains}>
-                                                        {t('addDomainNow')}
-                                                    </button>
-                                                </p>
+                                            <div className="info-message warning">
+                                                <p>{t('noVerifiedDomainsToSendError')}</p>
+                                                <Button className="btn" onClick={handleGoToDomains}>{t('addDomainNow')}</Button>
                                             </div>
                                         )}
                                     </div>
                                 </div>
-                                <div className="form-group"><label>{t('subject')}</label><input type="text" value={currentContent.Subject} onChange={e => handleValueChange('Content', 'Subject', e.target.value)} required /></div>
-                                <div className="form-group"><label>{t('preheader')}</label><input type="text" value={currentContent.Preheader} onChange={e => handleValueChange('Content', 'Preheader', e.target.value)} /></div>
+                                
+                                <div className="form-group">
+                                    <label className="custom-checkbox">
+                                        <input type="checkbox" checked={enableReplyTo} onChange={handleEnableReplyToChange} />
+                                        <span className="checkbox-checkmark"></span>
+                                        <span className="checkbox-label" style={{ fontWeight: 'normal' }}>{t('setDifferentReplyTo', { ns: 'send-wizard' })}</span>
+                                    </label>
+                                </div>
+                                {enableReplyTo && (
+                                     <div className="form-grid">
+                                        <div className="form-group">
+                                            <label>{t('replyToName', {ns: 'send-wizard'})}</label>
+                                            <input type="text" value={replyToName} onChange={e => setReplyToName(e.target.value)} />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>{t('replyToEmail', {ns: 'send-wizard'})}</label>
+                                            <div className="from-email-composer">
+                                                <input
+                                                    type="text"
+                                                    value={replyToPrefix}
+                                                    onChange={e => setReplyToPrefix(e.target.value.trim())}
+                                                />
+                                                <span className="from-email-at">@</span>
+                                                <select value={replyToDomain} onChange={e => setReplyToDomain(e.target.value)}>
+                                                    {verifiedDomainsWithDefault.map(d => (
+                                                        <option key={d.domain} value={d.domain}>{d.domain}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                <div className="form-group">
+                                    <label>{t('subject')}</label>
+                                    <input type="text" value={currentContent.Subject} onChange={e => handleValueChange('Content', 'Subject', e.target.value)} />
+                                </div>
+                                <div className="form-group">
+                                    <label>{t('preheader')}</label>
+                                    <input type="text" value={currentContent.Preheader} onChange={e => handleValueChange('Content', 'Preheader', e.target.value)} />
+                                </div>
                             </>
                         )}
                     </div>
                 </div>
-            </div>
+                <div className="quick-send-actions">
+                    <p>{t('finalSummaryText', { template: currentContent.TemplateName || '...', count: recipientCount || 0 })}</p>
+                    <div className="action-buttons">
+                        <Button className="btn-secondary" onClick={() => handleSubmit('draft')} disabled={isSending}>
+                            <Icon>{ICONS.SAVE_CHANGES}</Icon> <span>{t('saveAsDraft')}</span>
+                        </Button>
+                        <Button className="btn-primary" onClick={() => handleSubmit('send')} disabled={isSending || verifiedDomainsWithDefault.length === 0}>
+                            {isSending ? <Loader /> : <><Icon>{ICONS.SEND_EMAIL}</Icon> <span>{t('sendNow')}</span></>}
+                        </Button>
+                    </div>
+                </div>
 
-            <div className="quick-send-actions">
-                <p>{t('finalSummaryText', { template: campaign.Content[0].TemplateName || '...', count: recipientCount || 0 })}</p>
-                <div className="action-buttons">
-                    <Button type="button" className="btn-secondary" onClick={() => handleSubmit('draft')} disabled={isSending} action="save_draft">{t('saveAsDraft')}</Button>
-                    <Button type="button" className="btn-primary" onClick={() => handleSubmit('send')} disabled={isSending || verifiedDomainsWithDefault.length === 0 || !isRecipientSelected} action="send_campaign">{isSending ? <Loader/> : t('sendNow')}</Button>
+                <div className="card" style={{ marginTop: '2rem' }}>
+                    <div className="card-header"><h3>API Payload for Debugging</h3></div>
+                    <div className="card-body" style={{padding: 0}}>
+                        <pre style={{ background: 'var(--subtle-background)', padding: '1rem', margin: 0, borderRadius: '0 0 8px 8px', fontSize: '0.8rem', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                            <code>{payloadForDisplay}</code>
+                        </pre>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
-
 export default SendEmailView;

@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApi from '../useApi';
@@ -58,12 +59,12 @@ const FormsTab = ({ apiKey }: { apiKey: string }) => {
     }
 
     return (
-        <div className="account-tab-content">
-            <div className="account-tab-card">
-                <div className="account-tab-card-header">
+        <div className="forms-view-container" style={{padding: '1.5rem'}}>
+            <div className="card subscribe-form-card">
+                <div className="card-header">
                     <h3>{t('yourSubscriptionForm')}</h3>
                 </div>
-                <div className="account-tab-card-body">
+                <div className="card-body">
                     <p>{t('subscriptionFormDesc')}</p>
                     
                     <div className="form-group">
@@ -93,11 +94,11 @@ const FormsTab = ({ apiKey }: { apiKey: string }) => {
                 </div>
             </div>
 
-            <div className="account-tab-card" style={{minHeight: '600px', overflow: 'hidden'}}>
-                 <div className="account-tab-card-header">
+            <div className="card form-preview-container">
+                 <div className="card-header">
                     <h3>{t('formPreview')}</h3>
                 </div>
-                <div className="account-tab-card-body" style={{padding: 0, display: 'flex'}}>
+                <div className="card-body" style={{padding: 0}}>
                     <iframe
                         key={subscribeUrl}
                         src={subscribeUrl}

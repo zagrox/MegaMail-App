@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
@@ -23,7 +24,6 @@ const RenameModal = ({ isOpen, onClose, entityName, entityType, onSubmit }: { is
     };
 
     return (
-        // FIX: Passed form content as children to the Modal component to satisfy TypeScript checks.
         <Modal
             isOpen={isOpen}
             onClose={onClose}

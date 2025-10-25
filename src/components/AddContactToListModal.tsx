@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
@@ -11,7 +12,7 @@ interface AddContactToListModalProps {
     listName: string;
 }
 
-const AddContactToListModal: React.FC<AddContactToListModalProps> = ({ isOpen, onClose, onSubmit, listName }) => {
+const AddContactToListModal = ({ isOpen, onClose, onSubmit, listName }: AddContactToListModalProps) => {
     const { t } = useTranslation(['contacts', 'common']);
     const [emails, setEmails] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);

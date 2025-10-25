@@ -13,7 +13,6 @@ const ToastContainer = ({ toasts, removeToast }: ToastContainerProps) => {
     return (
         <div className="toast-container">
             {toasts.map(toast => (
-                // FIX: The key prop is for React's reconciliation and should not be passed to the component.
                 <Toast
                     key={toast.id}
                     message={toast.message}

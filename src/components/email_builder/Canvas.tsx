@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -35,6 +34,7 @@ const Canvas = ({ items, removeItem, onDuplicateBlock, onEditImageBlock, selecte
     };
 
     return (
+        // @ts-ignore - React 19: Suppressing missing children prop error for @dnd-kit/sortable which is not yet updated for React 19.
         <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
             <div ref={setNodeRef} className="builder-canvas" style={canvasStyle}>
                 {items.length > 0 ? (

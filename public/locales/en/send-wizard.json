@@ -35,5 +35,7 @@
     "loading": "Loading...",
     "noVerifiedDomainError": "No verified sending domain available. Please configure a domain in your account settings.",
     "campaignSteps": "Campaign Steps",
-    "exitWizard": "Exit Wizard"
+    "exitWizard": "Exit Wizard",
+    "replyToName": "Reply to name",
+    "replyToEmail": "Reply to email"
 }

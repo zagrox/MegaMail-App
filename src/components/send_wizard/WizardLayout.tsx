@@ -2,11 +2,13 @@
 
 
 
+
+
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import Icon, { ICONS } from '../Icon';
-import Loader from '../Loader';
-import Button from '../Button';
+import Icon, { ICONS } from '../../components/Icon';
+import Loader from '../../components/Loader';
+import Button from '../../components/Button';
 import { AppActions } from '../../config/actions';
 
 interface WizardLayoutProps {

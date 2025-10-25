@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -30,7 +26,7 @@ const LabeledControl = ({ label, children, fullWidth = false }: { label: string,
 
 const ColorInput = ({ value, onChange, onAdd, onRemove }: { value?: string; onChange: (hex: string) => void; onAdd: () => void; onRemove: () => void; }) => {
     if (!value || value === 'transparent') {
-        {/* FIX: Changed path prop to children for Icon component */}
+        {/* FIX: Changed to use JSX children for Icon component */}
         return <button onClick={onAdd} className="btn-icon color-input-add-btn"><Icon>{ICONS.PLUS}</Icon></button>;
     }
     
@@ -46,7 +42,7 @@ const ColorInput = ({ value, onChange, onAdd, onRemove }: { value?: string; onCh
                 onChange={(e) => onChange(e.target.value)}
                 onFocus={(e) => e.target.select()}
             />
-             {/* FIX: Changed path prop to children for Icon component */}
+             {/* FIX: Changed to use JSX children for Icon component */}
              <button onClick={onRemove} className="btn-icon"><Icon>{ICONS.DELETE}</Icon></button>
         </div>
     );
@@ -182,7 +178,9 @@ const SocialSettings = ({ block, onStyleChange, onContentChange }: { block: any,
                 existingNetworks={c.items?.map((i: any) => i.network) || []}
             />
             <Section title={t('socialLinks')}>
+                {/* @ts-ignore - React 19: Suppressing missing children prop error for @dnd-kit/core which is not yet updated for React 19. */}
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    {/* @ts-ignore - React 19: Suppressing missing children prop error for @dnd-kit/sortable which is not yet updated for React 19. */}
                     <SortableContext items={c.items?.map((i: any) => i.id) || []} strategy={verticalListSortingStrategy}>
                         <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
                             {c.items?.map((item: any) => (

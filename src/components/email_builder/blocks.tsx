@@ -16,7 +16,7 @@ interface EditableBlockProps {
 
 const getPixelValue = (val: any) => parseInt(String(val).replace('px', '')) || 0;
 
-const EditableBlock: React.FC<EditableBlockProps> = ({ id, html, style, isSelected, onContentChange, className }) => {
+const EditableBlock = ({ id, html, style, isSelected, onContentChange, className }: EditableBlockProps) => {
     const ref = useRef<HTMLDivElement>(null);
     const lastHtml = useRef(html);
 
@@ -245,6 +245,7 @@ const ColumnDropZone = ({ id, items, allHandlers, selectedBlockId, flex }: { id:
 
     return (
         <div ref={setNodeRef} className={`column-droppable ${isOver ? 'is-over' : ''}`} style={{ flex: flex || 1 }}>
+             {/* @ts-ignore - React 19: Suppressing missing children prop error for @dnd-kit/sortable which is not yet updated for React 19. */}
              <SortableContext items={items.map((i: any) => i.id)} strategy={verticalListSortingStrategy}>
                  {items.length > 0 ? (
                     items.map((nestedItem: any, index: number) => (
@@ -388,7 +389,6 @@ const SocialBlock = ({ item }: { item: any }) => {
                     return (
                         <a key={socialItem.id} href={socialItem.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.preventDefault()}>
                             <div style={itemStyle}>
-                                {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                 <Icon 
                                     style={{ 
                                         color: s.iconStyle === 'default' ? colors.bg : colors.icon,

@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
@@ -11,7 +13,6 @@ const ThemeSwitcher = () => {
     const { theme, setTheme } = useTheme();
     const { updateUser, user } = useAuth();
 
-    // FIX: Changed icon type to React.ReactNode to accept JSX elements
     const options: { value: Theme; label: string; icon: React.ReactNode; }[] = [
         { value: 'light', label: t('themeLight'), icon: ICONS.SUN },
         { value: 'dark', label: t('themeDark'), icon: ICONS.MOON },
@@ -61,7 +62,6 @@ const ThemeSwitcher = () => {
                     onClick={() => handleThemeChange(option.value)}
                     aria-label={t('switchToTheme', { theme: option.label })}
                 >
-                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
                     <Icon>{option.icon}</Icon>
                     <span>{option.label}</span>
                 </button>

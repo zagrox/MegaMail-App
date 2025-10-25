@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../contexts/ToastContext';
 import Icon, { ICONS } from '../components/Icon';
@@ -6,6 +6,11 @@ import Badge from '../components/Badge';
 import { useStatusStyles } from '../hooks/useStatusStyles';
 import Loader from '../components/Loader';
 import Button from '../components/Button';
+import useApiV4 from '../hooks/useApiV4';
+import CenteredMessage from '../components/CenteredMessage';
+import ErrorMessage from '../components/ErrorMessage';
+// FIX: Import apiFetchV4 to make it available in the component.
+import { apiFetchV4 } from '../api/elasticEmail';
 
 const DNS_RECORDS_CONFIG = {
     SPF: {
@@ -105,10 +110,28 @@ const VerificationRecordCard = ({ recordKey, domainName, status, onVerify }: Ver
 
 const DomainVerificationView = ({ domainName, apiKey, onBack }: { domainName: string, apiKey: string, onBack: () => void }) => {
     const { t, i18n } = useTranslation(['domains', 'common']);
+    const { addToast } = useToast();
     const [statuses, setStatuses] = useState<Record<string, VerificationStatus>>(
       Object.keys(DNS_RECORDS_CONFIG).reduce((acc, key) => ({ ...acc, [key]: 'idle' }), {})
     );
     const [isCheckingAll, setIsCheckingAll] = useState(false);
+
+    const { data: domainDetails, loading: domainLoading, error: domainError } = useApiV4(
+        domainName ? `/domains/${encodeURIComponent(domainName)}` : '',
+        apiKey
+    );
+    
+    useEffect(() => {
+        if (domainDetails) {
+            const initialStatuses: Record<string, VerificationStatus> = {
+                SPF: domainDetails.Spf === true ? 'verified' : 'idle',
+                DKIM: domainDetails.Dkim === true ? 'verified' : 'idle',
+                Tracking: domainDetails.TrackingStatus === 'Validated' ? 'verified' : 'idle',
+                DMARC: 'idle', // DMARC status is not provided by the API, requires manual client-side check.
+            };
+            setStatuses(initialStatuses);
+        }
+    }, [domainDetails]);
 
     const checkDns = async (key: string) => {
         setStatuses(prev => ({ ...prev, [key]: 'checking' }));
@@ -133,11 +156,34 @@ const DomainVerificationView = ({ domainName, apiKey, onBack }: { domainName: st
 
     const handleVerifyAll = async () => {
         setIsCheckingAll(true);
+        // Fetch the latest status from the API first
+        const latestDetails = await apiFetchV4(`/domains/${encodeURIComponent(domainName)}`, apiKey);
+        if (latestDetails) {
+            const apiStatuses: Record<string, VerificationStatus> = {
+                SPF: latestDetails.Spf === true ? 'verified' : 'idle',
+                DKIM: latestDetails.Dkim === true ? 'verified' : 'idle',
+                Tracking: latestDetails.TrackingStatus === 'Validated' ? 'verified' : 'idle',
+                DMARC: 'idle',
+            };
+             setStatuses(apiStatuses);
+        }
+        // Then run client-side checks for anything that's still idle
         for (const key of Object.keys(DNS_RECORDS_CONFIG)) {
-            await checkDns(key);
+            // @ts-ignore
+            if (statuses[key] !== 'verified') {
+                 await checkDns(key);
+            }
         }
         setIsCheckingAll(false);
     };
+    
+    if (domainLoading) {
+        return <div className="domain-verification-view"><CenteredMessage><Loader /></CenteredMessage></div>;
+    }
+    
+    if (domainError) {
+        return <div className="domain-verification-view"><ErrorMessage error={domainError} /></div>;
+    }
 
     return (
         <div className="domain-verification-view">

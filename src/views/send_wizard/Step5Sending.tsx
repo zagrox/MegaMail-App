@@ -1,3 +1,4 @@
+
 import React, { useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import WizardLayout from '../../components/send_wizard/WizardLayout';
@@ -108,7 +109,7 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
             nextAction={nextAction}
         >
             <div className="wizard-step-intro">
-                {/* FIX: Changed to use explicit children prop for Icon component */}
+                {/* FIX: Pass icon as child to Icon component */}
                 <Icon>{ICONS.VERIFY}</Icon>
                 <p>{t('reviewAndSend_desc')}</p>
             </div>

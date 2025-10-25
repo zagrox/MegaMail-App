@@ -67,7 +67,6 @@ root.render(
     <React.StrictMode>
         <Suspense fallback={<CenteredMessage style={{height: '100vh'}}><Loader /></CenteredMessage>}>
             <I18nextProvider i18n={i18n}>
-                {/* FIX: Correctly nested the providers to pass children implicitly. */}
                 <ThemeProvider>
                     <ConfigurationProvider>
                         <AuthProvider>

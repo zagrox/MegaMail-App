@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Icon, { ICONS } from './Icon';
@@ -9,7 +11,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     className?: string;
 }
 
-const Button = ({ action, children, className, onClick, ...props }: ButtonProps) => {
+const Button = ({ action, children, className, ...props }: ButtonProps) => {
     const { canPerformAction, allModules, setModuleToUnlock } = useAuth();
     const isLocked = action ? !canPerformAction(action) : false;
 
@@ -34,10 +36,13 @@ const Button = ({ action, children, className, onClick, ...props }: ButtonProps)
             } else {
                 console.warn(`Action "${action}" is locked but no corresponding module was found.`);
             }
-        } else if (onClick) {
-            onClick(e);
+        } else if (props.onClick) {
+            props.onClick(e);
         }
     };
+    
+    // To avoid passing onClick twice to the button element, we can extract it from props.
+    const { onClick, ...restProps } = props;
 
     return (
         <button
@@ -45,7 +50,7 @@ const Button = ({ action, children, className, onClick, ...props }: ButtonProps)
             onClick={handleClick}
             disabled={isLocked ? false : props.disabled}
             aria-disabled={isLocked || props.disabled}
-            {...props}
+            {...restProps}
         >
             {isLocked && <Icon style={{ marginRight: '0.5rem' }}>{ICONS.LOCK}</Icon>}
             {children}
