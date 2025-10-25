@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState, useMemo } from 'react';
 import WizardLayout from './WizardLayout';
 import Icon, { ICONS } from '../Icon';
@@ -25,7 +21,7 @@ const decodeState = (base64: string): string => {
     return new TextDecoder().decode(bytes);
 };
 
-const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; apiKey: string; setView: (view: string, data?: any) => void; }) => {
+const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView, domains, domainsLoading }: { onNext: () => void; onBack: () => void; data: any; updateData: (d: any) => void; apiKey: string; setView: (view: string, data?: any) => void; domains: any[], domainsLoading: boolean }) => {
     const { t } = useTranslation(['send-wizard', 'templates', 'sendEmail', 'common']);
     const { addToast } = useToast();
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
@@ -40,7 +36,7 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
         { scopeType: 'Personal', templateTypes: 'RawHTML', limit: 1000 },
         isTemplateModalOpen ? 1 : 0
     );
-    
+
     const filteredTemplates = useMemo(() => {
         if (!Array.isArray(templates)) return [];
         return templates.filter((t: Template) => t.Name.toLowerCase().includes(templateSearchTerm.toLowerCase()));
@@ -103,17 +99,41 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         updateData({ [name]: value });
-        // If subject is changed, update campaign name as well for convenience
         if (name === 'subject') {
             updateData({ campaignName: value });
         }
     };
+    
+    const handleDomainChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const domainName = e.target.value;
+        const domainInfo = domains.find(d => d.domain === domainName);
+        
+        let prefix = 'mailer';
+        let currentFromName = data.fromName;
+
+        if (domainInfo?.defaultSender) {
+            const defaultSender = domainInfo.defaultSender;
+            const defaultMatch = defaultSender.match(/(.*)<(.*)>/);
+            if (defaultMatch) {
+                if (!currentFromName) { 
+                    currentFromName = defaultMatch[1].trim().replace(/"/g, '');
+                }
+                prefix = defaultMatch[2].trim().split('@')[0];
+            } else {
+                prefix = defaultSender.trim().split('@')[0];
+            }
+        }
+        updateData({ 
+            selectedDomain: domainName, 
+            fromEmailPrefix: prefix,
+            fromName: currentFromName
+        });
+    };
 
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, checked } = e.target;
-        // If unchecking, also clear the replyTo value
         if (name === 'enableReplyTo' && !checked) {
-            updateData({ [name]: checked, replyTo: '' });
+            updateData({ [name]: checked, replyToName: '', replyToPrefix: '' });
         } else {
             updateData({ [name]: checked });
         }
@@ -124,40 +144,23 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
         setView('Email Builder');
     };
     
-    const isNextDisabled = !data.template || !data.fromName || !data.subject;
+    const isNextDisabled = !data.template || !data.fromName || !data.subject || !data.selectedDomain;
 
     return (
         <>
             <Modal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} title={t('templates')}>
                 <div className="template-selector-modal">
                     <div className="search-bar" style={{marginBottom: '1rem'}}>
-                        {/* FIX: Pass icon as child to Icon component */}
                         <Icon>{ICONS.SEARCH}</Icon>
-                        <input
-                            type="search"
-                            placeholder={t('searchTemplatesPlaceholder', { ns: 'templates' })}
-                            value={templateSearchTerm}
-                            onChange={e => setTemplateSearchTerm(e.target.value)}
-                        />
+                        <input type="search" placeholder={t('searchTemplatesPlaceholder', { ns: 'templates' })} value={templateSearchTerm} onChange={e => setTemplateSearchTerm(e.target.value)} />
                     </div>
                     <div className="template-list-container">
                         {templatesLoading ? <Loader /> : (
                             !Array.isArray(templates) || templates.length === 0 ? (
-                                <EmptyState
-                                    icon={ICONS.ARCHIVE}
-                                    title={t('noTemplatesFound', { ns: 'templates' })}
-                                    message={t('noTemplatesFoundDesc', { ns: 'templates' })}
-                                    ctaText={t('createTemplate', { ns: 'templates' })}
-                                    onCtaClick={handleGoToBuilder}
-                                />
+                                <EmptyState icon={ICONS.ARCHIVE} title={t('noTemplatesFound', { ns: 'templates' })} message={t('noTemplatesFoundDesc', { ns: 'templates' })} ctaText={t('createTemplate', { ns: 'templates' })} onCtaClick={handleGoToBuilder} />
                             ) : filteredTemplates.length > 0 ? (
                                 filteredTemplates.map((template: Template) => (
-                                    <button
-                                        type="button"
-                                        key={template.Name}
-                                        className="template-list-item"
-                                        onClick={() => handleSelectTemplate(template.Name)}
-                                    >
+                                    <button type="button" key={template.Name} className="template-list-item" onClick={() => handleSelectTemplate(template.Name)}>
                                         <span>{template.Name}</span>
                                         <small>{template.Subject || t('noSubject', { ns: 'campaigns' })}</small>
                                     </button>
@@ -174,51 +177,68 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView }: { o
                 <iframe srcDoc={templateToPreview?.Body?.[0]?.Content || ''} className="preview-iframe" title={t('previewTemplate', { ns: 'templates' })} />
             </Modal>
             
-            <WizardLayout
-                title={t('designContent')}
-                onNext={onNext}
-                onBack={onBack}
-                nextDisabled={isNextDisabled}
-            >
-                <div className="wizard-step-intro">
-                    {/* FIX: Pass icon as child to Icon component */}
-                    <Icon>{ICONS.MAIL}</Icon>
-                    <p>{t('designContent_desc')}</p>
-                </div>
-                <div className="content-form-grid">
-                    <label>{t('template', { ns: 'sendEmail' })}</label>
-                    <div className="template-selector-display" onClick={() => setIsTemplateModalOpen(true)} style={{ gridColumn: '2 / 4' }}>
-                        {isLoadingTemplate ? <Loader /> : (data.template || t('useTemplate', { ns: 'sendEmail' }))}
+            <WizardLayout title={t('designContent')} onNext={onNext} onBack={onBack} nextDisabled={isNextDisabled}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    <div className="form-group">
+                        <label>{t('template', { ns: 'sendEmail' })}</label>
+                        <div className="template-summary">
+                            <Icon>{ICONS.ARCHIVE}</Icon>
+                            <span>{isLoadingTemplate ? <Loader /> : (data.template || '...')}</span>
+                            <button type="button" className="btn btn-secondary" onClick={() => setIsTemplateModalOpen(true)}>{t('changeTemplate')}</button>
+                            <button type="button" className="btn" onClick={handlePreview} disabled={!data.template || isLoadingTemplate}><Icon>{ICONS.EYE}</Icon></button>
+                        </div>
                     </div>
-                    <button className="btn btn-secondary" onClick={handlePreview} disabled={!data.template || isLoadingTemplate}>
-                        {/* FIX: Pass icon as child to Icon component */}
-                        <Icon>{ICONS.EYE}</Icon> {t('previewTemplate', { ns: 'templates' })}
-                    </button>
 
-                    <label>{t('fromName', { ns: 'sendEmail' })}</label>
-                    <input type="text" name="fromName" value={data.fromName} onChange={handleChange} className="full-width" style={{gridColumn: '2 / -1'}} />
-
-                    <label>{t('subject', { ns: 'sendEmail' })}</label>
-                    <input type="text" name="subject" value={data.subject} onChange={handleChange} style={{gridColumn: '2 / -1'}} />
-
-                    <label style={{alignSelf: 'start', paddingTop: '0.5rem'}}>{t('replyTo')}</label>
-                    <div style={{ gridColumn: '2 / -1', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div className="form-grid">
+                        <div className="form-group">
+                            <label>{t('fromName', { ns: 'sendEmail' })}</label>
+                            <input type="text" name="fromName" value={data.fromName} onChange={handleChange} />
+                        </div>
+                        <div className="form-group">
+                            <label>{t('fromEmail', { ns: 'sendEmail' })}</label>
+                            {domainsLoading ? <Loader /> : (
+                                <div className="from-email-composer">
+                                    <input type="text" value={data.fromEmailPrefix} onChange={e => updateData({ fromEmailPrefix: e.target.value.trim() })} />
+                                    <span className="from-email-at">@</span>
+                                    <select value={data.selectedDomain} onChange={handleDomainChange}>
+                                        {domains.map(d => ( <option key={d.domain} value={d.domain}>{d.domain}</option> ))}
+                                    </select>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="form-group">
                         <label className="custom-checkbox">
                             <input type="checkbox" name="enableReplyTo" checked={!!data.enableReplyTo} onChange={handleCheckboxChange} />
                             <span className="checkbox-checkmark"></span>
                             <span className="checkbox-label" style={{ fontWeight: 'normal' }}>{t('setDifferentReplyTo')}</span>
                         </label>
-                        {data.enableReplyTo &&
-                            <input 
-                                type="email" 
-                                name="replyTo" 
-                                value={data.replyTo} 
-                                onChange={handleChange} 
-                                className="full-width" 
-                                placeholder={t('replyToPlaceholder')}
-                            />
-                        }
                     </div>
+                    {data.enableReplyTo && (
+                         <div className="form-grid">
+                            <div className="form-group">
+                                <label>{t('replyToName')}</label>
+                                <input type="text" name="replyToName" value={data.replyToName} onChange={handleChange} />
+                            </div>
+                            <div className="form-group">
+                                <label>{t('replyToEmail')}</label>
+                                <div className="from-email-composer">
+                                    <input type="text" value={data.replyToPrefix} onChange={e => updateData({ replyToPrefix: e.target.value.trim() })} />
+                                    <span className="from-email-at">@</span>
+                                    <select value={data.replyToDomain} onChange={e => updateData({ replyToDomain: e.target.value })}>
+                                        {domains.map(d => (<option key={d.domain} value={d.domain}>{d.domain}</option>))}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <div className="form-group">
+                        <label>{t('subject', { ns: 'sendEmail' })}</label>
+                        <input type="text" name="subject" value={data.subject} onChange={handleChange} />
+                    </div>
+
                 </div>
             </WizardLayout>
         </>

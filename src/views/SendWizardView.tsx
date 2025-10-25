@@ -10,6 +10,12 @@ import Step4Settings from '../components/send_wizard/Step4Settings';
 import Step5Sending from '../components/send_wizard/Step5Sending';
 import Icon, { ICONS } from '../components/Icon';
 
+const cleanDomain = (domainStr: string) => {
+    if (!domainStr) return '';
+    const match = domainStr.match(/^([a-zA-Z0-9.-]+)/);
+    return match ? match[0] : domainStr;
+};
+
 const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, setView: (view: string, data?: any) => void, campaignToLoad?: any }) => {
     const { t } = useTranslation(['send-wizard', 'sendEmail', 'common']);
     const { addToast } = useToast();
@@ -26,9 +32,13 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         isCountLoading: false,
         template: null as string | null,
         fromName: '',
+        fromEmailPrefix: 'mailer',
+        selectedDomain: '',
         subject: '',
         enableReplyTo: false,
-        replyTo: '',
+        replyToName: '',
+        replyToPrefix: '',
+        replyToDomain: '',
         campaignName: '',
         sendTimeOptimization: false,
         deliveryOptimization: 'None',
@@ -55,6 +65,16 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         return domains.filter(d => String(d.Spf).toLowerCase() === 'true' && String(d.Dkim).toLowerCase() === 'true');
     }, [domains]);
 
+    const verifiedDomainsWithDefault = useMemo(() => {
+        if (!Array.isArray(domains)) return [];
+        return domains
+            .filter(d => String(d.Spf).toLowerCase() === 'true' && String(d.Dkim).toLowerCase() === 'true')
+            .map(d => ({
+                domain: cleanDomain(d.Domain),
+                defaultSender: d.DefaultSender
+            }));
+    }, [domains]);
+
     useEffect(() => {
         if (campaignToLoad && !domainsLoading) {
             const loadedContent = campaignToLoad.Content?.[0] || {};
@@ -73,36 +93,69 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             }
 
             const fromString = loadedContent.From || '';
-            let fromName = '';
-            let fromEmail = '';
+            let fromName = loadedContent.FromName || '';
+            let fromEmail = fromString;
 
-            const angleBracketMatch = fromString.match(/(.*)<(.*)>/);
-            if (angleBracketMatch && angleBracketMatch.length === 3) {
-                fromName = angleBracketMatch[1].trim().replace(/"/g, '');
-                fromEmail = angleBracketMatch[2].trim();
-            } else {
-                fromEmail = fromString.trim();
-            }
-
-            const isEmailValid = fromEmail && fromEmail.includes('@') && !fromEmail.endsWith('@');
-            const domainPart = isEmailValid ? fromEmail.split('@')[1] : '';
-            const isDomainVerified = verifiedDomains.some(d => d.Domain === domainPart);
-
-            let finalFromName = fromName;
-            if (!isEmailValid || !isDomainVerified) {
-                if (verifiedDomains.length > 0) {
-                    const firstDomain = verifiedDomains[0];
-                    const defaultSender = firstDomain.DefaultSender;
-                    const defaultMatch = defaultSender?.match(/(.*)<(.*)>/);
-                    if (defaultMatch) {
-                        finalFromName = defaultMatch[1].trim().replace(/"/g, '');
-                    } else {
-                        finalFromName = '';
-                    }
-                } else {
-                    finalFromName = '';
+            if (!fromName) {
+                const angleBracketMatch = fromString.match(/(.*)<(.*)>/);
+                if (angleBracketMatch && angleBracketMatch.length === 3) {
+                    fromName = angleBracketMatch[1].trim().replace(/"/g, '');
+                    fromEmail = angleBracketMatch[2].trim();
                 }
             }
+            
+            const isEmailValid = fromEmail && fromEmail.includes('@') && !fromEmail.endsWith('@');
+            const [prefix, domainPart] = isEmailValid ? fromEmail.split('@') : ['', ''];
+            const isDomainVerified = verifiedDomainsWithDefault.some(d => d.domain === domainPart);
+            
+            let finalFromName = fromName;
+            let finalPrefix = 'mailer';
+            let finalDomain = '';
+
+            if (isEmailValid && isDomainVerified) {
+                finalDomain = domainPart;
+                finalPrefix = prefix;
+            } else {
+                if (verifiedDomainsWithDefault.length > 0) {
+                    const firstDomain = verifiedDomainsWithDefault[0];
+                    finalDomain = firstDomain.domain;
+                    const defaultSender = firstDomain.defaultSender;
+                    const defaultMatch = defaultSender?.match(/(.*)<(.*)>/);
+                    if (defaultMatch) {
+                        if (!finalFromName) finalFromName = defaultMatch[1].trim().replace(/"/g, '');
+                        finalPrefix = defaultMatch[2].trim().split('@')[0] || 'mailer';
+                    } else if (defaultSender) {
+                        finalPrefix = defaultSender.trim().split('@')[0] || 'mailer';
+                    }
+                }
+            }
+
+            let replyToName = '';
+            let replyToPrefix = '';
+            let replyToDomain = '';
+            if (loadedContent.ReplyTo) {
+                const replyToString = loadedContent.ReplyTo;
+                let rName = '';
+                let rEmail = '';
+
+                const replyToMatch = replyToString.match(/(.*)<(.*)>/);
+                if (replyToMatch) {
+                    rName = replyToMatch[1].trim().replace(/"/g, '');
+                    rEmail = replyToMatch[2].trim();
+                } else {
+                    rEmail = replyToString.trim();
+                }
+
+                const [rPrefix, rDomain] = rEmail.includes('@') ? rEmail.split('@') : ['', ''];
+                replyToName = rName;
+                replyToPrefix = rPrefix;
+                if (verifiedDomainsWithDefault.some(d => d.domain === rDomain)) {
+                    replyToDomain = rDomain;
+                } else if (verifiedDomainsWithDefault.length > 0) {
+                    replyToDomain = verifiedDomainsWithDefault[0].domain;
+                }
+            }
+
 
             const newCampaignData = {
                 type: 'regular',
@@ -113,9 +166,13 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                 },
                 template: loadedContent.TemplateName || null,
                 fromName: finalFromName,
+                fromEmailPrefix: finalPrefix,
+                selectedDomain: finalDomain,
                 subject: loadedContent.Subject || '',
                 enableReplyTo: !!loadedContent.ReplyTo,
-                replyTo: loadedContent.ReplyTo || '',
+                replyToName,
+                replyToPrefix,
+                replyToDomain,
                 campaignName: campaignToLoad.Name || '',
                 trackOpens: loadedOptions.TrackOpens !== false,
                 trackClicks: loadedOptions.TrackClicks !== false,
@@ -129,8 +186,28 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             setCampaignData(prev => ({ ...prev, ...newCampaignData }));
             setStep(2);
             setMaxStep(5);
+        } else if (!campaignToLoad && verifiedDomainsWithDefault.length > 0) {
+            const firstDomain = verifiedDomainsWithDefault[0];
+            let fromName = '';
+            let prefix = 'mailer';
+            if (firstDomain.defaultSender) {
+                const defaultMatch = firstDomain.defaultSender.match(/(.*)<(.*)>/);
+                if (defaultMatch) {
+                    fromName = defaultMatch[1].trim().replace(/"/g, '');
+                    prefix = defaultMatch[2].trim().split('@')[0] || 'mailer';
+                } else {
+                    prefix = firstDomain.defaultSender.trim().split('@')[0] || 'mailer';
+                }
+            }
+            updateData({
+                selectedDomain: firstDomain.domain,
+                replyToDomain: firstDomain.domain,
+                fromEmailPrefix: prefix,
+                fromName: fromName,
+            });
         }
-    }, [campaignToLoad, verifiedDomains, domainsLoading]);
+    }, [campaignToLoad, verifiedDomains, domainsLoading, verifiedDomainsWithDefault, updateData]);
+
 
     const nextStep = () => setStep(s => {
         const next = s + 1;
@@ -169,35 +246,32 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                 }
             }
     
-            const defaultSender = (verifiedDomains.length > 0) ? verifiedDomains[0].DefaultSender : undefined;
-    
-            let fromEmail = '';
-            if (defaultSender) {
-                const emailMatch = defaultSender.match(/<([^>]+)>/);
-                if (emailMatch?.[1]) {
-                    fromEmail = emailMatch[1];
-                } else {
-                    fromEmail = defaultSender.split(/[\s(<>)]+/).filter(p => p.includes('@'))[0] || defaultSender;
-                }
-            }
-    
+            const fromEmail = `${campaignData.fromEmailPrefix}@${campaignData.selectedDomain}`;
             const fromName = campaignData.fromName?.trim() || '';
             const combinedFrom = fromName ? `${fromName} <${fromEmail}>` : fromEmail;
+
+            let combinedReplyTo = '';
+            if (campaignData.enableReplyTo && campaignData.replyToPrefix && campaignData.replyToDomain) {
+                const rEmail = `${campaignData.replyToPrefix}@${campaignData.replyToDomain}`;
+                combinedReplyTo = campaignData.replyToName.trim() ? `${campaignData.replyToName.trim()} <${rEmail}>` : rEmail;
+            } else if (combinedFrom) {
+                combinedReplyTo = combinedFrom;
+            }
     
             const contentPayload = {
                 From: combinedFrom,
-                ReplyTo: campaignData.enableReplyTo && campaignData.replyTo ? campaignData.replyTo : '',
+                ReplyTo: combinedReplyTo,
                 Subject: campaignData.subject || undefined,
                 TemplateName: campaignData.template || undefined,
-                Utm: campaignData.utmEnabled ? campaignData.utm : null,
+                Utm: campaignData.utmEnabled ? campaignData.utm : undefined,
                 Body: null
             };
     
             const optionsPayload = {
                 TrackOpens: campaignData.trackOpens,
                 TrackClicks: campaignData.trackClicks,
-                DeliveryOptimization: campaignData.deliveryOptimization,
-                EnableSendTimeOptimization: campaignData.enableSendTimeOptimization,
+                DeliveryOptimization: campaignData.sendTimeOptimization ? campaignData.deliveryOptimization : 'None',
+                EnableSendTimeOptimization: campaignData.sendTimeOptimization ? campaignData.enableSendTimeOptimization : false,
                 ScheduleFor: (action === 'send' && campaignData.sendAction === 'schedule' && campaignData.scheduleDateTime)
                     ? new Date(campaignData.scheduleDateTime).toISOString()
                     : undefined,
@@ -219,7 +293,6 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             const method = campaignToLoad ? 'PUT' : 'POST';
             const endpoint = campaignToLoad ? `/campaigns/${encodeURIComponent(campaignToLoad.Name)}` : '/campaigns';
     
-            // Use JSON.parse(JSON.stringify()) to strip out any keys with `undefined` values before sending
             await apiFetchV4(endpoint, apiKey, { method, body: JSON.parse(JSON.stringify(payload)) });
     
             addToast(payload.Status === 'Draft' ? t('draftSavedSuccess', { ns: 'sendEmail' }) : t('emailSentSuccess', { ns: 'sendEmail' }), 'success');
@@ -234,35 +307,34 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     };
 
     const payloadForDisplay = useMemo(() => {
-        const defaultSender = (verifiedDomains.length > 0) ? verifiedDomains[0].DefaultSender : undefined;
-        let fromEmail = '';
-        if (defaultSender) {
-            const emailMatch = defaultSender.match(/<([^>]+)>/);
-            if (emailMatch?.[1]) {
-                fromEmail = emailMatch[1];
-            } else {
-                fromEmail = defaultSender.split(/[\s(<>)]+/).filter(p => p.includes('@'))[0] || defaultSender;
-            }
-        }
+        const fromEmail = (campaignData.selectedDomain && campaignData.fromEmailPrefix) ? `${campaignData.fromEmailPrefix}@${campaignData.selectedDomain}` : '';
         const fromName = campaignData.fromName?.trim() || '';
         const combinedFrom = fromName ? `${fromName} <${fromEmail}>` : fromEmail;
-        const contentPayload: { [key: string]: any } = {
-            From: combinedFrom,
-            ReplyTo: campaignData.enableReplyTo && campaignData.replyTo ? campaignData.replyTo : '',
-        };
+
+        let combinedReplyTo = '';
+        if (campaignData.enableReplyTo && campaignData.replyToPrefix && campaignData.replyToDomain) {
+            const rEmail = `${campaignData.replyToPrefix}@${campaignData.replyToDomain}`;
+            combinedReplyTo = campaignData.replyToName.trim() ? `${campaignData.replyToName.trim()} <${rEmail}>` : rEmail;
+        } else if (combinedFrom) {
+            combinedReplyTo = combinedFrom;
+        }
+
+        const contentPayload: { [key: string]: any } = {};
+        if (combinedFrom) contentPayload.From = combinedFrom;
+        if (combinedReplyTo) contentPayload.ReplyTo = combinedReplyTo;
         if (campaignData.subject) contentPayload.Subject = campaignData.subject;
         if (campaignData.template) contentPayload.TemplateName = campaignData.template;
         if (campaignData.utmEnabled) contentPayload.Utm = campaignData.utm;
-
+    
         const optionsPayload = {
             TrackOpens: campaignData.trackOpens,
             TrackClicks: campaignData.trackClicks,
-            DeliveryOptimization: campaignData.deliveryOptimization,
-            EnableSendTimeOptimization: campaignData.enableSendTimeOptimization,
+            DeliveryOptimization: campaignData.sendTimeOptimization ? campaignData.deliveryOptimization : 'None',
+            EnableSendTimeOptimization: campaignData.sendTimeOptimization ? campaignData.enableSendTimeOptimization : false,
             ScheduleFor: (campaignData.sendAction === 'schedule' && campaignData.scheduleDateTime) ? new Date(campaignData.scheduleDateTime).toISOString() : undefined,
         };
 
-        const recipients: { ListNames: string[]; SegmentNames: string[]; } = { ListNames: [], SegmentNames: [] };
+        let recipients: { ListNames: string[]; SegmentNames: string[]; } = { ListNames: [], SegmentNames: [] };
         switch (campaignData.recipientTarget) {
             case 'list':
                 recipients.ListNames = campaignData.recipients.listNames || [];
@@ -282,12 +354,13 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         const payload: { [key: string]: any } = {
             Name: campaignData.campaignName || undefined,
             Status: status,
-            Content: [contentPayload],
-            Recipients: recipients,
-            Options: optionsPayload,
         };
+        if (Object.keys(contentPayload).length > 0 && (contentPayload.From || contentPayload.ReplyTo || contentPayload.Subject || contentPayload.TemplateName)) payload.Content = [contentPayload];
+        if (recipients.ListNames.length > 0 || recipients.SegmentNames.length > 0) payload.Recipients = recipients;
+        payload.Options = optionsPayload;
+        
         return JSON.stringify(JSON.parse(JSON.stringify(payload)), null, 2);
-    }, [campaignData, verifiedDomains]);
+    }, [campaignData]);
 
     const renderStepContent = () => {
         switch (step) {
@@ -296,7 +369,7 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             case 2:
                 return <Step2Recipients onNext={nextStep} onBack={prevStep} data={campaignData} updateData={updateData} apiKey={apiKey} />;
             case 3:
-                return <Step3Content onNext={nextStep} onBack={prevStep} data={campaignData} updateData={updateData} apiKey={apiKey} setView={setView} />;
+                return <Step3Content onNext={nextStep} onBack={prevStep} data={campaignData} updateData={updateData} apiKey={apiKey} setView={setView} domains={verifiedDomainsWithDefault} domainsLoading={domainsLoading} />;
             case 4:
                 return <Step4Settings onNext={nextStep} onBack={prevStep} data={campaignData} updateData={updateData} />;
             case 5:

@@ -18,7 +18,7 @@ const cleanDomain = (domainStr: string) => {
     return match ? match[0] : domainStr;
 };
 
-const emptyContent = { From: '', FromName: '', ReplyTo: '', Subject: '', TemplateName: '', Preheader: '', Body: null, Utm: null };
+const emptyContent = { From: '', FromName: '', ReplyTo: '', Subject: '', TemplateName: '', Body: null, Utm: null };
 const initialCampaignState = {
     Name: '',
     Content: [JSON.parse(JSON.stringify(emptyContent))],
@@ -286,7 +286,6 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                     FromName: fromName,
                     Subject: loadedContent.Subject || '',
                     TemplateName: loadedContent.TemplateName || '',
-                    Preheader: loadedContent.Preheader || '',
                     Body: loadedContent.Body || null,
                     Utm: loadedContent.Utm || null
                 }],
@@ -415,7 +414,6 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             ReplyTo: combinedReplyTo,
             Subject: content.Subject || undefined,
             TemplateName: content.TemplateName || undefined,
-            Preheader: content.Preheader || undefined,
         };
 
         const finalRecipients: { ListNames: string[]; SegmentNames: string[] } = { ListNames: [], SegmentNames: [] };
@@ -517,7 +515,7 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
     };
 
     const payloadForDisplay = useMemo(() => {
-        const { FromName, From, Subject, TemplateName, Preheader } = campaign.Content[0];
+        const { FromName, From, Subject, TemplateName } = campaign.Content[0];
         const fromEmail = From || '';
         const fromName = FromName?.trim() || '';
         const combinedFrom = fromName ? `${fromName} <${fromEmail}>` : fromEmail;
@@ -554,7 +552,6 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         contentForDisplay.ReplyTo = combinedReplyTo;
         if (Subject) contentForDisplay.Subject = Subject;
         if (TemplateName) contentForDisplay.TemplateName = TemplateName;
-        if (Preheader) contentForDisplay.Preheader = Preheader;
     
         const status = (recipientTarget === 'all' || finalRecipients.ListNames.length > 0 || finalRecipients.SegmentNames.length > 0) ? "Active" : "Draft";
     
@@ -782,10 +779,6 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                                 <div className="form-group">
                                     <label>{t('subject')}</label>
                                     <input type="text" value={currentContent.Subject} onChange={e => handleValueChange('Content', 'Subject', e.target.value)} />
-                                </div>
-                                <div className="form-group">
-                                    <label>{t('preheader')}</label>
-                                    <input type="text" value={currentContent.Preheader} onChange={e => handleValueChange('Content', 'Preheader', e.target.value)} />
                                 </div>
                             </>
                         )}
