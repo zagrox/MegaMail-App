@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useRef, FormEvent, useCallback } from 'react';
 import { GoogleGenAI, Chat, FunctionDeclaration, Type, GenerateContentResponse, Part } from '@google/genai';
 import { useAuth } from '../contexts/AuthContext';
@@ -170,9 +169,10 @@ const Chatbot = ({ setView }: { setView: (view: string, data?: any) => void }) =
                     });
                 }
 
-                // FIX: The `sendMessage` function expects a `SendMessageParameters` object.
-                // The function response parts array must be passed inside the `message.parts` property.
-                response = await chat.current.sendMessage({ message: { parts: functionResponseParts } });
+                // FIX: The `sendMessage` method expects the `message` property to be a `Part[]` for function responses.
+                // The previous implementation was wrapping the array in an extra `{ parts: ... }` object,
+                // causing a malformed request and an infinite loop. This has been corrected.
+                response = await chat.current.sendMessage({ message: functionResponseParts });
             }
             
             const modelResponse = response.text;
