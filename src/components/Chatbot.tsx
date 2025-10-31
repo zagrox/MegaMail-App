@@ -1,6 +1,7 @@
 
+
 import React, { useState, useEffect, useRef, FormEvent, useCallback } from 'react';
-import { GoogleGenAI, Chat, FunctionDeclaration, Type, GenerateContentResponse } from '@google/genai';
+import { GoogleGenAI, Chat, FunctionDeclaration, Type, GenerateContentResponse, Part } from '@google/genai';
 import { useAuth } from '../contexts/AuthContext';
 import * as chatbotFunctions from '../api/chatbotFunctions';
 import Icon, { ICONS } from './Icon';
@@ -137,7 +138,7 @@ const Chatbot = ({ setView }: { setView: (view: string, data?: any) => void }) =
 
             while (response.functionCalls && response.functionCalls.length > 0) {
                 const functionCalls = response.functionCalls;
-                const functionResponses = [];
+                const functionResponseParts: Part[] = [];
 
                 for (const call of functionCalls) {
                     let functionResult;
@@ -158,13 +159,20 @@ const Chatbot = ({ setView }: { setView: (view: string, data?: any) => void }) =
                             default:
                                 throw new Error(`Unknown function call requested by the model: ${call.name}`);
                         }
-                        functionResponses.push({ id: call.id, name: call.name, response: functionResult });
                     } catch (funcError: any) {
-                        functionResponses.push({ id: call.id, name: call.name, response: { error: funcError.message || 'Function execution failed.' } });
+                        functionResult = { error: funcError.message || 'Function execution failed.' };
                     }
+                    functionResponseParts.push({
+                        functionResponse: {
+                            name: call.name,
+                            response: functionResult,
+                        },
+                    });
                 }
 
-                response = await chat.current.sendMessage({ toolResponse: { functionResponses } });
+                // FIX: The `sendMessage` function expects a `SendMessageParameters` object.
+                // The function response parts array must be passed inside the `message.parts` property.
+                response = await chat.current.sendMessage({ message: { parts: functionResponseParts } });
             }
             
             const modelResponse = response.text;
