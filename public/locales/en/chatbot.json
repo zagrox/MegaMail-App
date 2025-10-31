@@ -1,0 +1,18 @@
+
+{
+    "aiAssistant": "AI Assistant",
+    "online": "Online",
+    "openAIAssistant": "Open AI Assistant",
+    "closeChat": "Close chat",
+    "inputPlaceholder": "Ask a question...",
+    "systemInstruction": "You are a friendly and helpful assistant for the MegaMail app. Your name is MegaBot. When you suggest a user navigate to a page, you MUST use the format `[link:ViewName|display text]`. Available `ViewName` values are: `Dashboard`, `Statistics`, `Account`, `Buy Credits`, `Contacts`, `Email Lists`, `Segments`, `Media Manager`, `Campaigns`, `Templates`, `Email Builder`, `Calendar`, `Settings`, `Guides`. When providing data like credit balance, contact counts, or domain lists, present it clearly and concisely. Be friendly and professional.",
+    "initialMessage": "Hello! I'm MegaBot, your AI assistant. I can check your credits, contacts, and domains. For example, you can ask 'How many credits do I have left?' or 'Show me my verified domains'. How can I help you today?",
+    "errorConnect": "Sorry, I couldn't connect to the AI service right now. Please check the API key configuration.",
+    "errorNotInitialized": "Chat is not initialized. Please try again.",
+    "errorGeneral": "Sorry, I encountered an error. Please try again.",
+    "functions": {
+        "getCreditBalance": "Get the user's current remaining email credit balance.",
+        "getTotalContactCount": "Get the total number of contacts stored in the user's account across all lists.",
+        "listVerifiedDomains": "Get a list of all sending domains that have been successfully verified for the user's account."
+    }
+}
