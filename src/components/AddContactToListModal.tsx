@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
@@ -67,6 +68,7 @@ const AddContactToListModal = ({ isOpen, onClose, onSubmit, listName }: AddConta
                         {t('cancel', { ns: 'common' })}
                     </button>
                     <button type="submit" className="btn btn-primary" disabled={isSubmitting || !emails.trim()}>
+                        {/* FIX: The Icon component requires a child. The user-plus icon is provided. */}
                         {isSubmitting ? <Loader /> : <><Icon>{ICONS.USER_PLUS}</Icon><span>{t('addContact')}</span></>}
                     </button>
                 </div>

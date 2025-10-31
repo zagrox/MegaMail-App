@@ -3,6 +3,10 @@
     "guidesTitle": "Guides & Tutorials",
     "guidesSubtitle": "Learn how to make the most out of MegaMail with these step-by-step guides for essential features.",
 
+    "guideAIAssistantTitle": "How to Use the AI Assistant",
+    "guideAIAssistantStep1Title": "Example Questions",
+    "guideAIAssistantStep1Desc": "The AI Assistant is a general-purpose chatbot that can help you with a wide range of topics related to email marketing and using the MegaMail app. Here are some examples of what you can ask:<ul><li>How do I improve my email open rates?</li><li>What is the difference between a List and a Segment?</li><li>Can you give me 5 subject line ideas for a summer sale?</li><li>Explain what DMARC is in simple terms.</li><li>How can I add a new contact to a list?</li><li>What are some best practices for email design?</li><li>Help me write a short welcome email for new subscribers.</li></ul>Feel free to ask anything you're curious about!",
+
     "guideAccountTitle": "How to Manage Your Account",
     "guideAccountStep1Title": "General Settings & Profile",
     "guideAccountStep1Desc": "Navigate to <strong>Account</strong> from the sidebar footer. In the <strong>General</strong> tab, you can change your display theme and language. In the <strong>Profile</strong> tab, you can update your personal and company information.",

@@ -513,60 +513,6 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         setIsTemplateModalOpen(false);
         setView('Email Builder');
     };
-
-    const payloadForDisplay = useMemo(() => {
-        const { FromName, From, Subject, TemplateName } = campaign.Content[0];
-        const fromEmail = From || '';
-        const fromName = FromName?.trim() || '';
-        const combinedFrom = fromName ? `${fromName} <${fromEmail}>` : fromEmail;
-
-        let combinedReplyTo = '';
-        if (enableReplyTo && replyToPrefix && replyToDomain) {
-            const rEmail = `${replyToPrefix}@${replyToDomain}`;
-            combinedReplyTo = replyToName.trim() ? `${replyToName.trim()} <${rEmail}>` : rEmail;
-        } else if (combinedFrom) {
-            // Default ReplyTo to From address if not otherwise specified and From is set
-            combinedReplyTo = combinedFrom;
-        }
-    
-        let finalRecipients: { ListNames: string[]; SegmentNames: string[] } = { ListNames: [], SegmentNames: [] };
-    
-        switch (recipientTarget) {
-            case 'list':
-                finalRecipients.ListNames = campaign.Recipients.ListNames || [];
-                break;
-            case 'segment':
-                finalRecipients.SegmentNames = campaign.Recipients.SegmentNames || [];
-                break;
-            case 'all':
-                finalRecipients.SegmentNames = ['All Contacts'];
-                break;
-            default:
-                 if (campaign.Recipients.ListNames.length > 0) finalRecipients.ListNames = campaign.Recipients.ListNames;
-                 if (campaign.Recipients.SegmentNames.length > 0) finalRecipients.SegmentNames = campaign.Recipients.SegmentNames;
-                break;
-        }
-    
-        const contentForDisplay: { [key: string]: any } = {};
-        if (combinedFrom) contentForDisplay.From = combinedFrom;
-        contentForDisplay.ReplyTo = combinedReplyTo;
-        if (Subject) contentForDisplay.Subject = Subject;
-        if (TemplateName) contentForDisplay.TemplateName = TemplateName;
-    
-        const status = (recipientTarget === 'all' || finalRecipients.ListNames.length > 0 || finalRecipients.SegmentNames.length > 0) ? "Active" : "Draft";
-    
-        const payload: { [key: string]: any } = {
-          Status: status,
-        };
-        if (campaign.Name) payload.Name = campaign.Name;
-        if (Object.keys(contentForDisplay).length > 0) payload.Content = [contentForDisplay];
-        if (finalRecipients.ListNames.length > 0 || finalRecipients.SegmentNames.length > 0) {
-            payload.Recipients = finalRecipients;
-        }
-        payload.Options = campaign.Options;
-    
-        return JSON.stringify(payload, null, 2);
-    }, [campaign, recipientTarget, enableReplyTo, replyToName, replyToPrefix, replyToDomain]);
     
     const currentContent = campaign.Content[activeContent] || {};
 
@@ -793,15 +739,6 @@ const SendEmailView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                         <Button className="btn-primary" onClick={() => handleSubmit('send')} disabled={isSending || verifiedDomainsWithDefault.length === 0}>
                             {isSending ? <Loader /> : <><Icon>{ICONS.SEND_EMAIL}</Icon> <span>{t('sendNow')}</span></>}
                         </Button>
-                    </div>
-                </div>
-
-                <div className="card" style={{ marginTop: '2rem' }}>
-                    <div className="card-header"><h3>API Payload for Debugging</h3></div>
-                    <div className="card-body" style={{padding: 0}}>
-                        <pre style={{ background: 'var(--subtle-background)', padding: '1rem', margin: 0, borderRadius: '0 0 8px 8px', fontSize: '0.8rem', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                            <code>{payloadForDisplay}</code>
-                        </pre>
                     </div>
                 </div>
             </div>

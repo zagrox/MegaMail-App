@@ -1,3 +1,5 @@
+
+
 import React, { useState, useMemo } from 'react';
 import WizardLayout from './WizardLayout';
 import Icon, { ICONS } from '../Icon';
@@ -151,6 +153,7 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView, domai
             <Modal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} title={t('templates')}>
                 <div className="template-selector-modal">
                     <div className="search-bar" style={{marginBottom: '1rem'}}>
+                        {/* FIX: Pass icon as child to Icon component */}
                         <Icon>{ICONS.SEARCH}</Icon>
                         <input type="search" placeholder={t('searchTemplatesPlaceholder', { ns: 'templates' })} value={templateSearchTerm} onChange={e => setTemplateSearchTerm(e.target.value)} />
                     </div>
@@ -178,6 +181,11 @@ const Step3Content = ({ onNext, onBack, data, updateData, apiKey, setView, domai
             </Modal>
             
             <WizardLayout title={t('designContent')} onNext={onNext} onBack={onBack} nextDisabled={isNextDisabled}>
+                <div className="wizard-step-intro">
+                    {/* FIX: Pass icon as child to Icon component */}
+                    <Icon>{ICONS.MAIL}</Icon>
+                    <p>{t('designContent_desc')}</p>
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     <div className="form-group">
                         <label>{t('template', { ns: 'sendEmail' })}</label>

@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from './Icon';
@@ -21,10 +22,12 @@ const BulkActionsBar = ({ count, onDeselectAll, onDelete, onAddToList }: BulkAct
             </div>
             <div className="bulk-actions-bar-actions">
                 <button className="btn btn-secondary" onClick={onAddToList}>
+                    {/* FIX: The Icon component requires a child. The plus icon is provided. */}
                     <Icon>{ICONS.PLUS}</Icon>
                     <span>{t('addToListOptional')}</span>
                 </button>
                 <button className="btn btn-danger" onClick={onDelete}>
+                    {/* FIX: The Icon component requires a child. The delete icon is provided. */}
                     <Icon>{ICONS.DELETE}</Icon>
                     <span>{t('delete')}</span>
                 </button>

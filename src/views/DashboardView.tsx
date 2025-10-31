@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -132,6 +133,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                                      <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                                 </div>
                             </button>
+                            {/* FIX: Corrected Button component usage by passing onClick as a prop. */}
                             <Button className="btn-secondary btn-notifications" onClick={handleNotificationsClick} title={t('notifications', { ns: 'common' })}>
                                 {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                 <Icon>{ICONS.BELL}</Icon>
@@ -149,6 +151,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <p className="cta-banner-desc">{t('startEmailMarketingDesc')}</p>
                         </div>
                         <div className="cta-banner-action">
+                            {/* FIX: Corrected Button component usage by passing onClick as a prop. */}
                             <Button className="btn-primary" onClick={() => setView('Marketing')}>
                                 {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                 <Icon>{ICONS.SEND_EMAIL}</Icon> {t('createCampaign', { ns: 'common' })}

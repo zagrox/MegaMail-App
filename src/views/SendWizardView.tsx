@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiFetchV4 } from '../api/elasticEmail';
@@ -277,10 +278,24 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
                     : undefined,
             };
     
-            const finalRecipients: { ListNames: string[]; SegmentNames: string[] } = {
-                ListNames: campaignData.recipients.listNames || [],
-                SegmentNames: campaignData.recipients.segmentNames || []
-            };
+            const finalRecipients: { ListNames: string[]; SegmentNames: string[] } = { ListNames: [], SegmentNames: [] };
+            switch (campaignData.recipientTarget) {
+                case 'list':
+                    finalRecipients.ListNames = campaignData.recipients.listNames || [];
+                    break;
+                case 'segment':
+                    finalRecipients.SegmentNames = campaignData.recipients.segmentNames || [];
+                    break;
+                case 'all':
+                    finalRecipients.SegmentNames = ['All Contacts'];
+                    break;
+                default:
+                    if (action === 'draft') {
+                        finalRecipients.ListNames = campaignData.recipients.listNames || [];
+                        finalRecipients.SegmentNames = campaignData.recipients.segmentNames || [];
+                    }
+                    break;
+            }
     
             const payload = {
                 Name: campaignData.campaignName || undefined,
@@ -306,8 +321,15 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
         }
     };
 
+    // FIX: A `payloadForDisplay` prop was missing for the `Step5Sending` component. This `useMemo` hook constructs the necessary payload from the current campaign data and formats it as a JSON string for display, resolving the TypeScript error.
     const payloadForDisplay = useMemo(() => {
-        const fromEmail = (campaignData.selectedDomain && campaignData.fromEmailPrefix) ? `${campaignData.fromEmailPrefix}@${campaignData.selectedDomain}` : '';
+        const action = campaignData.sendAction === 'later' ? 'draft' : 'send';
+        const isRecipientSelected =
+            campaignData.recipientTarget === 'all' ||
+            (campaignData.recipientTarget === 'list' && campaignData.recipients.listNames.length > 0) ||
+            (campaignData.recipientTarget === 'segment' && campaignData.recipients.segmentNames.length > 0);
+        
+        const fromEmail = `${campaignData.fromEmailPrefix}@${campaignData.selectedDomain}`;
         const fromName = campaignData.fromName?.trim() || '';
         const combinedFrom = fromName ? `${fromName} <${fromEmail}>` : fromEmail;
 
@@ -319,47 +341,54 @@ const MarketingView = ({ apiKey, setView, campaignToLoad }: { apiKey: string, se
             combinedReplyTo = combinedFrom;
         }
 
-        const contentPayload: { [key: string]: any } = {};
-        if (combinedFrom) contentPayload.From = combinedFrom;
-        if (combinedReplyTo) contentPayload.ReplyTo = combinedReplyTo;
-        if (campaignData.subject) contentPayload.Subject = campaignData.subject;
-        if (campaignData.template) contentPayload.TemplateName = campaignData.template;
-        if (campaignData.utmEnabled) contentPayload.Utm = campaignData.utm;
-    
+        const contentPayload = {
+            From: combinedFrom,
+            ReplyTo: combinedReplyTo,
+            Subject: campaignData.subject || undefined,
+            TemplateName: campaignData.template || undefined,
+            Utm: campaignData.utmEnabled ? campaignData.utm : undefined,
+            Body: null
+        };
+
         const optionsPayload = {
             TrackOpens: campaignData.trackOpens,
             TrackClicks: campaignData.trackClicks,
             DeliveryOptimization: campaignData.sendTimeOptimization ? campaignData.deliveryOptimization : 'None',
             EnableSendTimeOptimization: campaignData.sendTimeOptimization ? campaignData.enableSendTimeOptimization : false,
-            ScheduleFor: (campaignData.sendAction === 'schedule' && campaignData.scheduleDateTime) ? new Date(campaignData.scheduleDateTime).toISOString() : undefined,
+            ScheduleFor: (action === 'send' && campaignData.sendAction === 'schedule' && campaignData.scheduleDateTime)
+                ? new Date(campaignData.scheduleDateTime).toISOString()
+                : undefined,
         };
 
-        let recipients: { ListNames: string[]; SegmentNames: string[]; } = { ListNames: [], SegmentNames: [] };
+        const finalRecipients: { ListNames: string[]; SegmentNames: string[] } = { ListNames: [], SegmentNames: [] };
         switch (campaignData.recipientTarget) {
             case 'list':
-                recipients.ListNames = campaignData.recipients.listNames || [];
+                finalRecipients.ListNames = campaignData.recipients.listNames || [];
                 break;
             case 'segment':
-                recipients.SegmentNames = campaignData.recipients.segmentNames || [];
+                finalRecipients.SegmentNames = campaignData.recipients.segmentNames || [];
                 break;
             case 'all':
-                recipients.SegmentNames = ['All Contacts'];
+                finalRecipients.SegmentNames = ['All Contacts'];
+                break;
+            default:
+                if (action === 'draft') {
+                    finalRecipients.ListNames = campaignData.recipients.listNames || [];
+                    finalRecipients.SegmentNames = campaignData.recipients.segmentNames || [];
+                }
                 break;
         }
 
-        const action = campaignData.sendAction === 'later' ? 'draft' : 'send';
-        const isRecipientSelected = campaignData.recipientTarget === 'all' || recipients.ListNames.length > 0 || recipients.SegmentNames.length > 0;
-        const status = action === 'send' && isRecipientSelected ? 'Active' : 'Draft';
-
-        const payload: { [key: string]: any } = {
+        const payload = {
             Name: campaignData.campaignName || undefined,
-            Status: status,
+            Status: action === 'send' && isRecipientSelected ? 'Active' : 'Draft',
+            Content: [contentPayload],
+            Recipients: finalRecipients,
+            Options: optionsPayload,
         };
-        if (Object.keys(contentPayload).length > 0 && (contentPayload.From || contentPayload.ReplyTo || contentPayload.Subject || contentPayload.TemplateName)) payload.Content = [contentPayload];
-        if (recipients.ListNames.length > 0 || recipients.SegmentNames.length > 0) payload.Recipients = recipients;
-        payload.Options = optionsPayload;
-        
-        return JSON.stringify(JSON.parse(JSON.stringify(payload)), null, 2);
+
+        const cleanedPayload = JSON.parse(JSON.stringify(payload));
+        return JSON.stringify(cleanedPayload, null, 2);
     }, [campaignData]);
 
     const renderStepContent = () => {

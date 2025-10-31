@@ -33,6 +33,7 @@ const Badge = ({ text, type = 'default', color, iconPath }: BadgeProps) => {
 
     return (
         <span className={`badge badge-${type}`} style={style}>
+            {/* FIX: The Icon component requires a child. The iconPath prop is passed as a child. */}
             {iconPath && <Icon className="icon" style={{ width: '1em', height: '1em', marginRight: '0.4em', verticalAlign: 'text-bottom' }}>{iconPath}</Icon>}
             {text}
         </span>

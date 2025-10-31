@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useCallback, useRef, useEffect, forwardRef, useImperativeHandle, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     DndContext,
@@ -29,6 +29,7 @@ import Modal from '../components/Modal';
 import { apiFetchV4 } from '../api/elasticEmail';
 import Button from '../components/Button';
 import { AppActions } from '../config/actions';
+import useApiV4 from '../hooks/useApiV4';
 
 
 const generateId = (prefix = 'block') => `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -302,6 +303,12 @@ const renderBlockToHtml = (block: any): string => {
 };
 // --- END HTML GENERATION ---
 
+const cleanDomain = (domainStr: string) => {
+    if (!domainStr) return '';
+    const match = domainStr.match(/^([a-zA-Z0-9.-]+)/);
+    return match ? match[0] : domainStr;
+};
+
 
 // Helper to find an item and its parent array in a nested structure
 const findItemContainer = (items: any[], itemId: string): { container: any[], index: number } | null => {
@@ -368,7 +375,7 @@ interface EmailBuilderViewProps {
 }
 
 const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, onDirtyChange, isNewFromGallery }: EmailBuilderViewProps, ref) => {
-    const { t } = useTranslation(['emailBuilder', 'common']);
+    const { t } = useTranslation(['emailBuilder', 'common', 'sendEmail']);
     const { addToast } = useToast();
     const [items, setItems] = useState<any[]>([]);
     const [activeItem, setActiveItem] = useState<any | null>(null);
@@ -389,8 +396,32 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
     const [isSaving, setIsSaving] = useState(false);
     const [isTestSendVisible, setIsTestSendVisible] = useState(false);
     
+    // State for Test Send Panel
+    const [testRecipient, setTestRecipient] = useState('');
+    const [testSenderPrefix, setTestSenderPrefix] = useState('test');
+    const [testSenderDomain, setTestSenderDomain] = useState('');
+    const [isSendingTest, setIsSendingTest] = useState(false);
+    
     const [settingsView, setSettingsView] = useState<'block' | 'global' | null>(null);
     
+    const { data: domains, loading: domainsLoading } = useApiV4('/domains', apiKey, {});
+
+    const verifiedDomainsWithDefault = useMemo(() => {
+        if (!Array.isArray(domains)) return [];
+        return domains
+            .filter(d => String(d.Spf).toLowerCase() === 'true' && String(d.Dkim).toLowerCase() === 'true')
+            .map(d => ({
+                domain: cleanDomain(d.Domain),
+                defaultSender: d.DefaultSender
+            }));
+    }, [domains]);
+
+    useEffect(() => {
+        if (verifiedDomainsWithDefault.length > 0 && !testSenderDomain) {
+            setTestSenderDomain(verifiedDomainsWithDefault[0].domain);
+        }
+    }, [verifiedDomainsWithDefault, testSenderDomain]);
+
     const [globalStyles, setGlobalStyles] = useState({
         backdropColor: '#F7F9FC',
         canvasColor: '#FFFFFF',
@@ -568,6 +599,51 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
             </html>
         `;
     }, [items, globalStyles, subject, templateName, fromName]);
+
+    const handleSendTest = async () => {
+        if (!testRecipient) {
+            addToast(t('recipientEmailRequired', { ns: 'emailBuilder' }), 'error');
+            return;
+        }
+        setIsSendingTest(true);
+        try {
+            const htmlContent = generateEmailHtml();
+            const fromEmail = `${testSenderPrefix}@${testSenderDomain}`;
+            
+            const payload = {
+                Recipients: {
+                    To: [testRecipient]
+                },
+                Content: {
+                    Body: [
+                        {
+                            ContentType: "HTML" as const,
+                            Content: htmlContent,
+                            Charset: "UTF-8"
+                        }
+                    ],
+                    From: `${fromName} <${fromEmail}>`,
+                    Subject: subject || t('testEmailSubject', { ns: 'emailBuilder', defaultValue: 'Test Email' })
+                },
+                Options: {
+                    TrackOpens: false,
+                    TrackClicks: false
+                }
+            };
+            
+            await apiFetchV4('/emails/transactional', apiKey, {
+                method: 'POST',
+                body: payload
+            });
+
+            addToast(t('testEmailSentSuccess', { ns: 'emailBuilder', email: testRecipient }), 'success');
+            
+        } catch (err: any) {
+            addToast(t('testEmailSentError', { ns: 'emailBuilder', error: err.message }), 'error');
+        } finally {
+            setIsSendingTest(false);
+        }
+    };
     
     const handleSaveTemplate = async (): Promise<boolean> => {
         if (!templateName) {
@@ -1060,36 +1136,45 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
                 </header>
 
                 <div className={`email-builder-test-panel ${isTestSendVisible ? 'visible' : ''}`}>
-                    <div className="form-group">
+                    <div className="form-group" style={{ flex: '1 1 100%'}}>
                         <div className="input-with-icon">
                             <Icon>{ICONS.MAIL}</Icon>
-                            <input
-                                type="text"
-                                placeholder={t('subject', { ns: 'sendEmail' })}
-                                value={subject}
-                                onChange={(e) => setSubject(e.target.value)}
-                                aria-label={t('subject', { ns: 'sendEmail' })}
-                            />
+                            <input type="email" placeholder={t('recipientEmailPlaceholder')} value={testRecipient} onChange={(e) => setTestRecipient(e.target.value)} required />
                         </div>
                     </div>
-                    <div className="email-builder-test-panel-row">
-                        <div className="form-group">
-                            <div className="input-with-icon">
-                                <Icon>{ICONS.ACCOUNT}</Icon>
-                                <input
-                                    type="text"
-                                    placeholder={t('fromName', { ns: 'sendEmail' })}
-                                    value={fromName}
-                                    onChange={(e) => setFromName(e.target.value)}
-                                    aria-label={t('fromName', { ns: 'sendEmail' })}
-                                />
+                    <div className="form-group" style={{ flex: '2 1 300px' }}>
+                        <div className="input-with-icon">
+                            <Icon>{ICONS.TYPE}</Icon>
+                            <input type="text" placeholder={t('subject', { ns: 'sendEmail' })} value={subject} onChange={(e) => setSubject(e.target.value)} />
+                        </div>
+                    </div>
+                    <div className="form-group" style={{ flex: '1 1 200px' }}>
+                        <div className="input-with-icon">
+                            <Icon>{ICONS.ACCOUNT}</Icon>
+                            <input type="text" placeholder={t('fromName', { ns: 'sendEmail' })} value={fromName} onChange={(e) => setFromName(e.target.value)} />
+                        </div>
+                    </div>
+                     <div className="form-group" style={{ flex: '2 1 300px' }}>
+                        {verifiedDomainsWithDefault.length > 0 ? (
+                            <div className="from-email-composer">
+                                <input type="text" value={testSenderPrefix} onChange={e => setTestSenderPrefix(e.target.value.trim())} />
+                                <span className="from-email-at">@</span>
+                                <select value={testSenderDomain} onChange={e => setTestSenderDomain(e.target.value)}>
+                                    {verifiedDomainsWithDefault.map(d => (
+                                        <option key={d.domain} value={d.domain}>{d.domain}</option>
+                                    ))}
+                                </select>
                             </div>
-                        </div>
-                        <button className="btn btn-secondary">
-                            <Icon>{ICONS.SEND_EMAIL}</Icon>
-                            <span>{t('sendEmail')}</span>
-                        </button>
+                        ) : (
+                            <div className="info-message warning" style={{padding: '0.5rem 1rem', fontSize: '0.8rem', margin: 0, textAlign: 'center'}}>
+                                {t('noVerifiedDomainsToSendError', { ns: 'sendEmail' })}
+                            </div>
+                        )}
                     </div>
+                    <button className="btn btn-secondary" onClick={handleSendTest} disabled={isSendingTest || !testRecipient || verifiedDomainsWithDefault.length === 0} style={{flexShrink: 0}}>
+                        {isSendingTest ? <Loader /> : <Icon>{ICONS.SEND_EMAIL}</Icon>}
+                        <span>{t('sendTestEmail')}</span>
+                    </button>
                 </div>
 
 

@@ -44,6 +44,7 @@ import GuidesView from './views/GuidesView';
 import { useTheme } from './contexts/ThemeContext';
 import Tooltip from './components/Tooltip';
 import DomainVerificationView from './views/DomainVerificationView';
+import Chatbot from './components/Chatbot';
 
 
 const App = () => {
@@ -498,8 +499,10 @@ const App = () => {
                             return (
                                 <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
                                     {isSidebarCollapsed ? (
+// FIX: The Tooltip component requires a child component to wrap. Here, the Icon component is provided as a child.
                                         <Tooltip text={navItem.name}><Icon>{navItem.icon}</Icon></Tooltip>
                                     ) : (
+// FIX: The Icon component requires a child. The specific icon from the navItem is provided as a child.
                                         <Icon>{navItem.icon}</Icon>
                                     )}
                                     <span>{navItem.name}</span>
@@ -507,6 +510,7 @@ const App = () => {
                                         <Icon
                                             className="lock-icon"
                                             style={isPromotional ? { color: 'var(--success-color)' } : {}}
+// FIX: The Icon component requires a child. A conditional icon is provided.
                                             >{isPromotional ? ICONS.GIFT : ICONS.STAR}</Icon>
                                     )}
                                 </button>
@@ -518,18 +522,22 @@ const App = () => {
         </nav>
         <div className="sidebar-footer-nav">
              <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
+{/* FIX: The Tooltip and Icon components require children. The appropriate icon is provided. */}
                  {isSidebarCollapsed ? (<Tooltip text={t('settings', { ns: 'account' })}><Icon>{ICONS.SETTINGS}</Icon></Tooltip>) : (<Icon>{ICONS.SETTINGS}</Icon>)}
                  <span>{t('settings', { ns: 'account' })}</span>
              </button>
              <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
+{/* FIX: The Tooltip and Icon components require children. The appropriate icon is provided. */}
                  {isSidebarCollapsed ? (<Tooltip text={t('account')}><Icon>{ICONS.ACCOUNT}</Icon></Tooltip>) : (<Icon>{ICONS.ACCOUNT}</Icon>)}
                  <span>{t('account')}</span>
              </button>
              <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
+{/* FIX: The Tooltip and Icon components require children. The appropriate icon is provided. */}
                 {isSidebarCollapsed ? (<Tooltip text={t('buyCredits')}><Icon>{ICONS.BUY_CREDITS}</Icon></Tooltip>) : (<Icon>{ICONS.BUY_CREDITS}</Icon>)}
                 <span>{t('buyCredits')}</span>
              </button>
              <button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
+{/* FIX: The Tooltip and Icon components require children. The appropriate icon is provided. */}
                  {isSidebarCollapsed ? (<Tooltip text={t('guides')}><Icon>{ICONS.HELP_CIRCLE}</Icon></Tooltip>) : (<Icon>{ICONS.HELP_CIRCLE}</Icon>)}
                  <span>{t('guides')}</span>
              </button>
@@ -560,15 +568,18 @@ const App = () => {
                 <SidebarContent />
             </aside>
             <button onClick={toggleSidebarCollapse} className="sidebar-collapse-toggle" aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
+{/* FIX: The Icon component requires a child. A conditional chevron icon is provided. */}
                <Icon>{isRTL ? (isSidebarCollapsed ? ICONS.CHEVRON_LEFT : ICONS.CHEVRON_RIGHT) : (isSidebarCollapsed ? ICONS.CHEVRON_RIGHT : ICONS.CHEVRON_LEFT)}</Icon>
             </button>
             <div className="main-wrapper">
                 <header className="mobile-header">
                      <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)} aria-label={t('openMenu')}>
+{/* FIX: The Icon component requires a child. The menu icon is provided. */}
                         <Icon>{ICONS.MENU}</Icon>
                     </button>
                     <h1 className="mobile-header-title">{currentView?.title || appName}</h1>
                     <button className="mobile-menu-toggle" onClick={() => handleSetView('Account')} aria-label={t('account')}>
+{/* FIX: The Icon component requires a child. The account icon is provided. */}
                         <Icon>{ICONS.ACCOUNT}</Icon>
                     </button>
                 </header>
@@ -581,6 +592,7 @@ const App = () => {
                     {currentView?.component}
                 </main>
             </div>
+            <Chatbot setView={handleSetView} />
         </div>
     );
 };

@@ -1,10 +1,12 @@
 
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Tabs from '../../components/Tabs';
 import { ICONS } from '../../components/Icon';
-import DomainsView from './DomainsView';
-import SmtpView from './SmtpView';
+// FIX: Corrected import path for DomainsView
+import DomainsView from '../DomainsView';
+import SmtpView from '../SmtpView';
 import ApiKeyView from './ApiKeyView';
 import ShareTab from '../account/ShareTab';
 import { useAuth } from '../../contexts/AuthContext';

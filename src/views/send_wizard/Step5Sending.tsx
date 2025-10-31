@@ -18,7 +18,7 @@ const SummaryItem = ({ label, value }: { label: string, value: React.ReactNode }
     );
 };
 
-const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting }: { onSubmit: () => void; onBack: () => void; data: any; updateData: (d: any) => void; apiKey: string; isSubmitting: boolean; }) => {
+const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting, payloadForDisplay }: { onSubmit: () => void; onBack: () => void; data: any; updateData: (d: any) => void; apiKey: string; isSubmitting: boolean; payloadForDisplay: string; }) => {
     const { t, i18n } = useTranslation(['send-wizard', 'sendEmail', 'common', 'dashboard']);
     const { data: domains, loading: domainsLoading } = useApiV4('/domains', apiKey, {});
     const { data: accountData, loading: balanceLoading } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
@@ -109,7 +109,6 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
             nextAction={nextAction}
         >
             <div className="wizard-step-intro">
-                {/* FIX: Pass icon as child to Icon component */}
                 <Icon>{ICONS.VERIFY}</Icon>
                 <p>{t('reviewAndSend_desc')}</p>
             </div>
@@ -129,7 +128,6 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         disabled={!hasEnoughCredits}
                     />
                     <div className="sending-option-card-content">
-                        {/* FIX: Changed to use JSX children for Icon component */}
                         <Icon className="sending-option-card-icon">{ICONS.CALENDAR}</Icon>
                         <div className="sending-option-card-details">
                             <h4 className="sending-option-card-title">{t('schedule', { ns: 'sendEmail' })}</h4>
@@ -160,7 +158,6 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         disabled={!hasEnoughCredits}
                     />
                     <div className="sending-option-card-content">
-                        {/* FIX: Explicitly pass children to Icon component */}
                         <Icon className="sending-option-card-icon">{ICONS.SEND_EMAIL}</Icon>
                         <h4 className="sending-option-card-title">{t('sendNow', { ns: 'sendEmail' })}</h4> 
                     </div>
@@ -179,7 +176,6 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                         style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
                     />
                     <div className="sending-option-card-content">
-                        {/* FIX: Explicitly pass children to Icon component */}
                         <Icon className="sending-option-card-icon">{ICONS.SAVE_CHANGES}</Icon>
                         <h4 className="sending-option-card-title">{t('saveForLater')}</h4>
                     </div>
@@ -219,6 +215,25 @@ const Step5Sending = ({ onSubmit, onBack, data, updateData, apiKey, isSubmitting
                     <SummaryItem label={t('tracking', { ns: 'sendEmail' })} value={trackingStatus} />
                     <SummaryItem label={t('timeOptimization')} value={optimizationStatus} />
                 </dl>
+            </div>
+
+            <div className="card" style={{ marginTop: '2rem' }}>
+                <div className="card-header">
+                    <h3>API Payload for Debugging</h3>
+                </div>
+                <div className="card-body" style={{padding: 0}}>
+                    <pre style={{
+                        background: 'var(--subtle-background)',
+                        padding: '1rem',
+                        margin: 0,
+                        borderRadius: '0 0 8px 8px',
+                        fontSize: '0.8rem',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-all',
+                        maxHeight: '400px',
+                        overflowY: 'auto'
+                    }}><code>{payloadForDisplay}</code></pre>
+                </div>
             </div>
         </WizardLayout>
     );

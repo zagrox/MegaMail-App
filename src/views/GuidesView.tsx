@@ -16,6 +16,7 @@ const GuidesView = () => {
     const [isBugModalOpen, setIsBugModalOpen] = useState(false);
 
     const guideData = [
+        { key: 'AIAssistant', icon: ICONS.AI_ICON, steps: 1 },
         { key: 'Account', icon: ICONS.ACCOUNT, steps: 4 },
         { key: 'Domain', icon: ICONS.DOMAINS, steps: 4 },
         { key: 'Import', icon: ICONS.UPLOAD, steps: 3 },

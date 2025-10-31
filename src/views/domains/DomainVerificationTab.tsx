@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../../hooks/useApiV4';
@@ -196,7 +197,6 @@ const DomainVerificationTab = ({ apiKey, setView }: { apiKey: string, setView: (
                     <thead>
                         <tr>
                             <th>{t('domains')}</th>
-                            <th>{t('fromEmail')}</th>
                             <th>{t('status')}</th>
                             <th style={{ width: '1%', whiteSpace: 'nowrap', textAlign: i18n.dir() === 'rtl' ? 'left' : 'right' }}>{t('action')}</th>
                         </tr>
@@ -207,7 +207,6 @@ const DomainVerificationTab = ({ apiKey, setView }: { apiKey: string, setView: (
                              if (!domainName) return null;
 
                              const cleanDomainName = cleanDomain(domainName);
-                             const defaultSender = domain.DefaultSender || domain.defaultsender;
                              
                              const getVerificationStyle = (isVerified: boolean) => isVerified ? getStatusStyle('Verified') : getStatusStyle('Missing');
                              
@@ -222,12 +221,6 @@ const DomainVerificationTab = ({ apiKey, setView }: { apiKey: string, setView: (
                                 <tr>
                                     <td><strong>{cleanDomainName}</strong></td>
                                     <td>
-                                        <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                                            <span>{defaultSender || t('notSet')}</span>
-                                            <button className="btn-icon" onClick={() => setDomainToEdit(domain)}><Icon>{ICONS.PENCIL}</Icon></button>
-                                        </div>
-                                    </td>
-                                    <td>
                                         <div className="domain-status-pills">
                                             <Badge text="SPF" type={getVerificationStyle(isSpfVerified).type} />
                                             <Badge text="DKIM" type={getVerificationStyle(isDkimVerified).type} />
@@ -237,14 +230,6 @@ const DomainVerificationTab = ({ apiKey, setView }: { apiKey: string, setView: (
                                     </td>
                                     <td>
                                         <div className="action-buttons" style={{ justifyContent: 'flex-end' }}>
-                                             <Button
-                                                className="btn-icon"
-                                                onClick={() => handleReverifyDomain(domainName)}
-                                                disabled={verifyingDomain === domainName}
-                                                title={t('reverifyDnsRecords', { ns: 'domains' })}
-                                            >
-                                                {verifyingDomain === domainName ? <div style={{width: '20px', height: '20px'}}><Loader/></div> : <Icon>{ICONS.REFRESH_CW}</Icon>}
-                                            </Button>
                                             <Button 
                                                 className="btn-secondary" 
                                                 onClick={() => setView('DomainVerification', { domain: cleanDomainName })}

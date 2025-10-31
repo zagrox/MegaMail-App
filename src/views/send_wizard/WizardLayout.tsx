@@ -4,6 +4,7 @@
 
 
 
+
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../../components/Icon';
@@ -66,6 +67,7 @@ const WizardLayout = ({
                     )}
                 </button>
                 {!isLastStep ? (
+                    // FIX: Correctly pass onClick to Button component
                     <Button
                         className="btn-primary"
                         onClick={onNext}
@@ -87,6 +89,7 @@ const WizardLayout = ({
                         )}
                     </Button>
                 ) : (
+                    // FIX: Correctly pass onClick to Button component
                     <Button
                         className="btn-primary"
                         onClick={onNext}

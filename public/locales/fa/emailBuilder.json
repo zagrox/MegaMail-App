@@ -24,7 +24,7 @@
     "viewCode": "مشاهده کد",
     "exportHtml": "خروجی HTML",
     "htmlCode": "کد HTML",
-    "sendTestEmail": "ارسال ایمیل آزمایشی",
+    "sendTestEmail": "ارسال تست",
     "global": "تنظیمات کلی",
     "style": "سبک",
     "alignment": "ترازبندی",
@@ -64,7 +64,7 @@
     "Slack": "اسلک",
     "Bluesky": "بلواسکای",
     "saveTemplate": "ذخیره قالب",
-    "sendEmail": "ارسال ایمیل",
+    "sendEmail": "ارسال",
     "backdropColor": "رنگ پس‌زمینه اصلی",
     "canvasColor": "رنگ بوم",
     "canvasBorderColor": "رنگ حاشیه بوم",
@@ -137,5 +137,10 @@
     "unsavedChangesTitle": "تغییرات ذخیره نشده",
     "unsavedChangesMessage": "شما تغییرات ذخیره نشده‌ای در ایمیل ساز دارید. آیا مطمئن هستید که می‌خواهید خارج شوید؟ تغییرات شما از بین خواهد رفت.",
     "leave": "خروج",
-    "saveAndClose": "ذخیره و خروج"
+    "saveAndClose": "ذخیره و خروج",
+    "recipientEmailPlaceholder": "آدرس ایمیل گیرنده...",
+    "testEmailSubject": "ایمیل آزمایشی از ایمیل ساز مگامیل",
+    "testEmailSentSuccess": "ایمیل آزمایشی با موفقیت به {{email}} ارسال شد!",
+    "testEmailSentError": "ارسال ایمیل آزمایشی ناموفق بود: {{error}}",
+    "recipientEmailRequired": "لطفا یک ایمیل گیرنده وارد کنید."
 }

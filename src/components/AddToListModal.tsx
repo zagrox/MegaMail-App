@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -81,6 +82,7 @@ const AddToListModal = ({ isOpen, onClose, onConfirm, apiKey }: AddToListModalPr
                                 // Close the current modal when the unlock flow is triggered
                                 onClick={() => onClose()}
                             >
+                                {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                 <Icon>{ICONS.PLUS}</Icon>
                                 <span>{t('createList', { ns: 'emailLists' })}</span>
                             </Button>

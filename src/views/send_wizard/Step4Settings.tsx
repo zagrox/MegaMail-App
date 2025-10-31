@@ -138,19 +138,19 @@ const Step4Settings = ({ onNext, onBack, data, updateData }: { onNext: () => voi
                             <div className="form-grid">
                                 <div className="form-group">
                                     <label htmlFor="utm_Source">{t('utm_source')}</label>
-                                    <input type="text" id="utm_Source" name="utm_Source" value={data.utm.Source} onChange={handleUtmChange} />
+                                    <input type="text" id="utm_Source" name="utm_Source" value={data.utm.Source} onChange={handleUtmChange} placeholder="Source" />
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="utm_Medium">{t('utm_medium')}</label>
-                                    <input type="text" id="utm_Medium" name="utm_Medium" value={data.utm.Medium} onChange={handleUtmChange} />
+                                    <input type="text" id="utm_Medium" name="utm_Medium" value={data.utm.Medium} onChange={handleUtmChange} placeholder="Medium" />
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="utm_Campaign">{t('utm_campaign')}</label>
-                                    <input type="text" id="utm_Campaign" name="utm_Campaign" value={data.utm.Campaign} onChange={handleUtmChange} />
+                                    <input type="text" id="utm_Campaign" name="utm_Campaign" value={data.utm.Campaign} onChange={handleUtmChange} placeholder="Campaign" />
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="utm_Content">{t('utm_content')}</label>
-                                    <input type="text" id="utm_Content" name="utm_Content" value={data.utm.Content} onChange={handleUtmChange} />
+                                    <input type="text" id="utm_Content" name="utm_Content" value={data.utm.Content} onChange={handleUtmChange} placeholder="Content" />
                                 </div>
                             </div>
                         </div>

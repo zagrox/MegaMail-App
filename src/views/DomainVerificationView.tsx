@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../contexts/ToastContext';
@@ -87,17 +88,20 @@ const VerificationRecordCard = ({ recordKey, domainName, status, onVerify }: Ver
                     <span>{t('host')}</span>
                     <div className="copyable-field">
                         <code>{config.host}</code>
+                        {/* FIX: The Icon component requires children. The copy icon is provided. */}
                         <button onClick={() => copyToClipboard(config.host)} className="btn-icon"><Icon>{ICONS.COPY}</Icon></button>
                     </div>
 
                     <span>{t('value')}</span>
                     <div className="copyable-field">
                         <code>{config.expectedValue}</code>
+                        {/* FIX: The Icon component requires children. The copy icon is provided. */}
                         <button onClick={() => copyToClipboard(config.expectedValue)} className="btn-icon"><Icon>{ICONS.COPY}</Icon></button>
                     </div>
                 </div>
             </div>
             <div className="card-footer">
+                {/* FIX: Button usage updated to pass onClick prop correctly. */}
                 <Button onClick={() => onVerify(recordKey)} disabled={status === 'checking'}>
                     {status === 'checking' ? <Loader /> : <Icon>{ICONS.VERIFY}</Icon>}
                     <span>{t('verify')}</span>
@@ -192,10 +196,12 @@ const DomainVerificationView = ({ domainName, apiKey, onBack }: { domainName: st
                     {i18n.dir() === 'rtl' ? (
                         <>
                             <span>{t('backToDomains', {ns: 'domains'})}</span>
+                            {/* FIX: The Icon component requires children. The chevron icon is provided. */}
                             <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                         </>
                     ) : (
                         <>
+                            {/* FIX: The Icon component requires children. The chevron icon is provided. */}
                             <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                             <span>{t('backToDomains', {ns: 'domains'})}</span>
                         </>
@@ -205,6 +211,7 @@ const DomainVerificationView = ({ domainName, apiKey, onBack }: { domainName: st
                     {t('verifyDomainTitle', { ns: 'domains', domainName })}
                 </h2>
                 <div className="header-actions">
+                    {/* FIX: Button usage updated to pass onClick prop correctly. */}
                     <Button onClick={handleVerifyAll} className="btn-primary" disabled={isCheckingAll}>
                         {isCheckingAll ? <Loader /> : <Icon>{ICONS.VERIFY}</Icon>}
                         <span>{t('verifyAll', {ns: 'domains'})}</span>
