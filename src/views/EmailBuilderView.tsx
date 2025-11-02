@@ -24,7 +24,7 @@ import { FileInfo, Template } from '../api/types';
 import { ELASTIC_EMAIL_API_V4_BASE } from '../api/config';
 import { useToast } from '../contexts/ToastContext';
 import Loader from '../components/Loader';
-import SettingsPanel from '../components/email_builder/SettingsPanel';
+import SettingsPanel from '../components/email_builder/settings/SettingsPanel';
 import Modal from '../components/Modal';
 import { apiFetchV4 } from '../api/elasticEmail';
 import Button from '../components/Button';

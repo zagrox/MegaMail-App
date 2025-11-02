@@ -1,5 +1,10 @@
 
 
+
+
+
+
+
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -44,7 +49,6 @@ import GuidesView from './views/GuidesView';
 import { useTheme } from './contexts/ThemeContext';
 import Tooltip from './components/Tooltip';
 import DomainVerificationView from './views/DomainVerificationView';
-import Chatbot from './components/Chatbot';
 
 
 const App = () => {
@@ -555,6 +559,7 @@ const App = () => {
                 onCancel={handleCancelLeave}
                 onLeave={handleLeaveConfirmation}
                 onSaveAndLeave={handleSaveAndLeave}
+                zIndex={1050}
             />
             {moduleToUnlock && (
                 <UnlockModuleModal
@@ -592,7 +597,6 @@ const App = () => {
                     {currentView?.component}
                 </main>
             </div>
-            <Chatbot setView={handleSetView} />
         </div>
     );
 };

@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useApiV4 from '../hooks/useApiV4';
@@ -95,7 +96,7 @@ const CampaignCard = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, on
                     <p className="campaign-card-subject">{content?.Subject || t('noSubject')}</p>
                     {templateName && (
                         <button className="campaign-card-template" onClick={onPreviewTemplate} disabled={isLoadingPreview || !!processingCampaign}>
-                            <Icon>{isLoadingPreview ? <Loader /> : ICONS.ARCHIVE}</Icon>
+                            {isLoadingPreview ? <Loader /> : <Icon>{ICONS.ARCHIVE}</Icon>}
                             <span>{templateName}</span>
                         </button>
                     )}
@@ -139,13 +140,13 @@ const CampaignCard = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, on
                             <span>{t('wizard')}</span>
                         </Button>
                          <Button className="btn-danger" onClick={onDelete} disabled={loadingStats || !!processingCampaign}>
-                            <Icon>{processingCampaign === campaign.Name ? <Loader /> : ICONS.DELETE}</Icon>
+                            {processingCampaign === campaign.Name ? <Loader /> : <Icon>{ICONS.DELETE}</Icon>}
                         </Button>
                     </>
                 ) : isSending ? (
                      <>
                         <Button className="btn-secondary" onClick={onPause} disabled={loadingStats || !!processingCampaign}>
-                            <Icon>{processingCampaign === campaign.Name ? <Loader /> : ICONS.PAUSE}</Icon>
+                            {processingCampaign === campaign.Name ? <Loader /> : <Icon>{ICONS.PAUSE}</Icon>}
                             <span>{t('pause', { ns: 'campaigns' })}</span>
                         </Button>
                         <Button className="btn-secondary" onClick={onSelect} disabled={loadingStats || !!processingCampaign}>
@@ -201,7 +202,7 @@ const CampaignRow = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onP
                 <div className="campaign-row-subject">{content?.Subject || t('noSubject')}</div>
                 {templateName && (
                     <button className="campaign-row-template" onClick={onPreviewTemplate} disabled={isLoadingPreview || !!processingCampaign}>
-                        <Icon>{isLoadingPreview ? <Loader /> : ICONS.ARCHIVE}</Icon>
+                        {isLoadingPreview ? <Loader /> : <Icon>{ICONS.ARCHIVE}</Icon>}
                         <span>{templateName}</span>
                     </button>
                 )}
@@ -232,13 +233,13 @@ const CampaignRow = ({ campaign, onSelect, onEdit, onEditInWizard, onDelete, onP
                                 <span>{t('wizard')}</span>
                             </button>
                             <button className="btn-icon btn-icon-danger" onClick={onDelete} aria-label={t('delete')} disabled={!!processingCampaign}>
-                                <Icon>{processingCampaign === campaign.Name ? <div style={{width: '20px', height: '20px'}}><Loader/></div> : ICONS.DELETE}</Icon>
+                                {processingCampaign === campaign.Name ? <div style={{width: '20px', height: '20px'}}><Loader/></div> : <Icon>{ICONS.DELETE}</Icon>}
                             </button>
                         </>
                     ) : isSending ? (
                         <>
                             <button onClick={onPause} className="btn btn-secondary" disabled={loadingStats || !!processingCampaign} style={{padding: '0.5rem 1rem'}}>
-                                <Icon>{processingCampaign === campaign.Name ? <Loader /> : ICONS.PAUSE}</Icon>
+                                {processingCampaign === campaign.Name ? <Loader /> : <Icon>{ICONS.PAUSE}</Icon>}
                                 <span>{t('pause')}</span>
                             </button>
                             <button className="btn-icon" onClick={onSelect} aria-label={t('viewCampaignStats')}>

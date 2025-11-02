@@ -1,3 +1,5 @@
+
+
 import React, { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { I18nextProvider } from 'react-i18next';
@@ -31,7 +33,6 @@ import './src/styles/components/progress.css';
 import './src/styles/components/tabs.css';
 import './src/styles/components/toast.css';
 import './src/styles/components/view-switcher.css';
-import './src/styles/components/chatbot.css';
 
 /* Views */
 import './src/styles/views/shared.css';
