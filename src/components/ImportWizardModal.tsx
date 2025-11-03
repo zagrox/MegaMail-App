@@ -1,5 +1,4 @@
 
-
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiUploadV4 } from '../api/elasticEmail';
@@ -95,7 +94,6 @@ const ImportWizardModal = ({ isOpen, onClose, apiKey, onSuccess, onError, initia
 
         const reader = new FileReader();
         reader.onload = (e) => {
-            // FIX: Added a type guard to ensure the file reader result is a string before processing.
             const result = e.target?.result;
             if (typeof result !== 'string') {
                 onError("Could not read file content as text.");

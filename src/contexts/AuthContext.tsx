@@ -66,21 +66,14 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     // This function ONLY handles fetching and setting a Directus user.
     const getMe = useCallback(async () => {
         try {
-            // If allModules is already populated, modulesPromise resolves instantly.
-            // Otherwise, it starts the network request in the background.
-            const modulesPromise = allModules
-                ? Promise.resolve(allModules)
-                // FIX: Cast collection name to 'any' to bypass strict Directus SDK type checks when a full schema is not available.
-                : authenticatedRequest<Module[]>(readItems('modules' as any, { 
-                    // FIX: Cast `fields` and `filter` to `any` to bypass strict Directus SDK type checks when a full schema is not available.
-                    fields: ['id', 'modulename', 'moduleprice', 'moduledetails', 'status', 'modulepro', 'modulediscount', 'modulecore', 'locked_actions'] as any, 
-                    limit: -1,
-                    filter: { status: { _eq: 'published' } } as any
-                }));
+            // 1. Fetch modules, directus user, and profile in parallel where possible.
+            const modulesPromise = authenticatedRequest<Module[]>((readItems as any)('modules', { 
+                fields: ['id', 'modulename', 'moduleprice', 'moduledetails', 'status', 'modulepro', 'modulediscount', 'modulecore', 'locked_actions'], 
+                limit: -1,
+                filter: { status: { _eq: 'published' } }
+            }));
 
-            // 1. Get Directus user data
-            const me: any = await authenticatedRequest<any>(readMe({
-                // FIX: Cast `fields` array to `any` to bypass strict SDK type checks for relational fields.
+            const mePromise = authenticatedRequest<any>(readMe({
                 fields: [
                     'id', 'first_name', 'last_name', 'email', 'avatar', 'language',
                     'status', 'role.*', 'last_access', 'email_notifications',
@@ -88,54 +81,40 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                 ] as any
             }));
 
-            // 2. Get the associated user profile from the 'profiles' collection
-            // FIX: Cast collection name to 'any' to bypass strict Directus SDK type checks when a full schema is not available.
-            const profiles: any[] = await authenticatedRequest<any[]>(readItems('profiles' as any, {
-                // FIX: Cast `filter` to `any` to avoid type errors.
-                filter: { user_created: { _eq: me.id } } as any,
-                // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
-                fields: ['id', 'company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display', 'language'] as any,
+            const [fetchedModules, me] = await Promise.all([modulesPromise, mePromise]);
+
+            // Set modules state. This is safe now.
+            setAllModules(fetchedModules);
+
+            // 2. Get the associated user profile from the 'profiles' collection, now that we have the user ID.
+            const profiles: any[] = await authenticatedRequest<any[]>((readItems as any)('profiles', {
+                filter: { user_created: { _eq: me.id } },
+                fields: ['id', 'company', 'website', 'mobile', 'elastickey', 'elasticid', 'type', 'display', 'language'],
                 limit: 1
             }));
             
             let profileData: any = profiles?.[0];
 
             if (!profileData) {
-                // FIX: Cast collection name to 'any' to bypass strict Directus SDK type checks when a full schema is not available.
-                // FIX: Cast the item data to `any` to satisfy `createItem` when no schema is present.
-                profileData = await authenticatedRequest<any>(createItem('profiles' as any, { status: 'published', user_created: me.id } as any));
+                profileData = await authenticatedRequest<any>((createItem as any)('profiles', { status: 'published', user_created: me.id }));
             }
 
-            // 3. Initiate fetching purchased modules based on the profile ID.
-            // FIX: Cast collection name to 'any' to bypass strict Directus SDK type checks when a full schema is not available.
-            const purchasedModulesPromise = profileData.id
-                ? authenticatedRequest<{ module_id: string }[]>(readItems('profiles_modules' as any, {
-                    // FIX: Cast `filter` to `any` to avoid type errors.
-                    filter: { profile_id: { _eq: profileData.id } } as any,
-                    // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
-                    fields: ['module_id'] as any,
+            // 3. Fetch purchased modules based on the profile ID.
+            const purchasedModulesResponse = profileData.id
+                ? await authenticatedRequest<{ module_id: string }[]>((readItems as any)('profiles_modules', {
+                    filter: { profile_id: { _eq: profileData.id } },
+                    fields: ['module_id'],
                     limit: -1
                 }))
-                : Promise.resolve([]);
+                : [];
 
-            // 4. Await the modules (which may have been fetching in the background) and purchased modules.
-            const [fetchedModules, purchasedModulesResponse] = await Promise.all([
-                modulesPromise,
-                purchasedModulesPromise
-            ]);
-
-            // 5. Update the state for all modules if it was the first time fetching them.
-            if (!allModules) {
-                setAllModules(fetchedModules as Module[]);
-            }
-            
-            // 6. Process the purchased modules
+            // 4. Process the purchased modules
             const purchasedModuleIds = new Set(purchasedModulesResponse.map((pm: any) => String(pm.module_id)));
-            const purchasedModules = (fetchedModules as Module[])
+            const purchasedModules = fetchedModules
                 .filter((module: any) => purchasedModuleIds.has(String(module.id)))
                 .map((module: any) => module.modulename);
 
-            // 7. Combine data and set the user state
+            // 5. Combine data and set the user state
             const mergedUser: User = {
                 ...me,
                 ...profileData,
@@ -155,11 +134,14 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             setUser(mergedUser);
 
         } catch (error) {
-            console.error("Directus session refresh failed:", error);
-            await sdk.logout();
+            console.error("Failed to fetch full user profile:", error);
+            // On ANY failure in getMe, we should assume the session is invalid or data is corrupt.
+            // Clear everything to be safe. The authenticatedRequest wrapper will trigger a logout
+            // if it's a token issue, but this handles other errors (e.g. network, permissions).
             setUser(null);
+            setAllModules(null);
         }
-    }, [allModules]);
+    }, []);
 
     // This function ONLY handles fetching and setting an API Key user.
     const getApiKeyUser = useCallback(async (apiKey: string) => {
@@ -210,8 +192,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     const login = async (credentials: any, recaptchaToken?: string) => {
         setLoading(true);
         try {
-            // Using a raw request to include reCAPTCHA, which is now wrapped.
-            const authData = await authenticatedRequest<AuthenticationData>(() => ({
+            const authData = await sdk.request<AuthenticationData>(() => ({
                 method: 'POST',
                 path: '/auth/login',
                 body: JSON.stringify({
@@ -221,8 +202,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                 }),
                 headers: { 'Content-Type': 'application/json' },
             }));
-
-            // Manually set the authentication data in storage.
+    
             await storage.set(authData);
 
             localStorage.removeItem('elastic_email_api_key');
@@ -303,8 +283,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             }
 
             if (Object.keys(profileFields).length > 0 && user.profileId) {
-                // FIX: Cast collection name to 'any' to bypass strict Directus SDK type checks when a full schema is not available.
-                await authenticatedRequest<any>(updateItem('profiles' as any, user.profileId, profileFields));
+                // FIX: Cast SDK function to 'any' to bypass strict type checks when a full schema is not available for Directus.
+                await authenticatedRequest<any>((updateItem as any)('profiles', user.profileId, profileFields));
             }
             
             await getMe();
@@ -390,12 +370,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                 const endTime = Date.now() + timeout;
                 while (Date.now() < endTime) {
                     try {
-                        // FIX: Cast collection name to 'any' to bypass strict Directus SDK type checks when a full schema is not available.
-                        const profiles = await authenticatedRequest<any[]>(readItems('profiles' as any, {
-                            // FIX: Cast `filter` to `any` to avoid type errors.
-                            filter: { user_created: { _eq: user.id } } as any,
-                            // FIX: Cast `fields` array to `any` to bypass strict Directus SDK type checks.
-                            fields: ['elastickey'] as any,
+                        // FIX: Cast SDK function to 'any' to bypass strict type checks when a full schema is not available for Directus.
+                        const profiles = await authenticatedRequest<any[]>((readItems as any)('profiles', {
+                            filter: { user_created: { _eq: user.id } },
+                            fields: ['elastickey'],
                             limit: 1
                         }));
                         if (profiles && profiles.length > 0 && profiles[0].elastickey) {
@@ -487,13 +465,12 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                     const endTime = Date.now() + timeout;
                     while (Date.now() < endTime) {
                         try {
-                            // FIX: Cast collection name to 'any' to bypass strict Directus SDK type checks when a full schema is not available.
-                            const result = await authenticatedRequest<any[]>(readItems('profiles_modules' as any, {
-                                // FIX: Cast `filter` object to `any` to avoid type errors when a schema is not present.
+                            // FIX: Cast SDK function to 'any' to bypass strict type checks when a full schema is not available for Directus.
+                            const result = await authenticatedRequest<any[]>((readItems as any)('profiles_modules', {
                                 filter: {
                                     profile_id: { _eq: user.profileId },
                                     module_id: { _eq: moduleId }
-                                } as any,
+                                },
                                 limit: 1
                             }));
                             if (result && result.length > 0) {

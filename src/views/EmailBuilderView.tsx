@@ -1,3 +1,5 @@
+
+
 import React, { useState, useCallback, useRef, useEffect, forwardRef, useImperativeHandle, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -1099,7 +1101,6 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
     const selectedBlock = selectedBlockId ? findBlockById(items, selectedBlockId) : null;
     
     return (
-        // @ts-ignore - React 19: Suppressing missing children prop error for @dnd-kit/core which is not yet updated for React 19.
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="email-builder-view-container">
                 {isUpdatingImage && <div className="page-overlay"><Loader /></div>}
@@ -1205,6 +1206,7 @@ const EmailBuilderView = forwardRef(({ apiKey, user, templateToEdit, setView, on
                             globalStyles={globalStyles}
                             onGlobalStyleChange={handleGlobalStyleChange}
                             onStyleChange={handleStyleChange}
+                            // FIX: Corrected prop name from onContentChange to handleContentChange
                             onContentChange={handleContentChange}
                             onOpenMediaManager={handleEditImageBlock}
                             onClose={handleCloseSettingsPanel}

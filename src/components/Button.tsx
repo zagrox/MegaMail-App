@@ -1,29 +1,32 @@
 
-
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Icon, { ICONS } from './Icon';
 import { Module } from '../api/types';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+// Redefine ButtonProps to explicitly include common button attributes.
+// This is a safer approach if `extends React.ButtonHTMLAttributes` is not working as expected in the build environment.
+interface ButtonProps {
     action?: string;
     children: React.ReactNode;
     className?: string;
+    onClick?: React.MouseEventHandler<HTMLButtonElement>;
+    disabled?: boolean;
+    type?: 'button' | 'submit' | 'reset';
+    title?: string;
+    style?: React.CSSProperties;
+    'aria-label'?: string; // For icon buttons
 }
 
 const Button = ({ action, children, className, ...props }: ButtonProps) => {
     const { canPerformAction, allModules, setModuleToUnlock } = useAuth();
     const isLocked = action ? !canPerformAction(action) : false;
-    const { onClick, disabled, ...restProps } = props;
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         if (isLocked) {
             e.preventDefault();
             e.stopPropagation();
             
-            // Normalize action names for a case-insensitive, underscore-insensitive comparison,
-            // matching the logic in AuthContext's `canPerformAction`. This makes the feature
-            // locking more robust against minor inconsistencies in Directus configuration.
             const normalize = (str: string) => str.toLowerCase().replace(/_/g, '');
             const normalizedActionName = normalize(action!);
 
@@ -33,12 +36,12 @@ const Button = ({ action, children, className, ...props }: ButtonProps) => {
             );
 
             if (moduleForAction) {
-                setModuleToUnlock(moduleForAction);
+                setModuleToUnlock(moduleForAction as Module);
             } else {
                 console.warn(`Action "${action}" is locked but no corresponding module was found.`);
             }
-        } else if (onClick) {
-            onClick(e);
+        } else if (props.onClick) {
+            props.onClick(e);
         }
     };
     
@@ -46,9 +49,9 @@ const Button = ({ action, children, className, ...props }: ButtonProps) => {
         <button
             className={`btn ${className || ''} ${isLocked ? 'btn-locked' : ''}`}
             onClick={handleClick}
-            disabled={isLocked ? false : disabled}
-            aria-disabled={isLocked || disabled}
-            {...restProps}
+            disabled={isLocked ? false : props.disabled}
+            aria-disabled={isLocked || props.disabled}
+            {...props}
         >
             {isLocked && <Icon style={{ marginRight: '0.5rem' }}>{ICONS.LOCK}</Icon>}
             {children}

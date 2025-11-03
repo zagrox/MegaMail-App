@@ -1,5 +1,4 @@
 
-
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -120,7 +119,6 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                         <div className="dashboard-actions">
                             <button className="credits-card-cta" onClick={() => setView('Buy Credits')}>
                                 <div className="credits-card-cta__icon">
-                                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                     <Icon>{ICONS.BUY_CREDITS}</Icon>
                                 </div>
                                 <div className="credits-card-cta__text">
@@ -130,13 +128,10 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                                     </span>
                                 </div>
                                 <div className="credits-card-cta__arrow">
-                                     {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                      <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                                 </div>
                             </button>
-                            {/* FIX: Corrected Button component usage by passing onClick as a prop. */}
                             <Button className="btn-secondary btn-notifications" onClick={handleNotificationsClick} title={t('notifications', { ns: 'common' })}>
-                                {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                 <Icon>{ICONS.BELL}</Icon>
                                 {unreadCount > 0 && <span className="notification-dot"></span>}
                             </Button>
@@ -144,7 +139,6 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                     </div>
                     <div className="cta-banner">
                         <div className="cta-banner-icon">
-                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <Icon>{ICONS.AT_SIGN}</Icon>
                         </div>
                         <div className="cta-banner-text">
@@ -152,9 +146,7 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <p className="cta-banner-desc">{t('startEmailMarketingDesc')}</p>
                         </div>
                         <div className="cta-banner-action">
-                            {/* FIX: Corrected Button component usage by passing onClick as a prop. */}
                             <Button className="btn-primary" onClick={() => setView('Marketing')}>
-                                {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                 <Icon>{ICONS.SEND_EMAIL}</Icon> {t('createCampaign', { ns: 'common' })}
                             </Button>
                         </div>
@@ -164,7 +156,6 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
 
             <div className="dashboard-stats-grid">
                 <div className="card narrow-stat-card">
-                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
                     <Icon className="narrow-stat-card-icon">{ICONS.AWARD}</Icon>
                     <span className="narrow-stat-card-title">{t('sendingReputation')}</span>
                     <span className="narrow-stat-card-value">
@@ -172,7 +163,6 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                     </span>
                 </div>
                 <div className="card narrow-stat-card">
-                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
                     <Icon className="narrow-stat-card-icon">{ICONS.MAIL}</Icon>
                     <span className="narrow-stat-card-title">{t('emailsSent365d')}</span>
                     <span className="narrow-stat-card-value">
@@ -180,7 +170,6 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                     </span>
                 </div>
                  <div className="card narrow-stat-card">
-                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
                     <Icon className="narrow-stat-card-icon">{ICONS.CONTACTS}</Icon>
                     <span className="narrow-stat-card-title">{t('totalContacts')}</span>
                     <span className="narrow-stat-card-value">
@@ -197,7 +186,6 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                             <p>{t('exploreYourToolsSubtitle')}</p>
                         </div>
                         <div className="dashboard-nav-grid">
-                           {/* FIX: Replaced undefined variable 'modulesLoading' with 'authLoading' from the useAuth hook, which correctly represents the loading state for modules. */}
                            {(authLoading) ? (
                                 Array.from({ length: 8 }).map((_, i) => (
                                     <div key={i} className="card nav-card" style={{
@@ -240,11 +228,9 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                                         >
                                             {isLocked && (
                                                 <div className="lock-icon-overlay" style={isPromotional ? { color: 'var(--success-color)' } : {}}>
-                                                    {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                                     <Icon>{isPromotional ? ICONS.GIFT : ICONS.LOCK}</Icon>
                                                 </div>
                                             )}
-                                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                                             <Icon className="nav-card-icon">{item.icon}</Icon>
                                             <div className="nav-card-text-content">
                                                 <div className="nav-card-title">{item.name}</div>

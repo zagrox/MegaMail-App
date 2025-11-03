@@ -1,10 +1,5 @@
 
 
-
-
-
-
-
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from './contexts/AuthContext';
@@ -73,7 +68,7 @@ const App = () => {
     const appContainerRef = useRef<HTMLDivElement>(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
         const storedValue = localStorage.getItem('sidebarCollapsed');
-        return storedValue === null ? true : storedValue === 'true';
+        return storedValue === null ? false : storedValue === 'true';
     });
 
     const emailBuilderRef = useRef<{ save: () => Promise<boolean> } | null>(null);
@@ -475,128 +470,107 @@ const App = () => {
             ],
         },
     ];
-    
-    const logoUrl = config?.app_logo && config?.app_backend ? `${config.app_backend}/assets/${config.app_logo}` : '';
-    
-    const SidebarContent = () => (
-      <>
-        <div className="sidebar-header">
-            <img src={logoUrl} alt={`${appName} logo`} className="sidebar-logo" />
-            <span className="logo-font">{appName}</span>
-        </div>
-        <nav className="nav">
-            {navGroups.map((group, groupIndex) => (
-                <React.Fragment key={group.title || `group-${groupIndex}`}>
-                    <div className="nav-group">
-                        {group.title && (
-                            <div className="nav-group-header">
-                                <span>{group.title}</span>
-                            </div>
-                        )}
-                        {group.items.map((navItem) => {
-                            const hasAccess = hasModuleAccess(navItem.view, allModules);
-                            const moduleData = allModules?.find(m => m.modulename === navItem.view);
-                            const isPurchasableModule = !!moduleData;
-                            const isLocked = !hasAccess && (authLoading || !allModules || isPurchasableModule);
-                            const isPromotional = isLocked && moduleData?.modulepro === true;
-                            
-                            return (
-                                <button key={navItem.view} onClick={() => handleSetView(navItem.view)} className={`nav-btn ${view === navItem.view ? 'active' : ''} ${isLocked ? 'locked' : ''}`}>
-                                    {isSidebarCollapsed ? (
-// FIX: The Tooltip component requires a child component to wrap. Here, the Icon component is provided as a child.
-                                        <Tooltip text={navItem.name}><Icon>{navItem.icon}</Icon></Tooltip>
-                                    ) : (
-// FIX: The Icon component requires a child. The specific icon from the navItem is provided as a child.
-                                        <Icon>{navItem.icon}</Icon>
-                                    )}
-                                    <span>{navItem.name}</span>
-                                    {isLocked && (
-                                        <Icon
-                                            className="lock-icon"
-                                            style={isPromotional ? { color: 'var(--success-color)' } : {}}
-// FIX: The Icon component requires a child. A conditional icon is provided.
-                                            >{isPromotional ? ICONS.GIFT : ICONS.STAR}</Icon>
-                                    )}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </React.Fragment>
-            ))}
-        </nav>
-        <div className="sidebar-footer-nav">
-             <button onClick={() => handleSetView('Settings')} className={`nav-btn ${view === 'Settings' ? 'active' : ''}`}>
-{/* FIX: The Tooltip and Icon components require children. The appropriate icon is provided. */}
-                 {isSidebarCollapsed ? (<Tooltip text={t('settings', { ns: 'account' })}><Icon>{ICONS.SETTINGS}</Icon></Tooltip>) : (<Icon>{ICONS.SETTINGS}</Icon>)}
-                 <span>{t('settings', { ns: 'account' })}</span>
-             </button>
-             <button onClick={() => handleSetView('Account')} className={`nav-btn ${view === 'Account' ? 'active' : ''}`}>
-{/* FIX: The Tooltip and Icon components require children. The appropriate icon is provided. */}
-                 {isSidebarCollapsed ? (<Tooltip text={t('account')}><Icon>{ICONS.ACCOUNT}</Icon></Tooltip>) : (<Icon>{ICONS.ACCOUNT}</Icon>)}
-                 <span>{t('account')}</span>
-             </button>
-             <button onClick={() => handleSetView('Buy Credits')} className={`nav-btn ${view === 'Buy Credits' ? 'active' : ''}`}>
-{/* FIX: The Tooltip and Icon components require children. The appropriate icon is provided. */}
-                {isSidebarCollapsed ? (<Tooltip text={t('buyCredits')}><Icon>{ICONS.BUY_CREDITS}</Icon></Tooltip>) : (<Icon>{ICONS.BUY_CREDITS}</Icon>)}
-                <span>{t('buyCredits')}</span>
-             </button>
-             <button onClick={() => handleSetView('Guides')} className={`nav-btn ${view === 'Guides' ? 'active' : ''}`}>
-{/* FIX: The Tooltip and Icon components require children. The appropriate icon is provided. */}
-                 {isSidebarCollapsed ? (<Tooltip text={t('guides')}><Icon>{ICONS.HELP_CIRCLE}</Icon></Tooltip>) : (<Icon>{ICONS.HELP_CIRCLE}</Icon>)}
-                 <span>{t('guides')}</span>
-             </button>
-        </div>
-      </>
-    );
-    
-    const currentView = views[view];
-    const showHeader = view !== 'Dashboard' && view !== 'Email Builder' && view !== 'Account' && view !== 'Send Email' && view !== 'ListDetail' && view !== 'ContactDetail' && view !== 'Marketing' && view !== 'CampaignDetail' && view !== 'OfflinePayment' && view !== 'Invoice' && view !== 'DomainVerification';
+
+    const currentViewData = views[view] || views['Dashboard'];
 
     return (
-        <div ref={appContainerRef} className={`app-container ${isMobileMenuOpen ? 'mobile-menu-open' : ''} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        <div ref={appContainerRef} className={`app-container ${isMobileMenuOpen ? 'mobile-menu-open' : ''} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''} ${isRTL ? 'rtl' : 'ltr'}`}>
+            <aside className="app-sidebar">
+                <div className="sidebar-header">
+                    <a href="/" className="sidebar-logo-link">
+                        {config?.app_logo && config.app_backend && <img src={`${config.app_backend}/assets/${config.app_logo}`} alt="Logo" className="sidebar-logo" />}
+                        {!isSidebarCollapsed && <span className="app-name">{appName}</span>}
+                    </a>
+                    <button className="sidebar-toggle" onClick={toggleSidebarCollapse}>
+                        <Icon>{isRTL ? (isSidebarCollapsed ? ICONS.CHEVRON_LEFT : ICONS.CHEVRON_RIGHT) : (isSidebarCollapsed ? ICONS.CHEVRON_RIGHT : ICONS.CHEVRON_LEFT)}</Icon>
+                    </button>
+                </div>
+                <nav className="sidebar-nav">
+                    {navGroups.map((group, groupIndex) => (
+                        <div className="nav-group" key={groupIndex}>
+                            {group.title && !isSidebarCollapsed && <h5 className="nav-group-title">{group.title}</h5>}
+                            <ul>
+                                {group.items.map(item => (
+                                    <li key={item.view}>
+                                        <Tooltip text={isSidebarCollapsed ? item.name : ''}>
+                                            <button className={`nav-item ${view === item.view ? 'active' : ''}`} onClick={() => handleSetView(item.view)}>
+                                                <Icon>{item.icon}</Icon>
+                                                {!isSidebarCollapsed && <span className="nav-item-label">{item.name}</span>}
+                                            </button>
+                                        </Tooltip>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </nav>
+                 <div className="sidebar-footer">
+                    <ul>
+                        <li>
+                            <Tooltip text={isSidebarCollapsed ? t('settings', { ns: 'account' }) : ''}>
+                                <button className={`nav-item ${view === 'Settings' ? 'active' : ''}`} onClick={() => handleSetView('Settings')}>
+                                    <Icon>{ICONS.SETTINGS}</Icon>
+                                    {!isSidebarCollapsed && <span className="nav-item-label">{t('settings', { ns: 'account' })}</span>}
+                                </button>
+                            </Tooltip>
+                        </li>
+                        <li>
+                            <Tooltip text={isSidebarCollapsed ? t('account') : ''}>
+                                <button className={`nav-item ${view === 'Account' ? 'active' : ''}`} onClick={() => handleSetView('Account')}>
+                                    <Icon>{ICONS.ACCOUNT}</Icon>
+                                    {!isSidebarCollapsed && <span className="nav-item-label">{t('account')}</span>}
+                                </button>
+                            </Tooltip>
+                        </li>
+                        <li>
+                            <Tooltip text={isSidebarCollapsed ? t('buyCredits') : ''}>
+                                <button className={`nav-item ${view === 'Buy Credits' ? 'active' : ''}`} onClick={() => handleSetView('Buy Credits')}>
+                                    <Icon>{ICONS.BUY_CREDITS}</Icon>
+                                    {!isSidebarCollapsed && <span className="nav-item-label">{t('buyCredits')}</span>}
+                                </button>
+                            </Tooltip>
+                        </li>
+                        <li>
+                            <Tooltip text={isSidebarCollapsed ? t('guides') : ''}>
+                                <button className={`nav-item ${view === 'Guides' ? 'active' : ''}`} onClick={() => handleSetView('Guides')}>
+                                    <Icon>{ICONS.HELP_CIRCLE}</Icon>
+                                    {!isSidebarCollapsed && <span className="nav-item-label">{t('guides')}</span>}
+                                </button>
+                            </Tooltip>
+                        </li>
+                        <li>
+                            <Tooltip text={isSidebarCollapsed ? t('logout') : ''}>
+                                <button className="nav-item" onClick={handleLogout}>
+                                    <Icon>{ICONS.LOGOUT}</Icon>
+                                    {!isSidebarCollapsed && <span className="nav-item-label">{t('logout')}</span>}
+                                </button>
+                            </Tooltip>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+            <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>
+            <div className="app-main">
+                <header className="app-header">
+                     <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)}>
+                        <Icon>{ICONS.MENU}</Icon>
+                    </button>
+                    <h1 className="app-header-title">{currentViewData.title}</h1>
+                    <div className="header-actions">
+                        
+                    </div>
+                </header>
+                <main className="app-content">
+                    {currentViewData.component}
+                </main>
+            </div>
+            {moduleToUnlock && <UnlockModuleModal module={moduleToUnlock} onClose={() => setModuleToUnlock(null)} setView={handleSetView} />}
             <UnsavedChangesModal
                 isOpen={leaveConfirmationState.isOpen}
                 onCancel={handleCancelLeave}
                 onLeave={handleLeaveConfirmation}
                 onSaveAndLeave={handleSaveAndLeave}
-                zIndex={1050}
             />
-            {moduleToUnlock && (
-                <UnlockModuleModal
-                    module={moduleToUnlock}
-                    onClose={() => setModuleToUnlock(null)}
-                    setView={setView}
-                />
-            )}
-            <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>
-            <aside className="sidebar">
-                <SidebarContent />
-            </aside>
-            <button onClick={toggleSidebarCollapse} className="sidebar-collapse-toggle" aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
-{/* FIX: The Icon component requires a child. A conditional chevron icon is provided. */}
-               <Icon>{isRTL ? (isSidebarCollapsed ? ICONS.CHEVRON_LEFT : ICONS.CHEVRON_RIGHT) : (isSidebarCollapsed ? ICONS.CHEVRON_RIGHT : ICONS.CHEVRON_LEFT)}</Icon>
-            </button>
-            <div className="main-wrapper">
-                <header className="mobile-header">
-                     <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)} aria-label={t('openMenu')}>
-{/* FIX: The Icon component requires a child. The menu icon is provided. */}
-                        <Icon>{ICONS.MENU}</Icon>
-                    </button>
-                    <h1 className="mobile-header-title">{currentView?.title || appName}</h1>
-                    <button className="mobile-menu-toggle" onClick={() => handleSetView('Account')} aria-label={t('account')}>
-{/* FIX: The Icon component requires a child. The account icon is provided. */}
-                        <Icon>{ICONS.ACCOUNT}</Icon>
-                    </button>
-                </header>
-                <main className={`content ${view === 'Email Builder' || view === 'Marketing' ? 'content--no-padding' : ''}`}>
-                    {showHeader && (
-                        <header className="content-header">
-                            <h2>{currentView?.title}</h2>
-                        </header>
-                    )}
-                    {currentView?.component}
-                </main>
-            </div>
         </div>
     );
 };

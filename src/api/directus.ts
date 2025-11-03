@@ -48,10 +48,10 @@ export const authenticatedRequest = async <T>(request: any): Promise<T> => {
         if (errorMessage === 'Invalid refresh token.') {
             // Dispatch a global event to trigger logout.
             emitter.dispatchEvent(new CustomEvent('auth:tokenExpired'));
-            // By not re-throwing, we prevent downstream catch blocks from
-            // firing and showing duplicate/unnecessary error messages. The app
-            // will log out, so hanging this promise is acceptable.
-            return new Promise(() => {});
+            // Reject the promise so callers don't hang.
+            // The app will log out via the event handler, so the rejected promise
+            // just needs to stop the execution flow in the calling component.
+            return Promise.reject(new Error("Session expired. Logging out."));
         }
         // Re-throw all other errors for component-level handling.
         throw error;

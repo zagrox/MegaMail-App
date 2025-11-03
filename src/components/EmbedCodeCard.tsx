@@ -51,7 +51,7 @@ const EmbedCodeCard = ({ apiKey }: { apiKey: string }) => {
                 </div>
                 <div className="form-actions" style={{justifyContent: 'flex-end', padding: 0, border: 'none', margin: 0}}>
                     <button className="btn btn-secondary" onClick={handleCopy}>
-                        <Icon>{copied ? ICONS.CHECK : ICONS.MAIL}</Icon> {copied ? t('copied', { ns: 'common' }) : t('copyEmbedCode')}
+                        <Icon>{copied ? ICONS.CHECK : ICONS.COPY}</Icon> {copied ? t('copied', { ns: 'common' }) : t('copyEmbedCode')}
                     </button>
                 </div>
             </div>

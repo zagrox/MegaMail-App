@@ -66,7 +66,6 @@ const Step4Settings = ({ onNext, onBack, data, updateData }: { onNext: () => voi
             nextDisabled={!data.campaignName}
         >
             <div className="wizard-step-intro">
-                {/* FIX: Pass icon as child to Icon component */}
                 <Icon>{ICONS.SETTINGS}</Icon>
                 <p>{t('campaignSettings_desc')}</p>
             </div>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -72,20 +73,16 @@ export const SortableBlock = (props: SortableBlockProps) => {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="canvas-item-actions-bar-left">
-                           {/* FIX: Updated Icon component to accept children instead of a prop. */}
                            <Icon>{ICONS.DRAG_HANDLE}</Icon>
                            <span>{getBlockTypeTranslationKey(item.type)}</span>
                         </div>
                         <div className="canvas-item-actions-bar-right">
-                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onEdit(id); }} aria-label={t('editBlock')}>
                                 <Icon>{ICONS.PENCIL}</Icon>
                             </button>
-                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onDuplicate(id); }} aria-label={t('duplicateBlock')}>
                                 <Icon>{ICONS.DUPLICATE}</Icon>
                             </button>
-                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <button className="btn-icon btn-icon-danger" onClick={(e) => { e.stopPropagation(); onRemove(id); }} aria-label={t('deleteBlock')}>
                                 <Icon>{ICONS.DELETE}</Icon>
                             </button>
@@ -98,7 +95,6 @@ export const SortableBlock = (props: SortableBlockProps) => {
                             onClick={(e) => { e.stopPropagation(); setIsAddPopoverOpen(p => !p); }}
                             aria-label={t('addBlock')}
                         >
-                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <Icon>{ICONS.PLUS}</Icon>
                         </button>
                         {isAddPopoverOpen && (

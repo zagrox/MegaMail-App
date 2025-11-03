@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDraggable } from '@dnd-kit/core';
@@ -193,7 +194,6 @@ const ToolbarItem = ({ component, onAddComponent }: { component: typeof TOOLBAR_
                 }
             }}
         >
-            {/* FIX: Updated Icon component to accept children instead of a prop. */}
             <Icon>{component.icon}</Icon>
             <span>{t(component.type.toLowerCase())}</span>
         </div>

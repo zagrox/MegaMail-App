@@ -10,7 +10,6 @@ import Button from '../components/Button';
 import useApiV4 from '../hooks/useApiV4';
 import CenteredMessage from '../components/CenteredMessage';
 import ErrorMessage from '../components/ErrorMessage';
-// FIX: Import apiFetchV4 to make it available in the component.
 import { apiFetchV4 } from '../api/elasticEmail';
 
 const DNS_RECORDS_CONFIG = {
@@ -88,20 +87,17 @@ const VerificationRecordCard = ({ recordKey, domainName, status, onVerify }: Ver
                     <span>{t('host')}</span>
                     <div className="copyable-field">
                         <code>{config.host}</code>
-                        {/* FIX: The Icon component requires children. The copy icon is provided. */}
                         <button onClick={() => copyToClipboard(config.host)} className="btn-icon"><Icon>{ICONS.COPY}</Icon></button>
                     </div>
 
                     <span>{t('value')}</span>
                     <div className="copyable-field">
                         <code>{config.expectedValue}</code>
-                        {/* FIX: The Icon component requires children. The copy icon is provided. */}
                         <button onClick={() => copyToClipboard(config.expectedValue)} className="btn-icon"><Icon>{ICONS.COPY}</Icon></button>
                     </div>
                 </div>
             </div>
             <div className="card-footer">
-                {/* FIX: Button usage updated to pass onClick prop correctly. */}
                 <Button onClick={() => onVerify(recordKey)} disabled={status === 'checking'}>
                     {status === 'checking' ? <Loader /> : <Icon>{ICONS.VERIFY}</Icon>}
                     <span>{t('verify')}</span>
@@ -160,7 +156,6 @@ const DomainVerificationView = ({ domainName, apiKey, onBack }: { domainName: st
 
     const handleVerifyAll = async () => {
         setIsCheckingAll(true);
-        // Fetch the latest status from the API first
         const latestDetails = await apiFetchV4(`/domains/${encodeURIComponent(domainName)}`, apiKey);
         if (latestDetails) {
             const apiStatuses: Record<string, VerificationStatus> = {
@@ -171,7 +166,6 @@ const DomainVerificationView = ({ domainName, apiKey, onBack }: { domainName: st
             };
              setStatuses(apiStatuses);
         }
-        // Then run client-side checks for anything that's still idle
         for (const key of Object.keys(DNS_RECORDS_CONFIG)) {
             // @ts-ignore
             if (statuses[key] !== 'verified') {
@@ -196,12 +190,10 @@ const DomainVerificationView = ({ domainName, apiKey, onBack }: { domainName: st
                     {i18n.dir() === 'rtl' ? (
                         <>
                             <span>{t('backToDomains', {ns: 'domains'})}</span>
-                            {/* FIX: The Icon component requires children. The chevron icon is provided. */}
                             <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                         </>
                     ) : (
                         <>
-                            {/* FIX: The Icon component requires children. The chevron icon is provided. */}
                             <Icon>{ICONS.CHEVRON_LEFT}</Icon>
                             <span>{t('backToDomains', {ns: 'domains'})}</span>
                         </>
@@ -211,7 +203,6 @@ const DomainVerificationView = ({ domainName, apiKey, onBack }: { domainName: st
                     {t('verifyDomainTitle', { ns: 'domains', domainName })}
                 </h2>
                 <div className="header-actions">
-                    {/* FIX: Button usage updated to pass onClick prop correctly. */}
                     <Button onClick={handleVerifyAll} className="btn-primary" disabled={isCheckingAll}>
                         {isCheckingAll ? <Loader /> : <Icon>{ICONS.VERIFY}</Icon>}
                         <span>{t('verifyAll', {ns: 'domains'})}</span>
