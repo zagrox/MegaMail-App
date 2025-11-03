@@ -16,7 +16,7 @@ import ModulesTab from './account/ModulesTab';
 import NotificationsTab from './account/NotificationsTab';
 
 const AccountView = ({ apiKey, user, setView, allModules, hasModuleAccess }: { apiKey: string, user: any, setView: (view: string, data?: any) => void, allModules: any, hasModuleAccess: (moduleName: string, allModules: any) => boolean }) => {
-    const { t } = useTranslation(['account', 'common', 'orders', 'modules']);
+    const { t } = useTranslation(['account', 'common', 'orders']);
     const { data: accountData, loading: accountLoading, error: accountError } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
     const { data: contactsCountData, loading: contactsCountLoading } = useApi('/contact/count', apiKey, { allContacts: true }, apiKey ? 1 : 0);
     const [installPrompt, setInstallPrompt] = useState<any>(null);
