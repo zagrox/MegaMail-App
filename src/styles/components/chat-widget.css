@@ -153,6 +153,61 @@
     align-self: flex-end;
 }
 
+/* Markdown Styles inside bubbles */
+.message-bubble.bot p {
+    margin: 0;
+}
+.message-bubble.bot p:not(:first-child) {
+    margin-top: 0.5rem;
+}
+.message-bubble.bot ul {
+    margin: 0.5rem 0 0;
+    padding-inline-start: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.message-bubble.bot li {
+    text-align: left;
+}
+[dir="rtl"] .message-bubble.bot li {
+    text-align: right;
+}
+
+/* Premade Questions */
+.premade-questions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+    padding: 0.5rem 0;
+    margin: 0.5rem 0;
+}
+[dir="rtl"] .premade-questions {
+    align-items: flex-end;
+}
+
+.premade-question-btn {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    transition: background-color 0.2s, border-color 0.2s;
+    text-align: left;
+}
+[dir="rtl"] .premade-question-btn {
+    text-align: right;
+}
+
+.premade-question-btn:hover {
+    background-color: var(--subtle-background);
+    border-color: var(--secondary-color);
+}
+
 
 .typing-indicator {
     display: flex;

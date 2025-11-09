@@ -10,22 +10,39 @@ interface Message {
     sender: 'user' | 'bot';
 }
 
-// A safe component to render simple markdown-like bolding.
 const FormattedTextMessage = ({ text }: { text: string }) => {
-    // Split text by the bold delimiter (**text**), keeping the delimiters
-    const parts = text.split(/(\*\*.*?\*\*)/g);
-    return (
-        <>
-            {parts.map((part, index) => {
-                if (part.startsWith('**') && part.endsWith('**')) {
-                    // If it's a bold part, render it as <strong>
-                    return <strong key={index}>{part.slice(2, -2)}</strong>;
-                }
-                // Otherwise, render it as plain text
-                return part;
-            })}
-        </>
-    );
+    const lines = text.split('\n');
+    const elements: React.ReactNode[] = [];
+    let listItems: React.ReactNode[] = [];
+
+    const processInlineFormatting = (line: string) => {
+        return line.split(/(\*\*.*?\*\*)/g).map((part, index) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+                return <strong key={index}>{part.slice(2, -2)}</strong>;
+            }
+            return part;
+        });
+    };
+
+    lines.forEach((line, index) => {
+        if (line.trim().startsWith('* ')) {
+            listItems.push(<li key={`li-${index}`}>{processInlineFormatting(line.trim().substring(2))}</li>);
+        } else {
+            if (listItems.length > 0) {
+                elements.push(<ul key={`ul-${index - 1}`}>{listItems}</ul>);
+                listItems = [];
+            }
+            if (line.trim() !== '') {
+                elements.push(<p key={`p-${index}`}>{processInlineFormatting(line)}</p>);
+            }
+        }
+    });
+
+    if (listItems.length > 0) {
+        elements.push(<ul key={`ul-end`}>{listItems}</ul>);
+    }
+
+    return <>{elements}</>;
 };
 
 
@@ -46,16 +63,13 @@ const ChatWidget = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    // Generate a new session ID when the widget opens and clear state when it closes.
     useEffect(() => {
         if (isOpen) {
-            // Every time the widget opens, start a new session.
             setSessionId(`web-chat_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
             setMessages([]);
             setIsLoading(false);
             setInputValue('');
         } else {
-            // Clear state when closed to ensure a fresh start next time.
             setMessages([]);
             setSessionId(null);
             setIsLoading(false);
@@ -63,29 +77,20 @@ const ChatWidget = () => {
         }
     }, [isOpen]);
 
+    const premadeQuestions = [
+        t('premadeQuestion1'),
+        t('premadeQuestion2'),
+        t('premadeQuestion3'),
+    ].filter(Boolean);
+
 
     if (!chatWebhookUrl) {
         return null;
     }
 
-    const handleSend = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const trimmedInput = inputValue.trim();
-        if (!trimmedInput || !sessionId) return; // Guard against sending without a session
-
-        const newUserMessage: Message = {
-            id: Date.now(),
-            text: trimmedInput,
-            sender: 'user',
-        };
-
-        setMessages(prev => [...prev, newUserMessage]);
-        setInputValue('');
-        setIsLoading(true);
-
-        // The sessionId is now guaranteed to exist when the chat is open.
+    const sendMessageToServer = async (messageText: string) => {
         const requestBody = {
-            chatInput: trimmedInput,
+            chatInput: messageText,
             sessionId: sessionId,
         };
 
@@ -107,18 +112,14 @@ const ChatWidget = () => {
             let botText = t('fallbackMessage');
             let responsePayload: any;
 
-            // n8n webhook responses are typically an array of items.
             if (Array.isArray(responseData) && responseData.length > 0) {
-                // The actual data might be in the root of the item, or nested in a `json` property.
                 responsePayload = responseData[0].json || responseData[0];
             } 
-            // Fallback for a direct object response.
             else if (typeof responseData === 'object' && responseData !== null) {
                 responsePayload = responseData;
             }
 
             if (responsePayload) {
-                // The final response text could be in a 'response' or 'text' property.
                 botText = responsePayload.response || responsePayload.text || botText;
             }
 
@@ -141,6 +142,34 @@ const ChatWidget = () => {
             setIsLoading(false);
         }
     };
+    
+    const handleSend = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const trimmedInput = inputValue.trim();
+        if (!trimmedInput || !sessionId) return;
+
+        const newUserMessage: Message = {
+            id: Date.now(),
+            text: trimmedInput,
+            sender: 'user',
+        };
+
+        setMessages(prev => [...prev, newUserMessage]);
+        setInputValue('');
+        setIsLoading(true);
+
+        await sendMessageToServer(trimmedInput);
+    };
+
+    const handlePremadeQuestionClick = async (question: string) => {
+        if (!question || !sessionId) return;
+    
+        const newUserMessage: Message = { id: Date.now(), text: question, sender: 'user' };
+        setMessages(prev => [...prev, newUserMessage]);
+        setIsLoading(true);
+        
+        await sendMessageToServer(question);
+    };
 
     return (
         <>
@@ -158,10 +187,21 @@ const ChatWidget = () => {
                     </button>
                 </div>
                 <div className="chat-widget-messages">
-                    {messages.length === 0 && (
-                         <div className="message-bubble bot">
-                            {t('initialMessage')}
-                        </div>
+                    {messages.length === 0 && !isLoading && (
+                         <>
+                            <div className="message-bubble bot">
+                                <FormattedTextMessage text={t('initialMessage')} />
+                            </div>
+                            {premadeQuestions.length > 0 && (
+                                <div className="premade-questions">
+                                    {premadeQuestions.map((q, i) => (
+                                        <button key={i} className="premade-question-btn" onClick={() => handlePremadeQuestionClick(q)}>
+                                            {q}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </>
                     )}
                     {messages.map(msg => (
                         <div key={msg.id} className={`message-bubble ${msg.sender}`}>
