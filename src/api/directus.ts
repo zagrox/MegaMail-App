@@ -42,10 +42,10 @@ export const authenticatedRequest = async <T>(request: any): Promise<T> => {
         // The SDK's request method automatically handles token refreshing.
         return await sdk.request(request);
     } catch (error: any) {
-        // The Directus SDK wraps errors. We only need to catch the final,
-        // unrecoverable error when the refresh token itself is invalid.
+        // The Directus SDK wraps errors. We need to catch the final, unrecoverable
+        // errors when the refresh token itself is invalid or expired.
         const errorMessage = error?.errors?.[0]?.message;
-        if (errorMessage === 'Invalid refresh token.') {
+        if (errorMessage === 'Invalid refresh token.' || errorMessage === 'Token expired.') {
             // Dispatch a global event to trigger logout.
             emitter.dispatchEvent(new CustomEvent('auth:tokenExpired'));
             // Reject the promise so callers don't hang.

@@ -1,0 +1,9 @@
+{
+    "supportChat": "Support Chat",
+    "openChat": "Open support chat",
+    "closeChat": "Close chat",
+    "typeMessage": "Type a message...",
+    "initialMessage": "Hello! How can I assist you today?",
+    "fallbackMessage": "Sorry, I could not process that.",
+    "connectionError": "I'm sorry, I couldn't connect to the support chat. Please try again later."
+}

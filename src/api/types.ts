@@ -96,6 +96,7 @@ export type Configuration = {
     app_bank_name?: string;
     app_card_number?: string;
     app_account_name?: string;
+    app_chat?: string;
 };
 export type CustomField = {
     Name: string;

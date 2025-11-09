@@ -5,6 +5,7 @@ import { apiFetch } from '../api/elasticEmail';
 import type { Module } from '../api/types';
 import { AppActions } from '../config/actions';
 import { DIRECTUS_CRM_URL } from '../api/config';
+import { getErrorMessage } from '../utils/helpers';
 
 interface User {
     id: string;
@@ -133,8 +134,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             
             setUser(mergedUser);
 
-        } catch (error) {
-            console.error("Failed to fetch full user profile:", error);
+        } catch (error: any) {
+            console.error("Failed to fetch full user profile:", getErrorMessage(error));
             // On ANY failure in getMe, we should assume the session is invalid or data is corrupt.
             // Clear everything to be safe. The authenticatedRequest wrapper will trigger a logout
             // if it's a token issue, but this handles other errors (e.g. network, permissions).

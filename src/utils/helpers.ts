@@ -109,3 +109,32 @@ export const formatAxisLabel = (value: number, locale: string = 'en-US'): string
     }
     return num.toLocaleString(locale);
 };
+
+export const getErrorMessage = (error: any): string => {
+    const defaultMessage = 'An unknown error occurred.';
+    if (!error) return defaultMessage;
+    
+    // Directus SDK error format
+    if (error?.errors?.[0]?.message) {
+        return error.errors[0].message;
+    }
+    
+    // Standard Error object or object with a message property
+    if (error?.message) {
+        // If message is an object, stringify it to avoid [object Object]
+        return typeof error.message === 'string' ? error.message : JSON.stringify(error.message);
+    }
+    
+    // If the error itself is a string
+    if (typeof error === 'string') {
+        return error;
+    }
+
+    // Fallback for other unexpected error structures
+    try {
+        const stringified = JSON.stringify(error);
+        return stringified === '{}' ? defaultMessage : stringified;
+    } catch {
+        return defaultMessage;
+    }
+};

@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +7,7 @@ import { useToast } from '../contexts/ToastContext';
 import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
 import { useConfiguration } from '../contexts/ConfigurationContext';
+import { getErrorMessage } from '../utils/helpers';
 
 type AuthMode = 'login' | 'register' | 'forgot';
 
@@ -63,15 +65,11 @@ const AuthView = () => {
                 setMode('login');
             }
         } catch (err: any) {
-            let errorMessage = err.message;
-            if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
-                errorMessage = err.errors[0].message;
-            }
-
-            if (errorMessage && errorMessage.toLowerCase().includes('has to be unique') && errorMessage.toLowerCase().includes('email')) {
+            const errorMessage = getErrorMessage(err);
+            if (errorMessage.toLowerCase().includes('has to be unique') && errorMessage.toLowerCase().includes('email')) {
                 addToast(t('emailAlreadyExists'), 'error');
             } else {
-                addToast(errorMessage || t('unknownError', { ns: 'common' }), 'error');
+                addToast(errorMessage, 'error');
             }
         } finally {
             setLoading(false);

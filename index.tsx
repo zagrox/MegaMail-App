@@ -33,6 +33,7 @@ import './src/styles/components/progress.css';
 import './src/styles/components/tabs.css';
 import './src/styles/components/toast.css';
 import './src/styles/components/view-switcher.css';
+import './src/styles/components/chat-widget.css';
 
 /* Views */
 import './src/styles/views/shared.css';

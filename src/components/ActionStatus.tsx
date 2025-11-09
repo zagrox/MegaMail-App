@@ -30,10 +30,10 @@ const ActionStatus = ({ status, onDismiss }: ActionStatusProps) => {
 
     return (
         <div className={`action-status info-message ${currentConfig.className}`} style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            <Icon children={currentConfig.icon} />
+            <Icon>{currentConfig.icon}</Icon>
             <p style={{ margin: '0 0.75rem', flexGrow: 1 }}>{status.message}</p>
             <button onClick={onDismiss} className="btn-icon" style={{alignSelf: 'center'}}>
-                <Icon children={ICONS.DELETE} />
+                <Icon>{ICONS.DELETE}</Icon>
             </button>
         </div>
     );

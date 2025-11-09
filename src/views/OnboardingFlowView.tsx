@@ -7,6 +7,7 @@ import Loader from '../components/Loader';
 import Icon, { ICONS } from '../components/Icon';
 import { useConfiguration } from '../contexts/ConfigurationContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { getErrorMessage } from '../utils/helpers';
 
 const TOTAL_STEPS = 4;
 
@@ -266,11 +267,7 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
             addToast(t('profileUpdateSuccess', { ns: 'account' }), 'success');
             handleNext();
         } catch (err: any) {
-            let errorMessage = err.message;
-            if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
-                errorMessage = err.errors[0].message;
-            }
-            addToast(t('profileUpdateError', { error: errorMessage || t('unknownError', { ns: 'common' }), ns: 'account' }), 'error');
+            addToast(t('profileUpdateError', { error: getErrorMessage(err), ns: 'account' }), 'error');
         } finally {
             setLoading(false);
         }
@@ -285,7 +282,7 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
             addToast(t('apiKeyUpdateSuccess', { ns: 'account' }), 'success');
             onComplete();
         } catch (err: any) {
-            addToast(err.message || t('invalidApiKey'), 'error');
+            addToast(getErrorMessage(err) || t('invalidApiKey'), 'error');
         } finally {
             setLoading(false);
         }
@@ -300,7 +297,7 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
             addToast(t('welcomeToDemo'), 'success');
             onComplete();
         } catch (err: any) {
-            addToast(err.message || t('invalidApiKey'), 'error');
+            addToast(getErrorMessage(err) || t('invalidApiKey'), 'error');
         } finally {
             setDemoLoading(false);
         }
@@ -320,13 +317,14 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
             await createElasticSubaccount(user.email, randomPassword);
             addToast(t('accountConnectedSuccess'), 'success');
         } catch (err: any) {
+            const errorMessage = getErrorMessage(err);
             if (
-                (err.message && err.message.includes('AN ACCOUNT ALREADY EXISTS FOR THAT EMAIL ADDRESS')) ||
-                (err.message && err.message.includes('Account creation timed out'))
+                errorMessage.includes('AN ACCOUNT ALREADY EXISTS FOR THAT EMAIL ADDRESS') ||
+                errorMessage.includes('Account creation timed out')
             ) {
                 setAccountExistsState('prompt');
             } else {
-                addToast(err.message, 'error');
+                addToast(errorMessage, 'error');
                 setNewUserFlowFailed(true);
             }
         } finally {
@@ -348,7 +346,7 @@ const OnboardingFlowView = ({ onComplete }: { onComplete: () => void }) => {
             await createElasticSubaccount(newEmail, randomPassword);
             addToast(t('accountConnectedSuccess'), 'success');
         } catch (err: any) {
-            addToast(err.message, 'error');
+            addToast(getErrorMessage(err), 'error');
             setAccountExistsState('newEmail');
         } finally {
             setLoading(false);

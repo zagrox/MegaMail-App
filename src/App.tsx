@@ -44,6 +44,7 @@ import GuidesView from './views/GuidesView';
 import { useTheme } from './contexts/ThemeContext';
 import Tooltip from './components/Tooltip';
 import DomainVerificationView from './views/DomainVerificationView';
+import ChatWidget from './components/ChatWidget';
 
 
 const App = () => {
@@ -99,8 +100,13 @@ const App = () => {
         const handleForbidden = () => {
             addToast(t('permissionDeniedError'), 'error');
         };
+
         const handleTokenExpired = () => {
-            addToast(t('sessionExpired'), 'error');
+            // When a token expires (on load, during login, or mid-session),
+            // the most reliable user feedback is to simply log them out.
+            // This avoids race conditions with loading states that could show
+            // an unnecessary "Session Expired" toast. The user is returned to the
+            // login screen, which is a clear indication that their session ended.
             logout(); // Force logout
         };
 
@@ -571,6 +577,7 @@ const App = () => {
                 onLeave={handleLeaveConfirmation}
                 onSaveAndLeave={handleSaveAndLeave}
             />
+            {isAuthenticated && user?.elastickey && <ChatWidget />}
         </div>
     );
 };

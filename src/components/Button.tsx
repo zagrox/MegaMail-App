@@ -18,7 +18,7 @@ interface ButtonProps {
     'aria-label'?: string; // For icon buttons
 }
 
-const Button = ({ action, children, className, ...props }: ButtonProps) => {
+const Button = ({ action, children, className, onClick, ...props }: ButtonProps) => {
     const { canPerformAction, allModules, setModuleToUnlock } = useAuth();
     const isLocked = action ? !canPerformAction(action) : false;
 
@@ -40,8 +40,8 @@ const Button = ({ action, children, className, ...props }: ButtonProps) => {
             } else {
                 console.warn(`Action "${action}" is locked but no corresponding module was found.`);
             }
-        } else if (props.onClick) {
-            props.onClick(e);
+        } else if (onClick) {
+            onClick(e);
         }
     };
     

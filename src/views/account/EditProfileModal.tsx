@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import Modal from '../../components/Modal';
 import Loader from '../../components/Loader';
 import { useToast } from '../../contexts/ToastContext';
+import { getErrorMessage } from '../../utils/helpers';
 
 // NOTE: The user's request is to fix the non-working Edit Profile modal.
 // This implementation replaces the placeholder content.
@@ -51,14 +52,8 @@ export const EditProfileModal = ({ isOpen, onClose, user }: { isOpen: boolean, o
             addToast(t('profileUpdateSuccess'), 'success');
             onClose();
         } catch (err: any) {
-            let errorMessage = err.message;
-            if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
-                errorMessage = err.errors[0].message;
-            } else if (err.message && typeof err.message !== 'string') {
-                // If message is an object (which causes `[object Object]`), stringify it.
-                errorMessage = JSON.stringify(err.message);
-            }
-            addToast(t('profileUpdateError', { error: errorMessage || t('unknownError', { ns: 'common' }) }), 'error');
+            const errorMessage = getErrorMessage(err);
+            addToast(t('profileUpdateError', { error: errorMessage }), 'error');
         } finally {
             setIsSaving(false);
         }
