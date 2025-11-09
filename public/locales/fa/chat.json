@@ -8,5 +8,15 @@
     "connectionError": "متاسفم، نتوانستم به چت پشتیبانی متصل شوم. لطفاً بعداً دوباره امتحان کنید.",
     "premadeQuestion1": "مگامیل چیست؟",
     "premadeQuestion2": "چگونه اعتبار بخرم؟",
-    "premadeQuestion3": "چگونه مخاطبین را آپلود کنم؟"
+    "premadeQuestion3": "چگونه مخاطبین را آپلود کنم؟",
+    "goToBuyCredits": "رفتن به خرید اعتبار",
+    "goToDashboard": "رفتن به داشبورد",
+    "goToContacts": "رفتن به مشترکین",
+    "goToCampaigns": "رفتن به کمپین‌ها",
+    "goToTemplates": "رفتن به قالب‌ها",
+    "goToDomainSettings": "رفتن به تنظیمات دامنه",
+    "goToApiSettings": "رفتن به تنظیمات کلید API",
+    "goToSmtpSettings": "رفتن به تنظیمات SMTP",
+    "goToProfile": "رفتن به پروفایل",
+    "goToOrders": "رفتن به سفارش‌ها"
 }

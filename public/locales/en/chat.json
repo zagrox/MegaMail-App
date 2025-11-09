@@ -8,5 +8,15 @@
     "connectionError": "I'm sorry, I couldn't connect to the support chat. Please try again later.",
     "premadeQuestion1": "What is MegaMail?",
     "premadeQuestion2": "How do I buy credits?",
-    "premadeQuestion3": "How do I upload contacts?"
+    "premadeQuestion3": "How do I upload contacts?",
+    "goToBuyCredits": "Go to Buy Credits",
+    "goToDashboard": "Go to Dashboard",
+    "goToContacts": "Go to Contacts",
+    "goToCampaigns": "Go to Campaigns",
+    "goToTemplates": "Go to Templates",
+    "goToDomainSettings": "Go to Domain Settings",
+    "goToApiSettings": "Go to API Key Settings",
+    "goToSmtpSettings": "Go to SMTP Settings",
+    "goToProfile": "Go to Profile",
+    "goToOrders": "Go to Orders"
 }

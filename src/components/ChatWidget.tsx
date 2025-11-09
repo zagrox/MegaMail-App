@@ -3,11 +3,17 @@ import { useTranslation } from 'react-i18next';
 import { useConfiguration } from '../contexts/ConfigurationContext';
 import { useToast } from '../contexts/ToastContext';
 import Icon, { ICONS } from './Icon';
+import { navigationKeywords } from '../config/chatNavigation';
 
 interface Message {
     id: number;
     text: string;
     sender: 'user' | 'bot';
+    navigationAction?: {
+        view: string;
+        buttonText: string;
+        data?: any;
+    } | null;
 }
 
 const FormattedTextMessage = ({ text }: { text: string }) => {
@@ -46,7 +52,7 @@ const FormattedTextMessage = ({ text }: { text: string }) => {
 };
 
 
-const ChatWidget = () => {
+const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }) => {
     const { config } = useConfiguration();
     const { addToast } = useToast();
     const { t } = useTranslation(['chat', 'common']);
@@ -54,8 +60,14 @@ const ChatWidget = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [sessionId, setSessionId] = useState<string | null>(null);
+    const sessionIdRef = useRef<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!sessionIdRef.current) {
+            sessionIdRef.current = `web-chat_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        }
+    }, []);
 
     const chatWebhookUrl = config?.app_chat;
 
@@ -63,26 +75,34 @@ const ChatWidget = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    useEffect(() => {
-        if (isOpen) {
-            setSessionId(`web-chat_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
-            setMessages([]);
-            setIsLoading(false);
-            setInputValue('');
-        } else {
-            setMessages([]);
-            setSessionId(null);
-            setIsLoading(false);
-            setInputValue('');
-        }
-    }, [isOpen]);
-
     const premadeQuestions = [
         t('premadeQuestion1'),
         t('premadeQuestion2'),
         t('premadeQuestion3'),
     ].filter(Boolean);
 
+    const getNavigationAction = (text: string) => {
+        const lowerText = text.toLowerCase();
+        for (const nav of navigationKeywords) {
+            if (nav.keywords.some(keyword => lowerText.includes(keyword))) {
+                return {
+                    view: nav.view,
+                    buttonText: t(nav.buttonTextKey),
+                    data: nav.data,
+                };
+            }
+        }
+        return null;
+    };
+
+    const handleNavigation = (action: Message['navigationAction']) => {
+        if (!action) return;
+        if(action.data?.tab) {
+             sessionStorage.setItem('settings-tab', action.data.tab);
+        }
+        setView(action.view, action.data);
+        setIsOpen(false);
+    };
 
     if (!chatWebhookUrl) {
         return null;
@@ -91,7 +111,7 @@ const ChatWidget = () => {
     const sendMessageToServer = async (messageText: string) => {
         const requestBody = {
             chatInput: messageText,
-            sessionId: sessionId,
+            sessionId: sessionIdRef.current,
         };
 
         try {
@@ -123,10 +143,12 @@ const ChatWidget = () => {
                 botText = responsePayload.response || responsePayload.text || botText;
             }
 
+            const navigationAction = getNavigationAction(botText);
             const newBotMessage: Message = {
                 id: Date.now() + 1,
                 text: botText,
                 sender: 'bot',
+                navigationAction,
             };
             setMessages(prev => [...prev, newBotMessage]);
 
@@ -146,7 +168,7 @@ const ChatWidget = () => {
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
         const trimmedInput = inputValue.trim();
-        if (!trimmedInput || !sessionId) return;
+        if (!trimmedInput) return;
 
         const newUserMessage: Message = {
             id: Date.now(),
@@ -162,7 +184,7 @@ const ChatWidget = () => {
     };
 
     const handlePremadeQuestionClick = async (question: string) => {
-        if (!question || !sessionId) return;
+        if (!question) return;
     
         const newUserMessage: Message = { id: Date.now(), text: question, sender: 'user' };
         setMessages(prev => [...prev, newUserMessage]);
@@ -177,8 +199,6 @@ const ChatWidget = () => {
                 <Icon>{ICONS.MESSAGE_SQUARE}</Icon>
             </button>
 
-            {isOpen && <div className="chat-widget-overlay" onClick={() => setIsOpen(false)}></div>}
-
             <div className={`chat-widget-window ${isOpen ? 'open' : ''}`}>
                 <div className="chat-widget-header">
                     <h3>{t('supportChat')}</h3>
@@ -189,8 +209,10 @@ const ChatWidget = () => {
                 <div className="chat-widget-messages">
                     {messages.length === 0 && !isLoading && (
                          <>
-                            <div className="message-bubble bot">
-                                <FormattedTextMessage text={t('initialMessage')} />
+                            <div className="message-container bot">
+                                <div className="message-bubble bot">
+                                    <FormattedTextMessage text={t('initialMessage')} />
+                                </div>
                             </div>
                             {premadeQuestions.length > 0 && (
                                 <div className="premade-questions">
@@ -204,14 +226,26 @@ const ChatWidget = () => {
                         </>
                     )}
                     {messages.map(msg => (
-                        <div key={msg.id} className={`message-bubble ${msg.sender}`}>
-                            {msg.sender === 'bot' ? <FormattedTextMessage text={msg.text} /> : msg.text}
+                        <div key={msg.id} className={`message-container ${msg.sender}`}>
+                            <div className={`message-bubble ${msg.sender}`}>
+                                {msg.sender === 'bot' ? <FormattedTextMessage text={msg.text} /> : msg.text}
+                            </div>
+                            {msg.navigationAction && (
+                                <div className="navigation-action">
+                                    <button className="navigation-action-btn" onClick={() => handleNavigation(msg.navigationAction)}>
+                                        <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
+                                        <span>{msg.navigationAction.buttonText}</span>
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ))}
                     {isLoading && (
-                        <div className="message-bubble bot">
-                            <div className="typing-indicator">
-                                <span></span><span></span><span></span>
+                        <div className="message-container bot">
+                            <div className="message-bubble bot">
+                                <div className="typing-indicator">
+                                    <span></span><span></span><span></span>
+                                </div>
                             </div>
                         </div>
                     )}

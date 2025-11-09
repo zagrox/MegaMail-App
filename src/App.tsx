@@ -577,7 +577,7 @@ const App = () => {
                 onLeave={handleLeaveConfirmation}
                 onSaveAndLeave={handleSaveAndLeave}
             />
-            {isAuthenticated && user?.elastickey && <ChatWidget />}
+            {isAuthenticated && user?.elastickey && <ChatWidget setView={handleSetView} />}
         </div>
     );
 };
