@@ -124,6 +124,7 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
                 body: JSON.stringify(requestBody),
             });
 
+
             if (!response.ok) {
                 throw new Error(`Server responded with status ${response.status}`);
             }
