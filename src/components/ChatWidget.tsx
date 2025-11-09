@@ -114,83 +114,118 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
             chatInput: messageText,
             sessionId: sessionIdRef.current,
         };
-
+    
         try {
             const response = await fetch(chatWebhookUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody),
             });
-
-
+    
             if (!response.ok) {
-                throw new Error(`Server responded with status ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(`Server responded with status ${response.status}: ${errorText}`);
             }
-
-            // Handle streaming response
-            const reader = response.body?.getReader();
-            if (!reader) {
-                throw new Error('Could not read streaming response.');
-            }
-
-            const decoder = new TextDecoder();
-            let accumulatedText = '';
-            
-            // Add an empty bot message to start populating
-            const newBotMessage: Message = {
-                id: Date.now() + 1,
-                text: '',
-                sender: 'bot',
-            };
-            setMessages(prev => [...prev, newBotMessage]);
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-
-                const chunk = decoder.decode(value);
-                const lines = chunk.split('\n').filter(line => line.trim() !== '');
-
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        try {
-                            const jsonStr = line.substring(6);
-                            const dataObj = JSON.parse(jsonStr);
-                            const textChunk = dataObj.response || dataObj.text || dataObj.output || '';
+    
+            const contentType = response.headers.get('content-type');
+    
+            // Handle SSE streaming response
+            if (contentType && contentType.includes('text/event-stream')) {
+                const reader = response.body?.getReader();
+                if (!reader) {
+                    throw new Error('Could not read streaming response.');
+                }
+    
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let accumulatedText = '';
+                let botMessageId: number | null = null;
+    
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || ''; // Keep last partial line
+    
+                    for (const line of lines) {
+                        if (line.trim().startsWith('data: ')) {
+                            const jsonStr = line.substring(6).trim();
+                            if (jsonStr === '[DONE]' || !jsonStr) continue;
+    
+                            if (botMessageId === null) {
+                                botMessageId = Date.now() + 1;
+                                setMessages(prev => [...prev, { id: botMessageId!, text: '', sender: 'bot' }]);
+                            }
                             
+                            let textChunk = '';
+                            try {
+                                const dataObj = JSON.parse(jsonStr);
+                                textChunk = dataObj.response || dataObj.text || dataObj.output || (typeof dataObj === 'string' ? dataObj : '');
+                            } catch (e) {
+                                textChunk = jsonStr;
+                            }
+    
                             if (textChunk) {
                                 accumulatedText += textChunk;
-                                setMessages(prev => {
-                                    const newMessages = [...prev];
-                                    const lastMessage = newMessages[newMessages.length - 1];
-                                    if (lastMessage && lastMessage.sender === 'bot') {
-                                        lastMessage.text = accumulatedText;
-                                    }
-                                    return newMessages;
-                                });
+                                setMessages(prev => prev.map(msg =>
+                                    msg.id === botMessageId ? { ...msg, text: accumulatedText } : msg
+                                ));
                             }
-                        } catch (e) {
-                            console.warn("Could not parse streaming chunk:", line);
                         }
                     }
                 }
-            }
-
-            // After stream is finished, check for navigation actions
-            const navigationAction = getNavigationAction(accumulatedText);
-            if (navigationAction) {
-                setMessages(prev => {
-                    const newMessages = [...prev];
-                    const lastMessage = newMessages[newMessages.length - 1];
-                    if (lastMessage && lastMessage.sender === 'bot') {
-                      lastMessage.navigationAction = navigationAction;
+    
+                if (botMessageId === null) {
+                    throw new Error("Stream ended without sending any data.");
+                }
+                
+                const navigationAction = getNavigationAction(accumulatedText);
+                if (navigationAction && botMessageId) {
+                    setMessages(prev => prev.map(msg =>
+                        msg.id === botMessageId ? { ...msg, navigationAction } : msg
+                    ));
+                }
+    
+            } else { // Handle single JSON response
+                const responseData = await response.json();
+                let botText = '';
+                
+                // Recursively search for a response string in common keys
+                const findText = (obj: any): string | null => {
+                    if (typeof obj !== 'object' || obj === null) return null;
+                    if (typeof obj.response === 'string') return obj.response;
+                    if (typeof obj.text === 'string') return obj.text;
+                    if (typeof obj.output === 'string') return obj.output;
+                    if (typeof obj.json === 'object') return findText(obj.json);
+                    
+                    for (const key in obj) {
+                        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                            const result = findText(obj[key]);
+                            if (result) return result;
+                        }
                     }
-                    return newMessages;
-                });
-            }
+                    return null;
+                };
 
+                botText = findText(responseData) || JSON.stringify(responseData);
+    
+                if (!botText) {
+                    throw new Error("Received an empty or unparsable JSON response.");
+                }
+                
+                const botMessageId = Date.now() + 1;
+                const navigationAction = getNavigationAction(botText);
+                const newBotMessage: Message = {
+                    id: botMessageId,
+                    text: botText,
+                    sender: 'bot',
+                    navigationAction
+                };
+                setMessages(prev => [...prev, newBotMessage]);
+            }
+    
         } catch (error: any) {
             addToast(`${t('error', { ns: 'common' })}: ${error.message}`, 'error');
             const errorMessage: Message = {
@@ -279,7 +314,7 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
                             )}
                         </div>
                     ))}
-                    {isLoading && messages[messages.length - 1]?.sender !== 'bot' && (
+                    {isLoading && messages[messages.length - 1]?.sender === 'user' && (
                         <div className="message-container bot">
                             <div className="message-bubble bot">
                                 <div className="typing-indicator">
