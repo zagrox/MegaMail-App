@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useConfiguration } from '../contexts/ConfigurationContext';
@@ -127,30 +128,67 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
                 throw new Error(`Server responded with status ${response.status}`);
             }
 
-            const responseData = await response.json();
+            // Handle streaming response
+            const reader = response.body?.getReader();
+            if (!reader) {
+                throw new Error('Could not read streaming response.');
+            }
+
+            const decoder = new TextDecoder();
+            let accumulatedText = '';
             
-            let botText = t('fallbackMessage');
-            let responsePayload: any;
-
-            if (Array.isArray(responseData) && responseData.length > 0) {
-                responsePayload = responseData[0].json || responseData[0];
-            } 
-            else if (typeof responseData === 'object' && responseData !== null) {
-                responsePayload = responseData;
-            }
-
-            if (responsePayload) {
-                botText = responsePayload.response || responsePayload.text || botText;
-            }
-
-            const navigationAction = getNavigationAction(botText);
+            // Add an empty bot message to start populating
             const newBotMessage: Message = {
                 id: Date.now() + 1,
-                text: botText,
+                text: '',
                 sender: 'bot',
-                navigationAction,
             };
             setMessages(prev => [...prev, newBotMessage]);
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value);
+                const lines = chunk.split('\n').filter(line => line.trim() !== '');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const jsonStr = line.substring(6);
+                            const dataObj = JSON.parse(jsonStr);
+                            const textChunk = dataObj.response || dataObj.text || dataObj.output || '';
+                            
+                            if (textChunk) {
+                                accumulatedText += textChunk;
+                                setMessages(prev => {
+                                    const newMessages = [...prev];
+                                    const lastMessage = newMessages[newMessages.length - 1];
+                                    if (lastMessage && lastMessage.sender === 'bot') {
+                                        lastMessage.text = accumulatedText;
+                                    }
+                                    return newMessages;
+                                });
+                            }
+                        } catch (e) {
+                            console.warn("Could not parse streaming chunk:", line);
+                        }
+                    }
+                }
+            }
+
+            // After stream is finished, check for navigation actions
+            const navigationAction = getNavigationAction(accumulatedText);
+            if (navigationAction) {
+                setMessages(prev => {
+                    const newMessages = [...prev];
+                    const lastMessage = newMessages[newMessages.length - 1];
+                    if (lastMessage && lastMessage.sender === 'bot') {
+                      lastMessage.navigationAction = navigationAction;
+                    }
+                    return newMessages;
+                });
+            }
 
         } catch (error: any) {
             addToast(`${t('error', { ns: 'common' })}: ${error.message}`, 'error');
@@ -240,7 +278,7 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
                             )}
                         </div>
                     ))}
-                    {isLoading && (
+                    {isLoading && messages[messages.length - 1]?.sender !== 'bot' && (
                         <div className="message-container bot">
                             <div className="message-bubble bot">
                                 <div className="typing-indicator">

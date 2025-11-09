@@ -291,10 +291,39 @@ html[data-theme='dark'] .app-name {
         opacity: 1;
         pointer-events: auto;
     }
-    .app-header .mobile-menu-toggle {
-        display: block;
-    }
     .sidebar-toggle {
         display: none;
+    }
+
+    /* --- MOBILE HEADER FIXES --- */
+    .app-header {
+        padding: 0 1rem; /* Reduce padding on mobile */
+        gap: 0.75rem; /* Add space between menu button and title */
+    }
+
+    .mobile-menu-toggle {
+        display: inline-flex; /* Use inline-flex for alignment */
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        padding: 0.5rem;
+        margin-inline-start: -0.5rem; /* Align icon with content edge */
+        color: var(--text-color);
+        cursor: pointer;
+        border-radius: 50%;
+    }
+    .mobile-menu-toggle:hover {
+        background-color: var(--subtle-background);
+    }
+    .mobile-menu-toggle .icon {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    .app-header-title {
+        font-size: 1.25rem; /* Reduce font size on mobile */
+        flex-shrink: 1; /* Allow title to shrink if needed */
+        min-width: 0; /* Crucial for flexbox ellipsis to work */
     }
 }
