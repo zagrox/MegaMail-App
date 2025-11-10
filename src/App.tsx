@@ -45,6 +45,8 @@ import { useTheme } from './contexts/ThemeContext';
 import Tooltip from './components/Tooltip';
 import DomainVerificationView from './views/DomainVerificationView';
 import ChatWidget from './components/ChatWidget';
+import sdk from './api/directus';
+import { readItems } from '@directus/sdk';
 
 
 const App = () => {
@@ -80,6 +82,11 @@ const App = () => {
         targetData: null as any,
     });
 
+    // Header state
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const userMenuRef = useRef<HTMLDivElement>(null);
+
     const isRTL = i18n.dir() === 'rtl';
 
     useEffect(() => {
@@ -89,6 +96,56 @@ const App = () => {
     const toggleSidebarCollapse = () => {
         setIsSidebarCollapsed(prev => !prev);
     };
+
+    // --- GLOBAL NOTIFICATION LOGIC ---
+    useEffect(() => {
+        if (!user || !user.id || user.isApiKeyUser) {
+            return;
+        }
+        
+        const fetchUnreadCount = async () => {
+            try {
+                const filter = {
+                    _and: [
+                        { status: { _eq: 'published' } },
+                        { read_status: { _eq: false } },
+                        {
+                            _or: [
+                                { recipient: { _eq: user.id } },
+                                { is_system_wide: { _eq: true } }
+                            ]
+                        }
+                    ]
+                };
+                const response = await sdk.request(readItems('notifications', {
+                    aggregate: { count: '*' },
+                    filter
+                }));
+                
+                if (response && response.length > 0 && (response[0] as any).count) {
+                     setUnreadCount(Number((response[0] as any).count));
+                }
+            } catch (error) {
+                console.warn("Failed to fetch unread notification count:", error);
+            }
+        };
+
+        fetchUnreadCount();
+        const intervalId = setInterval(fetchUnreadCount, 30000); // Poll every 30 seconds
+
+        return () => clearInterval(intervalId);
+    }, [user]);
+
+    // --- USER MENU LOGIC ---
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+                setIsUserMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         if (user?.display && user.display !== theme) {
@@ -316,6 +373,7 @@ const App = () => {
     const apiKey = user?.elastickey;
 
     const handleLogout = () => {
+        setIsUserMenuOpen(false);
         logout();
         setView('Dashboard');
     };
@@ -413,6 +471,19 @@ const App = () => {
                 }, 0);
             }
         }
+    };
+
+    const handleUserMenuItemClick = (view: string, tab?: string) => {
+        if (tab) {
+            sessionStorage.setItem(`${view.toLowerCase()}-tab`, tab);
+        }
+        handleSetView(view);
+        setIsUserMenuOpen(false);
+    };
+
+    const handleNotificationsClick = () => {
+        sessionStorage.setItem('account-tab', 'notifications');
+        handleSetView('Account');
     };
     
     const views: Record<string, { component: ReactNode, title: string, icon: React.ReactNode }> = {
@@ -521,34 +592,10 @@ const App = () => {
                             </Tooltip>
                         </li>
                         <li>
-                            <Tooltip text={isSidebarCollapsed ? t('account') : ''}>
-                                <button className={`nav-item ${view === 'Account' ? 'active' : ''}`} onClick={() => handleSetView('Account')}>
-                                    <Icon>{ICONS.ACCOUNT}</Icon>
-                                    {!isSidebarCollapsed && <span className="nav-item-label">{t('account')}</span>}
-                                </button>
-                            </Tooltip>
-                        </li>
-                        <li>
                             <Tooltip text={isSidebarCollapsed ? t('buyCredits') : ''}>
                                 <button className={`nav-item ${view === 'Buy Credits' ? 'active' : ''}`} onClick={() => handleSetView('Buy Credits')}>
                                     <Icon>{ICONS.BUY_CREDITS}</Icon>
                                     {!isSidebarCollapsed && <span className="nav-item-label">{t('buyCredits')}</span>}
-                                </button>
-                            </Tooltip>
-                        </li>
-                        <li>
-                            <Tooltip text={isSidebarCollapsed ? t('guides') : ''}>
-                                <button className={`nav-item ${view === 'Guides' ? 'active' : ''}`} onClick={() => handleSetView('Guides')}>
-                                    <Icon>{ICONS.HELP_CIRCLE}</Icon>
-                                    {!isSidebarCollapsed && <span className="nav-item-label">{t('guides')}</span>}
-                                </button>
-                            </Tooltip>
-                        </li>
-                        <li>
-                            <Tooltip text={isSidebarCollapsed ? t('logout') : ''}>
-                                <button className="nav-item" onClick={handleLogout}>
-                                    <Icon>{ICONS.LOGOUT}</Icon>
-                                    {!isSidebarCollapsed && <span className="nav-item-label">{t('logout')}</span>}
                                 </button>
                             </Tooltip>
                         </li>
@@ -558,12 +605,50 @@ const App = () => {
             <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>
             <div className="app-main">
                 <header className="app-header">
-                     <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)}>
-                        <Icon>{ICONS.MENU}</Icon>
-                    </button>
-                    <h1 className="app-header-title">{currentViewData.title}</h1>
+                    <div className="header-start">
+                        <button className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(true)}>
+                            <Icon>{ICONS.MENU}</Icon>
+                        </button>
+                        <h1 className="app-header-title">{currentViewData.title}</h1>
+                    </div>
                     <div className="header-actions">
+                        <button className="btn-icon" onClick={() => handleSetView('Guides')} title={t('guides')}>
+                            <Icon>{ICONS.HELP_CIRCLE}</Icon>
+                        </button>
+                        <button className="btn-icon btn-notifications" onClick={handleNotificationsClick} title={t('notifications')}>
+                            <Icon>{ICONS.BELL}</Icon>
+                            {unreadCount > 0 && <span className="notification-dot"></span>}
+                        </button>
                         
+                        <div className="dropdown" ref={userMenuRef}>
+                            <button className="header-avatar" onClick={() => setIsUserMenuOpen(prev => !prev)}>
+                                <Icon>{ICONS.ACCOUNT}</Icon>
+                            </button>
+                            <div className={`dropdown-menu ${isUserMenuOpen ? 'open' : ''}`}>
+                                <div className="dropdown-header">
+                                    <h4>{(user?.first_name && user?.last_name) ? `${user.first_name} ${user.last_name}` : user?.first_name || user?.email}</h4>
+                                </div>
+                                <div className="dropdown-divider"></div>
+                                <button className="dropdown-item" onClick={() => handleUserMenuItemClick('Account', 'profile')}>
+                                    <Icon>{ICONS.ACCOUNT}</Icon>
+                                    <span>{t('profile', { ns: 'account' })}</span>
+                                </button>
+                                <button className="dropdown-item" onClick={() => handleUserMenuItemClick('Account', 'orders')}>
+                                    <Icon>{ICONS.BOX}</Icon>
+                                    <span>{t('orders', { ns: 'account' })}</span>
+                                </button>
+                                <button className="dropdown-item" onClick={() => handleUserMenuItemClick('Settings')}>
+                                    <Icon>{ICONS.SETTINGS}</Icon>
+                                    <span>{t('settings', { ns: 'account' })}</span>
+                                </button>
+                                <div className="dropdown-divider"></div>
+                                <button className="dropdown-item danger" onClick={handleLogout}>
+                                    <Icon>{ICONS.LOGOUT}</Icon>
+                                    <span>{t('logout')}</span>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 </header>
                 <main className="app-content">

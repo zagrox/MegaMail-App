@@ -1,0 +1,127 @@
+/* --- DROPDOWN MENU --- */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  inset-inline-end: 0;
+  background-color: var(--surface-color);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-width: 220px;
+  z-index: 100;
+  padding: 0.5rem;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dropdown-menu.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.5rem;
+}
+
+.dropdown-header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dropdown-header p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--subtle-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  font-weight: 500;
+}
+[dir="rtl"] .dropdown-item {
+    text-align: right;
+}
+
+
+.dropdown-item:hover {
+  background-color: var(--subtle-background);
+}
+
+.dropdown-item .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--subtle-text-color);
+}
+
+.dropdown-item.danger {
+  color: var(--danger-color);
+}
+.dropdown-item.danger .icon {
+  color: var(--danger-color);
+}
+.dropdown-item.danger:hover {
+  background-color: rgba(239, 68, 68, 0.1); /* Equivalent of var(--danger-color) with 0.1 opacity */
+}
+html[data-theme='dark'] .dropdown-item.danger:hover {
+    background-color: rgba(248, 113, 113, 0.1); /* Equivalent of var(--danger-color) with 0.1 opacity for dark theme */
+}
+
+
+.dropdown-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 0.5rem 0;
+}
+
+/* User avatar in header */
+.header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--subtle-background);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 0; /* Override button padding */
+}
+
+.header-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.header-avatar .icon {
+    color: var(--subtle-text-color);
+    width: 20px;
+    height: 20px;
+}

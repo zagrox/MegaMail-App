@@ -111,14 +111,15 @@ html[data-theme='dark'] .contact-status-filter-item .badge {
 @media (max-width: 767px) {
     .contacts-header {
         flex-direction: column;
+        width: 50%;
         align-items: stretch;
     }
     .header-actions {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
         gap: 0.5rem;
-        width: 100%;
-        justify-content: stretch;
+        width: 40%;
+        justify-content: end;
     }
     .header-actions .btn {
         padding: 0.75rem;

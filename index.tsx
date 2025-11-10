@@ -34,6 +34,7 @@ import './src/styles/components/tabs.css';
 import './src/styles/components/toast.css';
 import './src/styles/components/view-switcher.css';
 import './src/styles/components/chat-widget.css';
+import './src/styles/components/dropdown.css';
 
 /* Views */
 import './src/styles/views/shared.css';

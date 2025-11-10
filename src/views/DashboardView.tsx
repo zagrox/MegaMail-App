@@ -1,4 +1,5 @@
 
+
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -25,47 +26,6 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     const { data: statsData, loading: statsLoading, error: statsError } = useApiV4(`/statistics`, apiKey, apiParams);
     const { data: accountData, loading: accountLoading } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
     const { data: contactsCountData, loading: contactsCountLoading } = useApi('/contact/count', apiKey, { allContacts: true }, apiKey ? 1 : 0);
-    const [unreadCount, setUnreadCount] = useState(0);
-
-    useEffect(() => {
-        if (!user || !user.id || user.isApiKeyUser) {
-            return;
-        }
-        
-        const fetchUnreadCount = async () => {
-            try {
-                const filter = {
-                    _and: [
-                        { status: { _eq: 'published' } },
-                        { read_status: { _eq: false } },
-                        {
-                            _or: [
-                                { recipient: { _eq: user.id } },
-                                { is_system_wide: { _eq: true } }
-                            ]
-                        }
-                    ]
-                };
-                const response = await sdk.request(readItems('notifications', {
-                    aggregate: { count: '*' },
-                    filter
-                }));
-                
-                if (response && response.length > 0 && (response[0] as any).count) {
-                     setUnreadCount(Number((response[0] as any).count));
-                }
-            } catch (error) {
-                console.warn("Failed to fetch unread notification count:", error);
-            }
-        };
-
-        fetchUnreadCount();
-    }, [user]);
-
-    const handleNotificationsClick = () => {
-        sessionStorage.setItem('account-tab', 'notifications');
-        setView('Account');
-    };
 
     const staticNavItems = useMemo(() => [
         { name: t('statistics', { ns: 'common' }), icon: ICONS.STATISTICS, desc: t('statisticsDesc'), view: 'Statistics' },
@@ -131,10 +91,6 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                                      <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
                                 </div>
                             </button>
-                            <Button className="btn-secondary btn-notifications" onClick={handleNotificationsClick} title={t('notifications', { ns: 'common' })}>
-                                <Icon>{ICONS.BELL}</Icon>
-                                {unreadCount > 0 && <span className="notification-dot"></span>}
-                            </Button>
                         </div>
                     </div>
                     <div className="cta-banner">
