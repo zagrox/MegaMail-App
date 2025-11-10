@@ -265,6 +265,11 @@ const AuthView = () => {
                         <h1>MEGAMAIL</h1>
                         <h2>{t('brandingTitle', { ns: 'auth' })}</h2>
                         <p>{t('brandingSubtitle', { ns: 'auth', appName: t('appName') })}</p>
+                        {config?.app_version && (
+                            <div className="auth-app-version">
+                                App Version {config.app_version}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

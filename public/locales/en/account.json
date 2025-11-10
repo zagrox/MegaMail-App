@@ -38,6 +38,7 @@
     "reputationVeryPoor": "Very Poor",
     "dailySendLimit": "Daily Send Limit",
     "remainingCredits": "Remaining Credits",
+    "myCredits": "My Credits",
     "apiKeySignInMessage": "You are signed in using an API key, which has limited access to account settings.",
     "logOut": "Log Out",
     "logoutDescription": "End your current session and return to the login screen.",

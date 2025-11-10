@@ -47,6 +47,7 @@ import DomainVerificationView from './views/DomainVerificationView';
 import ChatWidget from './components/ChatWidget';
 import sdk from './api/directus';
 import { readItems } from '@directus/sdk';
+import useApi from './views/useApi';
 
 
 const App = () => {
@@ -55,6 +56,7 @@ const App = () => {
     const { t, i18n } = useTranslation(['common', 'emailLists', 'contacts', 'buyCredits', 'account']);
     const { addToast } = useToast();
     const { theme, setTheme } = useTheme();
+    const { data: accountData, loading: accountLoading } = useApi('/account/load', user?.elastickey ?? '', {}, user?.elastickey ? 1 : 0);
     const [view, setView] = useState('Dashboard');
     const [templateToEdit, setTemplateToEdit] = useState<Template | null>(null);
     const [isNewFromGallery, setIsNewFromGallery] = useState(false);
@@ -628,6 +630,19 @@ const App = () => {
                                 <div className="dropdown-header">
                                     <h4>{(user?.first_name && user?.last_name) ? `${user.first_name} ${user.last_name}` : user?.first_name || user?.email}</h4>
                                 </div>
+                                <button className="dropdown-item" onClick={() => handleUserMenuItemClick('Buy Credits')}>
+                                    <Icon>{ICONS.BUY_CREDITS}</Icon>
+                                    <span className="dropdown-item-label-with-value">
+                                        <span>{t('myCredits', { ns: 'account' })}</span>
+                                        <span className="dropdown-item-value">
+                                            {accountLoading && !accountData ? (
+                                                <Loader />
+                                            ) : (
+                                                Number(accountData?.emailcredits ?? 0).toLocaleString(i18n.language)
+                                            )}
+                                        </span>
+                                    </span>
+                                </button>
                                 <div className="dropdown-divider"></div>
                                 <button className="dropdown-item" onClick={() => handleUserMenuItemClick('Account', 'profile')}>
                                     <Icon>{ICONS.ACCOUNT}</Icon>

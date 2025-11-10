@@ -16,7 +16,6 @@ import Button from '../components/Button';
 import sdk from '../api/directus';
 import { readItems } from '@directus/sdk';
 import { AppActions } from '../config/actions';
-import DOMPurify from 'dompurify';
 
 const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (view: string, data?: any) => void, apiKey: string, user: any, isEmbed?: boolean }) => {
     const { t, i18n } = useTranslation(['dashboard', 'common', 'account']);
@@ -65,40 +64,17 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
     if (statsError) console.warn("Could not load dashboard stats:", statsError);
 
     const welcomeName = user?.first_name || t('user');
-    const appName = t('appName');
-    const copyrightText = configLoading ? '...' : (config?.app_copyright || `${appName} © ${new Date().getFullYear()}, All Rights Reserved`);
 
     return (
         <div className="dashboard-container">
             {!isEmbed && (
                 <>
-                    <div className="dashboard-header">
-                        <div className="hide-on-mobile">
-                            <h2>{t('welcomeMessage', { name: welcomeName })}</h2>
-                        </div>
-                        <div className="dashboard-actions">
-                            <button className="credits-card-cta" onClick={() => setView('Buy Credits')}>
-                                <div className="credits-card-cta__icon">
-                                    <Icon>{ICONS.BUY_CREDITS}</Icon>
-                                </div>
-                                <div className="credits-card-cta__text">
-                                    
-                                    <span className="credits-card-cta__value">
-                                        {accountLoading ? <Loader /> : Number(accountData?.emailcredits ?? 0).toLocaleString(i18n.language)}
-                                    </span>
-                                </div>
-                                <div className="credits-card-cta__arrow">
-                                     <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
                     <div className="cta-banner">
                         <div className="cta-banner-icon">
                             <Icon>{ICONS.AT_SIGN}</Icon>
                         </div>
                         <div className="cta-banner-text">
-                            <h3 className="cta-banner-title">{t('startEmailMarketingTitle')}</h3>
+                            <h3 className="cta-banner-title">{t('welcomeMessage', { name: welcomeName })}</h3>
                             <p className="cta-banner-desc">{t('startEmailMarketingDesc')}</p>
                         </div>
                         <div className="cta-banner-action">
@@ -111,6 +87,13 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
             )}
 
             <div className="dashboard-stats-grid">
+                <div className="card narrow-stat-card clickable" onClick={() => setView('Buy Credits')}>
+                    <Icon className="narrow-stat-card-icon">{ICONS.BUY_CREDITS}</Icon>
+                    <span className="narrow-stat-card-title">{t('remainingCredits', { ns: 'account' })}</span>
+                    <span className="narrow-stat-card-value">
+                        {accountLoading ? <LineLoader /> : Number(accountData?.emailcredits ?? 0).toLocaleString(i18n.language)}
+                    </span>
+                </div>
                 <div className="card narrow-stat-card">
                     <Icon className="narrow-stat-card-icon">{ICONS.AWARD}</Icon>
                     <span className="narrow-stat-card-title">{t('sendingReputation')}</span>
@@ -197,9 +180,6 @@ const DashboardView = ({ setView, apiKey, user, isEmbed = false }: { setView: (v
                                 })
                            )}
                         </div>
-                    </div>
-                    <div className="dashboard-branding-footer hide-on-mobile">
-                        <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(copyrightText) }} />
                     </div>
                 </>
             )}

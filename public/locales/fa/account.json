@@ -38,6 +38,7 @@
     "reputationVeryPoor": "بسیار ضعیف",
     "dailySendLimit": "محدودیت ارسال روزانه",
     "remainingCredits": "اعتبار باقیمانده",
+    "myCredits": "اعتبار من",
     "apiKeySignInMessage": "شما با استفاده از یک کلید API وارد شده‌اید که دسترسی محدودی به تنظیمات حساب دارد.",
     "logOut": "خروج از حساب",
     "logoutDescription": "جلسه فعلی خود را خاتمه داده و به صفحه ورود بازگردید.",
