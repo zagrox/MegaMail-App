@@ -9,6 +9,7 @@ import { useToast } from '../contexts/ToastContext';
 import { useConfiguration } from '../contexts/ConfigurationContext';
 import sdk from '../api/directus';
 import ReportBugModal from '../components/ReportBugModal';
+import emitter from '../api/eventEmitter';
 
 const GuidesView = () => {
     const { t } = useTranslation(['guides', 'common', 'onboarding']);
@@ -30,7 +31,7 @@ const GuidesView = () => {
     ];
 
     const helpCards = [
-        { key: 'AI', title: t('aiAssistant'), desc: t('aiAssistantDesc'), icon: ICONS.AI_ICON, isSoon: true, onClick: () => {} },
+        { key: 'AI', title: t('aiAssistant'), desc: t('aiAssistantDesc'), icon: ICONS.AI_ICON, isSoon: false, onClick: () => emitter.dispatchEvent(new CustomEvent('chat:open')) },
         { key: 'Bug', title: t('reportABug'), desc: t('reportABugDesc'), icon: ICONS.COMPLAINT, isSoon: false, onClick: () => setIsBugModalOpen(true) },
         { key: 'Ticket', title: t('submitATicket'), desc: t('submitATicketDesc'), icon: ICONS.MAIL, isSoon: true, onClick: () => {} },
         { key: 'API', title: t('apiDocumentation'), desc: t('apiDocumentationDesc'), icon: ICONS.CHEVRON_RIGHT, isSoon: false, onClick: () => window.open('https://megamail.readme.io/reference/', '_blank') },
@@ -66,7 +67,6 @@ const GuidesView = () => {
                             className={`guides-nav-item ${activeIndex === index ? 'active' : ''}`}
                             onClick={() => setActiveIndex(index)}
                         >
-                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <Icon>{guide.icon}</Icon>
                             <span>{t(`guide${guide.key}Title`)}</span>
                         </button>
@@ -74,7 +74,6 @@ const GuidesView = () => {
                 </nav>
                 <article className="guides-content card">
                     <header className="guides-content-header">
-                        {/* FIX: Updated Icon component to accept children instead of a prop. */}
                         <Icon>{activeGuide.icon}</Icon>
                         <h3>{t(`guide${activeGuide.key}Title`)}</h3>
                     </header>
@@ -113,7 +112,6 @@ const GuidesView = () => {
                     {helpCards.map(card => (
                         <button key={card.key} className="card help-card" onClick={card.onClick} disabled={card.isSoon}>
                             {card.isSoon && <div className="soon-badge-overlay">{t('soon', { ns: 'onboarding' })}</div>}
-                            {/* FIX: Updated Icon component to accept children instead of a prop. */}
                             <Icon>{card.icon}</Icon>
                             <h4>{card.title}</h4>
                             <p>{card.desc}</p>

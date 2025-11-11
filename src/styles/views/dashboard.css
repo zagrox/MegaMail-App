@@ -183,7 +183,7 @@ html[data-theme='dark'] .cta-banner {
 }
 .dashboard-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2.5rem;
 }
@@ -326,4 +326,17 @@ html[data-theme='dark'] .cta-banner {
     color: var(--text-color);
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     font-weight: 500;
+}
+
+.lock-icon-overlay {
+    position: absolute;
+    top: 0.75rem;
+    inset-inline-end: 0.75rem;
+    z-index: 5;
+    color: var(--warning-color);
+}
+
+.lock-icon-overlay .icon {
+    width: 1.25rem;
+    height: 1.25rem;
 }

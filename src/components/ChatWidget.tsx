@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useConfiguration } from '../contexts/ConfigurationContext';
 import { useToast } from '../contexts/ToastContext';
 import Icon, { ICONS } from './Icon';
 import { navigationKeywords } from '../config/chatNavigation';
+import emitter from '../api/eventEmitter';
 
 interface Message {
     id: number;
@@ -75,6 +75,18 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
+
+    useEffect(() => {
+        const handleOpenChat = () => {
+            setIsOpen(true);
+        };
+
+        emitter.addEventListener('chat:open', handleOpenChat);
+
+        return () => {
+            emitter.removeEventListener('chat:open', handleOpenChat);
+        };
+    }, []);
 
     const premadeQuestions = [
         t('premadeQuestion1'),

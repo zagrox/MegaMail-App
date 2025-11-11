@@ -644,7 +644,7 @@ const App = () => {
                                     </span>
                                 </button>
                                 <div className="dropdown-divider"></div>
-                                <button className="dropdown-item" onClick={() => handleUserMenuItemClick('Account', 'profile')}>
+                                <button className="dropdown-item" onClick={() => handleUserMenuItemClick('Account', 'general')}>
                                     <Icon>{ICONS.ACCOUNT}</Icon>
                                     <span>{t('profile', { ns: 'account' })}</span>
                                 </button>
