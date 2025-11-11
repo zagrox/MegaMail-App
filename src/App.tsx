@@ -762,7 +762,7 @@ const App = () => {
                                 </button>
                                 {!isAppInstalled && (
                                     <>
-                                        <div className="dropdown-divider"></div>
+                                        
                                         <button className="dropdown-item" onClick={handleInstallClick}>
                                             <Icon>{ICONS.DOWNLOAD}</Icon>
                                             <span>{t('installApp', { ns: 'account' })}</span>
