@@ -135,7 +135,13 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             setUser(mergedUser);
 
         } catch (error: any) {
-            console.error("Failed to fetch full user profile:", getErrorMessage(error));
+            const errorMessage = getErrorMessage(error);
+            // If the error is a session expiration, it's handled globally by an event listener
+            // that triggers a logout. We don't need to log it as a critical error here,
+            // as it's an expected part of the authentication flow.
+            if (errorMessage !== "Session expired. Logging out.") {
+                console.error("Failed to fetch full user profile:", errorMessage);
+            }
             // On ANY failure in getMe, we should assume the session is invalid or data is corrupt.
             // Clear everything to be safe. The authenticatedRequest wrapper will trigger a logout
             // if it's a token issue, but this handles other errors (e.g. network, permissions).

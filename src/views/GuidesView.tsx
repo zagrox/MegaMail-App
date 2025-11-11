@@ -1,13 +1,8 @@
-import React, { useState } from 'react';
+
+
+import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import Icon, { ICONS } from '../components/Icon';
-import Modal from '../components/Modal';
-import Loader from '../components/Loader';
-import Button from '../components/Button';
-import { useAuth } from '../contexts/AuthContext';
-import { useToast } from '../contexts/ToastContext';
-import { useConfiguration } from '../contexts/ConfigurationContext';
-import sdk from '../api/directus';
 import ReportBugModal from '../components/ReportBugModal';
 import emitter from '../api/eventEmitter';
 
@@ -15,6 +10,8 @@ const GuidesView = () => {
     const { t } = useTranslation(['guides', 'common', 'onboarding']);
     const [activeIndex, setActiveIndex] = useState(0);
     const [isBugModalOpen, setIsBugModalOpen] = useState(false);
+    const [prompt, setPrompt] = useState('');
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const guideData = [
         { key: 'AIAssistant', icon: ICONS.AI_ICON, steps: 1 },
@@ -33,9 +30,35 @@ const GuidesView = () => {
     const helpCards = [
         { key: 'AI', title: t('aiAssistant'), desc: t('aiAssistantDesc'), icon: ICONS.AI_ICON, isSoon: false, onClick: () => emitter.dispatchEvent(new CustomEvent('chat:open')) },
         { key: 'Bug', title: t('reportABug'), desc: t('reportABugDesc'), icon: ICONS.COMPLAINT, isSoon: false, onClick: () => setIsBugModalOpen(true) },
-        { key: 'Ticket', title: t('submitATicket'), desc: t('submitATicketDesc'), icon: ICONS.MAIL, isSoon: true, onClick: () => {} },
         { key: 'API', title: t('apiDocumentation'), desc: t('apiDocumentationDesc'), icon: ICONS.CHEVRON_RIGHT, isSoon: false, onClick: () => window.open('https://megamail.readme.io/reference/', '_blank') },
+        { key: 'Ticket', title: t('submitATicket'), desc: t('submitATicketDesc'), icon: ICONS.MAIL, isSoon: true, onClick: () => {} },
     ];
+
+    const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setPrompt(e.target.value);
+        // Auto-resize textarea
+        e.target.style.height = 'auto';
+        e.target.style.height = `${e.target.scrollHeight}px`;
+    };
+
+    const handlePromptSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const trimmedPrompt = prompt.trim();
+        if (trimmedPrompt) {
+            emitter.dispatchEvent(new CustomEvent('chat:startWithPrompt', { detail: trimmedPrompt }));
+            setPrompt('');
+            if (textareaRef.current) {
+                textareaRef.current.style.height = 'auto';
+            }
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handlePromptSubmit(e as any);
+        }
+    };
 
     const renderGuideContent = (key: string, numSteps: number) => (
         <div className="step-by-step-list">
@@ -59,6 +82,37 @@ const GuidesView = () => {
     return (
         <div className="guides-view-container">
             <ReportBugModal isOpen={isBugModalOpen} onClose={() => setIsBugModalOpen(false)} />
+            
+            
+
+            <div className="help-section">
+                <div className="help-cards-grid">
+                    {helpCards.map(card => (
+                        <button key={card.key} className="card help-card" onClick={card.onClick} disabled={card.isSoon}>
+                            {card.isSoon && <div className="soon-badge-overlay">{t('soon', { ns: 'onboarding' })}</div>}
+                            <Icon>{card.icon}</Icon>
+                            <h4>{card.title}</h4>
+                            <p>{card.desc}</p>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <form className="ai-prompt-container" onSubmit={handlePromptSubmit}>
+                <textarea
+                    ref={textareaRef}
+                    className="ai-prompt-textarea"
+                    rows={1}
+                    value={prompt}
+                    onChange={handlePromptChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder={t('askAnythingPlaceholder', { ns: 'guides' })}
+                />
+                <button type="submit" className="ai-prompt-submit-btn" disabled={!prompt.trim()}>
+                    <Icon>{ICONS.SEND_EMAIL}</Icon>
+                </button>
+            </form>
+
             <div className="guides-layout">
                 <nav className="guides-nav">
                     {guideData.map((guide, index) => (
@@ -83,6 +137,8 @@ const GuidesView = () => {
                 </article>
             </div>
             
+            <hr />
+
             <div className="card contact-info-card">
                 <div className="contact-info-item">
                     <Icon>{ICONS.MOBILE}</Icon>
@@ -106,22 +162,6 @@ const GuidesView = () => {
                     </div>
                 </div>
             </div>
-
-            <div className="help-section">
-                <div className="help-cards-grid">
-                    {helpCards.map(card => (
-                        <button key={card.key} className="card help-card" onClick={card.onClick} disabled={card.isSoon}>
-                            {card.isSoon && <div className="soon-badge-overlay">{t('soon', { ns: 'onboarding' })}</div>}
-                            <Icon>{card.icon}</Icon>
-                            <h4>{card.title}</h4>
-                            <p>{card.desc}</p>
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            
-
         </div>
     );
 };

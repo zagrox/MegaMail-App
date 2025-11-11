@@ -31,7 +31,7 @@
     "fromEmail": "From Email",
     "defaultSenderTitle": "Default Sender for Domain",
     "defaultSenderDescription": "Set a default 'From' email address to be used with this specific domain. This can help pre-fill sender information in your campaigns.",
-    "backToDomains": "Back to Domains",
+    "backToDomains": "My Domains",
     "verifyDomainTitle": "Verify Domain: {{domainName}}",
     "verifyAll": "Verify All",
     "domainVerification": "Domain Verification",
@@ -61,5 +61,6 @@
     "defaultSenderSetSuccess": "Default sender set to {{email}}.",
     "defaultSenderSetError": "Failed to set default sender: {{error}}",
     "noSenders": "No sender emails found",
-    "noSendersDesc": "Add sender email addresses that you can use in the 'From' field of your campaigns."
+    "noSendersDesc": "Add sender email addresses that you can use in the 'From' field of your campaigns.",
+    "howToVerifyDomain": "How to verify your domain?"
 }

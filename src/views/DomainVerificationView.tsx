@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../contexts/ToastContext';
@@ -203,10 +202,15 @@ const DomainVerificationView = ({ domainName, apiKey, onBack }: { domainName: st
                     {t('verifyDomainTitle', { ns: 'domains', domainName })}
                 </h2>
                 <div className="header-actions">
-                    <Button onClick={handleVerifyAll} className="btn-primary" disabled={isCheckingAll}>
-                        {isCheckingAll ? <Loader /> : <Icon>{ICONS.VERIFY}</Icon>}
-                        <span>{t('verifyAll', {ns: 'domains'})}</span>
-                    </Button>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+                        <Button onClick={handleVerifyAll} className="btn-primary" disabled={isCheckingAll}>
+                            {isCheckingAll ? <Loader /> : <Icon>{ICONS.VERIFY}</Icon>}
+                            <span>{t('verifyAll', {ns: 'domains'})}</span>
+                        </Button>
+                        <a href="https://mailzila.com/docs/domain/" target="_blank" rel="noopener noreferrer" className="link-button" style={{ fontSize: '0.9rem' }}>
+                            {t('howToVerifyDomain', { ns: 'domains' })}
+                        </a>
+                    </div>
                 </div>
             </div>
 

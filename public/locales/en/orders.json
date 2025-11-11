@@ -1,7 +1,7 @@
 
 {
     "orders": "Orders",
-    "totalAmount": "Total Amount",
+    "totalAmount": "Amount",
     "transactions": "Transactions",
     "noOrdersFound": "No orders found.",
     "noTransactionsFound": "No transactions found for this order.",
@@ -16,7 +16,7 @@
     "modules": "Modules",
     "unlock": "Unlock",
     "unlocked": "Unlocked",
-    "description": "Description",
+    "description": "Package",
     "date": "Date",
     "status": "Status",
     "action": "Action",
@@ -39,5 +39,5 @@
     "tax": "Tax (0%)",
     "thankYouForYourBusiness": "Thank you for your business!",
     "returnToOrders": "Return to My Orders",
-    "newOrder": "Create New Order"
+    "newOrder": "New Order"
 }

@@ -80,11 +80,25 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
         const handleOpenChat = () => {
             setIsOpen(true);
         };
+        
+        const handleStartWithPrompt = (event: CustomEvent<string>) => {
+            const question = event.detail;
+            if (question) {
+                setIsOpen(true);
+                setMessages([]); // Clear previous messages
+                const newUserMessage: Message = { id: Date.now(), text: question, sender: 'user' };
+                setMessages(prev => [...prev, newUserMessage]);
+                setIsLoading(true);
+                sendMessageToServer(question);
+            }
+        };
 
         emitter.addEventListener('chat:open', handleOpenChat);
+        emitter.addEventListener('chat:startWithPrompt', handleStartWithPrompt as EventListener);
 
         return () => {
             emitter.removeEventListener('chat:open', handleOpenChat);
+            emitter.removeEventListener('chat:startWithPrompt', handleStartWithPrompt as EventListener);
         };
     }, []);
 
@@ -326,7 +340,7 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
                             )}
                         </div>
                     ))}
-                    {isLoading && messages[messages.length - 1]?.sender === 'user' && (
+                    {isLoading && (messages.length === 0 || messages[messages.length - 1]?.sender === 'user') && (
                         <div className="message-container bot">
                             <div className="message-bubble bot">
                                 <div className="typing-indicator">
