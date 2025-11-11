@@ -15,30 +15,15 @@ import OrdersTab from './account/OrdersTab';
 import ModulesTab from './account/ModulesTab';
 import NotificationsTab from './account/NotificationsTab';
 
-const AccountView = ({ apiKey, user, setView, allModules, hasModuleAccess }: { apiKey: string, user: any, setView: (view: string, data?: any) => void, allModules: any, hasModuleAccess: (moduleName: string, allModules: any) => boolean }) => {
+const AccountView = ({ apiKey, user, setView, allModules, hasModuleAccess, isAppInstalled, handleInstallClick }: { apiKey: string, user: any, setView: (view: string, data?: any) => void, allModules: any, hasModuleAccess: (moduleName: string, allModules: any) => boolean, isAppInstalled: boolean, handleInstallClick: () => void }) => {
     const { t } = useTranslation(['account', 'common', 'orders']);
     const { data: accountData, loading: accountLoading, error: accountError } = useApi('/account/load', apiKey, {}, apiKey ? 1 : 0);
     const { data: contactsCountData, loading: contactsCountLoading } = useApi('/contact/count', apiKey, { allContacts: true }, apiKey ? 1 : 0);
-    const [installPrompt, setInstallPrompt] = useState<any>(null);
     const [activeTab, setActiveTab] = useState('general');
-
-    useEffect(() => {
-        const handler = (e: Event) => {
-            e.preventDefault();
-            setInstallPrompt(e);
-        };
-        window.addEventListener('beforeinstallprompt', handler);
-        return () => window.removeEventListener('beforeinstallprompt', handler);
-    }, []);
-
-    const handleInstallClick = () => {
-        if (!installPrompt) return;
-        installPrompt.prompt();
-    };
 
     const tabs = useMemo(() => {
         const baseTabs = [
-            { id: 'general', label: t('general'), icon: ICONS.DASHBOARD, component: <GeneralTab accountData={accountData} contactsCountData={contactsCountData} contactsCountLoading={contactsCountLoading} installPrompt={installPrompt} handleInstallClick={handleInstallClick} /> },
+            { id: 'general', label: t('general'), icon: ICONS.DASHBOARD, component: <GeneralTab accountData={accountData} contactsCountData={contactsCountData} contactsCountLoading={contactsCountLoading} isAppInstalled={isAppInstalled} handleInstallClick={handleInstallClick} /> },
             { id: 'profile', label: t('profile'), icon: ICONS.ACCOUNT, component: <ProfileTab accountData={accountData} user={user} /> },
             { id: 'orders', label: t('orders'), icon: ICONS.BUY_CREDITS, component: <OrdersTab setView={setView} /> },
             { id: 'modules', label: t('modules'), icon: ICONS.BOX, component: <ModulesTab setView={setView} /> },
@@ -47,7 +32,7 @@ const AccountView = ({ apiKey, user, setView, allModules, hasModuleAccess }: { a
         ];
 
         return baseTabs;
-    }, [t, accountData, contactsCountData, contactsCountLoading, installPrompt, handleInstallClick, user, setView]);
+    }, [t, accountData, contactsCountData, contactsCountLoading, isAppInstalled, handleInstallClick, user, setView]);
     
     useEffect(() => {
         const initialTab = sessionStorage.getItem('account-tab');

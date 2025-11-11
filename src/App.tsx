@@ -48,6 +48,54 @@ import ChatWidget from './components/ChatWidget';
 import sdk from './api/directus';
 import { readItems } from '@directus/sdk';
 import useApi from './views/useApi';
+import Modal from './components/Modal';
+
+
+const PWAInstallModal = ({ onClose, appName }: { onClose: () => void; appName: string; }) => {
+    const { t } = useTranslation(['account', 'common']);
+
+    const getOS = () => {
+        const userAgent = window.navigator.userAgent;
+        if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) return 'iOS'; // Check for MSStream for Windows phones
+        if (/Android/.test(userAgent)) return 'Android';
+        return 'Desktop';
+    };
+
+    const os = getOS();
+
+    const getInstructions = () => {
+        switch (os) {
+            case 'iOS':
+                return (
+                    <div className="pwa-install-instructions">
+                        <p>{t('installInstructionsIOS')}</p>
+                        <div className="instruction-icon-ios">
+                            <Icon>{ICONS.SHARE}</Icon>
+                            <span>&rarr;</span>
+                            <Icon>{ICONS.PLUS}</Icon>
+                        </div>
+                    </div>
+                );
+            case 'Android':
+                return <p>{t('installInstructionsAndroid')}</p>;
+            default:
+                return <p>{t('installInstructionsDesktop', { appName })}</p>;
+        }
+    };
+
+    return (
+        <Modal isOpen={true} onClose={onClose} title={t('installInstructionsTitle')}>
+            <div className="pwa-install-modal-content">
+                {getInstructions()}
+                <div className="form-actions" style={{ justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+                    <button className="btn" onClick={onClose}>
+                        {t('close', { ns: 'common' })}
+                    </button>
+                </div>
+            </div>
+        </Modal>
+    );
+};
 
 
 const App = () => {
@@ -89,6 +137,11 @@ const App = () => {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const userMenuRef = useRef<HTMLDivElement>(null);
 
+    // PWA Install state
+    const [installPrompt, setInstallPrompt] = useState<any>(null);
+    const [isPWAInstallModalOpen, setIsPWAInstallModalOpen] = useState(false);
+    const [isAppInstalled, setIsAppInstalled] = useState(false);
+
     const isRTL = i18n.dir() === 'rtl';
 
     useEffect(() => {
@@ -98,6 +151,23 @@ const App = () => {
     const toggleSidebarCollapse = () => {
         setIsSidebarCollapsed(prev => !prev);
     };
+
+    // --- PWA INSTALLATION LOGIC ---
+    useEffect(() => {
+        // Check if the app is already installed
+        if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
+            setIsAppInstalled(true);
+            return;
+        }
+
+        const handler = (e: Event) => {
+            e.preventDefault();
+            setInstallPrompt(e);
+        };
+        window.addEventListener('beforeinstallprompt', handler);
+
+        return () => window.removeEventListener('beforeinstallprompt', handler);
+    }, []);
 
     // --- GLOBAL NOTIFICATION LOGIC ---
     useEffect(() => {
@@ -505,10 +575,27 @@ const App = () => {
         }
     };
 
+    const handleInstallClick = () => {
+        setIsUserMenuOpen(false); // Close the menu if open
+        if (installPrompt) {
+            installPrompt.prompt();
+            // The prompt can only be used once. Listen for the user's choice
+            installPrompt.userChoice.then((choiceResult: { outcome: 'accepted' | 'dismissed' }) => {
+                if (choiceResult.outcome === 'accepted') {
+                    setIsAppInstalled(true); // Hide install buttons after successful installation
+                }
+                setInstallPrompt(null); // Clear the prompt regardless of choice
+            });
+        } else {
+            // If no prompt, it's likely Safari or another unsupported browser
+            setIsPWAInstallModalOpen(true);
+        }
+    };
+
     const views: Record<string, { component: ReactNode, title: string, icon: React.ReactNode }> = {
         'Dashboard': { component: <DashboardView setView={handleSetView} apiKey={apiKey} user={user} />, title: t('dashboard'), icon: ICONS.DASHBOARD },
         'Statistics': { component: <StatisticsView apiKey={apiKey} />, title: t('statistics'), icon: ICONS.STATISTICS },
-        'Account': { component: <AccountView apiKey={apiKey} user={user} setView={handleSetView} allModules={allModules} hasModuleAccess={hasModuleAccess} />, title: t('account'), icon: ICONS.ACCOUNT },
+        'Account': { component: <AccountView apiKey={apiKey} user={user} setView={handleSetView} allModules={allModules} hasModuleAccess={hasModuleAccess} isAppInstalled={isAppInstalled} handleInstallClick={handleInstallClick} />, title: t('account'), icon: ICONS.ACCOUNT },
         'Buy Credits': { component: <BuyCreditsView apiKey={apiKey} user={user} setView={handleSetView} orderToResume={orderToResume} />, title: t('buyCredits'), icon: ICONS.BUY_CREDITS },
         'OfflinePayment': { component: <OfflinePaymentView order={orderForOfflinePayment} setView={handleSetView} />, title: t('offlinePaymentTitle', { ns: 'buyCredits' }), icon: ICONS.PENCIL },
         'Invoice': { component: <InvoiceView order={orderForInvoice} setView={handleSetView} />, title: t('invoiceTitle', { ns: 'orders' }), icon: ICONS.FILE_TEXT },
@@ -673,6 +760,15 @@ const App = () => {
                                     <Icon>{ICONS.SETTINGS}</Icon>
                                     <span>{t('settings', { ns: 'account' })}</span>
                                 </button>
+                                {!isAppInstalled && (
+                                    <>
+                                        <div className="dropdown-divider"></div>
+                                        <button className="dropdown-item" onClick={handleInstallClick}>
+                                            <Icon>{ICONS.DOWNLOAD}</Icon>
+                                            <span>{t('installApp', { ns: 'account' })}</span>
+                                        </button>
+                                    </>
+                                )}
                                 <div className="dropdown-divider"></div>
                                 <div className="dropdown-theme-switcher">
                                     <button
@@ -719,6 +815,7 @@ const App = () => {
                 onSaveAndLeave={handleSaveAndLeave}
             />
             {isAuthenticated && user?.elastickey && <ChatWidget setView={handleSetView} />}
+            {isPWAInstallModalOpen && <PWAInstallModal onClose={() => setIsPWAInstallModalOpen(false)} appName={appName} />}
         </div>
     );
 };

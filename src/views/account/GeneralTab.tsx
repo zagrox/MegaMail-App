@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
@@ -10,7 +11,7 @@ import { useConfiguration } from '../../contexts/ConfigurationContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import ThemeSwitcher from '../../components/ThemeSwitcher';
 
-const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, installPrompt, handleInstallClick }: { accountData: any, contactsCountData: any, contactsCountLoading: boolean, installPrompt: any, handleInstallClick: () => void }) => {
+const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, isAppInstalled, handleInstallClick }: { accountData: any, contactsCountData: any, contactsCountLoading: boolean, isAppInstalled: boolean, handleInstallClick: () => void }) => {
     const { t, i18n } = useTranslation(['account', 'common']);
     const { logout } = useAuth();
     const { config } = useConfiguration();
@@ -74,7 +75,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
                 </div>
             </div>
 
-            {installPrompt && (
+            {!isAppInstalled && (
                 <div className="account-tab-card">
                     <div className="account-tab-card-header">
                         <h3>{t('installApp')}</h3>

@@ -232,6 +232,45 @@ input:checked + .toggle-slider:before {
     white-space: pre-wrap;
 }
 
+/* --- PWA INSTALL MODAL --- */
+.pwa-install-modal-content {
+    line-height: 1.6;
+}
+
+.pwa-install-instructions {
+    text-align: center;
+}
+
+.pwa-install-instructions p {
+    color: var(--text-color);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.instruction-icon-ios {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: var(--subtle-background);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.instruction-icon-ios .icon {
+    width: 28px;
+    height: 28px;
+    color: var(--secondary-color);
+}
+
+.instruction-icon-ios span {
+    font-size: 1.5rem;
+    color: var(--subtle-text-color);
+}
+
+
 @media (max-width: 768px) {
     .profile-hero {
         flex-direction: column;
