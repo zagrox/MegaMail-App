@@ -1,10 +1,23 @@
 // sw.js
 
-const CACHE_NAME = 'megamail-v1.5';
+const CACHE_NAME = 'megamail-v1.6'; // Incremented cache version
 const APP_SHELL_URLS = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/index.tsx',
+  '/src/styles/00_variables.css',
+  '/src/styles/01_global.css',
+  '/src/styles/02_utilities.css',
+  '/src/styles/03_layout.css',
+  '/src/styles/components/button.css',
+  '/src/styles/components/card.css',
+  '/src/styles/components/forms.css',
+  '/src/styles/views/auth.css',
+  '/locales/en/common.json',
+  '/locales/fa/common.json',
+  '/locales/en/auth.json',
+  '/locales/fa/auth.json'
 ];
 
 let DYNAMIC_BACKEND_HOST = 'crm.megamail.ir'; // Default fallback host
@@ -85,10 +98,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // For app shell requests, use Cache-First.
+  // For all other requests (app assets), use a Cache-First strategy that also populates the cache.
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+    caches.match(event.request).then((cachedResponse) => {
+      // If we have a cached response, return it.
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      // Otherwise, fetch from the network.
+      return fetch(event.request).then((networkResponse) => {
+        // Check if we received a valid response (e.g. not a 403 or 404 error)
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        // Return the network response, even if it's an error. The browser will handle it.
+        return networkResponse;
+      });
     })
   );
 });
