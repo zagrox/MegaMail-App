@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
-import ThemeSwitcher from '../../components/ThemeSwitcher';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import AccountDataCard from '../../components/AccountDataCard';
 import Icon, { ICONS } from '../../components/Icon';
@@ -9,10 +8,12 @@ import Badge from '../../components/Badge';
 import { useStatusStyles } from '../../hooks/useStatusStyles';
 import { useConfiguration } from '../../contexts/ConfigurationContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import ThemeSwitcher from '../../components/ThemeSwitcher';
 
 const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, installPrompt, handleInstallClick }: { accountData: any, contactsCountData: any, contactsCountLoading: boolean, installPrompt: any, handleInstallClick: () => void }) => {
     const { t, i18n } = useTranslation(['account', 'common']);
     const { logout } = useAuth();
+    const { config } = useConfiguration();
     const { setTheme } = useTheme();
     const { getStatusStyle } = useStatusStyles();
     
@@ -33,6 +34,7 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
     const accountStatus = accountData?.status || 'Active';
     const statusStyle = getStatusStyle(accountStatus);
     const reputation = getReputationInfo(accountData?.reputation);
+    const appName = config?.app_name || t('appName');
     
     return (
         <div className="account-tab-content">
@@ -53,11 +55,11 @@ const GeneralTab = ({ accountData, contactsCountData, contactsCountLoading, inst
             </div>
 
             <div className="account-tab-card">
-                 <div className="account-tab-card-header">
+                <div className="account-tab-card-header">
                     <h3>{t('displayMode')}</h3>
                 </div>
                 <div className="account-tab-card-body">
-                    <p>{t('displayModeSubtitle', { appName: t('appName') })}</p>
+                    <p>{t('displayModeSubtitle', { appName: appName })}</p>
                     <ThemeSwitcher />
                 </div>
             </div>

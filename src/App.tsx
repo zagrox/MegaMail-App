@@ -51,7 +51,7 @@ import useApi from './views/useApi';
 
 
 const App = () => {
-    const { isAuthenticated, user, logout, hasModuleAccess, loading: authLoading, allModules, moduleToUnlock, setModuleToUnlock } = useAuth();
+    const { isAuthenticated, user, logout, hasModuleAccess, loading: authLoading, allModules, moduleToUnlock, setModuleToUnlock, updateUser } = useAuth();
     const { config, loading: configLoading } = useConfiguration();
     const { t, i18n } = useTranslation(['common', 'emailLists', 'contacts', 'buyCredits', 'account']);
     const { addToast } = useToast();
@@ -488,6 +488,23 @@ const App = () => {
         handleSetView('Account');
     };
     
+    const handleThemeChange = (newTheme: 'light' | 'dark' | 'auto') => {
+        setTheme(newTheme);
+        if (user && !user.isApiKeyUser) {
+            const payload: any = { display: newTheme };
+            if (newTheme === 'dark') {
+                payload.theme_light = false;
+                payload.theme_dark = true;
+            } else {
+                payload.theme_light = true;
+                payload.theme_dark = false;
+            }
+            updateUser(payload).catch(error => {
+                console.warn("Failed to sync theme preference:", error);
+            });
+        }
+    };
+
     const views: Record<string, { component: ReactNode, title: string, icon: React.ReactNode }> = {
         'Dashboard': { component: <DashboardView setView={handleSetView} apiKey={apiKey} user={user} />, title: t('dashboard'), icon: ICONS.DASHBOARD },
         'Statistics': { component: <StatisticsView apiKey={apiKey} />, title: t('statistics'), icon: ICONS.STATISTICS },
@@ -586,18 +603,18 @@ const App = () => {
                  <div className="sidebar-footer">
                     <ul>
                         <li>
-                            <Tooltip text={isSidebarCollapsed ? t('settings', { ns: 'account' }) : ''}>
-                                <button className={`nav-item ${view === 'Settings' ? 'active' : ''}`} onClick={() => handleSetView('Settings')}>
-                                    <Icon>{ICONS.SETTINGS}</Icon>
-                                    {!isSidebarCollapsed && <span className="nav-item-label">{t('settings', { ns: 'account' })}</span>}
-                                </button>
-                            </Tooltip>
-                        </li>
-                        <li>
                             <Tooltip text={isSidebarCollapsed ? t('buyCredits') : ''}>
                                 <button className={`nav-item ${view === 'Buy Credits' ? 'active' : ''}`} onClick={() => handleSetView('Buy Credits')}>
                                     <Icon>{ICONS.BUY_CREDITS}</Icon>
                                     {!isSidebarCollapsed && <span className="nav-item-label">{t('buyCredits')}</span>}
+                                </button>
+                            </Tooltip>
+                        </li>
+                        <li>
+                            <Tooltip text={isSidebarCollapsed ? t('settings', { ns: 'account' }) : ''}>
+                                <button className={`nav-item ${view === 'Settings' ? 'active' : ''}`} onClick={() => handleSetView('Settings')}>
+                                    <Icon>{ICONS.SETTINGS}</Icon>
+                                    {!isSidebarCollapsed && <span className="nav-item-label">{t('settings', { ns: 'account' })}</span>}
                                 </button>
                             </Tooltip>
                         </li>
@@ -656,6 +673,30 @@ const App = () => {
                                     <Icon>{ICONS.SETTINGS}</Icon>
                                     <span>{t('settings', { ns: 'account' })}</span>
                                 </button>
+                                <div className="dropdown-divider"></div>
+                                <div className="dropdown-theme-switcher">
+                                    <button
+                                        className={`theme-btn ${theme === 'light' ? 'active' : ''}`}
+                                        onClick={() => handleThemeChange('light')}
+                                        aria-label={t('themeLight', { ns: 'account' })}
+                                    >
+                                        <Icon>{ICONS.SUN}</Icon>
+                                    </button>
+                                    <button
+                                        className={`theme-btn ${theme === 'dark' ? 'active' : ''}`}
+                                        onClick={() => handleThemeChange('dark')}
+                                        aria-label={t('themeDark', { ns: 'account' })}
+                                    >
+                                        <Icon>{ICONS.MOON}</Icon>
+                                    </button>
+                                    <button
+                                        className={`theme-btn ${theme === 'auto' ? 'active' : ''}`}
+                                        onClick={() => handleThemeChange('auto')}
+                                        aria-label={t('themeSystem', { ns: 'account' })}
+                                    >
+                                        <Icon>{ICONS.DESKTOP}</Icon>
+                                    </button>
+                                </div>
                                 <div className="dropdown-divider"></div>
                                 <button className="dropdown-item danger" onClick={handleLogout}>
                                     <Icon>{ICONS.LOGOUT}</Icon>
