@@ -5,6 +5,7 @@ import { useToast } from '../contexts/ToastContext';
 import Icon, { ICONS } from './Icon';
 import { navigationKeywords } from '../config/chatNavigation';
 import emitter from '../api/eventEmitter';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Message {
     id: number;
@@ -57,6 +58,7 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
     const { config } = useConfiguration();
     const { addToast } = useToast();
     const { t } = useTranslation(['chat', 'common']);
+    const { user } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState('');
@@ -139,6 +141,13 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
         const requestBody = {
             chatInput: messageText,
             sessionId: sessionIdRef.current,
+            email: user?.email,
+            firstName: user?.first_name,
+            lastName: user?.last_name,
+            phone: user?.mobile,
+            type: user?.type,
+            company: user?.company,
+            website: user?.website,
         };
     
         try {

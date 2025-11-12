@@ -1,9 +1,10 @@
+
 {
     "supportChat": "Support Chat",
     "openChat": "Open support chat",
     "closeChat": "Close chat",
     "typeMessage": "Type a message...",
-    "initialMessage": "Hello! How can I assist you today? **For example, you can ask:**\n* How do I improve my email open rates?\n* Can you give me 5 subject line ideas for a summer sale?",
+    "initialMessage": "What can I help you with? **For example, you can ask:**\n* How do I improve my email open rates?\n* Can you give me 5 subject line ideas for a summer sale?",
     "fallbackMessage": "Sorry, I could not process that.",
     "connectionError": "I'm sorry, I couldn't connect to the support chat. Please try again later.",
     "premadeQuestion1": "What is MegaMail?",
