@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode, PropsWithChildren } from 'react';
 import sdk from '../api/directus';
 import { Configuration } from '../api/types';
@@ -19,9 +20,8 @@ export const ConfigurationProvider = ({ children }: PropsWithChildren) => {
         const fetchConfig = async () => {
             try {
                 // FIX: Replaced the Directus SDK's `readSingleton` helper with a direct `fetch` call.
-                // This provides more robust error handling for non-JSON responses (like HTML error pages),
-                // which was causing the generic "[object Object]" error in the console.
-                const response = await fetch(`${sdk.url}items/configuration`);
+                // Added timestamp query param to prevent caching and ensure fresh config (like updated chat URLs) is loaded.
+                const response = await fetch(`${sdk.url}items/configuration?t=${Date.now()}`);
                 
                 if (!response.ok) {
                     let errorBody = '';

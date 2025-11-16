@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useConfiguration } from '../contexts/ConfigurationContext';
@@ -23,12 +24,36 @@ const FormattedTextMessage = ({ text }: { text: string }) => {
     const elements: React.ReactNode[] = [];
     let listItems: React.ReactNode[] = [];
 
-    const processInlineFormatting = (line: string) => {
-        return line.split(/(\*\*.*?\*\*)/g).map((part, index) => {
+    const processInlineFormatting = (text: string) => {
+        // Split by bold syntax (**text**)
+        const parts = text.split(/(\*\*.*?\*\*)/g);
+        return parts.map((part, i) => {
             if (part.startsWith('**') && part.endsWith('**')) {
-                return <strong key={index}>{part.slice(2, -2)}</strong>;
+                return <strong key={i}>{part.slice(2, -2)}</strong>;
             }
-            return part;
+            // Split by URLs
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const subParts = part.split(urlRegex);
+            return (
+                <React.Fragment key={i}>
+                    {subParts.map((subPart, j) => {
+                        if (subPart.match(urlRegex)) {
+                            return (
+                                <a
+                                    key={j}
+                                    href={subPart}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ textDecoration: 'underline', wordBreak: 'break-all', color: 'inherit' }}
+                                >
+                                    {subPart}
+                                </a>
+                            );
+                        }
+                        return subPart;
+                    })}
+                </React.Fragment>
+            );
         });
     };
 
@@ -65,6 +90,15 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
     const [isLoading, setIsLoading] = useState(false);
     const sessionIdRef = useRef<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    
+    // Use a Ref to track the latest user object.
+    // This solves the stale closure issue where the event listener (created once)
+    // would only see the initial 'user' state (null) and never the loaded user.
+    const userRef = useRef(user);
+
+    useEffect(() => {
+        userRef.current = user;
+    }, [user]);
 
     useEffect(() => {
         if (!sessionIdRef.current) {
@@ -72,7 +106,11 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
         }
     }, []);
 
-    const chatWebhookUrl = config?.app_chat;
+    // Ensure protocol is present for the webhook URL
+    let chatWebhookUrl = config?.app_chat;
+    if (chatWebhookUrl && !chatWebhookUrl.startsWith('http')) {
+        chatWebhookUrl = `https://${chatWebhookUrl}`;
+    }
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -126,6 +164,12 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
 
     const handleNavigation = (action: Message['navigationAction']) => {
         if (!action) return;
+        
+        if (action.view === 'External' && action.data?.url) {
+            window.open(action.data.url, '_blank');
+            return;
+        }
+
         if(action.data?.tab) {
              sessionStorage.setItem('settings-tab', action.data.tab);
         }
@@ -138,20 +182,28 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
     }
 
     const sendMessageToServer = async (messageText: string) => {
+        // Always use the fresh user data from the ref
+        const currentUser = userRef.current;
+
+        const userInfo = {
+            email: currentUser?.email,
+            firstName: currentUser?.first_name,
+            lastName: currentUser?.last_name,
+            phone: currentUser?.mobile,
+            type: currentUser?.type,
+            company: currentUser?.company,
+            website: currentUser?.website,
+        };
+
         const requestBody = {
             chatInput: messageText,
             sessionId: sessionIdRef.current,
-            email: user?.email,
-            firstName: user?.first_name,
-            lastName: user?.last_name,
-            phone: user?.mobile,
-            type: user?.type,
-            company: user?.company,
-            website: user?.website,
+            ...userInfo, // Backward compatibility for older workflows
+            metadata: userInfo, // Nested object for newer n8n Chat Triggers
         };
     
         try {
-            const response = await fetch(chatWebhookUrl, {
+            const response = await fetch(chatWebhookUrl!, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody),
@@ -342,7 +394,8 @@ const ChatWidget = ({ setView }: { setView: (view: string, data?: any) => void }
                             {msg.navigationAction && (
                                 <div className="navigation-action">
                                     <button className="navigation-action-btn" onClick={() => handleNavigation(msg.navigationAction)}>
-                                        <Icon>{ICONS.CHEVRON_RIGHT}</Icon>
+                                        {/* FIX: Changed to use JSX children for Icon component */}
+                                        <Icon>{msg.navigationAction.view === 'External' ? ICONS.SHARE : ICONS.CHEVRON_RIGHT}</Icon>
                                         <span>{msg.navigationAction.buttonText}</span>
                                     </button>
                                 </div>

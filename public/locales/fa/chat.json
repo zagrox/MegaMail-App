@@ -19,5 +19,6 @@
     "goToApiSettings": "رفتن به تنظیمات کلید API",
     "goToSmtpSettings": "رفتن به تنظیمات SMTP",
     "goToProfile": "رفتن به پروفایل",
-    "goToOrders": "رفتن به سفارش‌ها"
+    "goToOrders": "رفتن به سفارش‌ها",
+    "chatWithHuman": "چت با اپراتور"
 }
